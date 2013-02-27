@@ -13,19 +13,3 @@ object RandomVariable {
   def int(i: Int) = RandomVariableInt(i)
   def float(f: Float) = RandomVariableFloat(f)
 }
-
-object RandomVariableGenerator {
-  def apply(rv: RandomVariable) = new RandomVariableGenerator(rv)
-  def apply(rvs: List[RandomVariable]) = new RandomVariableGenerator(rvs)
-}
-
-class RandomVariableGenerator(rv: RandomVariable, instances: List[RandomVariable] = List.empty) extends RandomVariable { 
-  def this(i: List[RandomVariable]) = this(null, i)
-  def map[B](f: RandomVariable => B) : FactorGenerator = new FactorGenerator(this) 
-
-  override def toString() : String = if (rv == null) {
-    this.getClass.getName + "(" + instances.mkString(",") + ")"
-  } else {
-    this.getClass.getName + "(" + rv.toString + ")"
-  }
-}
