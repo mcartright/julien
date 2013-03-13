@@ -13,7 +13,7 @@ import GalagoBridging._
 val query = "new york city"
 val queryNodes = bowNodes(query)
 
-val aquaint = Sources.aquaint
+val aquaint = Sources.get('aquaint)
 val lengths = aquaint.getLengthsIterator
 val nodeMap = LinkedHashMap[Node, java.lang.Object]()
 for (n <- queryNodes) { nodeMap.update(n,

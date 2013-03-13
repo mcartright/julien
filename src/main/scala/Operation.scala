@@ -10,7 +10,7 @@ object Operation {
   def filter(vars : RandomVariableGenerator) : RandomVariableGenerator = {
     return FilterOp(vars)
   }
-  
+
   def sort(vars : RandomVariableGenerator) : RandomVariableGenerator = {
     return SortOp(vars)
   }
@@ -25,16 +25,13 @@ object ReduceOp {
     new ReduceOp(r, factors)
 }
 
-class ReduceOp(r: FactorGenerator => RandomVariableGenerator, factors: FactorGenerator) 
+class ReduceOp(r: FactorGenerator => RandomVariableGenerator, factors: FactorGenerator)
 extends RandomVariableGenerator(Result(factors)) {
-  override def toString() : String = 
+  override def toString() : String =
     this.getClass.getName + "(" + r + "," + factors.toString + ")"
 }
 
 case class SelectOp(rv: RandomVariableGenerator) extends RandomVariableGenerator(rv)
 case class FilterOp(rv: RandomVariableGenerator) extends RandomVariableGenerator(rv)
 case class SortOp(rv: RandomVariableGenerator) extends RandomVariableGenerator(rv)
-
-class TopKOp(rv: RandomVariableGenerator) extends RandomVariableGenerator(rv) {
-  
-}
+case class TopKOp(rv: RandomVariableGenerator) extends RandomVariableGenerator(rv)

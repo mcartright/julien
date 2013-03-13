@@ -138,8 +138,8 @@ def generateFeatures(
 // Query prep
 val query = "new york city"
 val queryNodes = bowNodes(query, "extents")
-val index = Sources.aquaint
-val auxIndex = Sources.gov2
+val index = Sources.get('aquaint)
+val auxIndex = Sources.get('gov2)
 val lengths = index.getLengthsIterator
 val nodeMap = LinkedHashMap[Node, java.lang.Object]()
 for (n <- queryNodes) { nodeMap.update(n,

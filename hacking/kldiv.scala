@@ -19,7 +19,7 @@ import GalagoBridging._
 // let's load some stopwords
 val stopwords = Stopwords.inquery
 
-val index = Sources.aquaint
+val index = Sources.get('aquaint)
 val dummyParams = new Parameters()
 val queryDoc = index.getDocument("NYT19980609.0018", dummyParams)
 

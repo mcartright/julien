@@ -6,7 +6,7 @@ object ParameterizedScorer {
     features: List[FeatureFunction],
     weights: List[Double],
     scorer: CountScorer,
-    l: MLI,m
+    l: MLI,
     it: TCI) = new FeatureScorer(features, weights, scorer, l, it)
   def apply(scorers: List[ParameterizedScorer]) = new ComposedScorer(scorers)
   def apply(
