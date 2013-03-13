@@ -1,3 +1,5 @@
+package garage
+
 import scala.collection.immutable.List
 import org.lemurproject.galago.core.index.disk.DiskIndex
 
@@ -5,7 +7,7 @@ object RetrievalModels {
   type ReduceFunction = FactorGenerator => RandomVariableGenerator
   type TermFactorFunction = (RandomVariable, RandomVariable) => Factor
 
-  // Almost all of this needs further definition. 
+  // Almost all of this needs further definition.
   def product(factors: FactorGenerator) : RandomVariableGenerator = return RandomVariableGenerator(Result(factors))
   def sum(factors: FactorGenerator) : RandomVariableGenerator = return RandomVariableGenerator(Result(factors))
 

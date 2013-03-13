@@ -6,6 +6,10 @@ High-Level Features:
 - scoring a single document (repeatedly, but with different parameters)
 
 THINGS TO FIX/IMPROVE:
+- Remove the ScoringContext. It's in the way now.
+- How do we memoize statistics functions?
+- Annotations. We want them, particularly for debugging. How to cleanly
+  add them?
 - Need some abstraction for getting the physical iterators
 - I like the composition of scoring function + filter + iterator, and so
   on. Any more we can do?
@@ -16,3 +20,10 @@ THINGS TO FIX/IMPROVE:
 - To make the toolkit configurable, should we focus on schema-validated JSON
   or a series of case classes? (Note: case classes have a 22-parameter limit,
   but are built into Scala more cleanly than JSON)
+
+
+An "index" should:
+- have a way to map between external ids (keys) and internal ids
+(the latter may be of a different type for efficiency reasons)
+- provide iterators for a given key, if it exists in the index
+- get statistics given a key

@@ -1,3 +1,5 @@
+package garage
+
 import org.lemurproject.galago.core.index.Index
 
 abstract class RandomVariable

@@ -1,3 +1,5 @@
+package garage
+
 import scala.collection.immutable.List
 
 object FactorGenerator {

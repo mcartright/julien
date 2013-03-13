@@ -1,9 +1,11 @@
+package garage
+
 abstract class TermScoringFunction
 
 case class DirichletParameters(cf: Double, cl: Double, mu : Double = 1500.0)
 class DirichletScorer(parameters : DirichletParameters) extends TermScoringFunction {
   val background : Double = parameters.cf match {
-    case 0 => 0.5 / parameters.cl 
+    case 0 => 0.5 / parameters.cl
     case _ => parameters.cf / parameters.cl
   }
 
