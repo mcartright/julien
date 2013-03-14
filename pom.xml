@@ -65,17 +65,17 @@
     <dependency>
       <groupId>org.lemurproject.galago</groupId>
       <artifactId>core</artifactId>
-      <version>3.4</version>
+      <version>3.3-JULIEN</version>
     </dependency>
     <dependency>
       <groupId>org.lemurproject.galago</groupId>
       <artifactId>tupleflow</artifactId>
-      <version>3.4</version>
+      <version>3.3-JULIEN</version>
     </dependency>
     <dependency>
       <groupId>org.lemurproject.galago</groupId>
       <artifactId>tupleflow-typebuilder</artifactId>
-      <version>3.4</version>
+      <version>3.3-JULIEN</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -163,7 +163,7 @@
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
         </configuration>
-         
+
         <executions>
           <execution>
             <id>make-assembly</id> <!-- this is used for inheritance merges -->

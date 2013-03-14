@@ -11,6 +11,7 @@ import org.lemurproject.galago.core.retrieval.iterator.MovableExtentIterator
 import org.lemurproject.galago.core.retrieval.iterator.MovableCountIterator
 import org.lemurproject.galago.core.util.ExtentArray
 import org.lemurproject.galago.core.retrieval.processing.ScoringContext
+import org.lemurproject.galago.tupleflow.Parameters
 import scala.collection.JavaConversions._
 import scala.collection.Map
 
