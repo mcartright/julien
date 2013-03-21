@@ -6,7 +6,6 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable.HashMap
 
 object Sources {
-
   private[this] val s = {
     val map = HashMap[Symbol, String]()
     val allProps = new Properties
@@ -28,6 +27,12 @@ object Sources {
       indexes(symbol)
     }
   }
+}
+
+object Classifiers {
+  def muc7 =
+    "/usr/ayr/tmp1/irmarc/projects/julien/localdata/english.muc.7class.distsim.crf.ser.gz"
+
 }
 
 object Stopwords {

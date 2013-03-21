@@ -1,3 +1,8 @@
+import edu.stanford.nlp.ie.AbstractSequenceClassifier
+import edu.stanford.nlp.ie.crf._
+import edu.stanford.nlp.io.IOUtils
+import edu.stanford.nlp.ling.CoreLabel
+import edu.stanford.nlp.ling.CoreAnnotations.AnswerAnnotation
 import org.lemurproject.galago.core.index.disk.DiskIndex
 import org.lemurproject.galago.core.index.Index
 import org.lemurproject.galago.core.retrieval.iterator.MovableLengthsIterator
@@ -17,28 +22,34 @@ import scala.collection.Map
 
 import java.net.URL
 import scala.io.Source._
+import java.io.IOException
 
 // Hack for now to load some common definitions
 import GalagoBridging._
 
 object Models {
-  type RetrievalFunction = () => Unit
+  type RetrievalFunction = (String) => Unit
 
   def main(args: Array[String]) : Unit = {
+    // Set query
+    val query = args.length match {
+      case 1 => "new york city"
+      case _ => args(1)
+    }
+
+    // Choose model if we have it
     models.get(args(0)) match {
-      case Some(f: RetrievalFunction) => f()
+      case Some(f: RetrievalFunction) => f(query)
       case None => {
-        Console.printf("I don't know what '%s'\n", args(0))
+        Console.printf("I don't know what '%s' is\n", args(0))
       }
     }
   }
 
   val models = HashMap[String, RetrievalFunction]()
-  models("bow") = () => {
+  models("bow") = (query: String) => {
     // Query prep
-    val query = "new york city"
     val queryNodes = bowNodes(query)
-
     val aquaint = Sources.get('aquaint)
     val lengths = aquaint.getLengthsIterator
     val nodeMap = LinkedHashMap[Node, java.lang.Object]()
@@ -58,9 +69,8 @@ object Models {
     printResults(resultQueue, aquaint)
   }
 
-  models("sdm") = () => {
+  models("sdm") = (query: String) => {
     // Query prep
-    val query = "new york city"
     val queryNodes = bowNodes(query, "extents")
     val aquaint = Sources.get('aquaint)
     val lengths = aquaint.getLengthsIterator
@@ -86,7 +96,7 @@ object Models {
     printResults(resultQueue, aquaint)
   }
 
-  models("pqm") = () => {
+  models("pqm") = (query: String) => {
     // components of our feature functions
     // Hold external references to the feature weights so we can tune quickly
     val weightTable = HashMap[String, List[Double]]()
@@ -202,7 +212,6 @@ object Models {
     }
 
     // Query prep
-    val query = "new york city"
     val queryNodes = bowNodes(query, "extents")
     val index = Sources.get('aquaint)
     val auxIndex = Sources.get('gov2)
@@ -229,7 +238,7 @@ object Models {
     printResults(resultQueue, index)
   }
 
-  models("kldiv") = () => {
+  models("kldiv") = (query: String) => {
 
     // Hack for now to load some common definitions
     import GalagoBridging._
@@ -368,9 +377,8 @@ object Models {
     printResults(finalScoredDocs, index)
   }
 
-  models("relmodel") = () => {
+  models("relmodel") = (query: String) => {
     // Query prep
-    val query = "new york city"
     val queryNodes = bowNodes(query)
 
     val index = Sources.get('aquaint)
@@ -486,6 +494,69 @@ object Models {
 
     // Scoring loop
     resultQueue = standardScoringLoop(finalScorers, finalIterators, lengths)
+
+    // Get doc names and print
+    printResults(resultQueue, index)
+  }
+
+  models("sentidate") = (query: String) => {
+    def generateFeatures(
+      qN: Node,
+      nodeMap: Map[Node, java.lang.Object],
+      index: Index) : List[FeatureFunction] = {
+
+      // Stanford NER tagger
+      val classifier =
+        CRFClassifier.getClassifier(Classifiers.muc7)
+      val dummy = new Parameters
+      val feats = ListBuffer[FeatureFunction]()
+
+      // Get the doc content and find dates - make the final score
+      // dependent on the number of date-tagged terms (simple for now)
+      var f = () => {
+        val it = nodeMap(qN).asInstanceOf[TCI]
+        val id = it.getContext.document
+        val doc = index.getDocument(index.getName(id), dummy)
+        val results: java.util.List[java.util.List[CoreLabel]] =
+          classifier.classify(doc.text)
+        val dateTagCount = results.flatten.filter {
+          cl: CoreLabel =>
+          cl.get[String, AnswerAnnotation](classOf[AnswerAnnotation]) ==
+          "DATE"
+        }.size
+        dateTagCount.toDouble
+      }
+      feats += f
+
+      // Now let's do some sentiment analysis
+
+
+      feats.toList
+    }
+
+    // components of our feature functions
+    // Hold external references to the feature weights so we can tune quickly
+    val weightTable = HashMap[String, List[Double]]()
+    val queryNodes = bowNodes(query, "extents")
+    val index = Sources.get('aquaint)
+    val lengths = index.getLengthsIterator
+    val nodeMap = LinkedHashMap[Node, java.lang.Object]()
+    for (n <- queryNodes) { nodeMap.update(n,
+      index.getIterator(n).asInstanceOf[TEI])
+    }
+
+    val iterators = nodeMap.values.toList.map(obj2movableIt(_))
+
+    // Make the scorers - each one will have its own feature/weight vector
+    val scorers = queryNodes.map { qN =>
+      val scorer = dirichlet(collectionFrequency(qN, index, lengths))
+      val features = generateFeatures(qN, nodeMap, index)
+      val weights = List.fill(features.size)(1.0)
+      ParameterizedScorer(features, weights, scorer, lengths, nodeMap(qN))
+    }
+
+    // Scoring loop
+    val resultQueue = standardScoringLoop(scorers, iterators, lengths)
 
     // Get doc names and print
     printResults(resultQueue, index)
