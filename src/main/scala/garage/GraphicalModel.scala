@@ -2,7 +2,6 @@ package garage
 
 import org.lemurproject.galago.core.index.disk.DiskIndex
 import org.lemurproject.galago.core.index.Index
-import org.lemurproject.galago.core.retrieval.ScoredDocument
 
 import scala.collection.immutable.List
 

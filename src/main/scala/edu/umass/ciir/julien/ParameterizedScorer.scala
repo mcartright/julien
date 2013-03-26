@@ -4,7 +4,7 @@ import QueryGraph._
 import ExecutionGraph._
 import Intersections._
 import TermScorers._
-import Features._
+import Node._
 
 object ParameterizedScorer {
   def apply(
@@ -13,11 +13,17 @@ object ParameterizedScorer {
     scorer: CountScorer,
     l: MLI,
     it: TCI) = new FeatureScorer(features, weights, scorer, l, it)
-  def apply(scorers: List[ParameterizedScorer]) = new ComposedScorer(scorers)
+
   def apply(
     scorers: List[ParameterizedScorer],
+    combiner: ScoreCombiner
+  ) = new ComposedScorer(scorers, combiner)
+
+  def apply(
+    scorers: List[ParameterizedScorer],
+    combiner: ScoreCombiner,
     weight: Double) : ComposedScorer = {
-    val cs : ComposedScorer = this(scorers)
+    val cs : ComposedScorer = this(scorers, combiner)
     cs.weight = weight
     cs
   }
@@ -26,6 +32,7 @@ object ParameterizedScorer {
     l: MLI,
     it: TCI) =
     new TermScorer(scorer, l, it)
+
   def apply(
     scorer: CountScorer,
     filter: Intersection,
@@ -51,8 +58,10 @@ abstract class ParameterizedScorer {
 }
 
 class ComposedScorer(
-  scorers: List[ParameterizedScorer]) extends ParameterizedScorer {
-  def _score : Double = scorers.foldLeft(0.0)((S, I) => I.score + S)
+  scorers: List[ParameterizedScorer],
+  combiner: ScoreCombiner
+) extends ParameterizedScorer {
+  def _score : Double = scorers.foldLeft(0.0)(combiner)
 }
 
 class TermScorer(

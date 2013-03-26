@@ -16,7 +16,7 @@ import java.net.URL
 import scala.io.Source._
 import java.io.IOException
 
-object Features {
+object PQMFeatures {
   // components of our feature functions
   // Hold external references to the feature weights so we can tune quickly
   val weightTable = HashMap[String, List[Double]]()
@@ -139,7 +139,7 @@ object PQM extends App {
   val queryNodes = args(0).map(Term(_, dirichlet))
   queryNodes.foreach(q => q.index = 'aquaint)
   for (n <- queryNodes) {
-    val features = Features.generate(n)
+    val features = PQMFeatures.generate(n)
     val weights = List.fill(features.size)(1.0)
     graph.add(Node.features(n, features, weights))
   }

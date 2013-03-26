@@ -36,23 +36,37 @@ class ExecutionGraph(graph: QueryGraph) {
   import ExecutionGraph._
 
   // prepare the needed components to run
-  val index = graph.defaultIndex match {
+  val index = graph.index match {
   case Some(name) => Sources.get(name)
   case None => throw new IllegalArgumentException("No default index specified!")
   }
   val dummy = new Parameters()
   val lengths = index.getLengthsIterator
-  val nodeMap = LinkedHashMap[Node, TEI]()
+  val nodeMap = LinkedHashMap[Term, TEI]()
   for (n <- graph.leaves) {
     nodeMap.update(n,
       index.getIterator(n, dummy).asInstanceOf[ExtentIterator])
   }
   val iterators = nodeMap.values.toList
-  val scorers : graph.scoreNodes.map { n =>
-    n match {
-      case Term(text, p) =>
+  val scorers = graph.scoreNodes.map(transform(_))
+
+  private def transform(sn:ScoreNode) : ParameterizedScorer = sn match {
+    case f: Features =>
+      ParameterizedScorer(f.features, f.weights, f.scorer, lengths, nodeMap(f))
+    case t: Term => ParameterizedScorer(t.scorer, lengths, nodeMap(t))
+    case c: Combine => {
+      val scorers = c.children.map(transform(_))
+      ParameterizedScorer(scorers, c.combiner)
     }
+    case i: Intersected =>
+      ParameterizedScorer(
+        i.scorer,
+        i.filter,
+        lengths,
+        i.children.map(n => nodeMap(n))
+      )
   }
+
 
   def run(numResults: Int = 100) : PriorityQueue[ScoredDocument] = {
 
@@ -72,8 +86,8 @@ class ExecutionGraph(graph: QueryGraph) {
     return resultQueue.reverse
   }
 
-  def collectionCount(node: Node, index: Index) : Double = {
-    val it = index.getIterator(node)
+  def collectionCount(node: Term, index: Index) : Double = {
+    val it = index.getIterator(node, dummy)
     it match {
       case _: NullExtentIterator => 0.5 // smooth it
       case _ => {
@@ -83,26 +97,27 @@ class ExecutionGraph(graph: QueryGraph) {
     }
   }
 
-  def collectionLength(lengths: ARCA) : Long = {
+  def collectionLength(index: Index) : Long = {
+    val lengths = index.getLengthsIterator.asInstanceOf[ARCA]
     lengths.getStatistics.collectionLength
   }
 
-  def avgLength(lengths: ARCA) : Double = {
+  def avgLength(index: Index) : Double = {
+    val lengths = index.getLengthsIterator.asInstanceOf[ARCA]
     lengths.getStatistics.avgLength
   }
 
-  def numDocuments(lengths: ARCA) : Long = {
+  def numDocuments(index: Index) : Long = {
+    val lengths = index.getLengthsIterator.asInstanceOf[ARCA]
     lengths.getStatistics.documentCount
   }
 
-  def collectionFrequency(node: Node,
-    index: DiskIndex,
-    lengths: ARCA): Double = {
-    collectionCount(node, index) / collectionLength(lengths)
+  def collectionFrequency(node: Term, index: Index): Double = {
+    collectionCount(node, index) / collectionLength(index)
   }
 
-  def documentCount(node: Node, index: Index) : Double = {
-    val it = index.getIterator(node)
+  def documentCount(node: Term, index: Index) : Double = {
+    val it = index.getIterator(node, dummy)
     it match {
       case _: NullExtentIterator => 0.5
       case _ => {
@@ -112,30 +127,23 @@ class ExecutionGraph(graph: QueryGraph) {
     }
   }
 
-  def bowNodes(query: String) : List[Node] = {
-    val queryTerms = """\w+""".r.findAllIn(query).toList
-    queryTerms.map { T => Term(T) }
-  }
-
   def unigrams(
-    nodeMap: Map[Node, TEI],
     index: DiskIndex,
     lengths : ARCA
   ) : List[ParameterizedScorer] = {
     nodeMap.keys.map { Q =>
-      val scorer = dirichlet(collectionFrequency(Q, index, lengths))
+      val scorer = dirichlet(collectionFrequency(Q, index))
       ParameterizedScorer(scorer, lengths, nodeMap(Q))
     }.toList
   }
 
   def orderedWindows(
-    nodeMap: Map[Node, TEI],
     index: DiskIndex,
     lengths: ARCA,
     width: Int = 1
   ) : List[ParameterizedScorer] = {
     nodeMap.keys.toList.sliding(2,1).map { termPair =>
-      val scorer = dirichlet(collectionFrequency(termPair(0), index, lengths))
+      val scorer = dirichlet(collectionFrequency(termPair(0), index))
       val isect = od(width)
       val iterators = termPair.map(nodeMap(_))
       ParameterizedScorer(scorer, isect, lengths, iterators)
@@ -143,13 +151,12 @@ class ExecutionGraph(graph: QueryGraph) {
   }
 
   def unorderedWindows(
-    nodeMap: Map[Node, TEI],
     index: DiskIndex,
     lengths: ARCA,
     width: Int = 1
   ) : List[ParameterizedScorer] = {
     nodeMap.keys.toList.sliding(2,1).map { termPair =>
-      val scorer = dirichlet(collectionFrequency(termPair(0), index, lengths))
+      val scorer = dirichlet(collectionFrequency(termPair(0), index))
       val isect = uw(width)
       val iterators = termPair.map(nodeMap(_))
       ParameterizedScorer(scorer, isect, lengths, iterators)

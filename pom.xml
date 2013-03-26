@@ -43,8 +43,17 @@
         <updatePolicy>always</updatePolicy>
       </snapshots>
     </pluginRepository>
+    <pluginRepository>
+      <id>protoc-plugin</id>
+      <url>http://sergei-ivanov.github.com/maven-protoc-plugin/repo/releases/</url>
+    </pluginRepository>
   </pluginRepositories>
   <dependencies>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>2.5.0</version>
+    </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
@@ -117,6 +126,22 @@
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>com.google.protobuf.tools</groupId>
+        <artifactId>maven-protoc-plugin</artifactId>
+        <version>0.3.1</version>
+        <configuration>
+          <protocExecutable>/usr/local/bin/protoc</protocExecutable>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -202,6 +227,19 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-source-plugin</artifactId>
+	<version>2.1.2</version>
+	<executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+	</executions>
       </plugin>
     </plugins>
   </build>

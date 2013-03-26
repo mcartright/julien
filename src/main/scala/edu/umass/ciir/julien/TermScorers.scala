@@ -28,3 +28,4 @@ object TermScorers {
       idf * num / den
     }
 }
+

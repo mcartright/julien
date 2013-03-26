@@ -16,7 +16,7 @@ import java.net.URL
 import scala.io.Source._
 import java.io.IOException
 
-object Features {
+object SDFeatures {
   def generate(
     qN: Node,
     nodeMap: Map[Node, java.lang.Object],
@@ -69,7 +69,7 @@ object SentiDate extends App {
   // Make the scorers - each one will have its own feature/weight vector
   val scorers = queryNodes.map { qN =>
     val scorer = dirichlet(collectionFrequency(qN, index, lengths))
-    val features = Features.generate(qN, nodeMap, index)
+    val features = SDFeatures.generate(qN, nodeMap, index)
     val weights = List.fill(features.size)(1.0)
     ParameterizedScorer(features, weights, scorer, lengths, nodeMap(qN))
   }
