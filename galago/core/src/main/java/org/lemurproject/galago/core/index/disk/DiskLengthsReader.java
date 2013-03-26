@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.lemurproject.galago.core.index.*;
 import org.lemurproject.galago.core.index.AggregateReader.CollectionStatistics;
 import org.lemurproject.galago.core.index.BTreeReader.BTreeIterator;
-import org.lemurproject.galago.core.retrieval.iterator.CountIterator;
 import org.lemurproject.galago.tupleflow.DataStream;
 import org.lemurproject.galago.tupleflow.Utility;
 

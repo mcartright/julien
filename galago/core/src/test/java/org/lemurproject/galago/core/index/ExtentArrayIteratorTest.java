@@ -2,9 +2,9 @@
 
 package org.lemurproject.galago.core.index;
 
-import org.lemurproject.galago.core.retrieval.iterator.ExtentArrayIterator;
-import org.lemurproject.galago.core.util.ExtentArray;
 import junit.framework.*;
+import org.lemurproject.galago.core.util.ExtentArray;
+import org.lemurproject.galago.core.util.ExtentArrayIterator;
 
 /**
  *

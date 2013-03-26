@@ -1,15 +1,8 @@
 // BSD License (http://lemurproject.org/galago-license)
 package org.lemurproject.galago.core.index;
 
-import org.lemurproject.galago.core.retrieval.processing.ScoringContext;
 import org.lemurproject.galago.core.util.ExtentArray;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import org.lemurproject.galago.core.retrieval.iterator.MovableExtentIterator;
-import org.lemurproject.galago.core.retrieval.iterator.MovableCountIterator;
-import org.lemurproject.galago.core.retrieval.iterator.MovableIterator;
-import org.lemurproject.galago.core.retrieval.query.AnnotatedNode;
 import org.lemurproject.galago.tupleflow.Utility;
 
 /**
@@ -17,11 +10,10 @@ import org.lemurproject.galago.tupleflow.Utility;
  * @author trevor
  * @author irmarc
  */
-public class FakeExtentIterator implements MovableExtentIterator, MovableCountIterator {
+public class FakeExtentIterator implements ExtentIterator {
 
   private int[][] data;
   private int index;
-  private ScoringContext context;
 
   public FakeExtentIterator(int[][] data) {
     this.data = data;
@@ -44,11 +36,7 @@ public class FakeExtentIterator implements MovableExtentIterator, MovableCountIt
 
   @Override
   public int count() {
-    if (context.document == currentCandidate()) {
-      return data[index].length - 1;
-    } else {
-      return 0;
-    }
+    return data[index].length - 1;
   }
 
   @Override
@@ -63,18 +51,14 @@ public class FakeExtentIterator implements MovableExtentIterator, MovableCountIt
 
   @Override
   public ExtentArray extents() {
-    if (context.document == currentCandidate()) {
-      ExtentArray array = new ExtentArray();
-      int[] datum = data[index];
-      array.setDocument(datum[0]);
-      for (int i = 1; i < datum.length; i++) {
-        array.add(datum[i]);
-      }
-
-      return array;
-    } else {
-      return new ExtentArray();
+    ExtentArray array = new ExtentArray();
+    int[] datum = data[index];
+    array.setDocument(datum[0]);
+    for (int i = 1; i < datum.length; i++) {
+      array.add(datum[i]);
     }
+
+    return array;
   }
 
   @Override
@@ -104,7 +88,7 @@ public class FakeExtentIterator implements MovableExtentIterator, MovableCountIt
   }
 
   @Override
-  public int compareTo(MovableIterator other) {
+  public int compareTo(Iterator other) {
     if (isDone() && !other.isDone()) {
       return 1;
     }
@@ -130,29 +114,6 @@ public class FakeExtentIterator implements MovableExtentIterator, MovableCountIt
   @Override
   public boolean hasAllCandidates() {
     return false;
-  }
-
-  @Override
-  public void setContext(ScoringContext context) {
-    this.context = context;
-  }
-
-  @Override
-  public ScoringContext getContext() {
-    return context;
-  }
-
-  @Override
-  public AnnotatedNode getAnnotatedNode() {
-    String type = "count";
-    String className = this.getClass().getSimpleName();
-    String parameters = "";
-    int document = currentCandidate();
-    boolean atCandidate = hasMatch(this.context.document);
-    String returnValue = extents().toString();
-    List<AnnotatedNode> children = Collections.EMPTY_LIST;
-
-    return new AnnotatedNode(type, className, parameters, document, atCandidate, returnValue, children);
   }
 
   @Override

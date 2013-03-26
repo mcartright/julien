@@ -155,18 +155,6 @@
       <artifactId>tupleflow</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <artifactId>core</artifactId>
-      <groupId>org.lemurproject.galago</groupId>
-      <type>jar</type>
-      <version>3.3</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>core</artifactId>
-          <groupId>org.lemurproject.galago</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
   </dependencies>
   <build>
     <plugins>

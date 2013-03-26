@@ -4,10 +4,9 @@ package org.lemurproject.galago.core.index.merge;
 import java.io.IOException;
 import java.util.List;
 import java.util.PriorityQueue;
-import org.lemurproject.galago.core.index.LengthsReader;
+import org.lemurproject.galago.core.index.LengthsReader.LengthsIterator;
+import org.lemurproject.galago.core.index.MovableLengthsIterator;
 import org.lemurproject.galago.core.index.disk.DiskLengthsWriter;
-import org.lemurproject.galago.core.retrieval.iterator.MovableLengthsIterator;
-import org.lemurproject.galago.core.retrieval.processing.ScoringContext;
 import org.lemurproject.galago.core.types.FieldLengthData;
 import org.lemurproject.galago.tupleflow.Processor;
 import org.lemurproject.galago.tupleflow.TupleFlowParameters;
@@ -52,19 +51,15 @@ public class DocumentLengthsMerger extends GenericIndexMerger<FieldLengthData> {
   private class LengthIteratorWrapper implements Comparable<LengthIteratorWrapper> {
 
     int indexId;
-    ScoringContext sc;
-    MovableLengthsIterator iterator;
+    LengthsIterator iterator;
     int currentDocument;
     int currentLength;
     DocumentMappingReader mapping;
 
-    private LengthIteratorWrapper(int indexId, MovableLengthsIterator iterator, DocumentMappingReader mapping) {
+    private LengthIteratorWrapper(int indexId, LengthsIterator iterator, DocumentMappingReader mapping) {
       this.indexId = indexId;
       this.iterator = iterator;
       this.mapping = mapping;
-
-      this.sc = new ScoringContext();
-      this.iterator.setContext(sc);
       
       // initialization
       load();
@@ -80,7 +75,6 @@ public class DocumentLengthsMerger extends GenericIndexMerger<FieldLengthData> {
     // changes the document numbers in the extent array
     private void load() {
       int currentIdentifier = iterator.getCurrentIdentifier();
-      sc.document = currentIdentifier;
       this.currentDocument = mapping.map(indexId, currentIdentifier);
       this.currentLength = iterator.getCurrentLength();
     }

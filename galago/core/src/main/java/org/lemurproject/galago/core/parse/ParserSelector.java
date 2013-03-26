@@ -64,7 +64,6 @@ public class ParserSelector extends StandardStep<DocumentSplit, Document> {
 	{"trectext", TrecTextParser.class.getName()},
 	{"trecweb", TrecWebParser.class.getName()},
 	{"twitter", TwitterParser.class.getName()},
-	{"corpus", CorpusSplitParser.class.getName()},
 	{"wiki", WikiParser.class.getName()}
     };
 

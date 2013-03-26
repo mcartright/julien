@@ -3,8 +3,6 @@ package org.lemurproject.galago.core.index.disk;
 
 import java.io.DataInput;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 import org.lemurproject.galago.core.index.AggregateReader;
 import org.lemurproject.galago.core.index.AggregateReader.NodeAggregateIterator;
 import org.lemurproject.galago.core.index.AggregateReader.NodeStatistics;
@@ -13,7 +11,6 @@ import org.lemurproject.galago.core.index.ExtentIterator;
 import org.lemurproject.galago.core.index.Iterator;
 import org.lemurproject.galago.core.index.KeyListReader;
 import org.lemurproject.galago.core.parse.stem.Stemmer;
-import org.lemurproject.galago.core.retrieval.query.AnnotatedNode;
 import org.lemurproject.galago.core.util.ExtentArray;
 import org.lemurproject.galago.tupleflow.DataStream;
 import org.lemurproject.galago.tupleflow.Parameters;
