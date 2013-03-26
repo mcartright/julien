@@ -50,7 +50,7 @@ class ExecutionGraph(graph: QueryGraph) {
   val iterators = nodeMap.values.toList
   val scorers = graph.scoreNodes.map(transform(_))
 
-  private def transform(sn:ScoreNode) : ParameterizedScorer = sn match {
+  private def transform(n: Node) : ParameterizedScorer = n match {
     case f: Features =>
       ParameterizedScorer(f.features, f.weights, f.scorer, lengths, nodeMap(f))
     case t: Term => ParameterizedScorer(t.scorer, lengths, nodeMap(t))
