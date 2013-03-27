@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.lemurproject.galago.tupleflow.Utility;
@@ -48,7 +49,7 @@ public class Job implements Serializable {
    * stages in the job are renamed from <tt>stageName</tt> to
    * <tt>jobName.stageName</tt>.
    */
-  public void add(String jobName, Job group) {
+  public Job add(String jobName, Job group) {
     assert this != group;
 
     for (Stage s : group.stages.values()) {
@@ -59,10 +60,7 @@ public class Job implements Serializable {
 
     for (Connection c : group.connections) {
       Connection copy = c.clone();
-
-      for (ConnectionEndPoint input : copy.inputs) {
-        input.setStageName(jobName + "." + input.getStageName());
-      }
+      copy.input.setStageName(jobName + "." + copy.input.getStageName());
 
       for (ConnectionEndPoint output : copy.outputs) {
         output.setStageName(jobName + "." + output.getStageName());
@@ -70,13 +68,15 @@ public class Job implements Serializable {
 
       connections.add(copy);
     }
+    return this;
   }
 
   /**
    * Adds a stage to the current job.
    */
-  public void add(Stage s) {
+  public Job add(Stage s) {
     stages.put(s.name, s);
+    return this;
   }
 
   Map<String, Stage> findStagesWithPrefix(String prefix) {
@@ -100,7 +100,7 @@ public class Job implements Serializable {
    * stageName.
    * @param factor What the reduction factor is for each merger.
    */
-  public void addMergeStage(String stageName, String pointName, int factor) {
+  public Job addMergeStage(String stageName, String pointName, int factor) {
     // find the stage and the point, initialize class/order information
     Stage inputStage = this.stages.get(stageName);
 
@@ -113,7 +113,7 @@ public class Job implements Serializable {
 
     // if this merge stage has already been added, don't add it again
     if (this.stages.containsKey(mergedStageName)) {
-      return;        // create the stage itself
+      return this;        // create the stage itself
     }
     Stage s = new Stage(mergedStageName);
     s.add(new StageConnectionPoint(ConnectionPointType.Input,
@@ -136,21 +136,19 @@ public class Job implements Serializable {
 
     // run through the connections list, find all inputs for the previous data
     for (Connection connection : this.connections) {
-      for (ConnectionEndPoint input : connection.inputs) {
-        if (input.getStageName().equals(stageName)
-                && input.getPointName().equals(pointName)) {
-          if (hash != null && connection.hash != null
-                  && !Arrays.equals(hash, connection.hash)) {
-            continue;
-          }
-          if (connection.hash != null) {
-            hash = connection.hash;
-            connection.hash = null;
-          }
-
-          input.setStageName(mergedStageName);
-          input.setPointName(mergedPointName);
+      if (connection.input.getStageName().equals(stageName)
+              && connection.input.getPointName().equals(pointName)) {
+        if (hash != null && connection.hash != null
+                && !Arrays.equals(hash, connection.hash)) {
+          continue;
         }
+        if (connection.hash != null) {
+          hash = connection.hash;
+          connection.hash = null;
+        }
+
+        connection.input.setStageName(mergedStageName);
+        connection.input.setPointName(mergedPointName);
       }
     }
 
@@ -160,6 +158,7 @@ public class Job implements Serializable {
             ConnectionAssignmentType.Each,
             hash,
             hashCount);
+    return this;
   }
 
   public static class StagePoint implements Comparable<StagePoint> {
@@ -254,15 +253,19 @@ public class Job implements Serializable {
    * that starts with sourceName (same goes for destinationName), which makes
    * this particularly useful for making connections between sub-jobs.
    */
-  public void connect(String sourceName, String destinationName, ConnectionAssignmentType assignment) {
-    connect(sourceName, destinationName, assignment, null, -1);
+  public Job connect(String sourceName, String destinationName, ConnectionAssignmentType assignment) {
+    return connect(sourceName, destinationName, assignment, null, -1);
   }
 
-  public void connect(String sourceName, String destinationName, ConnectionAssignmentType assignment, String[] hashType) {
-    connect(sourceName, destinationName, assignment, hashType, -1);
+  public Job connect(String sourceName, String destinationName, ConnectionAssignmentType assignment, int hashCount) {
+    return connect(sourceName, destinationName, assignment, null, hashCount);
   }
 
-  public void connect(String sourceName, String destinationName, ConnectionAssignmentType assignment, String[] hashType, int hashCount) {
+  public Job connect(String sourceName, String destinationName, ConnectionAssignmentType assignment, String[] hashType) {
+    return connect(sourceName, destinationName, assignment, hashType, -1);
+  }
+
+  public Job connect(String sourceName, String destinationName, ConnectionAssignmentType assignment, String[] hashType, int hashCount) {
     // scan the stages, looking for sources
     Map<String, Stage> sources = findStagesWithPrefix(sourceName);
     Map<String, Stage> destinations = findStagesWithPrefix(destinationName);
@@ -303,32 +306,29 @@ public class Job implements Serializable {
         } else {
           connectionHashType = sourcePoint.point.getOrder();
         }
-        
-        if(assignment == ConnectionAssignmentType.Combined){
+
+        if (assignment == ConnectionAssignmentType.Combined) {
           connectionHashType = null;
         }
-        
+
         connect(sourcePoint, destinationPoint, assignment, connectionHashType, hashCount);
       }
     }
+    return this;
   }
 
-  public void connect(StagePoint source, StagePoint destination, ConnectionAssignmentType assignment, String[] hashType, int hashCount) {
+  public Job connect(StagePoint source, StagePoint destination, ConnectionAssignmentType assignment, String[] hashType, int hashCount) {
     // first, try to find a usable connection
     Connection connection = null;
 
     if (source.getPoint() == null) {
       Stage sourceStage = stages.get(source.stageName);
       StageConnectionPoint sourcePoint = sourceStage.getConnection(source.pointName);
-      source.point = sourcePoint;
+      source.setPoint(sourcePoint);
     }
 
     for (Connection c : connections) {
-      if (c.inputs.size() < 1) {
-        continue;
-      }
-      ConnectionEndPoint connectionInput = c.inputs.get(0);
-
+      ConnectionEndPoint connectionInput = c.input;
       if (connectionInput.getPointName().equals(source.pointName)
               && connectionInput.getStageName().equals(source.stageName)) {
         connection = c;
@@ -338,15 +338,12 @@ public class Job implements Serializable {
 
     // couldn't find a connection that has this input, so we'll make one
     if (connection == null) {
-      connection = new Connection(null, source.getPoint().getClassName(), source.getPoint().
-              getOrder(),
-              hashType,
-              hashCount);
+      connection = new Connection(null, source.getPoint(), hashType, hashCount);
       ConnectionEndPoint input = new ConnectionEndPoint(null,
               source.stageName,
               source.pointName,
               ConnectionPointType.Input);
-      connection.inputs.add(input);
+      connection.input = input;
       connections.add(connection);
     }
 
@@ -356,6 +353,7 @@ public class Job implements Serializable {
             assignment,
             ConnectionPointType.Output);
     connection.outputs.add(output);
+    return this;
   }
 
   /**
@@ -367,12 +365,10 @@ public class Job implements Serializable {
     builder.append("digraph {\n");
 
     for (Connection connection : connections) {
-      for (ConnectionEndPoint input : connection.inputs) {
-        for (ConnectionEndPoint output : connection.outputs) {
-          String edge = String.format("  %s -> %s [label=\"%s\"];\n",
-                  input.getStageName(), output.getStageName(), connection.getName());
-          builder.append(edge);
-        }
+      for (ConnectionEndPoint output : connection.outputs) {
+        String edge = String.format("  %s -> %s [label=\"%s\"];\n",
+                connection.input.getStageName(), output.getStageName(), connection.getName());
+        builder.append(edge);
       }
     }
 
@@ -423,14 +419,12 @@ public class Job implements Serializable {
         builder.append(connectionHeader);
       }
 
-      for (ConnectionEndPoint point : connection.inputs) {
-        String endPointString = String.format(
+        String inputEndPointString = String.format(
                 "            <input stage=\"%s\"         \n"
                 + "                   endpoint=\"%s\" />   \n",
-                point.getStageName(),
-                point.getPointName());
-        builder.append(endPointString);
-      }
+                connection.input.getStageName(),
+                connection.input.getPointName());
+        builder.append(inputEndPointString);
 
       for (ConnectionEndPoint point : connection.outputs) {
         String endPointString = String.format(
@@ -476,7 +470,7 @@ public class Job implements Serializable {
     return builder.toString();
   }
 
-  private void printSteps(final StringBuilder builder, final ArrayList<Step> steps, final String tag) {
+  private void printSteps(final StringBuilder builder, final List<Step> steps, final String tag) {
     builder.append(String.format("            <%s>\n", tag));
     for (Step step : steps) {
       if (step instanceof InputStep) {
@@ -494,8 +488,8 @@ public class Job implements Serializable {
       } else if (step instanceof MultiStep) {
         MultiStep multi = (MultiStep) step;
         builder.append("                <multi>\n");
-        for (ArrayList<Step> group : multi.groups) {
-          printSteps(builder, group, "group");
+        for (String name : multi) {
+          printSteps(builder, multi.getGroup(name), "group");
         }
         builder.append("                </multi>\n");
       } else if (step.getParameters() == null || step.getParameters().isEmpty()) {

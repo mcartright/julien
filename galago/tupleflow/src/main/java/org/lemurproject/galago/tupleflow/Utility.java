@@ -41,7 +41,8 @@ public class Utility {
   private static final List<String> roots = new ArrayList();
   // Some constant values
   public static final double log2 = Math.log(2);
-  public static final double loge = Math.log(Math.E) / log2;
+  public static final double loge_base2 = Math.log(Math.E) / log2;
+  public static final double tinyLogProbScore = Math.log(Math.pow(10, -10));
 
   /**
    * Put all initialization here
@@ -74,14 +75,14 @@ public class Utility {
       sorterOptions.copyFrom(preferences.getMap("sorter"));
     }
   }
-  
+
   /**
    * All static parameters
    */
-  public static Parameters getAllOptions(){
+  public static Parameters getAllOptions() {
     return preferences;
   }
-  
+
   /**
    * Drmaa parameters
    *
@@ -124,7 +125,11 @@ public class Utility {
    * @return a Step object that can be added to a TupleFlow Stage.
    */
   public static Step getSorter(Order sortOrder) {
-    return getSorter(sortOrder, null);
+    return getSorter(sortOrder, null, CompressionType.VBYTE);
+  }
+  
+  public static Step getSorter(Order sortOrder, CompressionType c) {
+    return getSorter(sortOrder, null, c);
   }
 
   /**
@@ -135,9 +140,20 @@ public class Utility {
    * @return a Step object that can be added to a TupleFlow Stage.
    */
   public static Step getSorter(Order sortOrder, Class reducerClass) {
+    return getSorter(sortOrder, null, CompressionType.VBYTE);
+  }
+  
+  public static Step getSorter(Order sortOrder, Class reducerClass, CompressionType c) {
     Parameters p = new Parameters();
     p.set("class", sortOrder.getOrderedClass().getName());
     p.set("order", Utility.join(sortOrder.getOrderSpec()));
+    if(c != null){
+      p.set("compression", c.toString());
+//      System.err.println("Setting sorter to :" + c.toString() + " -- " + join(sortOrder.getOrderSpec()));
+//    } else {
+//      System.err.println("NOT setting sorter to : null -- " + join(sortOrder.getOrderSpec()));
+    }
+    
     if (reducerClass != null) {
       try {
         reducerClass.asSubclass(Reducer.class);
@@ -775,6 +791,19 @@ public class Utility {
     return set;
   }
 
+  public static String readFileToString(File file) throws IOException {
+    BufferedReader reader = new BufferedReader(new FileReader(file));
+    StringBuilder sb = new StringBuilder();
+    String line;
+
+    while ((line = reader.readLine()) != null) {
+      sb.append(line).append("\n");
+    }
+
+    reader.close();
+    return sb.toString();
+  }
+
   public static byte[] readResourceBytes(Class requestingClass, String resourcePath) throws IOException {
     InputStream resourceStream = requestingClass.getResourceAsStream(resourcePath);
     if (resourceStream == null) {
@@ -967,7 +996,7 @@ public class Utility {
   }
 
   public static void compressInt(DataOutput output, int i) throws IOException {
-      assert i >= 0 : String.format("Tried to compress int val: %d", i);
+    assert i >= 0;
 
     if (i < 1 << 7) {
       output.writeByte((i | 0x80));
@@ -1029,7 +1058,7 @@ public class Utility {
   }
 
   public static void compressLong(DataOutput output, long i) throws IOException {
-      assert i >= 0 : String.format("Tried to compress long val %d", i);
+    assert i >= 0;
 
     if (i < 1 << 7) {
       output.writeByte((int) (i | 0x80));
@@ -1087,7 +1116,7 @@ public class Utility {
 
     return result;
   }
-  
+
   /*
    * The following methods are used to display bytes as strings
    */

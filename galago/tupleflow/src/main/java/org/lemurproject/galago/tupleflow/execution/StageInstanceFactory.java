@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import org.lemurproject.galago.tupleflow.CompressionType;
 import org.lemurproject.galago.tupleflow.Counter;
 import org.lemurproject.galago.tupleflow.ExNihiloSource;
 import org.lemurproject.galago.tupleflow.FileOrderedReader;
@@ -93,7 +94,7 @@ public class StageInstanceFactory {
 
   public org.lemurproject.galago.tupleflow.Step instantiate(
           StageInstanceDescription instance,
-          ArrayList<Step> steps)
+          List<Step> steps)
           throws IncompatibleProcessorException, IOException {
     org.lemurproject.galago.tupleflow.Step previous = null;
     org.lemurproject.galago.tupleflow.Step first = null;
@@ -193,11 +194,14 @@ public class StageInstanceFactory {
           StageInstanceDescription instance,
           final Step step) throws IncompatibleProcessorException, IOException {
     MultiStep multiStep = (MultiStep) step;
-    Processor[] processors = new Processor[multiStep.groups.size()];
+    Processor[] processors = new Processor[multiStep.size()];
 
-    for (int i = 0; i < multiStep.groups.size(); i++) {
-      ArrayList<Step> group = multiStep.groups.get(i);
-      processors[i] = (org.lemurproject.galago.tupleflow.Processor) instantiate(instance, group);
+    int i = 0;
+    for (String groupName : multiStep) {
+      processors[i] = 
+	  (org.lemurproject.galago.tupleflow.Processor) instantiate(instance, 
+								    multiStep.getGroup(groupName));
+      ++i;
     }
 
     return new org.lemurproject.galago.tupleflow.Multi(processors);
@@ -240,7 +244,7 @@ public class StageInstanceFactory {
     if (fileNames.size() > 1) {
       reader = OrderedCombiner.combineFromFiles(fileNames, order);
     } else {
-      reader = new FileOrderedReader(fileNames.get(0), order);
+      reader = new FileOrderedReader(fileNames.get(0));
     }
     return reader;
 
@@ -259,7 +263,7 @@ public class StageInstanceFactory {
     if (fileNames.length > 1) {
       reader = OrderedCombiner.combineFromFiles(Arrays.asList(fileNames), order);
     } else {
-      reader = new FileOrderedReader(fileNames[0], order);
+      reader = new FileOrderedReader(fileNames[0]);
     }
     return reader;
   }
@@ -285,9 +289,12 @@ public class StageInstanceFactory {
         int end = Math.min(names.size(), i + 20);
         List<String> toCombine = names.subList(start, end);
 
-        reader = OrderedCombiner.combineFromFiles(toCombine, order);
+        OrderedCombiner combReader = OrderedCombiner.combineFromFiles(toCombine, order);
+        reader = combReader;
+        CompressionType c = combReader.getCompression();
+        
         File temporary = Utility.createTemporary();
-        FileOrderedWriter<T> writer = new FileOrderedWriter<T>(temporary, order);
+        FileOrderedWriter<T> writer = new FileOrderedWriter<T>(temporary.getAbsolutePath(), order, c);
 
         try {
           reader.setProcessor(writer);
@@ -305,7 +312,7 @@ public class StageInstanceFactory {
     } else if (fileNames.length > 1) {
       reader = OrderedCombiner.combineFromFiles(Arrays.asList(fileNames), order);
     } else {
-      reader = new FileOrderedReader(fileNames[0], order);
+      reader = new FileOrderedReader(fileNames[0]);
     }
     return reader;
   }
@@ -324,10 +331,10 @@ public class StageInstanceFactory {
 
     try {
       if (fileNames.length == 1) {
-        writer = new FileOrderedWriter(fileNames[0], order);
+        writer = new FileOrderedWriter(fileNames[0], order, pipeInput.getPipe().getCompression());
       } else {
         assert hashOrder != null : "Hash order not found: " + pipeInput.getPipe().getPipeName() + " " + pipeInput.getPipe().getHash();
-        writer = Splitter.splitToFiles(fileNames, order, hashOrder);
+        writer = Splitter.splitToFiles(fileNames, order, hashOrder, pipeInput.getPipe().getCompression());
       }
     } catch (IncompatibleProcessorException e) {
       throw (IOException) new IOException("Failed to create a typeWriter").initCause(e);
