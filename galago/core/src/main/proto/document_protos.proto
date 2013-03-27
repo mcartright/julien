@@ -1,0 +1,49 @@
+option java_package = "org.lemurproject.galago.core.proto";
+
+message Pair {
+  required string key = 1;
+  required string value = 2;
+}
+
+message Tag {
+
+  // Name of this tag
+  required string name = 1;
+
+  // Beginning of the tag span
+  required int32 begin = 2;
+
+  // End of the tag span
+  required int32 end = 3;
+
+  // attributes of this tag
+  optional Pair attributes = 4;
+}
+
+message Document {
+  message ProcessingData {
+    optional int32 fileId = 1;
+    optional int32 totalFileCount = 2;
+  }
+
+  // The external identifier for this object
+  required string name = 1;
+
+  // The unparsed text
+  required string text = 2;
+
+  // metadata objects
+  repeated Pair metadata = 3;
+
+  // Tags found in this document
+  repeated Tag tag = 4;
+
+  // The tokenized term vector
+  repeated string token = 5;
+
+  // Internally assigned id that may not exist
+  optional int32 identifier = 6;
+
+  // this is for distribution purposes
+  optional ProcessingData assignment = 7;
+}
