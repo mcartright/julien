@@ -891,7 +891,7 @@ public class Parameters implements Serializable {
   public boolean isList(String key, Type type) {
     if (isList(key)) {
       List<Object> list = getList(key);
-      // empty lists can store anything                                                                                                                             
+      // empty lists can store anything
       if (list.isEmpty()) {
         return true;
       }
@@ -1105,4 +1105,7 @@ public class Parameters implements Serializable {
       return val.toString();
     }
   }
+
+  // Shareable and unmodifiable (well, sorta)
+  public static final Parameters empty = new Parameters();
 }

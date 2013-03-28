@@ -17,17 +17,6 @@
         <updatePolicy>always</updatePolicy>
       </snapshots>
     </repository>
-    <repository>
-      <id>scala-tools.releases</id>
-      <name>Scala-Tools Dependencies Repository for Releases</name>
-      <url>http://scala-tools.org/repo-releases</url>
-    </repository>
-    <repository>
-      <id>scala-tools.snapshots</id>
-      <name>Scala-Tools Dependencies Repository for Snapshots</name>
-      <url>http://scala-tools.org/repo-snapshots</url>
-      <snapshots/>
-    </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
@@ -63,12 +52,6 @@
       <version>1.2.7</version>
     </dependency>
     <dependency>
-      <groupId>org.scalatest</groupId>
-      <artifactId>scalatest_2.9.0</artifactId>
-      <version>1.6.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.8.2</version>
@@ -76,8 +59,13 @@
     </dependency>
     <dependency>
       <groupId>org.scala-lang</groupId>
+      <artifactId>scala-compiler</artifactId>
+      <version>2.10.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
       <artifactId>scala-library</artifactId>
-      <version>2.9.0</version>
+      <version>2.10.1</version>
     </dependency>
     <dependency>
       <groupId>org.lemurproject.galago</groupId>
@@ -103,11 +91,6 @@
       <groupId>org.antlr</groupId>
       <artifactId>stringtemplate</artifactId>
       <version>3.0</version>
-    </dependency>
-    <dependency>
-      <groupId>net.liftweb</groupId>
-      <artifactId>lift-json_2.9.0</artifactId>
-      <version>2.4-M5</version>
     </dependency>
     <dependency>
       <groupId>org.json</groupId>
@@ -144,6 +127,7 @@
       <plugin>
         <groupId>org.scala-tools</groupId>
         <artifactId>maven-scala-plugin</artifactId>
+	<version>2.15.2</version>
         <executions>
           <execution>
             <id>scala-compile-first</id>

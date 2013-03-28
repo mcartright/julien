@@ -253,6 +253,18 @@ public class Job implements Serializable {
    * that starts with sourceName (same goes for destinationName), which makes
    * this particularly useful for making connections between sub-jobs.
    */
+  public Job combined(String sourceName, String destinationName) {
+    return connect(sourceName, destinationName, ConnectionAssignmentType.Combined);
+  }
+
+  public Job each(String sourceName, String destinationName) {
+    return connect(sourceName, destinationName, ConnectionAssignmentType.Each);
+  }
+  
+  public Job one(String sourceName, String destinationName) {
+    return connect(sourceName, destinationName, ConnectionAssignmentType.One);
+  }
+
   public Job connect(String sourceName, String destinationName, ConnectionAssignmentType assignment) {
     return connect(sourceName, destinationName, assignment, null, -1);
   }
@@ -419,12 +431,12 @@ public class Job implements Serializable {
         builder.append(connectionHeader);
       }
 
-        String inputEndPointString = String.format(
-                "            <input stage=\"%s\"         \n"
-                + "                   endpoint=\"%s\" />   \n",
-                connection.input.getStageName(),
-                connection.input.getPointName());
-        builder.append(inputEndPointString);
+      String inputEndPointString = String.format(
+              "            <input stage=\"%s\"         \n"
+              + "                   endpoint=\"%s\" />   \n",
+              connection.input.getStageName(),
+              connection.input.getPointName());
+      builder.append(inputEndPointString);
 
       for (ConnectionEndPoint point : connection.outputs) {
         String endPointString = String.format(

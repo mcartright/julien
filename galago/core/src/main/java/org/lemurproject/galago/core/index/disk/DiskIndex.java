@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.lemurproject.galago.core.index.AggregateReader.AggregateIndexPart;
 import org.lemurproject.galago.core.index.AggregateReader.IndexPartStatistics;
 import org.lemurproject.galago.core.index.BTreeFactory;
@@ -20,7 +22,8 @@ import org.lemurproject.galago.core.index.IndexPartReader;
 import org.lemurproject.galago.core.index.Iterator;
 import org.lemurproject.galago.core.index.LengthsReader;
 import org.lemurproject.galago.core.index.LengthsReader.LengthsIterator;
-import org.lemurproject.galago.core.index.store.SplitBTreeReader;
+import org.lemurproject.galago.core.index.corpus.CorpusReader;
+import org.lemurproject.galago.core.index.corpus.SplitBTreeReader;
 import org.lemurproject.galago.core.parse.Document;
 import org.lemurproject.galago.tupleflow.Parameters;
 
@@ -174,7 +177,7 @@ public class DiskIndex implements Index {
       }
       throw new IllegalArgumentException("Index part, " + part + ", does not store aggregated statistics.");
     }
-    throw new IllegalArgumentException("Index part, " + part + ", could not be found in index, " + this.location.getAbsolutePath() );
+    throw new IllegalArgumentException("Index part, " + part + ", could not be found in index, " + this.location.getAbsolutePath());
   }
 
   @Override
@@ -204,7 +207,19 @@ public class DiskIndex implements Index {
 
   @Override
   public Document getItem(String name, Parameters p) throws IOException {
-    throw new RuntimeException("Implement Me!");
+    if (parts.containsKey("corpus")) {
+      try {
+        CorpusReader corpus = (CorpusReader) parts.get("corpus");
+        int docId = getIdentifier(name);
+        return corpus.getDocument(docId, p);
+      } catch (Exception e) {
+        // ignore the exception                                                                                                                       
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE,
+                "Failed to get document: {0}\n{1}",
+                new Object[]{name, e.toString()});
+      }
+    }
+    return null;
   }
 
   @Override

@@ -2,7 +2,6 @@
 
 package org.lemurproject.galago.core.index.corpus;
 
-import org.lemurproject.galago.core.index.store.KeyValuePairToDocument;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;

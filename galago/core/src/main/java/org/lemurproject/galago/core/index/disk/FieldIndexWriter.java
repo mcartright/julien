@@ -1,7 +1,6 @@
 // BSD License (http://lemurproject.org/galago-license)
 package org.lemurproject.galago.core.index.disk;
 
-import org.lemurproject.galago.core.index.disk.DiskBTreeWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -9,7 +8,6 @@ import org.lemurproject.galago.core.index.CompressedByteBuffer;
 import org.lemurproject.galago.core.index.CompressedRawByteBuffer;
 import org.lemurproject.galago.core.index.BTreeWriter;
 import org.lemurproject.galago.core.index.IndexElement;
-import org.lemurproject.galago.core.index.store.SplitBTreeValueWriter;
 import org.lemurproject.galago.core.types.KeyValuePair;
 import org.lemurproject.galago.core.types.NumberedField;
 import org.lemurproject.galago.tupleflow.Utility;
@@ -50,10 +48,12 @@ public class FieldIndexWriter implements NumberedField.FieldNameNumberOrder.Shre
       data = new CompressedRawByteBuffer();
     }
 
+    @Override
     public byte[] key() {
       return key;
     }
 
+    @Override
     public long dataLength() {
       long listLength = 0;
 
@@ -63,6 +63,7 @@ public class FieldIndexWriter implements NumberedField.FieldNameNumberOrder.Shre
       return listLength;
     }
 
+    @Override
     public void write(OutputStream stream) throws IOException {
       header.write(stream);
       header.clear();
@@ -116,6 +117,7 @@ public class FieldIndexWriter implements NumberedField.FieldNameNumberOrder.Shre
     filename = header.getString("filename");
   }
 
+  @Override
   public void processFieldName(byte[] wordBytes) throws IOException {
     if (writer == null) {
       writer = new DiskBTreeWriter(stepParameters);
@@ -133,14 +135,17 @@ public class FieldIndexWriter implements NumberedField.FieldNameNumberOrder.Shre
     lastWord = wordBytes;
   }
 
+  @Override
   public void processNumber(long document) throws IOException {
     invertedList.addDocument(document);
   }
 
+  @Override
   public void processTuple(byte[] content) throws IOException {
     invertedList.setContent(content);
   }
 
+  @Override
   public void close() throws IOException {
     if (invertedList != null) {
       invertedList.close();
@@ -161,6 +166,7 @@ public class FieldIndexWriter implements NumberedField.FieldNameNumberOrder.Shre
     Verification.requireWriteableFile(index, handler);
   }
 
+  @Override
   public void setProcessor(Step processor) throws IncompatibleProcessorException {
     writer.setProcessor(processor);
   }

@@ -6,8 +6,16 @@ import org.lemurproject.galago.core.parse.Document
 
 import scala.collection.mutable.PriorityQueue
 import scala.collection.JavaConversions._
+import scala.util.matching.Regex
 
 object Utils {
+  class RichRegex(underlying: Regex) {
+    def matches(s: String): Boolean = underlying.pattern.matcher(s).matches
+    def misses(s: String): Boolean = (matches(s) == false)
+  }
+
+  implicit def regexToRichRegex(r: Regex) = new RichRegex(r)
+
   def printResults(
     results: List[ScoredDocument],
     index: Index) : Unit = {
