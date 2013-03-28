@@ -64,7 +64,6 @@ public class Sorter<T> extends StandardStep<T, T> implements NotificationListene
   public static final long DEFAULT_REDUCE_INTERVAL = 1 * 1024 * 1024;
   public static final double DEFAULT_MEMORY_FRACTION = 0.7;
   //public static final boolean DEFAULT_FLUSH_PAUSE = false;
-  
   // instance limits and parameters
   private long limit;
   private int fileLimit;
@@ -75,6 +74,7 @@ public class Sorter<T> extends StandardStep<T, T> implements NotificationListene
   private Comparator<T> lessThanCompare;
   private Reducer<T> reducer;
   // sorter data store
+  private CompressionType compression;
   private ArrayList<T> objects;
   private ArrayList<List<T>> runs;
   private ArrayList<File> temporaryFiles;
@@ -105,7 +105,8 @@ public class Sorter<T> extends StandardStep<T, T> implements NotificationListene
     this.runs = new ArrayList<List<T>>();
     this.temporaryFiles = new ArrayList<File>();
     this.lessThanCompare = order.lessThan();
-
+    this.compression = CompressionType.VBYTE;
+    
     setLimits(new Parameters());
 
     requestMemoryWarnings();
@@ -117,6 +118,11 @@ public class Sorter<T> extends StandardStep<T, T> implements NotificationListene
           IllegalAccessException, IOException {
     String className = parameters.getJSON().getString("class");
     String[] orderSpec = parameters.getJSON().getString("order").split(" ");
+    compression = CompressionType.fromString(parameters.getJSON().get("compression", "VBYTE"));
+    if(compression == null){
+      logger.info("WARNING: compression is set to NULL. Defaulting to VBYTE");
+      compression = CompressionType.VBYTE;
+    }
 
     Class clazz = Class.forName(className);
     Type<T> typeInstance = (Type<T>) clazz.newInstance();
@@ -464,14 +470,15 @@ public class Sorter<T> extends StandardStep<T, T> implements NotificationListene
 
   private synchronized FileOrderedWriter<T> getTemporaryWriter(long fileSize) throws IOException, FileNotFoundException {
     File temporary = Utility.createTemporary(fileSize * 4);
-    FileOrderedWriter<T> writer = new FileOrderedWriter<T>(temporary, order);
+    // default to VBYTE compression (but make this configurable later...
+    FileOrderedWriter<T> writer = new FileOrderedWriter<T>(temporary.getAbsolutePath(), order, compression);
     temporaryFiles.add(temporary);
     return writer;
   }
 
   private synchronized FileOrderedWriter<T> getTemporaryWriter() throws IOException, FileNotFoundException {
     File temporary = Utility.createTemporary();
-    FileOrderedWriter<T> writer = new FileOrderedWriter<T>(temporary, order);
+    FileOrderedWriter<T> writer = new FileOrderedWriter<T>(temporary.getAbsolutePath(), order, compression);
     temporaryFiles.add(temporary);
     return writer;
   }

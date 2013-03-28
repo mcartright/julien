@@ -4,11 +4,12 @@ package org.lemurproject.galago.tupleflow.execution;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.lemurproject.galago.tupleflow.CompressionType;
 import org.lemurproject.galago.tupleflow.Order;
 
 /**
  * This is a stage description for a TupleFlow job.
- * 
+ *
  * @author trevor
  */
 public class Stage extends Locatable implements Serializable, Cloneable {
@@ -68,25 +69,36 @@ public class Stage extends Locatable implements Serializable, Cloneable {
     return result;
   }
 
-  public void addInput(String pipeName, Order pipeOrder) {
+  public Stage addInput(String pipeName, Order pipeOrder) {
     add(new StageConnectionPoint(ConnectionPointType.Input,
             pipeName, pipeOrder));
+    return this;
   }
 
-  public void addOutput(String pipeName, Order pipeOrder) {
+  public Stage addOutput(String pipeName, Order pipeOrder) {
     add(new StageConnectionPoint(ConnectionPointType.Output,
             pipeName, pipeOrder));
+    return this;
   }
 
-  public void add(StageConnectionPoint point) {
+  public Stage addOutput(String pipeName, Order pipeOrder, CompressionType compression) {
+    add(new StageConnectionPoint(ConnectionPointType.Output,
+            pipeName, pipeOrder, compression));
+    return this;
+  }  
+  
+  public Stage add(StageConnectionPoint point) {
     connections.put(point.getExternalName(), point);
+    return this;
   }
 
-  public void add(Step step) {
+  public Stage add(Step step) {
     steps.add(step);
+    return this;
   }
 
-  public void remove(String connectionName) {
+  public Stage remove(String connectionName) {
     connections.remove(connectionName);
+    return this;
   }
 }
