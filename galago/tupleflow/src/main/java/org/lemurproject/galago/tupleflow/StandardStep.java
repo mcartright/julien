@@ -1,5 +1,4 @@
 // BSD License (http://lemurproject.org/galago-license)
-
 package org.lemurproject.galago.tupleflow;
 
 import java.io.IOException;
@@ -12,13 +11,20 @@ import java.io.IOException;
  * @author trevor
  */
 public abstract class StandardStep<T, U> implements Processor<T>, Source<U> {
-    public Processor<U> processor;
 
-    public abstract void process(T object) throws IOException;
-    public void setProcessor(Step next) throws IncompatibleProcessorException {
-        Linkage.link(this, next);
-    }
-    public void close() throws IOException {
-        processor.close();
-    }
+  public Processor<U> processor;
+
+  @Override
+  public abstract void process(T object) throws IOException;
+
+  @Override
+  public Step setProcessor(Step next) throws IncompatibleProcessorException {
+    Linkage.link(this, next);
+    return next;
+  }
+
+  @Override
+  public void close() throws IOException {
+    processor.close();
+  }
 }

@@ -59,8 +59,9 @@ public class FileSource implements ExNihiloSource<FileName> {
     }
 
   @Override
-    public void setProcessor(Step nextStage) throws IncompatibleProcessorException {
+    public Step setProcessor(Step nextStage) throws IncompatibleProcessorException {
         Linkage.link(this, nextStage);
+        return nextStage;
     }
 
     public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {

@@ -515,8 +515,11 @@ public class ConnectionTest extends TestCase {
     }
 
     @Override
-    public void setProcessor(org.lemurproject.galago.tupleflow.Step processor) throws IncompatibleProcessorException {
+    public org.lemurproject.galago.tupleflow.Step 
+            setProcessor(org.lemurproject.galago.tupleflow.Step processor) 
+            throws IncompatibleProcessorException {
       Linkage.link(this, processor);
+      return processor;
     }
 
     public static void verify(TupleFlowParameters parameters, ErrorHandler handler) throws IOException {
@@ -551,8 +554,11 @@ public class ConnectionTest extends TestCase {
     }
 
     @Override
-    public void setProcessor(org.lemurproject.galago.tupleflow.Step processor) throws IncompatibleProcessorException {
+    public org.lemurproject.galago.tupleflow.Step 
+            setProcessor(org.lemurproject.galago.tupleflow.Step processor) 
+            throws IncompatibleProcessorException {
       Linkage.link(this, processor);
+      return processor;
     }
 
     public static void verify(TupleFlowParameters parameters, ErrorHandler handler) throws IOException {
@@ -600,8 +606,11 @@ public class ConnectionTest extends TestCase {
     }
 
     @Override
-    public void setProcessor(org.lemurproject.galago.tupleflow.Step processor) throws IncompatibleProcessorException {
+    public org.lemurproject.galago.tupleflow.Step 
+            setProcessor(org.lemurproject.galago.tupleflow.Step processor) 
+            throws IncompatibleProcessorException {
       Linkage.link(this, processor);
+      return processor;
     }
 
     public static void verify(TupleFlowParameters parameters, ErrorHandler handler) throws IOException {
@@ -648,8 +657,11 @@ public class ConnectionTest extends TestCase {
     }
 
     @Override
-    public void setProcessor(org.lemurproject.galago.tupleflow.Step processor) throws IncompatibleProcessorException {
+    public org.lemurproject.galago.tupleflow.Step 
+            setProcessor(org.lemurproject.galago.tupleflow.Step processor) 
+            throws IncompatibleProcessorException {
       Linkage.link(this, processor);
+      return processor;
     }
 
     public static void verify(TupleFlowParameters parameters, ErrorHandler handler) throws IOException {
@@ -693,8 +705,11 @@ public class ConnectionTest extends TestCase {
     }
 
     @Override
-    public void setProcessor(org.lemurproject.galago.tupleflow.Step processor) throws IncompatibleProcessorException {
+    public org.lemurproject.galago.tupleflow.Step 
+            setProcessor(org.lemurproject.galago.tupleflow.Step processor) 
+            throws IncompatibleProcessorException {
       Linkage.link(this, processor);
+      return processor;
     }
 
     public static void verify(TupleFlowParameters parameters, ErrorHandler handler) throws IOException {

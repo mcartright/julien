@@ -1,7 +1,8 @@
 package edu.umass.ciir.julien
 
-sealed trait Support
-trait Stored extends Support
-trait Synthetic extends Support {
+sealed trait Support {
   def supports: Set[Stored]
 }
+
+trait Stored extends Support
+trait Synthetic extends Support

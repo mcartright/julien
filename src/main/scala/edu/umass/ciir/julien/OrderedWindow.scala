@@ -4,12 +4,9 @@ import org.lemurproject.galago.core.util.ExtentArray
 import org.lemurproject.galago.core.util.ExtentArrayIterator
 
 class OrderedWindow(
-  override val sources: List[KeyedSource],
+  override val sources: List[BoundSource],
   val width: Int = 1)
-    extends KeyedSource with Synthetic {
-  def supports: Set[Support] = Set.empty
-
-  def count: Int = positions.size
+    extends WindowSource {
 
   def positions: ExtentArray = {
     val hits = new ExtentArray()

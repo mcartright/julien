@@ -1,6 +1,6 @@
 package edu.umass.ciir.julien
 
-class JelinekMercer(src: KeyedSource, lambda: Double = 0.2)
+class JelinekMercer(src: BoundSource, lambda: Double = 0.2)
     extends Feature {
   val cf = src.collectionCount.toDouble / src.collectionLength.toDouble
 

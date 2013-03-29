@@ -7,21 +7,16 @@ import scala.collection.JavaConversions._
 import org.lemurproject.galago.core.index.{Index, AggregateReader}
 import org.lemurproject.galago.core.index.LengthsReader
 import org.lemurproject.galago.core.index.Iterator
-import org.lemurproject.galago.core.index.NullExtentIterator
-import org.lemurproject.galago.core.index.ExtentIterator
-import org.lemurproject.galago.core.index.CountIterator
-import org.lemurproject.galago.core.index.disk.DiskIndex
-import org.lemurproject.galago.core.index.disk.PositionIndexReader
-import org.lemurproject.galago.core.parse.Document
-
 import org.lemurproject.galago.tupleflow.{Parameters,Utility}
 
 import Utils._
 
-object ExecutionEnvironment {
+abstract class ExecutionEnvironment {
+  val iterators : List[Iterator] = List.empty
+  val scorers: List[QueryVariable] = List.empty
+  val lengths : LengthsReader.LengthsIterator
 
   def run(numResults: Int = 100) : PriorityQueue[ScoredDocument] = {
-
     val resultQueue = PriorityQueue[ScoredDocument]()(ScoredDocumentOrdering)
     while (iterators.exists(_.isDone == false)) {
       val candidate = iterators.filterNot(_.isDone).map(_.currentCandidate).min

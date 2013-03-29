@@ -1,6 +1,6 @@
 package edu.umass.ciir.julien
 
-class Dirichlet(src: KeyedSource, mu: Double = 1500) extends Feature {
+class Dirichlet(src: BoundSource, mu: Double = 1500) extends Feature {
   val cf = src.collectionCount.toDouble / src.collectionLength.toDouble
 
   def calculate : Double = {

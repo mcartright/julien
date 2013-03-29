@@ -19,6 +19,7 @@ import org.lemurproject.galago.core.parse.Document;
 import org.lemurproject.galago.core.parse.stem.Porter2Stemmer;
 import org.lemurproject.galago.core.index.NullExtentIterator;
 import org.lemurproject.galago.core.index.corpus.CorpusReader;
+import org.lemurproject.galago.tupleflow.FakeParameters;
 import org.lemurproject.galago.tupleflow.InputClass;
 import org.lemurproject.galago.tupleflow.Parameters;
 import org.lemurproject.galago.tupleflow.TupleFlowParameters;
@@ -42,8 +43,23 @@ public class MemoryIndex implements DynamicIndex, Index {
   HashMap<String, String> defaultIndexOperators = new HashMap<String, String>();
   HashSet<String> knownIndexOperators = new HashSet<String>();
 
+  public MemoryIndex(Parameters p) throws Exception {
+    manifest = p;
+    initialize();
+  }
+  
+  public MemoryIndex() throws Exception {
+    manifest = new Parameters();
+    manifest.set("stemming", false);
+    manifest.set("makecorpus", true);
+  }
+  
   public MemoryIndex(TupleFlowParameters parameters) throws Exception {
     manifest = parameters.getJSON();
+    initialize();
+  }
+  
+  private void initialize() throws Exception {
     // determine which parts are to be created:
     stemming = manifest.get("stemming", true);
     nonstemming = manifest.get("nonstemming", true);
@@ -74,7 +90,7 @@ public class MemoryIndex implements DynamicIndex, Index {
       parts.put("postings.porter", new MemoryPositionalIndex(stemParams));
     }
 
-    dirty = false;
+    dirty = false;    
   }
 
   /**
@@ -207,7 +223,7 @@ public class MemoryIndex implements DynamicIndex, Index {
         int docId = getIdentifier(document);
         corpus.getDocument(docId, p);
       } catch (Exception e) {
-        // ignore the exception                                                                                                                       
+        // ignore the exception
       }
     }
     return null;

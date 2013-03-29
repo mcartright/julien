@@ -7,5 +7,5 @@ package org.lemurproject.galago.tupleflow;
  * @author trevor
  */
 public interface Source<T> extends Step {
-    public void setProcessor(Step processor) throws IncompatibleProcessorException;
+    public Step setProcessor(Step processor) throws IncompatibleProcessorException;
 }

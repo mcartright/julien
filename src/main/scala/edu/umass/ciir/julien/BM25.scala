@@ -1,6 +1,6 @@
 package edu.umass.ciir.julien
 
-class BM25(src: KeyedSource, b: Double = 0.75, k: Double = 1.2)
+class BM25(src: BoundSource, b: Double = 0.75, k: Double = 1.2)
     extends Feature {
   val avgDocLength =
     src.collectionCount.toDouble / src.numDocuments.toDouble
