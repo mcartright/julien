@@ -5,7 +5,7 @@ package org.lemurproject.galago.core.index;
 
 import java.io.File;
 import java.io.IOException;
-import org.lemurproject.galago.core.index.store.SplitBTreeReader;
+import org.lemurproject.galago.core.index.corpus.SplitBTreeReader;
 import org.lemurproject.galago.core.index.disk.DiskBTreeReader;
 
 /**

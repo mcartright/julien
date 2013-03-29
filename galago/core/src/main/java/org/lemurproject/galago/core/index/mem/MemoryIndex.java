@@ -18,6 +18,7 @@ import org.lemurproject.galago.core.index.NamesReader;
 import org.lemurproject.galago.core.parse.Document;
 import org.lemurproject.galago.core.parse.stem.Porter2Stemmer;
 import org.lemurproject.galago.core.index.NullExtentIterator;
+import org.lemurproject.galago.core.index.corpus.CorpusReader;
 import org.lemurproject.galago.tupleflow.InputClass;
 import org.lemurproject.galago.tupleflow.Parameters;
 import org.lemurproject.galago.tupleflow.TupleFlowParameters;
@@ -200,7 +201,16 @@ public class MemoryIndex implements DynamicIndex, Index {
 
   @Override
   public Document getItem(String document, Parameters p) throws IOException {
-    throw new RuntimeException("Implement Me!");
+    if (parts.containsKey("corpus")) {
+      try {
+        CorpusReader corpus = (CorpusReader) parts.get("corpus");
+        int docId = getIdentifier(document);
+        corpus.getDocument(docId, p);
+      } catch (Exception e) {
+        // ignore the exception                                                                                                                       
+      }
+    }
+    return null;
   }
 
   @Override

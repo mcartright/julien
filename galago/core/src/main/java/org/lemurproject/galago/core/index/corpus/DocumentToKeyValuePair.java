@@ -1,5 +1,5 @@
 // BSD License (http://lemurproject.org/galago-license)
-package org.lemurproject.galago.core.index.store;
+package org.lemurproject.galago.core.index.corpus;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

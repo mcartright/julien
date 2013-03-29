@@ -1,9 +1,6 @@
 // BSD License (http://lemurproject.org/galago-license)
 package org.lemurproject.galago.core.index.corpus;
 
-import org.lemurproject.galago.core.index.store.SplitBTreeKeyWriter;
-import org.lemurproject.galago.core.index.store.SplitBTreeValueWriter;
-import org.lemurproject.galago.core.index.store.SplitBTreeReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
