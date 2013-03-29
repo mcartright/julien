@@ -1,11 +1,14 @@
 package edu.umass.ciir.julien
 
-class JelinekMercer(src: BoundSource, lambda: Double = 0.2)
+class JelinekMercer(
+  bs: BoundSource,
+  cs: CollectionSource,
+  lambda: Double = 0.2)
     extends Feature {
-  val cf = src.collectionCount.toDouble / src.collectionLength.toDouble
+  val cf = bs.collectionCount.toDouble / cs.collectionLength.toDouble
 
   def calculate : Double = {
-    val foreground = src.count.toDouble / src.length
+    val foreground = bs.count.toDouble / bs.length
     scala.math.log((lambda*foreground) + ((1.0-lambda)*cf))
   }
 }

@@ -66,7 +66,7 @@ class IndexSource(index: Index) extends FreeSource with Stored {
 
   def collectionCount(key: String): Long = getKeyedStatistics(key).nodeFrequency
 
-  def docCount(key: String): Long = getKeyedStatistics(key).nodeDocumentCount
+  def docFreq(key: String): Long = getKeyedStatistics(key).nodeDocumentCount
 
   def document(targetId: String): Document =
     index.getItem(targetId, Parameters.empty)

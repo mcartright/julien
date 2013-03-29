@@ -1,14 +1,18 @@
 package edu.umass.ciir.julien
 
-class BM25(src: BoundSource, b: Double = 0.75, k: Double = 1.2)
+class BM25(
+  bs: BoundSource,
+  cs: CollectionSource,
+  b: Double = 0.75,
+  k: Double = 1.2)
     extends Feature {
   val avgDocLength =
-    src.collectionCount.toDouble / src.numDocuments.toDouble
-  val idf = src.inverseDocFreq
+    bs.collectionCount.toDouble / cs.numDocuments.toDouble
+  val idf = scala.math.log(cs.numDocuments / (bs.docFreq + 0.5))
 
   def calculate : Double = {
-    val num = src.count + (k + 1)
-    val den = src.count + (k * (1 - b + (b * src.length / avgDocLength)))
+    val num = bs.count + (k + 1)
+    val den = bs.count + (k * (1 - b + (b * bs.length / avgDocLength)))
     idf * num / den
   }
 }

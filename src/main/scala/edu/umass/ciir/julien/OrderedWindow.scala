@@ -3,10 +3,8 @@ package edu.umass.ciir.julien
 import org.lemurproject.galago.core.util.ExtentArray
 import org.lemurproject.galago.core.util.ExtentArrayIterator
 
-class OrderedWindow(
-  override val sources: List[BoundSource],
-  val width: Int = 1)
-    extends WindowSource {
+class OrderedWindow(sources: List[BoundSource], val width: Int = 1)
+    extends WindowSource(sources) {
 
   def positions: ExtentArray = {
     val hits = new ExtentArray()
