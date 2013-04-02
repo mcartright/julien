@@ -16,10 +16,6 @@ THINGS TO FIX/IMPROVE:
 
 - I like the composition of scoring function + filter + iterator, and so
   on. Any more we can do?
-- The node representation is clunky and not intuitive. Either
-  update the API or refactor out for now. (src: relmodel.scala)
-  UPDATE: Need something to describe what's needed to support a data source
-  for a term. Maybe just a "TermDescriptor" class?
 - To make the toolkit configurable, should we focus on schema-validated JSON
   or a series of case classes? (Note: case classes have a 22-parameter limit,
   but are built into Scala more cleanly than JSON)

@@ -1,4 +1,4 @@
-package operators
+package edu.umass.ciir.julien
 
 import scala.collection.mutable.PriorityQueue
 import edu.umass.ciir.julien.Utils._

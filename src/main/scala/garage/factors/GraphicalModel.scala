@@ -1,4 +1,4 @@
-package garage
+package garage.factors
 
 import org.lemurproject.galago.core.index.disk.DiskIndex
 import org.lemurproject.galago.core.index.Index

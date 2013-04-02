@@ -1,4 +1,4 @@
-package operators
+package edu.umass.ciir.julien
 
 case class CountStatistics(
   var collFreq: CollFreq,

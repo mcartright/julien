@@ -1,4 +1,4 @@
-package operators
+package edu.umass.ciir.julien
 
 import scala.collection.mutable.ArrayBuffer
 import org.lemurproject.galago.core.util._

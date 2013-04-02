@@ -1,4 +1,4 @@
-package operators
+package edu.umass.ciir.julien
 
 object SingleTermOp {
   def apply(t: Term) = new SingleTermOp(t)

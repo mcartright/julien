@@ -1,4 +1,4 @@
-package operators
+package edu.umass.ciir.julien
 
 import edu.umass.ciir.julien.Aliases._
 

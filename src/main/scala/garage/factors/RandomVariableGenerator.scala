@@ -1,4 +1,4 @@
-package garage
+package garage.factors
 
 object RandomVariableGenerator {
   def apply(rv: RandomVariable) = new RandomVariableGenerator(rv)

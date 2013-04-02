@@ -1,4 +1,4 @@
-package garage
+package garage.factors
 
 object Templates {
   def forAll(rv: RandomVariable) : RandomVariableGenerator = {

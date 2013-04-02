@@ -1,4 +1,4 @@
-package garage
+package garage.factors
 
 import scala.collection.immutable.List
 import org.lemurproject.galago.core.index.disk.DiskIndex

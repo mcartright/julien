@@ -1,4 +1,4 @@
-package operators
+package edu.umass.ciir.julien
 
 import scala.collection.{SeqView, SeqViewLike}
 import edu.umass.ciir.julien.Aliases._
