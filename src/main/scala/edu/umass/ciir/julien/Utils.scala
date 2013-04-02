@@ -1,12 +1,10 @@
 package edu.umass.ciir.julien
 
 import org.lemurproject.galago.tupleflow.Parameters
-import org.lemurproject.galago.core.index.Index
-import org.lemurproject.galago.core.parse.Document
-
 import scala.collection.mutable.PriorityQueue
 import scala.collection.JavaConversions._
 import scala.util.matching.Regex
+import Aliases._
 
 object Utils {
   class RichRegex(underlying: Regex) {
@@ -16,9 +14,7 @@ object Utils {
 
   implicit def regexToRichRegex(r: Regex) = new RichRegex(r)
 
-  def printResults(
-    results: List[ScoredDocument],
-    index: Index) : Unit = {
+  def printResults(results: List[ScoredDocument], index: GIndex) : Unit = {
     for ((sd, idx) <- results.zipWithIndex) {
       val name = index.getName(sd.docid)
       Console.printf("test %s %f %d julien\n",
@@ -28,7 +24,7 @@ object Utils {
 
   def printResults(
     results: PriorityQueue[ScoredDocument],
-    index: Index) : Unit = {
+    index: GIndex) : Unit = {
     var rank = 1
     while (!results.isEmpty) {
       val doc = results.dequeue
@@ -48,13 +44,13 @@ object Utils {
   def scrub(s: String) =
     s.filter(c => c.isLetterOrDigit || c.isWhitespace).toLowerCase
 
-  def histogram(doc: Document) : Histogram = {
+  def histogram(doc: GDoc) : Histogram = {
     // the case is to force Scala to make an identity function
     val h = doc.terms.groupBy { case s => s }.mapValues(_.size)
     Histogram(doc.identifier, h)
   }
 
-  def multinomial(doc: Document) : Multinomial = {
+  def multinomial(doc: GDoc) : Multinomial = {
     val h = doc.terms.groupBy { case s => s }.mapValues(_.size)
     val sum = h.values.sum
     val probs = h.mapValues(_.toDouble / sum)

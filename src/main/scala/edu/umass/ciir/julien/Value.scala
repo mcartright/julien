@@ -1,4 +1,4 @@
-package operators
+package edu.umass.ciir.julien
 
 /** Base trait for any value we might throw around the in the system.
   * Might be a little overkill, but it allows for very strong type-checking

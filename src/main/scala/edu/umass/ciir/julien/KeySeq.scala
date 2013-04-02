@@ -4,7 +4,7 @@ import org.lemurproject.galago.core.index.KeyIterator
 import org.lemurproject.galago.tupleflow.Utility
 import scala.collection.{SeqView, SeqViewLike}
 
-class KeySeq private[operators](iterGen: => KeyIterator)
+class KeySeq(iterGen: => KeyIterator)
     extends SeqView[String, KeyIterator]
     with SeqViewLike[String, KeyIterator, KeySeq] {
   override val underlying = iterGen

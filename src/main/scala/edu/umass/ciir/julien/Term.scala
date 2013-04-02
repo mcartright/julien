@@ -1,4 +1,4 @@
-package operators
+package edu.umass.ciir.julien
 
 import org.lemurproject.galago.core.index.ExtentIterator
 import edu.umass.ciir.julien.Aliases._

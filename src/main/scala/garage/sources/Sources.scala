@@ -1,4 +1,4 @@
-package edu.umass.ciir.julien
+package sources
 
 import org.lemurproject.galago.core.index.disk.DiskIndex
 import org.lemurproject.galago.tupleflow.Utility

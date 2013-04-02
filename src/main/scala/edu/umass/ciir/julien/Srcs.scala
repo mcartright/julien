@@ -1,4 +1,4 @@
-package operators
+package edu.umass.ciir.julien
 
 trait StatisticsSrc { def statistics: CountStatistics }
 trait CountSrc { def count: Count }

@@ -1,5 +1,4 @@
-package garage
-
+package factors
 
 object Operation {
   def reduce(r: RetrievalModels.ReduceFunction)(factors: FactorGenerator) : RandomVariableGenerator = {

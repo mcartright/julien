@@ -1,4 +1,4 @@
-package edu.umass.ciir.julien
+package sources
 
 import scala.collection.mutable.ListBuffer
 

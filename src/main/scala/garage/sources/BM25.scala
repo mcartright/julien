@@ -1,4 +1,4 @@
-package edu.umass.ciir.julien
+package sources
 
 class BM25(
   bs: BoundSource,

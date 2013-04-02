@@ -1,4 +1,4 @@
-package garage
+package factors
 
 import org.lemurproject.galago.core.index.Index
 

@@ -1,4 +1,4 @@
-package edu.umass.ciir.julien
+package sources
 
 class JelinekMercer(
   bs: BoundSource,

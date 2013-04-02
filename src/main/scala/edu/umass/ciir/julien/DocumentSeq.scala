@@ -49,9 +49,8 @@ object IndexBasedDocument {
   }
 }
 
-class DocumentSeq[+D <: Document] private[operators] (
-  index: Index
-)(implicit factory: (DataIterator[GDoc], Index) => D)
+class DocumentSeq[+D <: Document] (index: Index)
+  (implicit factory: (DataIterator[GDoc], Index) => D)
     extends SeqView[D, DataIterator[GDoc]]
     with SeqViewLike[D, DataIterator[GDoc], DocumentSeq[D]] {
   import IndexBasedDocument._

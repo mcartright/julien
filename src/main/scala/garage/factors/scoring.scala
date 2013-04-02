@@ -1,4 +1,4 @@
-package garage
+package factors
 
 abstract class TermScoringFunction
 

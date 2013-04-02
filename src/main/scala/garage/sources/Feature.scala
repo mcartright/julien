@@ -1,4 +1,4 @@
-package edu.umass.ciir.julien
+package sources
 
 trait Feature {
   def apply(): Double = calculate

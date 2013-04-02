@@ -1,4 +1,4 @@
-package operators
+package edu.umass.ciir.julien
 
 object Combine {
   def apply(ops: FeatureOp*) = new Combine(ops: _*)

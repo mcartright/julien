@@ -1,4 +1,4 @@
-package operators
+package edu.umass.ciir.julien
 
 import org.lemurproject.galago.core.index.ExtentIterator
 import scala.collection.{SeqView, SeqViewLike}
@@ -43,7 +43,7 @@ object PositionsPosting {
 // trait ScorePosting extends Posting with ScoreSrc
 // trait DataPosting extends Posting with DataSrc
 
-class PostingSeq[T <: Posting] private[operators] (
+class PostingSeq[T <: Posting] (
   override val underlying: ExtentIterator,
   index: Index
 )(implicit factory: (ExtentIterator) => T)

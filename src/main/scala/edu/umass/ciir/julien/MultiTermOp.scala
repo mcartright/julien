@@ -1,4 +1,4 @@
-package operators
+package edu.umass.ciir.julien
 
 abstract class MultiTermOp(terms: Term*) extends PositionsOp {
   // Lazily verifies that all terms

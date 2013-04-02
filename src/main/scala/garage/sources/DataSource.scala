@@ -1,4 +1,4 @@
-package edu.umass.ciir.julien
+package sources
 
 import org.lemurproject.galago.core.util.ExtentArray
 import org.lemurproject.galago.core.util.ExtentArrayIterator

@@ -1,4 +1,4 @@
-package operators
+package edu.umass.ciir.julien
 
 object Dirichlet {
   def apply(op: CountOp): Dirichlet = apply(op, 1500)

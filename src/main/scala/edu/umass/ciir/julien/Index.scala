@@ -1,4 +1,4 @@
-package operators
+package edu.umass.ciir.julien
 
 import org.lemurproject.galago.core.index.disk.DiskIndex
 import org.lemurproject.galago.core.index.mem.MemoryIndex
@@ -8,7 +8,6 @@ import org.lemurproject.galago.core.util.ExtentArray
 import org.lemurproject.galago.core.parse._
 import org.lemurproject.galago.tupleflow.{Parameters,Utility,Source}
 import scala.collection.JavaConversions._
-
 
 object Index {
   def apply(i: DiskIndex) = new Index(i)
@@ -65,6 +64,8 @@ class Index(val underlying: org.lemurproject.galago.core.index.Index) {
     new PostingSeq(iterator(key), this)
   def documents: DocumentSeq[Document] =
     new DocumentSeq[IndexBasedDocument](this)
+  def vocabulary: KeySeq = new KeySeq(underlying.getIndexPart("postings").keys)
+
 
   def count(key: String, targetId: String): Int = positions(key, targetId).size
   def collectionCount(key: String): Long = getKeyedStatistics(key).nodeFrequency
@@ -82,8 +83,23 @@ class Index(val underlying: org.lemurproject.galago.core.index.Index) {
     it match {
       case n: NullExtentIterator => AggregateReader.NodeStatistics.zero
       case a: ARNA => a.getStatistics
-      case e: ExtentIterator =>
-        edu.umass.ciir.julien.IteratorSource.gatherStatistics(e)
+      case e: ExtentIterator => gatherStatistics(e)
     }
+  }
+
+  private def gatherStatistics(e: ExtentIterator): NS = {
+    val stats = new NS
+    stats.nodeDocumentCount = 0
+    stats.nodeFrequency = 0
+    stats.maximumCount = 0
+    while (!e.isDone) {
+      if (e.hasMatch(e.currentCandidate())) {
+        stats.nodeFrequency += e.count()
+        stats.maximumCount = scala.math.max(e.count(), stats.maximumCount)
+        stats.nodeDocumentCount += 1
+      }
+      e.movePast(e.currentCandidate())
+    }
+    stats
   }
 }

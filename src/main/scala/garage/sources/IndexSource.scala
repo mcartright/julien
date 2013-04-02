@@ -1,4 +1,4 @@
-package edu.umass.ciir.julien
+package sources
 
 import org.lemurproject.galago.core.index.disk.DiskIndex
 import org.lemurproject.galago.core.index.mem.MemoryIndex
@@ -34,7 +34,7 @@ object IndexSource {
 }
 
 class IndexSource(index: Index) extends FreeSource with Stored {
-  import Aliases._
+  import edu.umass.ciir.julien.Aliases._
 
   private val lengthsIterator = index.getLengthsIterator
   private val collectionStats =

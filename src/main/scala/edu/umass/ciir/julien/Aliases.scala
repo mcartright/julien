@@ -5,6 +5,7 @@ import org.lemurproject.galago.core.index.corpus._
 import org.lemurproject.galago.tupleflow.Utility
 
 object Aliases {
+  type GIndex = org.lemurproject.galago.core.index.Index
   type GDoc = org.lemurproject.galago.core.parse.Document
   type ARCA = AggregateReader.CollectionAggregateIterator
   type ARNA = AggregateReader.NodeAggregateIterator

@@ -1,4 +1,4 @@
-package garage
+package factors
 
 object Factor {
   def dirichlet(name: RandomVariable, src: RandomVariable) = termFunction(name, src)

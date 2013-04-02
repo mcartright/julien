@@ -3,7 +3,6 @@ package edu.umass.ciir.julien
 import scala.collection.mutable.PriorityQueue
 import edu.umass.ciir.julien.Utils._
 import edu.umass.ciir.julien.Aliases._
-import edu.umass.ciir.julien.{ScoredDocument,ScoredDocumentOrdering}
 import scala.collection.JavaConversions._
 
 object Test {

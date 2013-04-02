@@ -1,4 +1,4 @@
-package edu.umass.ciir.julien
+package sources
 
 import scala.collection.mutable.{PriorityQueue,LinkedHashMap}
 import scala.collection.Map
@@ -9,7 +9,8 @@ import org.lemurproject.galago.core.index.LengthsReader
 import org.lemurproject.galago.core.index.Iterator
 import org.lemurproject.galago.tupleflow.{Parameters,Utility}
 
-import Utils._
+import edu.umass.ciir.julien.Utils._
+import edu.umass.ciir.julien.{ScoredDocument, ScoredDocumentOrdering}
 
 abstract class ExecutionEnvironment {
   val iterators : List[Iterator] = List.empty

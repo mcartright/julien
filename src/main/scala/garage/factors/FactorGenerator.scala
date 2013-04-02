@@ -1,4 +1,4 @@
-package garage.factors
+package factors
 
 import scala.collection.immutable.List
 

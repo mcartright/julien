@@ -1,4 +1,4 @@
-package edu.umass.ciir.julien
+package sources
 
 sealed trait Support {
   def supports: Set[Stored]
