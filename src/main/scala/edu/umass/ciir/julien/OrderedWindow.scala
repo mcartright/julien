@@ -8,9 +8,9 @@ object OrderedWindow {
 }
 
 class OrderedWindow(val width: Int, val terms: Term*)
-    extends MultiTermOp(terms: _*) {
+    extends MultiTermOp(terms) {
   override def positions: Positions = {
-    val hits = Positions()
+    val hits = Positions.newBuilder
     val iterators : Seq[BufferedIterator[Int]] = terms.map(t =>
       Positions(t.underlying.extents).iterator.buffered)
     while (iterators.forall(_.hasNext)) {
@@ -19,7 +19,7 @@ class OrderedWindow(val width: Int, val terms: Term*)
         while (i2.hasNext && i2.head < i1.head) i2.next
         i2
       }
-      if (iterators.exists(! _.hasNext)) return hits
+      if (iterators.exists(! _.hasNext)) return hits.result
 
       // Now see if we have a valid match
       val matched = iterators.sliding(2,1).map { P =>
@@ -27,10 +27,10 @@ class OrderedWindow(val width: Int, val terms: Term*)
         P(1).head - P(0).head < width
       }.reduceLeft((A,B) => A && B)
       if (matched) {
-        hits.append(iterators.head.head)
+        hits += iterators.head.head
       }
       iterators(0).next
     }
-    hits
+    hits.result
   }
 }

@@ -1,35 +1,34 @@
 package edu.umass.ciir.julien
 
-import scala.collection.mutable.{ArrayBuffer, BufferLike, Builder}
-import scala.collection._
+import scala.collection.{IndexedSeqOptimized,IndexedSeqLike}
 import scala.collection.generic._
+import scala.collection.immutable.Vector
+import scala.collection.mutable.{ArrayBuffer,Builder}
 import org.lemurproject.galago.core.util.ExtentArray
 
-/** Represents a set of locations in a document
-  * corresponding to where a particular count-based
-  * operator occurs.
-  * Replaces the ExtentArray class from Galago.
-  */
-class Positions(initialSize: Int)
-    extends ArrayBuffer[Int]
+class Positions(underlying: Array[Int])
+    extends IndexedSeqOptimized[Int, Positions]
     with Value {
-  def this() = this(16) // same as ArrayBuffer
-  override def newBuilder: Builder[Int, Positions] = Positions.newBuilder
+  def apply(idx: Int): Int = underlying(idx)
+  def length: Int = underlying.length
+  def seq: IndexedSeq[Int] = Vector(underlying: _*)
+  def newBuilder : Builder[Int, Positions] = Positions.newBuilder
 }
 
 object Positions {
-  def apply() = new Positions(16)
-  def apply(initialSize: Int) = new Positions(initialSize)
-  def apply(e: ExtentArray) = {
-    val pos = new Positions()
-    for (i <- 0 until e.size) pos.append(e.begin(i))
-    pos
-  }
+  val empty = new Positions(Array.empty)
   implicit def canBuildFrom: CanBuildFrom[Positions, Int, Positions] =
     new CanBuildFrom[Positions, Int, Positions] {
       def apply(): Builder[Int, Positions] = newBuilder
       def apply(from: Positions): Builder[Int, Positions] = newBuilder
     }
-  def newBuilder: Builder[Int, Positions] =
-    new Positions().asInstanceOf[Builder[Int, Positions]]
+  def apply() = Positions.empty
+  def apply(a: Array[Int]) = new Positions(a)
+  def apply(a: ArrayBuffer[Int]) = new Positions(a.toArray)
+  def apply(e: ExtentArray) : Positions = {
+    val b = newBuilder
+    for (i <- 0 until e.size) b += e.begin(i)
+    b.result
+  }
+  def newBuilder: Builder[Int, Positions] = new ArrayBuffer[Int] mapResult apply
 }

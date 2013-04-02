@@ -1,12 +1,36 @@
 package edu.umass.ciir.julien
 
+import scala.collection.{Traversable,TraversableLike}
+import scala.collection.immutable.List
+import scala.collection.mutable.{Builder,ListBuffer}
+import scala.collection.generic.CanBuildFrom
 import edu.umass.ciir.julien.Aliases._
 
 // Two kinds of operations on a query graph:
 // 1) views : Masquerade one operator for 1 or more, or for filtering
 // 2) features: Use views to perform calculations to provide some belief
 //              of the current system state.
-sealed trait Operator
+trait Operator
+    extends Traversable[Operator]
+    with TraversableLike[Operator, List[Operator]] {
+  def children: Seq[Operator]
+
+  def foreach[U](f: Operator => U) {
+    f(this)
+    children foreach f
+  }
+  override def newBuilder: Builder[Operator, List[Operator]] =
+    Operator.newBuilder
+}
+
+object Operator {
+  implicit def canBuildFrom: CanBuildFrom[Operator, Operator, List[Operator]] =
+    new CanBuildFrom[Operator, Operator, List[Operator]] {
+      def apply(): Builder[Operator, List[Operator]] = newBuilder
+      def apply(from: Operator): Builder[Operator, List[Operator]] = newBuilder
+    }
+  def newBuilder: Builder[Operator, List[Operator]] = ListBuffer[Operator]()
+}
 
 // // Views provide Values to the Features
 trait ViewOp extends Operator

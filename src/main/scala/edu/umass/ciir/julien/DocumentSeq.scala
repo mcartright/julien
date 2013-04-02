@@ -23,18 +23,18 @@ trait Document extends Value {
 
 class IndexBasedDocument extends Document {
   var index: Index = null
-  var doc: GDoc = null
-  def length = new Length(index.length(doc.name))
+  var underlying: GDoc = null
+  def length = new Length(index.length(underlying.name))
   def count(op: CountOp) = op.count
   def positions(op: PositionsOp) = op.positions
-  def content: String = doc.text
+  def content: String = underlying.text
 
   // These depend on the term vector being present
-  def vocabulary: Set[String] = doc.terms.toSet
+  def vocabulary: Set[String] = underlying.terms.toSet
   def histogram: Map[String, Int] =
-    doc.terms.groupBy { case s => s }.mapValues(_.size)
+    underlying.terms.groupBy { case s => s }.mapValues(_.size)
   def multinomial: Map[String, Double] = {
-    val h = doc.terms.groupBy { case s => s }.mapValues(_.size)
+    val h = underlying.terms.groupBy { case s => s }.mapValues(_.size)
     val sum = h.values.sum
     h.mapValues(_.toDouble / sum)
   }
@@ -44,8 +44,15 @@ object IndexBasedDocument {
   val theDocument = new IndexBasedDocument
   implicit def apply(ci: DataIterator[GDoc], idx: Index): IndexBasedDocument = {
     theDocument.index = idx
-    theDocument.doc = ci.getData
+    theDocument.underlying = ci.getData
     theDocument
+  }
+
+  def apply(d: GDoc, idx: Index): IndexBasedDocument = {
+    val doc = new IndexBasedDocument
+    doc.index = idx
+    doc.underlying = d
+    doc
   }
 }
 
@@ -63,10 +70,12 @@ class DocumentSeq[+D <: Document] (index: Index)
     asInstanceOf[DataIterator[GDoc]]
 
   def length: Int = underlying.totalEntries.toInt
+
   def apply(idx: Int): D = {
     underlying.syncTo(idx)
     factory(underlying, index)
   }
+
   def iterator: Iterator[D] = new Iterator[D] {
     // Use another iterator for correctness safety
     val other = index.

@@ -11,6 +11,7 @@ object Dirichlet {
 
 class Dirichlet(val op: CountOp, mu: Double)
     extends TraversableEvaluator[Document] {
+  lazy val children: Seq[Operator] = List[Operator](op)
   def views: Set[ViewOp] = Set[ViewOp](op)
   // Runs when asked for the first time, and runs only once
   lazy val cf = {

@@ -5,7 +5,7 @@ import org.lemurproject.galago.core.index.mem.MemoryIndex
 import org.lemurproject.galago.core.index._
 import org.lemurproject.galago.core.index.AggregateReader._
 import org.lemurproject.galago.core.util.ExtentArray
-import org.lemurproject.galago.core.parse._
+import org.lemurproject.galago.core.parse.{Document => _, _}
 import org.lemurproject.galago.tupleflow.{Parameters,Utility,Source}
 import scala.collection.JavaConversions._
 
@@ -65,17 +65,23 @@ class Index(val underlying: org.lemurproject.galago.core.index.Index) {
   def documents: DocumentSeq[Document] =
     new DocumentSeq[IndexBasedDocument](this)
   def vocabulary: KeySeq = new KeySeq(underlying.getIndexPart("postings").keys)
-
-
+  def names: PairSeq[String] =
+    new PairSeq[String](underlying.getIndexPart("names").keys,
+    (k: KeyIterator) => Utility.toString(k.getValueBytes) : String )
   def count(key: String, targetId: String): Int = positions(key, targetId).size
   def collectionCount(key: String): Long = getKeyedStatistics(key).nodeFrequency
   def docFreq(key: String): Long = getKeyedStatistics(key).nodeDocumentCount
-  def document(targetId: String): org.lemurproject.galago.core.parse.Document =
-    underlying.getItem(targetId, Parameters.empty)
+  def document(targetId: String): Document =
+    IndexBasedDocument(underlying.getItem(targetId, Parameters.empty), this)
 
   def terms(targetId: String): List[String] = {
     val doc = underlying.getItem(targetId, Parameters.empty)
     doc.terms.toList
+  }
+
+  def attach(op: Operator): Unit = for (o <- op) o match {
+    case t: Term => t.attach(this)
+    case _ => Unit
   }
 
   private def getKeyedStatistics(key: String) : NS = {

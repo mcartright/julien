@@ -7,11 +7,10 @@ object UnorderedWindow {
 }
 
 class UnorderedWindow(val width: Int, val terms: Term*)
-    extends MultiTermOp
+    extends MultiTermOp(terms)
     with PositionsOp {
-  override def count: Count = new Count(this.positions.size)
-  override def positions: Positions = {
-    val hits = Positions()
+  override def positions:  Positions = {
+    val hits = Positions.newBuilder
     val iterators: Seq[BufferedIterator[Int]] = terms.map(t =>
       Positions(t.underlying.extents).iterator.buffered)
     while (iterators.forall(_.hasNext == true)) {
@@ -21,11 +20,11 @@ class UnorderedWindow(val width: Int, val terms: Term*)
       val maxPos = currentPositions.max
 
       // see if it fits
-      if (maxPos - minPos <= width || width == -1) hits.append(minPos)
+      if (maxPos - minPos <= width || width == -1) hits += minPos
 
       // move all lower bound iterators foward
       for (it <- iterators; if (it.head == minPos)) it.next
     }
-    hits
+    hits.result
   }
 }

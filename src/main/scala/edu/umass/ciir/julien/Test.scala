@@ -33,8 +33,7 @@ object Test {
     val iterators = termObjs.map(_.underlying)
     val lengths = index.lengthsIterator
     val scorers : List[FeatureOp] = List[FeatureOp](sdm)
-    val currentdoc = new IndexBasedDocument()
-    currentdoc.index = index
+
     // Go
     val numResults: Int = 100
     val resultQueue = PriorityQueue[ScoredDocument]()(ScoredDocumentOrdering)
@@ -44,7 +43,7 @@ object Test {
       iterators.foreach(_.syncTo(candidate))
       if (iterators.exists(_.hasMatch(candidate))) {
         // Time to score
-        currentdoc.doc = index.document(index.underlying.getName(candidate))
+        val currentdoc = index.document(index.underlying.getName(candidate))
         var score = scorers.foldRight(new Score(0.0)) { (S,N) =>
           S match {
             case i: IntrinsicEvaluator => i.eval + N
