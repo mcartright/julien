@@ -88,3 +88,4 @@ case class NumDocs(val underlying: Long) extends AnyVal with Value
   * Underlying class is Long.
   */
 case class VocabSize(val underlying: Long) extends AnyVal with Value
+

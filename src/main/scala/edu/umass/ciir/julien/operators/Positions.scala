@@ -1,6 +1,6 @@
 package operators
 
-import scala.collection.mutable.{Buffer,BufferLike,Builder,ResizableArray}
+import scala.collection.mutable.{ArrayBuffer, BufferLike, Builder}
 import scala.collection._
 import scala.collection.generic._
 import org.lemurproject.galago.core.util.ExtentArray
@@ -11,14 +11,12 @@ import org.lemurproject.galago.core.util.ExtentArray
   * Replaces the ExtentArray class from Galago.
   */
 class Positions(initialSize: Int)
-    extends Buffer[Int]
-    with BufferLike[Int, Positions]
-    with IndexedSeqOptimized[Int, Positions]
-    with Builder[Int, Positions]
-    with ResizableArray[Int]
+    extends ArrayBuffer[Int]
     with Value {
   def this() = this(16) // same as ArrayBuffer
+  override def newBuilder: Builder[Int, Positions] = Positions.newBuilder
 }
+
 object Positions {
   def apply() = new Positions(16)
   def apply(initialSize: Int) = new Positions(initialSize)
@@ -32,6 +30,6 @@ object Positions {
       def apply(): Builder[Int, Positions] = newBuilder
       def apply(from: Positions): Builder[Int, Positions] = newBuilder
     }
-  def newBuilder[Int]: Builder[Int, Positions] =
+  def newBuilder: Builder[Int, Positions] =
     new Positions().asInstanceOf[Builder[Int, Positions]]
 }

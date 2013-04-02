@@ -6,7 +6,9 @@ object UnorderedWindow {
   def apply(w: Int, t: Term*) = new OrderedWindow(w, t: _*)
 }
 
-class UnorderedWindow(val width: Int, val terms: Term*) extends PositionsOp {
+class UnorderedWindow(val width: Int, val terms: Term*)
+    extends MultiTermOp
+    with PositionsOp {
   override def count: Count = new Count(this.positions.size)
   override def positions: Positions = {
     val hits = Positions()

@@ -5,6 +5,8 @@ object Combine {
 }
 
 class Combine(val ops: FeatureOp*) extends IntrinsicEvaluator {
+  def views: Set[ViewOp] =
+    ops.foldLeft(Set[ViewOp]()) { (s, op) => s ++ op.views }
   def eval : Score = ops.foldLeft(new Score(0.0)) { (sc, op) =>
     op match {
       case i: IntrinsicEvaluator => sc + i.eval

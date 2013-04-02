@@ -22,7 +22,7 @@ class Term(val t: String) extends Value {
 
   def isAttached: Boolean = index.isDefined
   def attach(i: Index): Unit = {
-    iter = Some(i.getIterator(t, Parameters.empty))
+    iter = Some(i.iterator(t))
     index = Some(i)
   }
 

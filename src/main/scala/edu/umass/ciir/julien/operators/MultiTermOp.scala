@@ -11,7 +11,16 @@ abstract class MultiTermOp(terms: Term*) extends PositionsOp {
   lazy val statistics: CountStatistics = {
     assume(verified) // precondition which means we can use any of them
     val index = terms.head.attachedIndex
+    val stats = CountStatistics(
+      new CollFreq(0),
+      new NumDocs(0),
+      new CollLength(0),
+      new DocFreq(0),
+      new MaximumCount(0)
+    )
 
-    // ...
+    // Need to fill in values here I think
+
+    stats
   }
 }

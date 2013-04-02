@@ -6,30 +6,6 @@ import edu.umass.ciir.julien.Aliases._
 import edu.umass.ciir.julien.{ScoredDocument,ScoredDocumentOrdering}
 import scala.collection.JavaConversions._
 
-class IndexBasedDocument(
-  index: Index,
-  lIter: MLI)
-    extends Document {
-  type GDoc = org.lemurproject.galago.core.parse.Document
-
-  private def doc: GDoc =
-    index.document(index.underlying.getName(lIter.getCurrentIdentifier))
-  def length = new Length(lIter.getCurrentLength)
-  def count(op: CountOp) = op.count
-  def positions(op: PositionsOp) = op.positions
-  def content: String = doc.text
-
-  // These depend on the term vector being present
-  def vocabulary: Set[String] = doc.terms.toSet
-  def histogram: Map[String, Int] =
-    doc.terms.groupBy { case s => s }.mapValues(_.size)
-  def multinomial: Map[String, Double] = {
-    val h = doc.terms.groupBy { case s => s }.mapValues(_.size)
-    val sum = h.values.sum
-    h.mapValues(_.toDouble / sum)
-  }
-}
-
 object Test {
   implicit def term2op(t: Term): SingleTermOp = SingleTermOp(t)
   type TMap = Map[Operator, Set[Term]]
@@ -54,11 +30,12 @@ object Test {
     // Assign iterators to each of the underlying terms
     val index = Index.disk(args(0))
     val termObjs = tMap.values.reduce((a,b) => a ++ b)
-    termObjs.foreach( term => term.underlying = index.iterator(term.t))
+    termObjs.foreach( _.attach(index) )
     val iterators = termObjs.map(_.underlying)
     val lengths = index.lengthsIterator
     val scorers : List[FeatureOp] = List[FeatureOp](sdm)
-    val currentdoc: Document = new IndexBasedDocument(index, lengths)
+    val currentdoc = new IndexBasedDocument()
+    currentdoc.index = index
     // Go
     val numResults: Int = 100
     val resultQueue = PriorityQueue[ScoredDocument]()(ScoredDocumentOrdering)
@@ -68,6 +45,7 @@ object Test {
       iterators.foreach(_.syncTo(candidate))
       if (iterators.exists(_.hasMatch(candidate))) {
         // Time to score
+        currentdoc.doc = index.document(index.underlying.getName(candidate))
         var score = scorers.foldRight(new Score(0.0)) { (S,N) =>
           S match {
             case i: IntrinsicEvaluator => i.eval + N

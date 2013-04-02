@@ -61,6 +61,11 @@ class Index(val underlying: org.lemurproject.galago.core.index.Index) {
   def iterator(key: String): ExtentIterator =
     underlying.getIterator(key, Parameters.empty).asInstanceOf[ExtentIterator]
 
+  def postings(key:String): PostingSeq[PositionsPosting] =
+    new PostingSeq(iterator(key), this)
+  def documents: DocumentSeq[Document] =
+    new DocumentSeq[IndexBasedDocument](this)
+
   def count(key: String, targetId: String): Int = positions(key, targetId).size
   def collectionCount(key: String): Long = getKeyedStatistics(key).nodeFrequency
   def docFreq(key: String): Long = getKeyedStatistics(key).nodeDocumentCount
