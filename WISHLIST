@@ -9,6 +9,10 @@ THINGS TO FIX/IMPROVE:
 - How do we memoize statistics functions?
 - Annotations. We want them, particularly for debugging. How to cleanly
   add them?
+- When instantiating iterators we need to track the following:
+  - what score tree is connected to what iterators (and vice-versa)
+  - a map of the weights (again, both ways would be good)
+
 
 - I like the composition of scoring function + filter + iterator, and so
   on. Any more we can do?
@@ -23,6 +27,4 @@ THINGS TO FIX/IMPROVE:
 TODO:
 - Need a place to put the aggregate statistics for the collection - make a
   manifest for the "whole thing"?
-- Need to re-implement BuildIndex
-- Need a general version of the corpus. Use the splitBTree components.
 - Add some tests back in.

@@ -12,7 +12,7 @@ import org.lemurproject.galago.tupleflow.Parameters;
 public class AggregateReader {
 
   public static class IndexPartStatistics implements Serializable {
-
+    public static final IndexPartStatistics zero = new IndexPartStatistics();
     private static final long serialVersionUID = 5553653651892088433L;
     public String partName = null;
     public long collectionLength = 0;
@@ -58,7 +58,7 @@ public class AggregateReader {
    * documents.
    */
   public static class CollectionStatistics implements Serializable {
-
+    public static final CollectionStatistics zero = new CollectionStatistics();
     private static final long serialVersionUID = 6553653651892088433L;
     // 'document', 'field', or passage label
     public String fieldName = null;
@@ -66,13 +66,13 @@ public class AggregateReader {
     public long collectionLength = 0;
     // total number of documents that contain field
     public long documentCount = 0;
-    // note for the next three values: 
+    // note for the next three values:
     //  - (instances of 'field' in a document are summed together)
     // maximum length of 'field'
     public long maxLength = 0;
     // minimum length of 'field'
     public long minLength = 0;
-    // average length of 'field' 
+    // average length of 'field'
     public double avgLength = 0;
 
     public CollectionStatistics() {
@@ -103,7 +103,7 @@ public class AggregateReader {
   }
 
   public static class NodeStatistics implements Serializable {
-
+    public static final NodeStatistics zero = new NodeStatistics();
     private static final long serialVersionUID = 7553653651892088433L;
     public String node = null;
     public long nodeFrequency = 0;

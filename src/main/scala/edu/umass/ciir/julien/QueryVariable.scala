@@ -1,10 +1,23 @@
 package edu.umass.ciir.julien
 
+import scala.collection.mutable.ListBuffer
+
+object QueryVariable {
+  def apply(features: List[Feature]) : QueryVariable = {
+    val weights = List.fill(features.size)(1.0)
+    new QueryVariable(features, weights)
+  }
+
+  def apply(features: List[Feature], weights: List[Double]) : QueryVariable =
+    new QueryVariable(features, weights)
+}
+
 class QueryVariable(
   val features: List[Feature],
-  val sources: List[DataSource],
   val weights: List[Double]
 ) {
+  val sources = ListBuffer[BoundSource]()
+
   // Precondition check
   require(weights.size == features.size,
     "|features| != |weights| (${features.size} != ${weights.size})")

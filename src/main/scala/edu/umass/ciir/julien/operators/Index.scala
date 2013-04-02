@@ -1,4 +1,4 @@
-package edu.umass.ciir.julien
+package operators
 
 import org.lemurproject.galago.core.index.disk.DiskIndex
 import org.lemurproject.galago.core.index.mem.MemoryIndex
@@ -10,11 +10,11 @@ import org.lemurproject.galago.tupleflow.{Parameters,Utility,Source}
 import scala.collection.JavaConversions._
 
 
-object IndexSource {
-  def apply(i: DiskIndex) = new IndexSource(i)
-  def apply(m: MemoryIndex) = new IndexSource(m)
-  def disk(s: String) = new IndexSource(new DiskIndex(s))
-  def memory(s: String*) : IndexSource = {
+object Index {
+  def apply(i: DiskIndex) = new Index(i)
+  def apply(m: MemoryIndex) = new Index(m)
+  def disk(s: String) = new Index(new DiskIndex(s))
+  def memory(s: String*) : Index = {
     // Try to use the components from the Galago pipeline to
     // 1) Chop the file into a DocumentSource
     val docsource = new DocumentSource(s: _*)
@@ -29,55 +29,56 @@ object IndexSource {
     // Run it
     docsource.run()
     // Return it
-    return new IndexSource(memoryIndex)
+    return new Index(memoryIndex)
   }
 }
 
-class IndexSource(index: Index) extends FreeSource with Stored {
-  import Aliases._
+class Index(val underlying: org.lemurproject.galago.core.index.Index) {
+  import edu.umass.ciir.julien.Aliases._
 
-  private val lengthsIterator = index.getLengthsIterator
+  val lengthsIterator = underlying.getLengthsIterator
   private val collectionStats =
     lengthsIterator.asInstanceOf[ARCA].getStatistics
-  private val postingsStats =  index.getIndexPartStatistics("postings")
-
-  def supports: Set[Stored] = Set[Stored](this)
+  private val postingsStats =
+    underlying.getIndexPartStatistics("postings")
 
   def collectionLength: Long = collectionStats.collectionLength
   def numDocuments: Long = collectionStats.documentCount
   def vocabularySize: Long = postingsStats.vocabCount
 
   def length(targetId: String): Int =
-    index.getLength(index.getIdentifier(targetId))
+    underlying.getLength(underlying.getIdentifier(targetId))
 
   def positions(key: String, targetId: String): ExtentArray = {
     val it =
-      index.getIterator(key, Parameters.empty).asInstanceOf[ExtentIterator]
+      underlying.getIterator(key, Parameters.empty).asInstanceOf[ExtentIterator]
     if (it.isInstanceOf[NullExtentIterator]) return ExtentArray.empty
-    val docid = index.getIdentifier(targetId)
+    val docid = underlying.getIdentifier(targetId)
     it.syncTo(docid)
     if (it.hasMatch(docid)) it.extents else ExtentArray.empty
   }
 
+  def iterator(key: String): ExtentIterator =
+    underlying.getIterator(key, Parameters.empty).asInstanceOf[ExtentIterator]
+
   def count(key: String, targetId: String): Int = positions(key, targetId).size
   def collectionCount(key: String): Long = getKeyedStatistics(key).nodeFrequency
   def docFreq(key: String): Long = getKeyedStatistics(key).nodeDocumentCount
-  def document(targetId: String): Document =
-    index.getItem(targetId, Parameters.empty)
+  def document(targetId: String): org.lemurproject.galago.core.parse.Document =
+    underlying.getItem(targetId, Parameters.empty)
 
   def terms(targetId: String): List[String] = {
-    val doc = index.getItem(targetId, Parameters.empty)
+    val doc = underlying.getItem(targetId, Parameters.empty)
     doc.terms.toList
   }
 
   private def getKeyedStatistics(key: String) : NS = {
-    val is = new IteratorSource(key, index)
-
-    val it = index.getIterator(key, Parameters.empty)
+    val it = underlying.getIterator(key, Parameters.empty)
     it match {
       case n: NullExtentIterator => AggregateReader.NodeStatistics.zero
       case a: ARNA => a.getStatistics
-      case e: ExtentIterator => IteratorSource.gatherStatistics(e)
+      case e: ExtentIterator =>
+        edu.umass.ciir.julien.IteratorSource.gatherStatistics(e)
     }
   }
 }

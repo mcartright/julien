@@ -158,7 +158,7 @@ public class DiskIndex implements Index {
   @Override
   public Iterator getIterator(byte[] key, Parameters p) throws IOException {
     Iterator result = null;
-    IndexPartReader part = parts.get(p.getString("part"));
+    IndexPartReader part = parts.get(p.get("part", "postings"));
     if (part != null) {
       result = part.getIterator(key);
       if (result == null) {
@@ -213,7 +213,7 @@ public class DiskIndex implements Index {
         int docId = getIdentifier(name);
         return corpus.getDocument(docId, p);
       } catch (Exception e) {
-        // ignore the exception                                                                                                                       
+        // ignore the exception
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE,
                 "Failed to get document: {0}\n{1}",
                 new Object[]{name, e.toString()});

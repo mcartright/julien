@@ -47,23 +47,24 @@ public class MemoryIndex implements DynamicIndex, Index {
     manifest = p;
     initialize();
   }
-  
+
   public MemoryIndex() throws Exception {
     manifest = new Parameters();
     manifest.set("stemming", false);
     manifest.set("makecorpus", true);
+    initialize();
   }
-  
+
   public MemoryIndex(TupleFlowParameters parameters) throws Exception {
     manifest = parameters.getJSON();
     initialize();
   }
-  
+
   private void initialize() throws Exception {
     // determine which parts are to be created:
-    stemming = manifest.get("stemming", true);
+    stemming = manifest.get("stemming", false);
     nonstemming = manifest.get("nonstemming", true);
-    makecorpus = manifest.get("makecorpus", false);
+    makecorpus = manifest.get("makecorpus", true);
 
     // we should have either a stemmed or non-stemmed posting list
     assert stemming || nonstemming;
@@ -90,7 +91,7 @@ public class MemoryIndex implements DynamicIndex, Index {
       parts.put("postings.porter", new MemoryPositionalIndex(stemParams));
     }
 
-    dirty = false;    
+    dirty = false;
   }
 
   /**
@@ -102,6 +103,7 @@ public class MemoryIndex implements DynamicIndex, Index {
   }
 
   public void process(Document doc) throws IOException {
+    System.err.printf("Indexing: %s\n", (doc == null) ? "NULL" : doc.name);
     doc.identifier = documentCount;
     for (MemoryIndexPart part : parts.values()) {
       part.addDocument(doc);
