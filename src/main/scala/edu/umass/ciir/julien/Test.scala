@@ -5,12 +5,16 @@ import edu.umass.ciir.julien.Utils._
 import edu.umass.ciir.julien.Aliases._
 import scala.collection.JavaConversions._
 
+import org.lemurproject.galago.tupleflow.Parameters
+
 object Test {
   implicit def term2op(t: Term): SingleTermOp = SingleTermOp(t)
   type TMap = Map[Operator, Set[Term]]
 
   def main(args: Array[String]): Unit = {
-    val query = "united states of america".split(" ").map(Term(_))
+    val params = new Parameters(args)
+    val query = params.getString("query").split(" ").map(Term(_))
+    val ql = Combine(query.map(a => Dirichlet(a)): _*)
     val sdm =
       Combine(
         Weight(Combine(query.map(a => Dirichlet(a)): _*), 0.8),
@@ -21,16 +25,21 @@ object Test {
           Dirichlet(UnorderedWindow(8, p: _*))
         }.toSeq: _*), 0.05)
       )
-    val tMap = findTerms(sdm)
-    for ((k,v) <- tMap) {
-      Console.printf("Node %s --> %s\n", k, v.mkString(","))
-    }
 
     // Assign iterators to each of the underlying terms
-    val index = Index.disk(args(0))
-    val termObjs = tMap.values.reduce((a,b) => a ++ b)
-    termObjs.foreach( _.attach(index) )
-    val iterators = termObjs.map(_.underlying)
+    val indexType = params.getString("type")
+    assert("""memory|disk""".r matches indexType,
+      s"Unknown index type: $indexType")
+    val index : Index = indexType match {
+      case "disk" => Index.disk(params.getString("disk"))
+      case "memory" => Index.memory(params.getString("memory"))
+    }
+    // Connect to this index
+    index.attach(ql)
+    // extract iteators
+    val iterators = ql.filter(_.isInstanceOf[Term]).map { t =>
+      t.asInstanceOf[Term].underlying
+    }
     val lengths = index.lengthsIterator
     val scorers : List[FeatureOp] = List[FeatureOp](sdm)
 
@@ -43,10 +52,13 @@ object Test {
       iterators.foreach(_.syncTo(candidate))
       if (iterators.exists(_.hasMatch(candidate))) {
         // Time to score
-        val currentdoc = index.document(index.underlying.getName(candidate))
+        lazy val currentdoc =
+          index.document(index.underlying.getName(candidate))
+        val len = new Length(lengths.getCurrentLength)
         var score = scorers.foldRight(new Score(0.0)) { (S,N) =>
           S match {
             case i: IntrinsicEvaluator => i.eval + N
+            case l: LengthsEvaluator => l.eval(len) + N
             case t: TraversableEvaluator[Document] => t.eval(currentdoc) + N
             case _ => N
           }

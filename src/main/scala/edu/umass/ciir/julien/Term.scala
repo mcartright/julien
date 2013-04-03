@@ -17,6 +17,7 @@ class Term(val t: String) extends Value with Operator {
   // The iterator attached to this Term
   private[this] var iter: Option[ExtentIterator] = None
 
+  override def toString: String = s"`$t"
   def children: Seq[Operator] = List.empty
   def isAttached: Boolean = index.isDefined
   def attach(i: Index): Unit = {

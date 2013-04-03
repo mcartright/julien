@@ -69,7 +69,8 @@ public class MemoryIndex implements DynamicIndex, Index {
     // we should have either a stemmed or non-stemmed posting list
     assert stemming || nonstemming;
 
-    // this allows memory index to start numbering documents from a specific documentCount.
+    // this allows memory index to start numbering documents
+    // from a specific documentCount.
     documentNumberOffset = (int) manifest.get("documentNumberOffset", 0L);
     documentCount = documentNumberOffset;
 
@@ -87,10 +88,10 @@ public class MemoryIndex implements DynamicIndex, Index {
     if (stemming) {
       Parameters stemParams = partParams.clone();
       // should change this to support several stemmers...
-      stemParams.set("stemmer", manifest.get("stemmer", Porter2Stemmer.class.getName()));
+      stemParams.set("stemmer",
+		     manifest.get("stemmer", Porter2Stemmer.class.getName()));
       parts.put("postings.porter", new MemoryPositionalIndex(stemParams));
     }
-
     dirty = false;
   }
 

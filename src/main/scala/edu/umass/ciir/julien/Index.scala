@@ -79,9 +79,12 @@ class Index(val underlying: org.lemurproject.galago.core.index.Index) {
     doc.terms.toList
   }
 
-  def attach(op: Operator): Unit = for (o <- op) o match {
-    case t: Term => t.attach(this)
-    case _ => Unit
+  def attach(op: Operator): Unit = {
+    if (op.isInstanceOf[Term]) op.asInstanceOf[Term].attach(this)
+    for (o <- op) o match {
+      case t: Term => t.attach(this)
+      case _ => Unit
+    }
   }
 
   private def getKeyedStatistics(key: String) : NS = {

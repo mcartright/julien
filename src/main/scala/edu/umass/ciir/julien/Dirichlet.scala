@@ -10,13 +10,20 @@ object Dirichlet {
 }
 
 class Dirichlet(val op: CountOp, mu: Double)
-    extends TraversableEvaluator[Document] {
+    extends TraversableEvaluator[Document]
+    with LengthsEvaluator {
   lazy val children: Seq[Operator] = List[Operator](op)
   def views: Set[ViewOp] = Set[ViewOp](op)
   // Runs when asked for the first time, and runs only once
   lazy val cf = {
     val stats: CountStatistics = op.statistics
     ((stats.collFreq + 0.5) / stats.collLength.toDouble)
+  }
+
+  def eval(l: Length): Score = {
+    val num = op.count + (mu*cf)
+    val den = l + mu
+    new Score(scala.math.log(num / den))
   }
 
   def eval(d: Document): Score = {

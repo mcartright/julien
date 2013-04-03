@@ -2,7 +2,7 @@ package edu.umass.ciir.julien
 
 import scala.collection.{Traversable,TraversableLike}
 import scala.collection.immutable.List
-import scala.collection.mutable.{Builder,ListBuffer}
+import scala.collection.mutable.{Builder,ListBuffer,Queue}
 import scala.collection.generic.CanBuildFrom
 import edu.umass.ciir.julien.Aliases._
 
@@ -12,13 +12,23 @@ import edu.umass.ciir.julien.Aliases._
 //              of the current system state.
 trait Operator
     extends Traversable[Operator]
-    with TraversableLike[Operator, List[Operator]] {
+    with TraversableLike[Operator, List[Operator]]
+{
   def children: Seq[Operator]
-
-  def foreach[U](f: Operator => U) {
+  def foreach[U](f: Operator => U) = {
     f(this)
-    children foreach f
+    // ironically...
+    for (c <- children) c foreach f
   }
+
+  override def toString: String = {
+    val b = new StringBuilder()
+    b append stringPrefix append "("
+    b append children.mkString(",")
+    b append ")"
+    b.result
+  }
+
   override def newBuilder: Builder[Operator, List[Operator]] =
     Operator.newBuilder
 }
