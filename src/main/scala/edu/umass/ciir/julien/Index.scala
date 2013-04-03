@@ -8,11 +8,12 @@ import org.lemurproject.galago.core.util.ExtentArray
 import org.lemurproject.galago.core.parse.{Document => _, _}
 import org.lemurproject.galago.tupleflow.{Parameters,Utility,Source}
 import scala.collection.JavaConversions._
+import edu.umass.ciir.julien.Aliases._
 
 object Index {
-  def apply(i: DiskIndex) = new Index(i)
-  def apply(m: MemoryIndex) = new Index(m)
-  def disk(s: String) = new Index(new DiskIndex(s))
+  def apply(i: DiskIndex) = new Index("unknown", i)
+  def apply(m: MemoryIndex) = new Index("unknown", m)
+  def disk(s: String) = new Index(s, new DiskIndex(s))
   def memory(s: String*) : Index = {
     // Try to use the components from the Galago pipeline to
     // 1) Chop the file into a DocumentSource
@@ -28,12 +29,22 @@ object Index {
     // Run it
     docsource.run()
     // Return it
-    return new Index(memoryIndex)
+    return new Index(s.mkString(","), memoryIndex)
   }
 }
 
-class Index(val underlying: org.lemurproject.galago.core.index.Index) {
-  import edu.umass.ciir.julien.Aliases._
+class Index(label: String,
+  val underlying: GIndex) {
+
+  override def toString: String = {
+    val b = new StringBuilder()
+    val hdr = if (underlying.isInstanceOf[MemoryIndex])
+      b ++= "memory:"
+    else
+      b ++= "disk:"
+    b ++= label
+    b.result
+  }
 
   val lengthsIterator = underlying.getLengthsIterator
   private val collectionStats =

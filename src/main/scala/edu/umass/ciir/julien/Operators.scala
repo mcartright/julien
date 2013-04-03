@@ -48,13 +48,17 @@ trait CountOp extends ViewOp with CountSrc with StatisticsSrc
 trait PositionsOp extends CountOp with PositionSrc
 trait DataOp[T] extends ViewOp with DataSrc[T]
 trait ScoreOp extends ViewOp with ScoreSrc
+trait ChildlessOperator extends Operator {
+  lazy val children: Seq[Operator] = List.empty
+  // Ever so slightly faster here
+  override def foreach[U](f: Operator => U) = f(this)
+}
 
 // Features
-sealed trait FeatureOp extends Operator { def views: Set[ViewOp] }
-trait TraversableEvaluator[T] extends FeatureOp { def eval(obj: T): Score }
-trait IntrinsicEvaluator extends FeatureOp { def eval: Score }
-trait CLEvaluator extends FeatureOp { def eval(c: Count, l: Length): Score }
-trait LengthsEvaluator extends FeatureOp { def eval(l: Length): Score }
+trait FeatureOp extends Operator {
+  def views: Set[ViewOp]
+  def eval: Score
+}
 
 // Overloaded operators that do both -- these need work
 // case class Require[T](test: (_) => Boolean, op: Operator) extends FeatureOp

@@ -68,6 +68,7 @@ class SimpleProcessor extends QueryProcessor {
       t.asInstanceOf[Term].underlying
     }
     val lengths = index.lengthsIterator
+    // Need to fix this
     val scorers : List[FeatureOp] = List[FeatureOp](model)
 
     // Go
@@ -79,16 +80,9 @@ class SimpleProcessor extends QueryProcessor {
       iterators.foreach(_.syncTo(candidate))
       if (iterators.exists(_.hasMatch(candidate))) {
         // Time to score
-        lazy val currentdoc =
-          index.document(index.underlying.getName(candidate))
         val len = new Length(lengths.getCurrentLength)
-        var score = scorers.foldRight(new Score(0.0)) { (S,N) =>
-          S match {
-            case i: IntrinsicEvaluator => i.eval + N
-            case l: LengthsEvaluator => l.eval(len) + N
-            case t: TraversableEvaluator[Document] => t.eval(currentdoc) + N
-            case _ => N
-          }
+        var score = scorers.foldLeft(new Score(0.0)) { (score,op) =>
+          score + op.eval
         }
         resultQueue.enqueue(ScoredDocument(candidate, score.underlying))
         if (resultQueue.size > numResults) resultQueue.dequeue

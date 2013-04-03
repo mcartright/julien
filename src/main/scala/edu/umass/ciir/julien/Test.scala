@@ -14,15 +14,15 @@ object Test {
   def main(args: Array[String]): Unit = {
     val params = new Parameters(args)
     val query = params.getString("query").split(" ").map(Term(_))
-    val ql = Combine(query.map(a => Dirichlet(a)): _*)
+    val ql = Combine(query.map(a => Dirichlet(a, LengthsOp())): _*)
     val sdm =
       Combine(
-        Weight(Combine(query.map(a => Dirichlet(a)): _*), 0.8),
+        Weight(Combine(query.map(a => Dirichlet(a,LengthsOp())): _*), 0.8),
         Weight(Combine(query.sliding(2,1).map { p =>
-          Dirichlet(OrderedWindow(1, p: _*))
+          Dirichlet(OrderedWindow(1, p: _*), LengthsOp())
         }.toSeq: _*), 0.15),
         Weight(Combine(query.sliding(2,1).map { p =>
-          Dirichlet(UnorderedWindow(8, p: _*))
+          Dirichlet(UnorderedWindow(8, p: _*), LengthsOp())
         }.toSeq: _*), 0.05)
       )
 
@@ -42,30 +42,4 @@ object Test {
     val results = processor.run
     printResults(results, index)
   }
-
-  def findTerms(
-    root: Operator,
-    ctx: List[Operator] = List[Operator](),
-    m: TMap = Map[Operator, Set[Term]]()) : TMap =
-    root match {
-      case s: SingleTermOp => ctx.foldLeft(m) {
-        (m, o) => m + (o -> (m.getOrElse(o, Set[Term]()) + s.t))
-      }
-      case ow: OrderedWindow => ctx.foldLeft(m) {
-        (m2, o) => ow.terms.foldLeft(m2) {
-          (m3, t) => m3 + (o -> (m3.getOrElse(o, Set[Term]()) + t))
-        }
-      }
-      case uw: UnorderedWindow => ctx.foldLeft(m) {
-        (m2, o) => uw.terms.foldLeft(m2) {
-          (m3, t) => m3 + (o -> (m3.getOrElse(o, Set[Term]()) + t))
-        }
-      }
-      case w: Weight => m ++ findTerms(w.op, root :: ctx, m)
-      case c: Combine => c.ops.foldLeft(m) { (m, o) =>
-        findTerms(o, root :: ctx, m)
-      }
-      case d: Dirichlet => m ++ findTerms(d.op, root :: ctx, m)
-      case _ => m
-    }
 }

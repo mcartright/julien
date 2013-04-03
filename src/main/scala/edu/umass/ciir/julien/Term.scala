@@ -13,28 +13,18 @@ object Term { def apply(s: String) = new Term(s) }
   * These are always 1-to-1.
   */
 final class Term(val t: String)
-    extends IteratedHook[ExtentIterator]
-    with Operator {
-  override def toString: String = s"`$t"
-  def children: Seq[Operator] = List.empty
-
-
-  private[this] var i: Option[Index] = None
-  private[this] var ei: Option[ExtentIterator] = None
-
-  def index: Option[Index] = i
-  def index_=(idx: Index) = i = Some(idx)
-
-  def iter: Option[ExtentIterator] = ei
-  def iter_=(it: ExtentIterator) = ei = Some(it)
-
+    extends ChildlessOperator
+    with IteratedHook[ExtentIterator] {
+  override def toString: String =
+    s"$t:" + (if (isAttached) index.toString else "")
   def getIterator(i: Index): ExtentIterator = i.iterator(t)
 }
 
-sealed trait IndexHook {
+trait IndexHook {
   // The index attached to this Term
-  protected def index: Option[Index]
-  protected def index_=(i: Index): Unit
+  protected[this] var i: Option[Index] = None
+  protected def index: Option[Index] = i
+  protected def index_=(idx: Index) = i = Some(idx)
 
   def attachedIndex: Index = {
     assume(index.isDefined,
@@ -45,10 +35,13 @@ sealed trait IndexHook {
   def isAttached: Boolean = index.isDefined
 }
 
-sealed trait IteratedHook[I <: Iterator] extends IndexHook {
+trait IteratedHook[I <: Iterator] extends IndexHook {
   // The iterator attached to this hook
-  protected def iter: Option[I]
-  protected def iter_=(i: I): Unit
+  protected[this] var it: Option[I] = None
+
+  protected def iter: Option[I] = it
+  protected def iter_=(it: I) = this.it = Some(it)
+
   protected def getIterator(i: Index): I
 
   override def attach(i: Index) {
