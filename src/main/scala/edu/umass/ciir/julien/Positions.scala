@@ -7,8 +7,7 @@ import scala.collection.mutable.{ArrayBuffer,Builder}
 import org.lemurproject.galago.core.util.ExtentArray
 
 class Positions(underlying: Array[Int])
-    extends IndexedSeqOptimized[Int, Positions]
-    with Value {
+    extends IndexedSeqOptimized[Int, Positions] {
   def apply(idx: Int): Int = underlying(idx)
   def length: Int = underlying.length
   def seq: IndexedSeq[Int] = Vector(underlying: _*)

@@ -13,9 +13,6 @@ THINGS TO FIX/IMPROVE:
   - what score tree is connected to what iterators (and vice-versa)
   - a map of the weights (again, both ways would be good)
 
-
-- I like the composition of scoring function + filter + iterator, and so
-  on. Any more we can do?
 - To make the toolkit configurable, should we focus on schema-validated JSON
   or a series of case classes? (Note: case classes have a 22-parameter limit,
   but are built into Scala more cleanly than JSON)

@@ -1,20 +1,21 @@
 package edu.umass.ciir.julien
 
-object Dirichlet {
-  def apply(op: CountOp): Dirichlet = apply(op, 1500)
-  def apply(op: CountOp, mu: Double): Dirichlet =
-    new Dirichlet(op, mu)
+object JelinekMercer {
+  def apply(op: CountOp): JelinekMercer = apply(op, 1500)
+  def apply(op: CountOp, lambda: Double): JelinekMercer =
+    new JelinekMercer(op, lambda)
 
-  def apply(t: Term, mu: Double = 1500): Dirichlet =
-    apply(new SingleTermOp(t), mu)
+  def apply(t: Term, lambda: Double = 1500): JelinekMercer =
+    apply(new SingleTermOp(t), lambda)
 }
 
-class Dirichlet(val op: CountOp, mu: Double)
+class JelinekMercer(val op: CountOp, lambda: Double)
     extends TraversableEvaluator[Document]
     with CLEvaluator
     with LengthsEvaluator {
   lazy val children: Seq[Operator] = List[Operator](op)
   def views: Set[ViewOp] = Set[ViewOp](op)
+
   // Runs when asked for the first time, and runs only once
   lazy val cf = {
     val stats: CountStatistics = op.statistics
@@ -24,8 +25,9 @@ class Dirichlet(val op: CountOp, mu: Double)
   def eval(l: Length): Score = eval(op.count, l)
   def eval(d: Document): Score = eval(d.count(op), d.length)
   def eval(c: Count, l: Length): Score = {
-    val num = c + (mu*cf)
-    val den = l + mu
-    new Score(scala.math.log(num / den))
+    val foreground = c / l
+    new Score(scala.math.log((lambda*foreground) + ((1.0-lambda)*cf)))
   }
 }
+
+

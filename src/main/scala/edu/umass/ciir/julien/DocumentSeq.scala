@@ -11,7 +11,7 @@ import scala.collection.JavaConversions._
   * An Index can support an Iterator over the collection
   * for this kind of object.
   */
-trait Document extends Value {
+trait Document {
   def length: Length
   def count(op: CountOp): Count
   def positions(op: PositionsOp): Positions
