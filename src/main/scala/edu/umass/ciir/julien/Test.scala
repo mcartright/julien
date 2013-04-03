@@ -34,41 +34,13 @@ object Test {
       case "disk" => Index.disk(params.getString("disk"))
       case "memory" => Index.memory(params.getString("memory"))
     }
+
+    val processor = SimpleProcessor()
     // Connect to this index
     index.attach(ql)
-    // extract iteators
-    val iterators = ql.filter(_.isInstanceOf[Term]).map { t =>
-      t.asInstanceOf[Term].underlying
-    }
-    val lengths = index.lengthsIterator
-    val scorers : List[FeatureOp] = List[FeatureOp](sdm)
-
-    // Go
-    val numResults: Int = 100
-    val resultQueue = PriorityQueue[ScoredDocument]()(ScoredDocumentOrdering)
-    while (iterators.exists(_.isDone == false)) {
-      val candidate = iterators.filterNot(_.isDone).map(_.currentCandidate).min
-      lengths.syncTo(candidate)
-      iterators.foreach(_.syncTo(candidate))
-      if (iterators.exists(_.hasMatch(candidate))) {
-        // Time to score
-        lazy val currentdoc =
-          index.document(index.underlying.getName(candidate))
-        val len = new Length(lengths.getCurrentLength)
-        var score = scorers.foldRight(new Score(0.0)) { (S,N) =>
-          S match {
-            case i: IntrinsicEvaluator => i.eval + N
-            case l: LengthsEvaluator => l.eval(len) + N
-            case t: TraversableEvaluator[Document] => t.eval(currentdoc) + N
-            case _ => N
-          }
-        }
-        resultQueue.enqueue(ScoredDocument(candidate, score.underlying))
-        if (resultQueue.size > numResults) resultQueue.dequeue
-      }
-      iterators.foreach(_.movePast(candidate))
-    }
-    printResults(resultQueue.reverse, index.underlying)
+    processor.add(ql)
+    val results = processor.run
+    printResults(results, index)
   }
 
   def findTerms(

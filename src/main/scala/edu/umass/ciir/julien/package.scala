@@ -97,4 +97,14 @@ package object julien {
     * Underlying class is Long.
     */
   implicit class VocabSize(val underlying: Long) extends AnyVal
+
+  import scala.collection.mutable.{ListBuffer,PriorityQueue}
+
+  implicit def q2list[T](q: PriorityQueue[T]): List[T] = {
+    val b = ListBuffer[T]()
+    while (!q.isEmpty) { b += q.dequeue }
+    b.toList
+  }
+
+  type Combiner = (Seq[FeatureOp]) => Score
 }

@@ -65,6 +65,7 @@ class Index(val underlying: org.lemurproject.galago.core.index.Index) {
   def documents: DocumentSeq[Document] =
     new DocumentSeq[IndexBasedDocument](this)
   def vocabulary: KeySeq = new KeySeq(underlying.getIndexPart("postings").keys)
+  def name(docid: Int) : String = underlying.getName(docid)
   def names: PairSeq[String] =
     new PairSeq[String](underlying.getIndexPart("names").keys,
     (k: KeyIterator) => Utility.toString(k.getValueBytes) : String )

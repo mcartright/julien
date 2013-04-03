@@ -14,9 +14,9 @@ object Utils {
 
   implicit def regexToRichRegex(r: Regex) = new RichRegex(r)
 
-  def printResults(results: List[ScoredDocument], index: GIndex) : Unit = {
+  def printResults(results: List[ScoredDocument], index: Index) : Unit = {
     for ((sd, idx) <- results.zipWithIndex) {
-      val name = index.getName(sd.docid)
+      val name = index.name(sd.docid)
       Console.printf("test %s %f %d julien\n",
         name, sd.score, idx+1)
     }
@@ -24,11 +24,11 @@ object Utils {
 
   def printResults(
     results: PriorityQueue[ScoredDocument],
-    index: GIndex) : Unit = {
+    index: Index) : Unit = {
     var rank = 1
     while (!results.isEmpty) {
       val doc = results.dequeue
-      val name = index.getName(doc.docid)
+      val name = index.name(doc.docid)
       Console.printf("test %s %f %d julien\n",
         name, doc.score, rank)
       rank += 1
