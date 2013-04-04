@@ -10,18 +10,20 @@ object SimpleProcessor {
 class SimpleProcessor extends QueryProcessor {
   override def validated: Boolean = {
     val looseCheck = super.validated
-    if (!looseCheck) return looseCheck
+    if (looseCheck == false) return looseCheck
 
     // For this processor, let's assume only 1 index may be held
     // Other processors will do trickier stuff
-    return _indexes.size == 1
+    assume(_indexes.size == 1,
+      s"${toString} does not process more than 1 index at a time.")
+    return true
   }
 
   def run: List[ScoredDocument] = {
     assume(validated, s"Unable to validate given model/index combination")
         // extract iteators
-    val index = _indexes(0)
-    val model = _models(0)
+    val index = _indexes.head
+    val model = _models.head
     val iterators = model.filter(_.isInstanceOf[Term]).map { t =>
       t.asInstanceOf[Term].underlying
     }
