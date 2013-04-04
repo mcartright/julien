@@ -42,28 +42,12 @@ object Utils {
 
   def scrub(s: String) =
     s.filter(c => c.isLetterOrDigit || c.isWhitespace).toLowerCase
-
-  def histogram(doc: GDoc) : Histogram = {
-    // the case is to force Scala to make an identity function
-    val h = doc.terms.groupBy { case s => s }.mapValues(_.size)
-    Histogram(doc.identifier, h)
-  }
-
-  def multinomial(doc: GDoc) : Multinomial = {
-    val h = doc.terms.groupBy { case s => s }.mapValues(_.size)
-    val sum = h.values.sum
-    val probs = h.mapValues(_.toDouble / sum)
-    Multinomial(doc.identifier, probs)
-  }
 }
 
 case class ScoredDocument(docid: Int, score: Double)
 object ScoredDocumentOrdering extends Ordering[ScoredDocument] {
   def compare(a: ScoredDocument, b: ScoredDocument) = b.score compare a.score
 }
-
-case class Histogram(id: Int, counts: Map[String, Int])
-case class Multinomial(id: Int, probs: Map[String, Double])
 
 // Extract terms we want to use for expansion
 case class Gram(term: String, score: Double)

@@ -5,14 +5,9 @@ import scala.collection.immutable.List
 import scala.collection.mutable.{Builder,ListBuffer,Queue}
 import scala.collection.generic.CanBuildFrom
 
-// Two kinds of operations on a query graph:
-// 1) views : Masquerade one operator for 1 or more, or for filtering
-// 2) features: Use views to perform calculations to provide some belief
-//              of the current system state.
 trait Operator
     extends Traversable[Operator]
-    with TraversableLike[Operator, List[Operator]]
-{
+    with TraversableLike[Operator, List[Operator]] {
   def children: Seq[Operator]
   def foreach[U](f: Operator => U) = {
     f(this)
@@ -41,7 +36,9 @@ object Operator {
   def newBuilder: Builder[Operator, List[Operator]] = ListBuffer[Operator]()
 }
 
-// // Views provide Values to the Features
+// Views
+
+// Views provide Values to the Features
 trait ViewOp extends Operator
 trait CountOp extends ViewOp with CountSrc with StatisticsSrc
 trait PositionsOp extends CountOp with PositionSrc
@@ -53,16 +50,16 @@ trait ChildlessOperator extends Operator {
   override def foreach[U](f: Operator => U) = f(this)
 }
 
-// Features
+// Root of all Features
 trait FeatureOp extends Operator {
   def views: Set[ViewOp]
   def eval: Score
 }
 
+// Features
+
 // Overloaded operators that do both -- these need work
 // case class Require[T](test: (_) => Boolean, op: Operator) extends FeatureOp
 // case class Reject[T](test: (_) => Boolean, op: Operator) extends FeatureOp
 // case class Priors extends FeatureOp
-
-
 

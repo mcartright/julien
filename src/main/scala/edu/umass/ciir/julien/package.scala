@@ -117,7 +117,6 @@ package object julien {
 
   /** Type definitions, most of which are for aliasing in the
     * package.
-    *
     */
   type Combiner = (Seq[FeatureOp]) => Score
 
@@ -128,6 +127,7 @@ package object julien {
   // Because the names are ridiculously long...
   type GIndex = org.lemurproject.galago.core.index.Index
   type GDoc = org.lemurproject.galago.core.parse.Document
+  type GIterator = org.lemurproject.galago.core.index.Iterator
   type ARCA = AggregateReader.CollectionAggregateIterator
   type ARNA = AggregateReader.NodeAggregateIterator
   type NS = AggregateReader.NodeStatistics

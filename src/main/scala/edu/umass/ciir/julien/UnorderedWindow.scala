@@ -3,10 +3,10 @@ package edu.umass.ciir.julien
 import org.lemurproject.galago.core.util._
 
 object UnorderedWindow {
-  def apply(w: Int, t: Term*) = new OrderedWindow(w, t: _*)
+  def apply(w: Int, t: Term*) = new UnorderedWindow(w, t)
 }
 
-class UnorderedWindow(val width: Int, val terms: Term*)
+class UnorderedWindow(val width: Int, val terms: Seq[Term])
     extends MultiTermOp(terms)
     with PositionsOp {
   override def positions:  Positions = {

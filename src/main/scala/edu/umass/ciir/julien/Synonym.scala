@@ -1,13 +1,12 @@
 package edu.umass.ciir.julien
 
 import scala.collection.mutable.TreeSet
-import org.lemurproject.galago.core.util._
 
 object Synonym {
-  def apply(terms: Term*) = new Synonym(terms: _*)
+  def apply(terms: Term*) = new Synonym(terms)
 }
 
-class Synonym(terms: Term*)
+class Synonym(terms: Seq[Term])
     extends MultiTermOp(terms)
     with PositionsOp {
   override def positions: Positions = {

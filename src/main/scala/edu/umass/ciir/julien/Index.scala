@@ -32,9 +32,7 @@ object Index {
   }
 }
 
-class Index(label: String,
-  val underlying: GIndex) {
-
+class Index(label: String, val underlying: GIndex) {
   override def toString: String = {
     val b = new StringBuilder()
     val hdr = if (underlying.isInstanceOf[MemoryIndex])

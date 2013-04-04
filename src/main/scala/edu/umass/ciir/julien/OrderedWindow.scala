@@ -1,13 +1,12 @@
 package edu.umass.ciir.julien
 
-import org.lemurproject.galago.core.util._
 import scala.collection.BufferedIterator
 
 object OrderedWindow {
-  def apply(w: Int, t: Term*) = new OrderedWindow(w, t: _*)
+  def apply(w: Int, t: Term*) = new OrderedWindow(w, t)
 }
 
-class OrderedWindow(val width: Int, val terms: Term*)
+class OrderedWindow(val width: Int, val terms: Seq[Term])
     extends MultiTermOp(terms) {
   override def positions: Positions = {
     val hits = Positions.newBuilder
