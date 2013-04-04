@@ -7,8 +7,6 @@ class IndexBasedDocument extends Document {
   var index: Index = null
   var underlying: GDoc = null
   def length = new Length(index.length(underlying.name))
-  def count(op: CountView) = op.count
-  def positions(op: PositionsView) = op.positions
   def content: String = underlying.text
 
   // These depend on the term vector being present
@@ -20,11 +18,14 @@ class IndexBasedDocument extends Document {
     val sum = h.values.sum
     h.mapValues(_.toDouble / sum)
   }
+  def copy: Document = DocumentClone(this)
 }
 
 object IndexBasedDocument {
   val theDocument = new IndexBasedDocument
-  implicit def apply(ci: DataIterator[GDoc], idx: Index): IndexBasedDocument = {
+  def apply(ci: DataIterator[GDoc], idx: Index): Document = fromIter(ci, idx)
+
+  implicit def fromIter(ci: DataIterator[GDoc], idx: Index): Document = {
     theDocument.index = idx
     theDocument.underlying = ci.getData
     theDocument

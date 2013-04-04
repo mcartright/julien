@@ -5,6 +5,7 @@ import edu.umass.ciir.julien.Utils._
 import scala.collection.JavaConversions._
 
 import org.lemurproject.galago.tupleflow.Parameters
+import edu.umass.ciir.macros.Macros._
 
 object Test {
   implicit def term2op(t: Term): SingleTermView = SingleTermView(t)
@@ -36,9 +37,12 @@ object Test {
 
     val processor = SimpleProcessor()
     // Connect to this index
+    val t0 = System.currentTimeMillis
     index.attach(ql)
     processor.add(ql)
     val results = processor.run
+    val t1 = System.currentTimeMillis
     printResults(results, index)
+    debugf("Elapsed time: %d ms\n", (t1-t0).toInt)  // this is a test macro
   }
 }

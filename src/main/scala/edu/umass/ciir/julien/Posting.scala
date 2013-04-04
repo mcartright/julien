@@ -6,14 +6,21 @@ import org.lemurproject.galago.core.index.{ExtentIterator,ScoreIterator}
   * An Index object can produce SeqViews over these
   * given a ViewOp.
   */
-trait Posting { var docid = new Docid(0) }
+trait Posting[T <: Posting[T]] {
+  def docid: Docid
+  def copy: T
+}
 
-class CountPosting extends Posting with CountSrc {
-  var count: Count = new Count(0)
+class CountPosting protected (var docid: Docid, var count: Count)
+    extends Posting[CountPosting]
+    with CountSrc {
+  def copy: CountPosting = CountPosting(this)
 }
 
 object CountPosting {
-  val thePosting = new CountPosting
+  val thePosting = new CountPosting(Docid(0), Count(0))
+  def apply(cp: CountPosting) = new CountPosting(cp.docid, cp.count)
+  def apply(d: Docid, c: Count) = new CountPosting(d, c)
   implicit def apply(e: ExtentIterator) = {
     thePosting.docid = Docid(e.currentCandidate)
     thePosting.count = Count(e.count)
@@ -21,12 +28,20 @@ object CountPosting {
   }
 }
 
-class PositionsPosting extends CountPosting with PositionSrc {
-  var positions: Positions = Positions()
+class PositionsPosting protected (
+  var docid: Docid,
+  var count: Count,
+  var positions: Positions)
+    extends Posting[PositionsPosting]
+    with PositionSrc {
+  def copy: PositionsPosting = PositionsPosting(this)
 }
 
 object PositionsPosting {
-  val thePosting = new PositionsPosting
+  val thePosting = new PositionsPosting(Docid(0), Count(0), Positions())
+  def apply(p: PositionsPosting) =
+    new PositionsPosting(p.docid, p.count, p.positions)
+  def apply(d: Docid, c: Count, p: Positions) = new PositionsPosting(d, c, p)
   implicit def apply(e: ExtentIterator) = {
     thePosting.docid = Docid(e.currentCandidate)
     thePosting.count = Count(e.count)
@@ -35,12 +50,16 @@ object PositionsPosting {
   }
 }
 
-class ScorePosting extends Posting with ScoreSrc {
-  var score: Score = Score(0)
+class ScorePosting protected (var docid: Docid, var score: Score)
+    extends Posting[ScorePosting]
+    with ScoreSrc {
+  def copy: ScorePosting = ScorePosting(this)
 }
 
 object ScorePosting {
-  val thePosting = new ScorePosting
+  val thePosting = new ScorePosting(Docid(0), Score(0))
+  def apply(p: ScorePosting) = new ScorePosting(p.docid, p.score)
+  def apply(d: Docid, s: Score) = new ScorePosting(d, s)
   implicit def apply(s: ScoreIterator) = {
     thePosting.docid = Docid(s.currentCandidate)
     thePosting.score = Score(s.score)

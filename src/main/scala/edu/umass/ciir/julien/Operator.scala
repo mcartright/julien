@@ -5,9 +5,7 @@ import scala.collection.immutable.List
 import scala.collection.mutable.{Builder,ListBuffer,Queue}
 import scala.collection.generic.CanBuildFrom
 
-trait Operator
-    extends Traversable[Operator]
-    with TraversableLike[Operator, List[Operator]] {
+trait Operator extends Traversable[Operator] {
   def children: Seq[Operator]
   def foreach[U](f: Operator => U) = {
     f(this)

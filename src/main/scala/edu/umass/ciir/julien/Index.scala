@@ -70,8 +70,7 @@ class Index(label: String, val underlying: GIndex) {
 
   def postings(key:String): PostingSeq[PositionsPosting] =
     new PostingSeq(iterator(key), this)
-  def documents: DocumentSeq[Document] =
-    new DocumentSeq[IndexBasedDocument](this)
+  def documents: DocumentSeq = DocumentSeq(this)
   def vocabulary: KeySeq = new KeySeq(underlying.getIndexPart("postings").keys)
   def name(docid: Int) : String = underlying.getName(docid)
   def names: PairSeq[String] =

@@ -8,11 +8,10 @@ package edu.umass.ciir.julien
   */
 trait Document extends LengthsSrc {
   def length: Length
-  def count(op: CountView): Count
-  def positions(op: PositionsView): Positions
   def content: String
   def vocabulary: Set[String]
   def histogram: Map[String, Int]
   def multinomial: Map[String, Double]
+  def copy: Document
 }
 
