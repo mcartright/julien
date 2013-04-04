@@ -7,7 +7,7 @@ object OrderedWindow {
 }
 
 class OrderedWindow(val width: Int, val terms: Seq[Term])
-    extends MultiTermOp(terms) {
+    extends MultiTermView(terms) {
   override def positions: Positions = {
     val hits = Positions.newBuilder
     val iterators : Seq[BufferedIterator[Int]] = terms.map(t =>

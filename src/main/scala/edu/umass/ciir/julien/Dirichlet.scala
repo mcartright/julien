@@ -1,15 +1,15 @@
 package edu.umass.ciir.julien
 
 object Dirichlet {
-  def apply(op: CountOp, l: LengthsOp): Dirichlet = apply(op, l, 1500)
-  def apply(op: CountOp, l: LengthsOp, mu: Double): Dirichlet =
+  def apply(op: CountView, l: LengthsView): Dirichlet = apply(op, l, 1500)
+  def apply(op: CountView, l: LengthsView, mu: Double): Dirichlet =
     new Dirichlet(op, l, mu)
 
-  def apply(t: Term, l: LengthsOp, mu: Double = 1500): Dirichlet =
-    apply(new SingleTermOp(t), l, mu)
+  def apply(t: Term, l: LengthsView, mu: Double = 1500): Dirichlet =
+    apply(new SingleTermView(t), l, mu)
 }
 
-class Dirichlet(op: CountOp, lengths: LengthsOp, mu: Double)
+class Dirichlet(op: CountView, lengths: LengthsView, mu: Double)
     extends FeatureOp {
   lazy val children: Seq[Operator] = List[Operator](op, lengths)
   def views: Set[ViewOp] = Set[ViewOp](op, lengths)

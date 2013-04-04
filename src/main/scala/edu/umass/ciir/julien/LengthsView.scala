@@ -2,11 +2,11 @@ package edu.umass.ciir.julien
 
 import org.lemurproject.galago.core.index.LengthsReader._
 
-object LengthsOp { def apply() = new LengthsOp }
+object LengthsView { def apply() = new LengthsView }
 
-class LengthsOp
+class LengthsView
     extends ViewOp
-    with ChildlessOperator
+    with ChildlessOp
     with LengthsSrc
     with IteratedHook[LengthsIterator] {
   override def toString =

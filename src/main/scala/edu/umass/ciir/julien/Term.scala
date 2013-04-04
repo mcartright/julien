@@ -12,7 +12,7 @@ object Term { def apply(s: String) = new Term(s) }
   * These are always 1-to-1.
   */
 final class Term(val t: String)
-    extends ChildlessOperator
+    extends ChildlessOp
     with IteratedHook[ExtentIterator] {
   override def toString: String =
     s"$t:" + (if (isAttached) index.toString else "")

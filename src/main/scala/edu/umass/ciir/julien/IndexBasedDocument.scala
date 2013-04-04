@@ -7,8 +7,8 @@ class IndexBasedDocument extends Document {
   var index: Index = null
   var underlying: GDoc = null
   def length = new Length(index.length(underlying.name))
-  def count(op: CountOp) = op.count
-  def positions(op: PositionsOp) = op.positions
+  def count(op: CountView) = op.count
+  def positions(op: PositionsView) = op.positions
   def content: String = underlying.text
 
   // These depend on the term vector being present

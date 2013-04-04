@@ -7,21 +7,21 @@ import scala.collection.JavaConversions._
 import org.lemurproject.galago.tupleflow.Parameters
 
 object Test {
-  implicit def term2op(t: Term): SingleTermOp = SingleTermOp(t)
+  implicit def term2op(t: Term): SingleTermView = SingleTermView(t)
   type TMap = Map[Operator, Set[Term]]
 
   def main(args: Array[String]): Unit = {
     val params = new Parameters(args)
     val query = params.getString("query").split(" ").map(Term(_))
-    val ql = Combine(query.map(a => Dirichlet(a, LengthsOp())): _*)
+    val ql = Combine(query.map(a => Dirichlet(a, LengthsView())): _*)
     val sdm =
       Combine(
-        Weight(Combine(query.map(a => Dirichlet(a,LengthsOp())): _*), 0.8),
+        Weight(Combine(query.map(a => Dirichlet(a,LengthsView())): _*), 0.8),
         Weight(Combine(query.sliding(2,1).map { p =>
-          Dirichlet(OrderedWindow(1, p: _*), LengthsOp())
+          Dirichlet(OrderedWindow(1, p: _*), LengthsView())
         }.toSeq: _*), 0.15),
         Weight(Combine(query.sliding(2,1).map { p =>
-          Dirichlet(UnorderedWindow(8, p: _*), LengthsOp())
+          Dirichlet(UnorderedWindow(8, p: _*), LengthsView())
         }.toSeq: _*), 0.05)
       )
 

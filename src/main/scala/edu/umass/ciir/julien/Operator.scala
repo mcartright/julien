@@ -40,11 +40,11 @@ object Operator {
 
 // Views provide Values to the Features
 trait ViewOp extends Operator
-trait CountOp extends ViewOp with CountSrc with StatisticsSrc
-trait PositionsOp extends CountOp with PositionSrc
-trait DataOp[T] extends ViewOp with DataSrc[T]
-trait ScoreOp extends ViewOp with ScoreSrc
-trait ChildlessOperator extends Operator {
+trait CountView extends ViewOp with CountSrc with StatisticsSrc
+trait PositionsView extends CountView with PositionSrc
+trait DataView[T] extends ViewOp with DataSrc[T]
+trait ScoreView extends ViewOp with ScoreSrc
+trait ChildlessOp extends Operator {
   lazy val children: Seq[Operator] = List.empty
   // Ever so slightly faster here
   override def foreach[U](f: Operator => U) = f(this)
@@ -56,7 +56,9 @@ trait FeatureOp extends Operator {
   def eval: Score
 }
 
-// Features
+// A FeatureView is basically a store-supplied feature -
+// basically anything precomputed.
+trait FeatureView extends ViewOp with FeatureOp
 
 // Overloaded operators that do both -- these need work
 // case class Require[T](test: (_) => Boolean, op: Operator) extends FeatureOp

@@ -1,9 +1,9 @@
 package edu.umass.ciir.julien
 
-object SingleTermOp { def apply(t: Term) = new SingleTermOp(t) }
+object SingleTermView { def apply(t: Term) = new SingleTermView(t) }
 
-class SingleTermOp(val t: Term)
-    extends PositionsOp {
+class SingleTermView(val t: Term)
+    extends PositionsView {
   lazy val children: Seq[Operator] = List[Operator](t)
   def count: Count = new Count(t.underlying.count)
   def positions: Positions = Positions(t.underlying.extents())

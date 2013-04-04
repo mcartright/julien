@@ -7,8 +7,8 @@ object Synonym {
 }
 
 class Synonym(terms: Seq[Term])
-    extends MultiTermOp(terms)
-    with PositionsOp {
+    extends MultiTermView(terms)
+    with PositionsView {
   override def positions: Positions = {
     // Assumption: a position is a one-to-one with a word, so the set union of
     // the position vectors of all involved terms is equal to the multiset union

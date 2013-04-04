@@ -1,6 +1,6 @@
 package edu.umass.ciir.julien
 
-abstract class MultiTermOp(terms: Seq[Term]) extends PositionsOp {
+abstract class MultiTermView(terms: Seq[Term]) extends PositionsView {
   // Lazily verifies that all terms
   lazy val verified = {
     val r = terms.forall { t => t.attachedIndex == terms.head.attachedIndex }
