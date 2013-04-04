@@ -1,7 +1,6 @@
 package edu.umass.ciir.julien
 
 import org.lemurproject.galago.core.index.{Iterator,ExtentIterator}
-import edu.umass.ciir.julien.Aliases._
 
 object Term { def apply(s: String) = new Term(s) }
 

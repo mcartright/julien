@@ -4,7 +4,7 @@ import org.lemurproject.galago.core.index.ExtentIterator
 import org.lemurproject.galago.core.util.{ExtentArray,ExtentArrayIterator}
 import org.lemurproject.galago.tupleflow.Parameters
 import org.lemurproject.galago.core.index._
-import edu.umass.ciir.julien.Aliases._
+import edu.umass.ciir.julien._
 
 object IteratorSource {
   def gatherStatistics(e: ExtentIterator) : NS = {
@@ -24,7 +24,7 @@ object IteratorSource {
   }
 }
 
-class IteratorSource(val key: String, index: Index)
+class IteratorSource(val key: String, index: GIndex)
     extends KeyedSource with Stored {
   private val iterator: ExtentIterator =
     index.getIterator(key, Parameters.empty).asInstanceOf[ExtentIterator]

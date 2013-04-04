@@ -2,7 +2,6 @@ package edu.umass.ciir.julien
 
 import scala.collection.mutable.PriorityQueue
 import edu.umass.ciir.julien.Utils._
-import edu.umass.ciir.julien.Aliases._
 import scala.collection.JavaConversions._
 
 import org.lemurproject.galago.tupleflow.Parameters

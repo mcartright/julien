@@ -4,7 +4,6 @@ import scala.collection.{Traversable,TraversableLike}
 import scala.collection.immutable.List
 import scala.collection.mutable.{Builder,ListBuffer,Queue}
 import scala.collection.generic.CanBuildFrom
-import edu.umass.ciir.julien.Aliases._
 
 // Two kinds of operations on a query graph:
 // 1) views : Masquerade one operator for 1 or more, or for filtering

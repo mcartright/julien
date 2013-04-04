@@ -1,7 +1,6 @@
 package edu.umass.ciir.julien
 
 import scala.collection.{SeqView, SeqViewLike}
-import edu.umass.ciir.julien.Aliases._
 import org.lemurproject.galago.core.index.DataIterator
 import org.lemurproject.galago.core.index.corpus.CorpusReader
 import org.lemurproject.galago.core.index.corpus.CorpusReader._

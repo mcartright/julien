@@ -4,7 +4,6 @@ import org.lemurproject.galago.tupleflow.Parameters
 import scala.collection.mutable.PriorityQueue
 import scala.collection.JavaConversions._
 import scala.util.matching.Regex
-import Aliases._
 
 object Utils {
   class RichRegex(underlying: Regex) {

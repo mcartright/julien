@@ -8,7 +8,6 @@ import org.lemurproject.galago.core.util.ExtentArray
 import org.lemurproject.galago.core.parse.{Document => _, _}
 import org.lemurproject.galago.tupleflow.{Parameters,Utility,Source}
 import scala.collection.JavaConversions._
-import edu.umass.ciir.julien.Aliases._
 
 object Index {
   def apply(i: DiskIndex) = new Index("unknown", i)

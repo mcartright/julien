@@ -34,7 +34,7 @@ object IndexSource {
 }
 
 class IndexSource(index: Index) extends FreeSource with Stored {
-  import edu.umass.ciir.julien.Aliases._
+  import edu.umass.ciir.julien._
 
   private val lengthsIterator = index.getLengthsIterator
   private val collectionStats =
@@ -62,7 +62,7 @@ class IndexSource(index: Index) extends FreeSource with Stored {
   def count(key: String, targetId: String): Int = positions(key, targetId).size
   def collectionCount(key: String): Long = getKeyedStatistics(key).nodeFrequency
   def docFreq(key: String): Long = getKeyedStatistics(key).nodeDocumentCount
-  def document(targetId: String): Document =
+  def document(targetId: String): GDoc =
     index.getItem(targetId, Parameters.empty)
 
   def terms(targetId: String): List[String] = {

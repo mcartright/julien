@@ -6,7 +6,6 @@ object SingleTermOp {
 
 class SingleTermOp(val t: Term)
     extends PositionsOp {
-  import edu.umass.ciir.julien.Aliases._
   lazy val children: Seq[Operator] = List[Operator](t)
   def count: Count = new Count(t.underlying.count)
   def positions: Positions = Positions(t.underlying.extents())
