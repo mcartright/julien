@@ -19,16 +19,21 @@ public class DocumentPriorReader extends KeyValueReader {
   private double def;
   protected Parameters manifest;
 
-  public DocumentPriorReader(String filename) throws FileNotFoundException, IOException {
+  public DocumentPriorReader(String filename)
+      throws FileNotFoundException, IOException {
     super(filename);
     this.manifest = this.reader.getManifest();
-    def = this.getManifest().get("default", Math.log(0.0000000001)); // this must exist
+    def =  this
+	.getManifest()
+	.get("default", Math.log(0.0000000001)); // this must exist
   }
 
   public DocumentPriorReader(BTreeReader r) {
     super(r);
     this.manifest = this.reader.getManifest();
-    def = this.getManifest().get("default", Math.log(0.0000000001)); // this must exist
+    def = this
+	.getManifest()
+	.get("default", Math.log(0.0000000001)); // this must exist
   }
 
   public double getPrior(int document) throws IOException {
@@ -93,8 +98,9 @@ public class DocumentPriorReader extends KeyValueReader {
     }
   }
 
-  // needs to be an AbstractIndicator
-  public class ValueIterator extends KeyToListIterator implements ScoreIterator {
+  public class ValueIterator
+      extends KeyToListIterator
+      implements ScoreIterator {
 
     double minScore;
 

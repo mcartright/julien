@@ -65,6 +65,7 @@ class Index(label: String, val underlying: GIndex) {
     if (it.hasMatch(docid)) it.extents else ExtentArray.empty
   }
 
+  def partReader(name: String): IndexPartReader = underlying.getIndexPart(name)
   def iterator(key: String): ExtentIterator =
     underlying.getIterator(key, Parameters.empty).asInstanceOf[ExtentIterator]
 

@@ -41,7 +41,6 @@ trait ViewOp extends Operator
 trait CountView extends ViewOp with CountSrc with StatisticsSrc
 trait PositionsView extends CountView with PositionSrc
 trait DataView[T] extends ViewOp with DataSrc[T]
-trait ScoreView extends ViewOp with ScoreSrc
 trait ChildlessOp extends Operator {
   lazy val children: Seq[Operator] = List.empty
   // Ever so slightly faster here
@@ -54,12 +53,19 @@ trait FeatureOp extends Operator {
   def eval: Score
 }
 
-// A FeatureView is basically a store-supplied feature -
+// A FeatureView is a store-supplied feature -
 // basically anything precomputed.
-trait FeatureView extends ViewOp with FeatureOp
+trait FeatureView extends ViewOp with FeatureOp with ChildlessOp
+
+// This is a marker trait that indicates the need for preparation
+// prior to execution. A typical example is an OrderedWindow view
+// needs to calculate some statistics before scoring takes place to
+// ensure accurate scoring
+trait NeedsPreparing {
+  def updateStatistics
+}
 
 // Overloaded operators that do both -- these need work
 // case class Require[T](test: (_) => Boolean, op: Operator) extends FeatureOp
 // case class Reject[T](test: (_) => Boolean, op: Operator) extends FeatureOp
-// case class Priors extends FeatureOp
 

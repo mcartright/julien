@@ -67,6 +67,8 @@ package object julien {
     */
   implicit class DocFreq(val underlying: Long) extends AnyVal {
     def +(d: Double): Double = d + underlying
+    def +(l: Long): DocFreq = DocFreq(underlying + l)
+    def +(i: Int): DocFreq = DocFreq(underlying + i)
   }
 
 

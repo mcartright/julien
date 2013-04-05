@@ -9,7 +9,9 @@ trait QueryProcessor {
   def indexes: Set[Index] = _indexes
   def models: Set[FeatureOp] = _models
 
-  // The thing that needs implementing in subclasses
+  // The things that need implementing in subclasses
+  // makes sure that all views are ready to provide info upwards
+  def prepare: Unit
   def run: List[ScoredDocument]
 
   // This probably needs work -- should probably refactor to objects as

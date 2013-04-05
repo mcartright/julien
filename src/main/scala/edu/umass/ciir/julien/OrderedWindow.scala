@@ -8,6 +8,13 @@ object OrderedWindow {
 
 class OrderedWindow(val width: Int, val terms: Seq[Term])
     extends MultiTermView(terms) {
+  // update the statistics object w/ our notion of "collection length"
+  // We *could* say it's dependent on the size of the gram and width, but
+  // that's a lot of work and no one else does it, so here's our lazy way out.
+  // val adjustment = t.size * statistics.numDocs
+  val adjustment = 0
+  statistics.collLength = terms.head.attachedIndex.collectionLength - adjustment
+
   override def positions: Positions = {
     val hits = Positions.newBuilder
     val iterators : Seq[BufferedIterator[Int]] = terms.map(t =>

@@ -1,28 +1,23 @@
 package edu.umass.ciir.julien
 
-abstract class MultiTermView(terms: Seq[Term]) extends PositionsView {
-  // Lazily verifies that all terms
-  lazy val verified = {
-    val r = terms.forall { t => t.attachedIndex == terms.head.attachedIndex }
-    assume(r, s"Tried to use multi-term op from different indexes.")
-    true // If we made it here, must be true
-  }
+abstract class MultiTermView(terms: Seq[Term])
+    extends PositionsView
+    with NeedsPreparing {
+  // Make sure we're not making a single view of multiple indexes - that's weird
+  val r = terms.forall { t => t.attachedIndex == terms.head.attachedIndex }
+  assume(r, s"Tried to use multi-term view from different indexes.")
+
   def children: Seq[Operator] = terms
   def count: Count = new Count(this.positions.size)
 
-  lazy val statistics: CountStatistics = {
-    assume(verified) // precondition which means we can use any of them
-    val index = terms.head.attachedIndex
-    val stats = CountStatistics(
-      new CollFreq(0),
-      new NumDocs(0),
-      new CollLength(0),
-      new DocFreq(0),
-      new MaximumCount(0)
-    )
+  // Start with no knowledge
+  val statistics = CountStatistics()
+  statistics.numDocs = terms.head.attachedIndex.numDocuments
 
-    // Need to fill in values here I think
-
-    stats
+  def updateStatistics = {
+    val c = count.underlying
+    statistics.collFreq += c
+    statistics.docFreq += 1
+    statistics.max = scala.math.min(statistics.max.underlying, c)
   }
 }
