@@ -7,14 +7,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.lemurproject.galago.core.types.WordCount;
-import org.lemurproject.galago.tupleflow.IncompatibleProcessorException;
 import org.lemurproject.galago.tupleflow.InputClass;
-import org.lemurproject.galago.tupleflow.Linkage;
 import org.lemurproject.galago.tupleflow.OutputClass;
-import org.lemurproject.galago.tupleflow.Processor;
 import org.lemurproject.galago.tupleflow.Reducer;
-import org.lemurproject.galago.tupleflow.Source;
-import org.lemurproject.galago.tupleflow.Step;
+import org.lemurproject.galago.tupleflow.StandardStep;
 import org.lemurproject.galago.tupleflow.execution.Verified;
 
 /**
@@ -24,17 +20,18 @@ import org.lemurproject.galago.tupleflow.execution.Verified;
 @InputClass(className = "org.lemurproject.galago.core.types.WordCount", order = {"+word"})
 @OutputClass(className = "org.lemurproject.galago.core.types.WordCount", order = {"+word"})
 @Verified
-public class WordCountReducer implements Processor<WordCount>, Source<WordCount>, Reducer<WordCount>,
-        WordCount.Processor {
+public class WordCountReducer
+        extends StandardStep<WordCount, WordCount>
+        implements Reducer<WordCount>, WordCount.Processor {
 
-  public Processor<WordCount> processor;
   private WordCount last = null;
   private WordCount aggregate = null;
   private long totalTerms = 0;
 
+  @Override
   public void process(WordCount wordCount) throws IOException {
     if (last != null) {
-      if ( ! Arrays.equals(wordCount.word, last.word)){
+      if (!Arrays.equals(wordCount.word, last.word)) {
         flush();
       } else if (aggregate == null) {
         aggregate = new WordCount(last.word, last.count + wordCount.count,
@@ -63,17 +60,15 @@ public class WordCountReducer implements Processor<WordCount>, Source<WordCount>
       aggregate = null;
     }
   }
-
+  
+  @Override
   public void close() throws IOException {
     flush();
-    processor.close();
-  }
-
-  public void setProcessor(Step processor) throws IncompatibleProcessorException {
-    Linkage.link(this, processor);
+    super.close();
   }
 
   // this won't work at the moment...
+  @Override
   public ArrayList<WordCount> reduce(List<WordCount> input) throws IOException {
     HashMap<byte[], WordCount> countObjects = new HashMap<byte[], WordCount>();
 
@@ -93,13 +88,5 @@ public class WordCountReducer implements Processor<WordCount>, Source<WordCount>
 
   public long getTotalTerms() {
     return totalTerms;
-  }
-
-  public Class<WordCount> getInputClass() {
-    return WordCount.class;
-  }
-
-  public Class<WordCount> getOutputClass() {
-    return WordCount.class;
   }
 }

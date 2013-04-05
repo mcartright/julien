@@ -58,7 +58,8 @@ public class FileLineParser implements ExNihiloSource<String> {
   }
 
   @Override
-  public void setProcessor(Step processor) throws IncompatibleProcessorException {
+  public Step setProcessor(Step processor) throws IncompatibleProcessorException {
     Linkage.link(this, processor);
+    return processor;
   }
 }

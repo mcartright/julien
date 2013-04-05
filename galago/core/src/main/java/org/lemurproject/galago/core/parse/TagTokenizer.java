@@ -11,15 +11,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import org.lemurproject.galago.tupleflow.IncompatibleProcessorException;
 import org.lemurproject.galago.tupleflow.InputClass;
 import org.lemurproject.galago.tupleflow.Parameters;
-import org.lemurproject.galago.tupleflow.Linkage;
 import org.lemurproject.galago.tupleflow.NullProcessor;
 import org.lemurproject.galago.tupleflow.OutputClass;
-import org.lemurproject.galago.tupleflow.Processor;
-import org.lemurproject.galago.tupleflow.Source;
-import org.lemurproject.galago.tupleflow.Step;
+import org.lemurproject.galago.tupleflow.StandardStep;
 import org.lemurproject.galago.tupleflow.TupleFlowParameters;
 import org.lemurproject.galago.tupleflow.Utility;
 import org.lemurproject.galago.tupleflow.execution.Verified;
@@ -37,11 +33,10 @@ import org.lemurproject.galago.tupleflow.execution.Verified;
 @Verified
 @InputClass(className = "org.lemurproject.galago.core.parse.Document")
 @OutputClass(className = "org.lemurproject.galago.core.parse.Document")
-public class TagTokenizer implements Source<Document>, Processor<Document> {
+public class TagTokenizer extends StandardStep<Document, Document> {
 
   protected static final boolean[] splits;
   protected static HashSet<String> ignoredTags;
-  public Processor<Document> processor = new NullProcessor(Document.class);
   protected StringPooler pooler = new StringPooler();
   protected String ignoreUntil;
   protected List<Pattern> whitelist;
@@ -98,6 +93,7 @@ public class TagTokenizer implements Source<Document>, Processor<Document> {
     position = 0;
     lastSplit = -1;
 
+    processor = new NullProcessor(Document.class);
     tokens = new ArrayList<String>();
     openTags = new HashMap<String, ArrayList<BeginTag>>();
     closedTags = new ArrayList<ClosedTag>();
@@ -807,21 +803,5 @@ public class TagTokenizer implements Source<Document>, Processor<Document> {
 
   public ArrayList<Pair> getTokenPositions() {
     return this.tokenPositions;
-  }
-
-  public void setProcessor(final Step processor) throws IncompatibleProcessorException {
-    Linkage.link(this, processor);
-  }
-
-  public void close() throws IOException {
-    processor.close();
-  }
-
-  public Class<Document> getInputClass() {
-    return Document.class;
-  }
-
-  public Class<Document> getOutputClass() {
-    return Document.class;
   }
 }

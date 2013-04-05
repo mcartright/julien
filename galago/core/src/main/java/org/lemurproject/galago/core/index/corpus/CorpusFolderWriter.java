@@ -62,7 +62,8 @@ public class CorpusFolderWriter implements Processor<Document>, Source<KeyValueP
   }
 
   @Override
-  public void setProcessor(Step next) throws IncompatibleProcessorException {
+  public Step setProcessor(Step next) throws IncompatibleProcessorException {
     Linkage.link(writer, next);
+    return next;
   }
 }

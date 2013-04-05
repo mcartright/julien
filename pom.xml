@@ -1,6 +1,5 @@
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.umass.ciir</groupId>
   <artifactId>julien</artifactId>
@@ -35,6 +34,11 @@
   </pluginRepositories>
   <dependencies>
     <dependency>
+      <groupId>edu.umass.ciir</groupId>
+      <artifactId>macros</artifactId>
+      <version>0.1</version>
+    </dependency>
+    <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
       <version>4.0</version>
@@ -58,6 +62,11 @@
     <dependency>
       <groupId>org.scala-lang</groupId>
       <artifactId>scala-library</artifactId>
+      <version>2.10.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-reflect</artifactId>
       <version>2.10.1</version>
     </dependency>
     <dependency>
@@ -117,27 +126,44 @@
 	  </execution>
 	</executions>
       </plugin>
+      <!-- <plugin>
+           <groupId>org.scala-tools</groupId>
+           <artifactId>maven-scala-plugin</artifactId>
+	   <version>2.15.2</version>
+           <executions>
+           <execution>
+           <id>scala-compile-first</id>
+           <phase>process-resources</phase>
+           <goals>
+           <goal>add-source</goal>
+           <goal>compile</goal>
+           </goals>
+           </execution>
+           <execution>
+           <id>scala-test-compile</id>
+           <phase>process-test-resources</phase>
+           <goals>
+           <goal>testCompile</goal>
+           </goals>
+           </execution>
+           </executions>
+	   </plugin> -->
       <plugin>
-        <groupId>org.scala-tools</groupId>
-        <artifactId>maven-scala-plugin</artifactId>
-	<version>2.15.2</version>
-        <executions>
-          <execution>
-            <id>scala-compile-first</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>add-source</goal>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>scala-test-compile</id>
-            <phase>process-test-resources</phase>
-            <goals>
-              <goal>testCompile</goal>
-            </goals>
-          </execution>
-        </executions>
+	<groupId>net.alchim31.maven</groupId>
+	<artifactId>scala-maven-plugin</artifactId>
+	<version>3.1.0</version>
+	<configuration>
+	  <recompileMode>incremental</recompileMode>
+	  <useZincServer>true</useZincServer>
+	</configuration>
+	<executions>
+	  <execution>
+	    <id>compile</id>
+	    <goals>
+	      <goal>compile</goal>
+	    </goals>
+	  </execution>
+	</executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

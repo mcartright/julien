@@ -75,6 +75,16 @@ public class ParserSelector extends StandardStep<DocumentSplit, Document> {
   private Closeable source;
   private byte[] subCollCheck = "subcoll".getBytes();
 
+  public ParserSelector() {
+    this(new Parameters());
+  }
+  
+  public ParserSelector(Parameters p) {
+    this.tfParameters = null;
+    this.parameters = p;
+    buildFileTypeMap();
+  }
+  
   public ParserSelector(TupleFlowParameters parameters) {
     this.tfParameters = parameters;
     documentCounter = parameters.getCounter("Documents Parsed");
@@ -103,6 +113,7 @@ public class ParserSelector extends StandardStep<DocumentSplit, Document> {
       }
   }
 
+  @Override
   public void process(DocumentSplit split) throws IOException {
     DocumentStreamParser parser = null;
     long count = 0;
@@ -174,6 +185,7 @@ public class ParserSelector extends StandardStep<DocumentSplit, Document> {
       InvocationTargetException {
       Constructor[] constructors = parserClass.getConstructors();
       Arrays.sort(constructors, new Comparator<Constructor>() {
+              @Override
 	      public int compare(Constructor c1, Constructor c2) {
 		  return (c2.getParameterTypes().length -
 			  c1.getParameterTypes().length);

@@ -1,35 +1,42 @@
 package edu.umass.ciir.julien
 
-import org.lemurproject.galago.core.util.ExtentArray
-import org.lemurproject.galago.core.util.ExtentArrayIterator
+import scala.collection.BufferedIterator
 
-class OrderedWindow(
-  override val sources: List[KeyedSource],
-  val width: Int = 1)
-    extends KeyedSource with Synthetic {
-  def supports: Set[Support] = Set.empty
+object OrderedWindow {
+  def apply(w: Int, t: Term*) = new OrderedWindow(w, t)
+}
 
-  def count: Int = positions.size
+class OrderedWindow(val width: Int, val terms: Seq[Term])
+    extends MultiTermView(terms) {
+  // update the statistics object w/ our notion of "collection length"
+  // We *could* say it's dependent on the size of the gram and width, but
+  // that's a lot of work and no one else does it, so here's our lazy way out.
+  // val adjustment = t.size * statistics.numDocs
+  val adjustment = 0
+  statistics.collLength = terms.head.attachedIndex.collectionLength - adjustment
 
-  def positions: ExtentArray = {
-    val hits = new ExtentArray()
-    val iterators = sources.map(s => new ExtentArrayIterator(s.positions))
-    while (iterators.forall(_.isDone == false)) {
+  override def positions: Positions = {
+    val hits = Positions.newBuilder
+    val iterators : Seq[BufferedIterator[Int]] = terms.map(t =>
+      Positions(t.underlying.extents).iterator.buffered)
+    while (iterators.forall(_.hasNext)) {
       // Make sure an iterator is after its preceding one
       iterators.reduceLeft { (i1, i2) =>
-        while (i2.currentBegin < i1.currentEnd && !i2.isDone) i2.next
+        while (i2.hasNext && i2.head < i1.head) i2.next
         i2
       }
+      if (iterators.exists(! _.hasNext)) return hits.result
+
       // Now see if we have a valid match
       val matched = iterators.sliding(2,1).map { P =>
         // Map pairs of iterators to booleans. All true = have match
-        P(1).currentBegin - P(0).currentEnd < width
+        P(1).head - P(0).head < width
       }.reduceLeft((A,B) => A && B)
       if (matched) {
-        hits.add(iterators.head.currentBegin, iterators.last.currentEnd)
+        hits += iterators.head.head
       }
       iterators(0).next
     }
-    hits
+    hits.result
   }
 }

@@ -80,7 +80,8 @@ public class MemoryDocumentLengths implements MemoryIndexPart, LengthsReader {
 
   public MemoryDocumentLengths(Parameters params) {
     this.params = params;
-    this.params.set("writerClass", "org.lemurproject.galago.core.index.DocumentLengthsWriter");
+    this.params.set("writerClass",
+		    "org.lemurproject.galago.core.index.DocumentLengthsWriter");
     this.document = new Bytes(Utility.fromString("document"));
 
     if (!lengths.containsKey(document)) {
@@ -293,7 +294,7 @@ public class MemoryDocumentLengths implements MemoryIndexPart, LengthsReader {
     }
   }
 
-  private static class FieldLengthsIterator implements CountIterator, 
+  private static class FieldLengthsIterator implements CountIterator,
           LengthsIterator, AggregateReader.CollectionAggregateIterator {
 
     FieldLengthPostingList fieldLengths;

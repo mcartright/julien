@@ -105,7 +105,7 @@ public abstract class BTreeWriter implements KeyValuePair.KeyValueOrder.Shredded
      *  - Useful for ParallelIndexes passing data to a central key indexer
      *  - not implemented for single-file Indexes
      */
-    public void setProcessor(Step processor) throws IncompatibleProcessorException {
+    public Step setProcessor(Step processor) throws IncompatibleProcessorException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

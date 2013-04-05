@@ -63,8 +63,9 @@ public class FileOrderedReader<T> implements ReaderSource<T> {
   }
 
   @Override
-  public void setProcessor(Step processor) throws IncompatibleProcessorException {
+  public Step setProcessor(Step processor) throws IncompatibleProcessorException {
     this.orderedReader.setProcessor(processor);
+    return processor;
   }
 
   public Class<T> getOutputClass() {

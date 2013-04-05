@@ -1,29 +1,32 @@
 package edu.umass.ciir.julien
 
-import org.lemurproject.galago.core.util.ExtentArray
-import org.lemurproject.galago.core.util.ExtentArrayIterator
+import org.lemurproject.galago.core.util._
 
-class UnorderedWindow(
-  override val sources: List[KeyedSource],
-  val width: Int = 1)
-    extends KeyedSource with Synthetic {
+object UnorderedWindow {
+  def apply(w: Int, t: Term*) = new UnorderedWindow(w, t)
+}
 
-  override def count : Int = positions.size
+class UnorderedWindow(val width: Int, val terms: Seq[Term])
+    extends MultiTermView(terms) {
+  // Again, being lazy about this number
+  statistics.collLength = terms.head.attachedIndex.collectionLength
 
-  override def positions : ExtentArray = {
-    val hits = new ExtentArray()
-    val iterators = sources.map(s => new ExtentArrayIterator(s.positions))
-    while (iterators.forall(_.isDone == false)) {
+  override def positions:  Positions = {
+    val hits = Positions.newBuilder
+    val iterators: Seq[BufferedIterator[Int]] = terms.map(t =>
+      Positions(t.underlying.extents).iterator.buffered)
+    while (iterators.forall(_.hasNext == true)) {
+      val currentPositions = iterators.map(_.head)
       // Find bounds
-      val minPos = iterators.map(_.currentBegin).min
-      val maxPos = iterators.map(_.currentEnd).max
+      val minPos = currentPositions.min
+      val maxPos = currentPositions.max
 
       // see if it fits
-      if (maxPos - minPos <= width || width == -1) hits.add(minPos, maxPos)
+      if (maxPos - minPos <= width || width == -1) hits += minPos
 
       // move all lower bound iterators foward
-      for (it <- iterators; if (it.currentBegin == minPos)) it.next
+      for (it <- iterators; if (it.head == minPos)) it.next
     }
-    hits
+    hits.result
   }
 }

@@ -40,8 +40,9 @@ public class LinkCombiner implements ExNihiloSource<IdentifiedLink>, IdentifiedL
     documentDatas = parameters.getTypeReader(documentDatasName);
   }
 
-  public void setProcessor(Step processor) throws IncompatibleProcessorException {
+  public Step setProcessor(Step processor) throws IncompatibleProcessorException {
     Linkage.link(this, processor);
+    return processor;
   }
 
   void match(NumberedDocumentData docData, ExtractedLink link) {

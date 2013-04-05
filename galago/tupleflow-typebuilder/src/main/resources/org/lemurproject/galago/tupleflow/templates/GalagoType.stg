@@ -207,7 +207,7 @@ public TypeReader\<<typeName>\> orderedReader(ArrayInput _input, int bufferSize)
 >>
 
 setProcessorMethod() ::= <<
-public void setProcessor(Step processor) throws IncompatibleProcessorException {  
+public Step setProcessor(Step processor) throws IncompatibleProcessorException {  
     if (processor instanceof ShreddedProcessor) {
         this.processor = new DuplicateEliminator((ShreddedProcessor) processor);
     } else if (processor instanceof <typeName>.Processor) {
@@ -217,6 +217,7 @@ public void setProcessor(Step processor) throws IncompatibleProcessorException {
     } else {
         throw new IncompatibleProcessorException(processor.getClass().getName() + " is not supported by " + this.getClass().getName());                                                                       
     }
+    return processor;
 }
 >>
 

@@ -40,7 +40,7 @@ public class DocumentSource implements ExNihiloSource<DocumentSplit> {
   };
   private Counter inputCounter;
   public Processor<DocumentSplit> processor;
-  private TupleFlowParameters parameters;
+  private Parameters parameters;
   private int fileId = 0;
   private int totalFileCount = 0;
   private List<DocumentSplit> splitBuffer;
@@ -49,15 +49,41 @@ public class DocumentSource implements ExNihiloSource<DocumentSplit> {
   private Logger logger;
   private String inputPolicy;
 
-  public DocumentSource(TupleFlowParameters parameters) {
-    this.parameters = parameters;
-    inputPolicy = parameters.getJSON().get("inputPolicy", "require");
-    this.inputCounter = parameters.getCounter("Inputs Processed");
+  public DocumentSource(String... sources) {
+    this.parameters = new Parameters();
+    ArrayList<String> dirs = new ArrayList<String>();
+    parameters.set("directory", dirs);
+    ArrayList<String> files = new ArrayList<String>();
+    parameters.set("filename", files);
+    for (String path : sources) {
+      File f = new File(path);
+      if (f.isDirectory()) {
+        dirs.add(path);
+      } else if (f.isFile()) {
+        files.add(path);
+      }
+    }
+    initialize();
+  }
+
+  public DocumentSource(Parameters p) {
+    this.parameters = p;
+    initialize();
+  }
+
+  public DocumentSource(TupleFlowParameters tfParameters) {
+    this.parameters = tfParameters.getJSON();
+    this.inputCounter = tfParameters.getCounter("Inputs Processed");
+    initialize();
+  }
+
+  private void initialize() {
+    inputPolicy = parameters.get("inputPolicy", "require");
     logger = Logger.getLogger("DOCSOURCE");
     externalFileTypes = new HashSet<String>();
-    forceFileType = parameters.getJSON().get("filetype", (String) null);
-    if (parameters.getJSON().containsKey("externalParsers")) {
-      List<Parameters> extP = parameters.getJSON().getAsList("externalParsers");
+    forceFileType = parameters.get("filetype", (String) null);
+    if (parameters.containsKey("externalParsers")) {
+      List<Parameters> extP = parameters.getAsList("externalParsers");
       for (Parameters p : extP) {
         logger.info(String.format("Adding external file type %s\n",
                 p.getString("filetype")));
@@ -71,15 +97,15 @@ public class DocumentSource implements ExNihiloSource<DocumentSplit> {
     // splitBuffer stores the full list of documents to emit.
     splitBuffer = new ArrayList();
 
-    if (parameters.getJSON().containsKey("directory")) {
-      List<String> directories = parameters.getJSON().getAsList("directory");
+    if (parameters.containsKey("directory")) {
+      List<String> directories = parameters.getAsList("directory");
       for (String directory : directories) {
         File directoryFile = new File(directory);
         processDirectory(directoryFile);
       }
     }
-    if (parameters.getJSON().containsKey("filename")) {
-      List<String> files = parameters.getJSON().getAsList("filename");
+    if (parameters.containsKey("filename")) {
+      List<String> files = parameters.getAsList("filename");
       for (String file : files) {
         processFile(new File(file));
       }
@@ -227,8 +253,8 @@ public class DocumentSource implements ExNihiloSource<DocumentSplit> {
   private void processSubCollectionFile(File file) throws IOException {
     BufferedReader br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
     // Look for a fraction and an absolute number of docs
-    double pctthreshold = parameters.getJSON().get("pct", 1.0);
-    long numdocs = parameters.getJSON().get("numdocs", -1);
+    double pctthreshold = parameters.get("pct", 1.0);
+    long numdocs = parameters.get("numdocs", -1);
 
     System.out.printf("pct: %f, numdocs=%d\n", pctthreshold, numdocs);
 
@@ -310,7 +336,7 @@ public class DocumentSource implements ExNihiloSource<DocumentSplit> {
     ArrayList<byte[]> keys = new ArrayList<byte[]>();
 
     // look for a manually specified number of corpus pieces:
-    long pieces = this.parameters.getJSON().get("corpusPieces", 10);
+    long pieces = this.parameters.get("corpusPieces", 10);
 
     // otherwise we want to divde the corpus up into ~50MB chunks
     if (pieces < 0) {
@@ -334,7 +360,7 @@ public class DocumentSource implements ExNihiloSource<DocumentSplit> {
     // otherwise we must always emit at least 2 pieces.
     pieces = Math.max(2, pieces);
 
-    logger.info("Splitting corpus into " + pieces);
+    logger.info(String.format("Splitting corpus into %d", pieces));
 
     for (int i = 1; i < pieces; ++i) {
       float fraction = (float) i / pieces;
@@ -472,8 +498,10 @@ public class DocumentSource implements ExNihiloSource<DocumentSplit> {
     return externalFileTypes.contains(extension);
   }
 
-  public void setProcessor(Step processor) throws IncompatibleProcessorException {
+  @Override
+  public Step setProcessor(Step processor) throws IncompatibleProcessorException {
     Linkage.link(this, processor);
+    return processor;
   }
 
   public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {

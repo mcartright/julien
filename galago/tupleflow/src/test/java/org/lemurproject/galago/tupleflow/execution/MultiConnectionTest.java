@@ -50,7 +50,7 @@ public class MultiConnectionTest extends TestCase {
 
     ErrorStore store = new ErrorStore();
     Verification.verify(job, store);
-    
+
     JobExecutor.runLocally(job, store, new Parameters());
     if (store.hasStatements()) {
       throw new RuntimeException(store.toString());
@@ -80,8 +80,10 @@ public class MultiConnectionTest extends TestCase {
     }
 
     @Override
-    public void setProcessor(org.lemurproject.galago.tupleflow.Step processor) throws IncompatibleProcessorException {
+    public org.lemurproject.galago.tupleflow.Step setProcessor(org.lemurproject.galago.tupleflow.Step processor)
+            throws IncompatibleProcessorException {
       Linkage.link(this, processor);
+      return processor;
     }
 
     public static void verify(TupleFlowParameters parameters, ErrorHandler handler) throws IOException {
@@ -115,8 +117,10 @@ public class MultiConnectionTest extends TestCase {
     }
 
     @Override
-    public void setProcessor(org.lemurproject.galago.tupleflow.Step processor) throws IncompatibleProcessorException {
+    public org.lemurproject.galago.tupleflow.Step setProcessor(org.lemurproject.galago.tupleflow.Step processor)
+            throws IncompatibleProcessorException {
       Linkage.link(this, processor);
+      return processor;
     }
 
     public static void verify(TupleFlowParameters parameters, ErrorHandler handler) throws IOException {

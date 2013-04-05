@@ -115,8 +115,10 @@ public class VocabularySource implements ExNihiloSource<KeyValuePair> {
     reader.close();
   }
 
-  public void setProcessor(Step processor) throws IncompatibleProcessorException {
+  @Override
+  public Step setProcessor(Step processor) throws IncompatibleProcessorException {
     Linkage.link(this, processor);
+    return processor;
   }
 
   public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {

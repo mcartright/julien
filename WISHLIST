@@ -9,13 +9,10 @@ THINGS TO FIX/IMPROVE:
 - How do we memoize statistics functions?
 - Annotations. We want them, particularly for debugging. How to cleanly
   add them?
+- When instantiating iterators we need to track the following:
+  - what score tree is connected to what iterators (and vice-versa)
+  - a map of the weights (again, both ways would be good)
 
-- I like the composition of scoring function + filter + iterator, and so
-  on. Any more we can do?
-- The node representation is clunky and not intuitive. Either
-  update the API or refactor out for now. (src: relmodel.scala)
-  UPDATE: Need something to describe what's needed to support a data source
-  for a term. Maybe just a "TermDescriptor" class?
 - To make the toolkit configurable, should we focus on schema-validated JSON
   or a series of case classes? (Note: case classes have a 22-parameter limit,
   but are built into Scala more cleanly than JSON)
@@ -23,6 +20,4 @@ THINGS TO FIX/IMPROVE:
 TODO:
 - Need a place to put the aggregate statistics for the collection - make a
   manifest for the "whole thing"?
-- Need to re-implement BuildIndex
-- Need a general version of the corpus. Use the splitBTree components.
 - Add some tests back in.

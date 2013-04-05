@@ -41,7 +41,8 @@ public class IndexNumberer implements ExNihiloSource<DocumentSplit> {
     processor.close();
   }
 
-  public void setProcessor(Step processor) throws IncompatibleProcessorException {
+  public Step setProcessor(Step processor) throws IncompatibleProcessorException {
     Linkage.link(this, processor);
+    return processor;
   }
 }

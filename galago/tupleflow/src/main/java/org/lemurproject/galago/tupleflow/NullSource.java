@@ -28,8 +28,9 @@ public class NullSource<T> implements ExNihiloSource<T> {
         Verification.requireClass(parameters.getJSON().getString("class"), handler);
     }
 
-    public void setProcessor(Step processor) throws IncompatibleProcessorException {
+    public Step setProcessor(Step processor) throws IncompatibleProcessorException {
         Linkage.link(this, processor);
+        return processor;
     }
 
     public void run() throws IOException {

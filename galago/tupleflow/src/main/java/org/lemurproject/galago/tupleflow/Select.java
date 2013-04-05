@@ -64,8 +64,9 @@ public class Select<T> implements ExNihiloSource<T> {
         return (Class<T>) Class.forName(parameters.getJSON().getString("class"));
     }
 
-    public void setProcessor(Step next) throws IncompatibleProcessorException {
+    public Step setProcessor(Step next) throws IncompatibleProcessorException {
         Linkage.link(this, next);
+        return next;
     }
 
     public static void verify(TupleFlowParameters parameters, ErrorHandler handler) throws ClassNotFoundException {

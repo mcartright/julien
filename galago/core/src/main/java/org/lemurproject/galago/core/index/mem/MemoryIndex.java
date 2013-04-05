@@ -19,6 +19,7 @@ import org.lemurproject.galago.core.parse.Document;
 import org.lemurproject.galago.core.parse.stem.Porter2Stemmer;
 import org.lemurproject.galago.core.index.NullExtentIterator;
 import org.lemurproject.galago.core.index.corpus.CorpusReader;
+import org.lemurproject.galago.tupleflow.FakeParameters;
 import org.lemurproject.galago.tupleflow.InputClass;
 import org.lemurproject.galago.tupleflow.Parameters;
 import org.lemurproject.galago.tupleflow.TupleFlowParameters;
@@ -42,17 +43,34 @@ public class MemoryIndex implements DynamicIndex, Index {
   HashMap<String, String> defaultIndexOperators = new HashMap<String, String>();
   HashSet<String> knownIndexOperators = new HashSet<String>();
 
+  public MemoryIndex(Parameters p) throws Exception {
+    manifest = p;
+    initialize();
+  }
+
+  public MemoryIndex() throws Exception {
+    manifest = new Parameters();
+    manifest.set("stemming", false);
+    manifest.set("makecorpus", true);
+    initialize();
+  }
+
   public MemoryIndex(TupleFlowParameters parameters) throws Exception {
     manifest = parameters.getJSON();
+    initialize();
+  }
+
+  private void initialize() throws Exception {
     // determine which parts are to be created:
-    stemming = manifest.get("stemming", true);
+    stemming = manifest.get("stemming", false);
     nonstemming = manifest.get("nonstemming", true);
-    makecorpus = manifest.get("makecorpus", false);
+    makecorpus = manifest.get("makecorpus", true);
 
     // we should have either a stemmed or non-stemmed posting list
     assert stemming || nonstemming;
 
-    // this allows memory index to start numbering documents from a specific documentCount.
+    // this allows memory index to start numbering documents
+    // from a specific documentCount.
     documentNumberOffset = (int) manifest.get("documentNumberOffset", 0L);
     documentCount = documentNumberOffset;
 
@@ -70,10 +88,10 @@ public class MemoryIndex implements DynamicIndex, Index {
     if (stemming) {
       Parameters stemParams = partParams.clone();
       // should change this to support several stemmers...
-      stemParams.set("stemmer", manifest.get("stemmer", Porter2Stemmer.class.getName()));
+      stemParams.set("stemmer",
+		     manifest.get("stemmer", Porter2Stemmer.class.getName()));
       parts.put("postings.porter", new MemoryPositionalIndex(stemParams));
     }
-
     dirty = false;
   }
 
@@ -86,6 +104,7 @@ public class MemoryIndex implements DynamicIndex, Index {
   }
 
   public void process(Document doc) throws IOException {
+    System.err.printf("Indexing: %s\n", (doc == null) ? "NULL" : doc.name);
     doc.identifier = documentCount;
     for (MemoryIndexPart part : parts.values()) {
       part.addDocument(doc);
@@ -207,7 +226,7 @@ public class MemoryIndex implements DynamicIndex, Index {
         int docId = getIdentifier(document);
         corpus.getDocument(docId, p);
       } catch (Exception e) {
-        // ignore the exception                                                                                                                       
+        // ignore the exception
       }
     }
     return null;

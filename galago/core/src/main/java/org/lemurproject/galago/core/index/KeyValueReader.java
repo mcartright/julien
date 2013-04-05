@@ -11,16 +11,17 @@ import org.lemurproject.galago.tupleflow.Utility;
  * of keys -> values, and we assume the entire value can be read into
  * memory.
  *
- * Implementations should provide their own methods for manipulating the keys and
- * values.
- * 
+ * Implementations should provide their own methods for manipulating
+ * the keys and values.
+ *
  * @author irmarc
  */
 public abstract class KeyValueReader implements IndexPartReader {
 
   protected BTreeReader reader;
 
-  public KeyValueReader(String filename) throws FileNotFoundException, IOException {
+  public KeyValueReader(String filename)
+      throws FileNotFoundException, IOException {
     reader = BTreeFactory.getBTreeReader(filename);
   }
 
@@ -85,7 +86,7 @@ public abstract class KeyValueReader implements IndexPartReader {
     public byte[] getValueBytes() throws IOException{
       return iterator.getValueBytes();
     }
-    
+
     @Override
     public int compareTo(KeyIterator other) {
       try {

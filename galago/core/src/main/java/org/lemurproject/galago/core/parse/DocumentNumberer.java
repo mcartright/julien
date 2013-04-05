@@ -28,6 +28,7 @@ public class DocumentNumberer extends StandardStep<Document, Document> {
   int curNum = -1;
   int increment = -1;
 
+  @Override
   public void process(Document doc) throws IOException {
     if (fileId != doc.fileId) {
       fileId = doc.fileId;

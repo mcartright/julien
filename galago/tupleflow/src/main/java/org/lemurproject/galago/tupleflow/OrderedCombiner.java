@@ -66,8 +66,10 @@ public class OrderedCombiner<T> implements ReaderSource<T> {
     return order.getOrderedClass();
   }
 
-  public void setProcessor(final Step processor) throws IncompatibleProcessorException {
+  @Override
+  public Step setProcessor(final Step processor) throws IncompatibleProcessorException {
     this.processor = processor;
+    return processor;
   }
 
   public static <S> OrderedCombiner combineFromFiles(List<String> filenames, Order<S> order) throws IOException {

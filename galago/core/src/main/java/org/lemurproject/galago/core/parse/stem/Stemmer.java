@@ -7,53 +7,31 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import org.lemurproject.galago.core.parse.Document;
-import org.lemurproject.galago.tupleflow.IncompatibleProcessorException;
-import org.lemurproject.galago.tupleflow.Linkage;
-import org.lemurproject.galago.tupleflow.Processor;
-import org.lemurproject.galago.tupleflow.Source;
-import org.lemurproject.galago.tupleflow.Step;
+import org.lemurproject.galago.tupleflow.InputClass;
+import org.lemurproject.galago.tupleflow.OutputClass;
+import org.lemurproject.galago.tupleflow.StandardStep;
 import org.lemurproject.galago.tupleflow.TupleFlowParameters;
-import org.lemurproject.galago.tupleflow.execution.ErrorHandler;
+import org.lemurproject.galago.tupleflow.execution.Verified;
 
 /**
  * 
  * 
  * @author sjh
  */
-public abstract class Stemmer implements Source<Document>, Processor<Document> {
+@Verified
+@InputClass(className = "org.lemurproject.galago.core.types.DocumentSplit")
+@OutputClass(className = "org.lemurproject.galago.core.types.DocumentSplit")
+public abstract class Stemmer extends StandardStep<Document, Document> {
 
   // each instance of Stemmer should have it's own lock
   final Object lock = new Object();
   
   long cacheLimit = 50000;
   HashMap<String, String> cache = new HashMap();
-  public Processor<Document> processor;
 
   @Override
   public void process(Document document) throws IOException {
     processor.process(stem(document));
-  }
-
-  @Override
-  public void close() throws IOException {
-    processor.close();
-  }
-
-  @Override
-  public void setProcessor(Step processor) throws IncompatibleProcessorException {
-    Linkage.link(this, processor);
-  }
-
-  public static void verify(TupleFlowParameters fullParameters, ErrorHandler handler) {
-    return;
-  }
-
-  public static String getInputClass(TupleFlowParameters parameters) {
-    return "org.lemurproject.galago.core.parse.Document";
-  }
-
-  public static String getOutputClass(TupleFlowParameters parameters) {
-    return "org.lemurproject.galago.core.parse.Document";
   }
 
   public static String[] getOutputOrder(TupleFlowParameters parameters) {

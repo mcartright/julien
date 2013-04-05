@@ -18,10 +18,10 @@ public interface KeyIterator extends Comparable<KeyIterator> {
 
   // moves iterator to some particular key
   public boolean findKey(byte[] key) throws IOException;
-  
+
   // moves iterator to a particular key (forward direction only)
   public boolean skipToKey(byte[] key) throws IOException;
-  
+
   // moves iterator to the next key
   public boolean nextKey() throws IOException;
 
@@ -30,7 +30,7 @@ public interface KeyIterator extends Comparable<KeyIterator> {
 
   // resets iterator to the first key
   public void reset() throws IOException;
-  
+
   // Access to key data
   public byte[] getKey() throws IOException;
   public String getKeyString() throws IOException;
