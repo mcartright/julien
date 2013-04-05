@@ -20,8 +20,6 @@ class SimpleProcessor extends QueryProcessor {
   }
 
   def prepare(): Unit = {
-    // Make sure we can do the next stuff easily
-    assume(validated, s"Unable to validate given model/index combination")
 
     val unprepped: Set[Operator] =
       models.flatMap(m => m.filter(_.isInstanceOf[NeedsPreparing]))
@@ -32,14 +30,16 @@ class SimpleProcessor extends QueryProcessor {
     val iterators: Set[GIterator] = unprepped
       .flatMap(_.children)
       .filter(_.isInstanceOf[IteratedHook[_ <: GIterator]])
-      .map(_.asInstanceOf[IteratedHook[_ <: GIterator]].underlying).toSet
+      .map(_.asInstanceOf[IteratedHook[_ <: GIterator]].underlying)
+      .toSet
+      .filterNot(_.hasAllCandidates)
 
     while (iterators.exists(!_.isDone)) {
       val active = iterators.filterNot(_.isDone)
       val candidate = active.map(_.currentCandidate).min
       iterators.foreach(_.syncTo(candidate))
       if (iterators.exists(_.hasMatch(candidate))) {
-        unprepped.asInstanceOf[NeedsPreparing].updateStatistics
+        unprepped.foreach(_.asInstanceOf[NeedsPreparing].updateStatistics)
       }
       active.foreach(_.movePast(candidate))
     }
@@ -49,6 +49,8 @@ class SimpleProcessor extends QueryProcessor {
   }
 
   def run: List[ScoredDocument] = {
+    // Make sure we can do the next stuff easily
+    assume(validated, s"Unable to validate given model/index combination")
     prepare()
 
     // extract iterators
@@ -57,7 +59,7 @@ class SimpleProcessor extends QueryProcessor {
     val iterators: Set[GIterator] =
       model.filter(_.isInstanceOf[IteratedHook[_ <: GIterator]]).map { t =>
         t.asInstanceOf[IteratedHook[_ <: GIterator]].underlying
-    }.toSet
+    }.toSet.filterNot(_.hasAllCandidates)
     val lengths = index.lengthsIterator
     // Need to fix this
     val scorers : List[FeatureOp] = List[FeatureOp](model)

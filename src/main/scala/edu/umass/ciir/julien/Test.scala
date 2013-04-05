@@ -38,8 +38,8 @@ object Test {
     val processor = SimpleProcessor()
     // Connect to this index
     val t0 = System.currentTimeMillis
-    index.attach(ql)
-    processor.add(ql)
+    index.attach(sdm)
+    processor.add(sdm)
     val results = processor.run
     val t1 = System.currentTimeMillis
     printResults(results, index)

@@ -13,7 +13,11 @@ class OrderedWindow(val width: Int, val terms: Seq[Term])
   // that's a lot of work and no one else does it, so here's our lazy way out.
   // val adjustment = t.size * statistics.numDocs
   val adjustment = 0
-  statistics.collLength = terms.head.attachedIndex.collectionLength - adjustment
+  override def updateStatistics = {
+    super.updateStatistics
+    statistics.collLength =
+      terms.head.attachedIndex.collectionLength - adjustment
+  }
 
   override def positions: Positions = {
     val hits = Positions.newBuilder

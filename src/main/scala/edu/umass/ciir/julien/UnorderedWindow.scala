@@ -9,7 +9,10 @@ object UnorderedWindow {
 class UnorderedWindow(val width: Int, val terms: Seq[Term])
     extends MultiTermView(terms) {
   // Again, being lazy about this number
-  statistics.collLength = terms.head.attachedIndex.collectionLength
+  override def updateStatistics = {
+    super.updateStatistics
+    statistics.collLength = terms.head.attachedIndex.collectionLength
+  }
 
   override def positions:  Positions = {
     val hits = Positions.newBuilder

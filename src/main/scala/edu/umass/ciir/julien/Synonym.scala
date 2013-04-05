@@ -9,7 +9,9 @@ object Synonym {
 class Synonym(terms: Seq[Term])
     extends MultiTermView(terms) {
   // Being lazy with the estimation of this number
-  statistics.collLength = terms.head.attachedIndex.collectionLength
+  override def updateStatistics = {
+    statistics.collLength = terms.head.attachedIndex.collectionLength
+  }
 
   override def positions: Positions = {
     // Assumption: a position is a one-to-one with a word, so the set union of
