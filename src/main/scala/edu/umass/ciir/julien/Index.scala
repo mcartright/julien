@@ -20,9 +20,10 @@ object Index {
 
     // Establish the pipeline
     val memoryIndex = docsource.asInstanceOf[Source[_]].
+      setProcessor(new ParserCounter()).asInstanceOf[Source[_]].
+      setProcessor(new SplitOffsetter()).asInstanceOf[Source[_]].
       setProcessor(new ParserSelector()).asInstanceOf[Source[_]].
       setProcessor(new TagTokenizer()).asInstanceOf[Source[_]].
-      setProcessor(new DocumentNumberer()).asInstanceOf[Source[_]].
       setProcessor(new MemoryIndex()).asInstanceOf[MemoryIndex]
 
     // Run it

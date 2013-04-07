@@ -23,7 +23,7 @@ object JulienProperties {
        conf = properties
      } catch {
        case e: Throwable =>
-         println(s"Unable to load file : $propertiesFile ${e.getMessage})
+         println(s"Unable to load file : $propertiesFile ${e.getMessage}")
        throw e
      }
   }

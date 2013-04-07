@@ -36,8 +36,8 @@ object BuildIndex extends TupleFlowFunction {
 
   def getOffsetSplitStage: Stage = {
     return new Stage("offsetting").
-      addInput("countedSplits", new DocumentSplit.FileIdOrder).
-      addOutput("offsetSplits", new DocumentSplit.FileIdOrder).
+      addInput("countedSplits", new DocumentSplit.FileNameOrder).
+      addOutput("offsetSplits", new DocumentSplit.FileNameOrder).
       add(new InputStep("countedSplits")).
       add(new Step(classOf[SplitOffsetter])).
       add(new OutputStep("offsetSplits"))
@@ -45,8 +45,8 @@ object BuildIndex extends TupleFlowFunction {
 
   def getCountDocumentsStage: Stage = {
     return new Stage("countDocuments").
-      addInput("splits", new DocumentSplit.FileIdOrder()).
-      addOutput("countedSplits", new DocumentSplit.FileIdOrder()).
+      addInput("splits", new DocumentSplit.FileNameOrder()).
+      addOutput("countedSplits", new DocumentSplit.FileNameOrder()).
       add(new InputStep("splits")).
       add(new Step(classOf[ParserCounter])).
       add(new OutputStep("countedSplits"))
@@ -54,7 +54,7 @@ object BuildIndex extends TupleFlowFunction {
 
   def getParsePostingsStage(bp : Parameters) : Stage = {
     val stage = new Stage("parsePostings").
-      addInput("offsetSplits", new DocumentSplit.FileIdOrder()).
+      addInput("offsetSplits", new DocumentSplit.FileNameOrder()).
       addOutput("fieldLengthData", new FieldLengthData.FieldDocumentOrder()).
       addOutput("numberedDocumentDataNumbers",
         new NumberedDocumentData.NumberOrder()).
@@ -66,7 +66,6 @@ object BuildIndex extends TupleFlowFunction {
         new FieldNumberWordPosition.FieldWordDocumentPositionOrder()).
       addOutput("encoded-fields",
         new NumberedField.FieldNameNumberOrder())
-    }
 
     // Steps
     stage.add(new InputStep("offsetSplits")).
@@ -207,7 +206,7 @@ object BuildIndex extends TupleFlowFunction {
     job.add(
       getSplitStage(bp.getAsList("inputPath").asInstanceOf[List[String]],
         classOf[DocumentSource],
-        new DocumentSplit.FileIdOrder(),
+        new DocumentSplit.FileNameOrder(),
         splitParameters)).
       add(getCountDocumentsStage).
       each("inputSplit", "countDocuments").
@@ -220,7 +219,7 @@ object BuildIndex extends TupleFlowFunction {
         "writeContent",
         "encoded-fields",
         new NumberedField.FieldNameNumberOrder,
-        new File(indexPath, "content"),
+        "content",
         classOf[PositionContentWriter])).
       combined("parsePostings", "writeContent").
       add(getParallelIndexKeyWriterStage(
