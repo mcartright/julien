@@ -4,7 +4,6 @@ package org.lemurproject.galago.core.index.disk;
 import java.io.*;
 
 import org.lemurproject.galago.core.index.IndexElement;
-import org.lemurproject.galago.core.index.merge.DocumentLengthsMerger;
 import org.lemurproject.galago.core.types.FieldLengthData;
 import org.lemurproject.galago.tupleflow.*;
 import org.lemurproject.galago.tupleflow.execution.ErrorHandler;
@@ -51,7 +50,6 @@ public class DiskLengthsWriter implements Processor<FieldLengthData> {
     writer = new DiskBTreeWriter(parameters);
     Parameters p = this.writer.getManifest();
     p.set("writerClass", DiskLengthsWriter.class.getName());
-    p.set("mergerClass", DocumentLengthsMerger.class.getName());
     p.set("readerClass", DiskLengthsReader.class.getName());
     p.set("version", 3);
     p.set("longs", true);

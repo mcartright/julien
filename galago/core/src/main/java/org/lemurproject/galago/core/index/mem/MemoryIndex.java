@@ -80,7 +80,6 @@ public class MemoryIndex implements DynamicIndex, Index {
     partParams.set("documentNumberOffset", documentNumberOffset);
     parts.put("names", new MemoryDocumentNames(partParams.clone()));
     parts.put("lengths", new MemoryDocumentLengths(partParams.clone()));
-    parts.put("extents", new MemoryWindowIndex(partParams.clone()));
 
     if (nonstemming) {
       parts.put("postings", new MemoryPositionalIndex(partParams.clone()));

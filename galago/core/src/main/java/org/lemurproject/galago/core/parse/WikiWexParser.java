@@ -586,8 +586,6 @@ public class WikiWexParser extends DocumentStreamParser {
 	new DocumentSplit(testFile.getAbsolutePath(),
 			  "",
 			  false,
-			  new byte[0],
-			  new byte[0],
 			  0,
 			  0);
     WikiWexParser parser = new WikiWexParser(split, new Parameters());

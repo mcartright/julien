@@ -83,7 +83,7 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
     return is;
   }
 
-  // subclasses 
+  // subclasses
   public class KeyIterator extends KeyListReader.KeyValueIterator {
 
     public KeyIterator(BTreeReader reader) throws IOException {
@@ -408,16 +408,6 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
     @Override
     public boolean isDone() {
       return documentIndex >= documentCount;
-    }
-
-    @Override
-    public ExtentArray getData() {
-      try {
-        loadExtents();
-        return extentArray;
-      } catch (IOException ioe) {
-        throw new RuntimeException(ioe);
-      }
     }
 
     @Override

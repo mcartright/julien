@@ -4,7 +4,6 @@ package org.lemurproject.galago.core.index.disk;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.lemurproject.galago.core.index.GenericElement;
-import org.lemurproject.galago.core.index.merge.DocumentNameMerger;
 import org.lemurproject.galago.core.types.KeyValuePair;
 import org.lemurproject.galago.core.types.NumberedDocumentData;
 import org.lemurproject.galago.tupleflow.Counter;
@@ -17,9 +16,9 @@ import org.lemurproject.galago.tupleflow.Utility;
 import org.lemurproject.galago.tupleflow.execution.ErrorHandler;
 
 /**
- * 
+ *
  * Writes a mapping from document names to document numbers
- * 
+ *
  * Does not assume that the data is sorted
  *  - as data would need to be sorted into both key and value order
  *  - instead this class takes care of the re-sorting
@@ -41,7 +40,6 @@ public class DiskNameWriter implements Processor<NumberedDocumentData> {
 
     Parameters p = parameters.getJSON();
     p.set("writerClass", DiskNameWriter.class.getName());
-    p.set("mergerClass", DocumentNameMerger.class.getName());
     p.set("readerClass", DiskNameReader.class.getName());
 
     writer = new DiskBTreeWriter(filename, p);
@@ -52,7 +50,7 @@ public class DiskNameWriter implements Processor<NumberedDocumentData> {
     byte[] docName = Utility.fromString(identifier);
 
     writer.add(new GenericElement(docNum, docName));
-    
+
     if (documentNamesWritten != null) {
       documentNamesWritten.increment();
     }
@@ -65,11 +63,11 @@ public class DiskNameWriter implements Processor<NumberedDocumentData> {
 
     assert last.number <= ndd.number;
     assert ndd.identifier != null;
-    
+
     writer.add(new GenericElement(
-            Utility.fromInt(ndd.number), 
+            Utility.fromInt(ndd.number),
             Utility.fromString(ndd.identifier)));
-    
+
     if (documentNamesWritten != null) {
       documentNamesWritten.increment();
     }

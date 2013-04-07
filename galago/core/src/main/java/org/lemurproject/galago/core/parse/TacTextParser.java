@@ -140,7 +140,7 @@ public class TacTextParser extends DocumentStreamParser {
     for (int i = 0; i < 10; i++) {
 
       File tacFile = testFiles[i];
-      DocumentSplit split = new DocumentSplit(tacFile.getAbsolutePath(), "", false, new byte[0], new byte[0], 0, 0);
+      DocumentSplit split = new DocumentSplit(tacFile.getAbsolutePath(), "", false, 0,0);
       TacTextParser parser = new TacTextParser(split, new Parameters());
       Document doc = null;
 

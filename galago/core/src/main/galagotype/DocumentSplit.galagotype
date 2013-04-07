@@ -4,13 +4,8 @@ type DocumentSplit {
     String fileName;
     String fileType;
     boolean isCompressed;
-    bytes startKey;
-    bytes endKey;
-    int fileId;
-    int totalFileCount;
-    
+    int numDocuments;
+    int startDocument;
 
-    order: ;
-    order: +fileName +startKey;
-	order: +fileId;
+    order: +fileName;
 };

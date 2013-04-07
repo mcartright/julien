@@ -45,11 +45,6 @@ public class FakeExtentIterator implements ExtentIterator {
   }
 
   @Override
-  public ExtentArray getData() {
-    return extents();
-  }
-
-  @Override
   public ExtentArray extents() {
     ExtentArray array = new ExtentArray();
     int[] datum = data[index];

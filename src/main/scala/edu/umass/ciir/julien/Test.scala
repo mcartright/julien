@@ -3,9 +3,7 @@ package edu.umass.ciir.julien
 import scala.collection.mutable.PriorityQueue
 import edu.umass.ciir.julien.Utils._
 import scala.collection.JavaConversions._
-
 import org.lemurproject.galago.tupleflow.Parameters
-import edu.umass.ciir.macros.Macros._
 
 object Test {
   implicit def term2op(t: Term): SingleTermView = SingleTermView(t)
@@ -37,12 +35,12 @@ object Test {
 
     val processor = SimpleProcessor()
     // Connect to this index
-    val t0 = System.currentTimeMillis
-    index.attach(sdm)
-    processor.add(sdm)
-    val results = processor.run
-    val t1 = System.currentTimeMillis
+    val results =
+      time("Exec time") {
+        index.attach(sdm)
+        processor.add(sdm)
+        processor.run
+      }
     printResults(results, index)
-    debugf("Elapsed time: %d ms\n", (t1-t0).toInt)  // this is a test macro
   }
 }

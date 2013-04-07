@@ -42,17 +42,17 @@ import org.tukaani.xz.XZInputStream;
  *
  * Instantiation of a type-specific parser (TSP) is done by the UniversalParser.
  * It checks the formal argument types of the (TSP) to match on the possible
- * input methods it has available (i.e. an inputstream or a buffered reader over
- * the input data. Additionally, any TSP may have TupleFlowParameters in its
- * formal argument list, and the parameters provided to the UniversalParser will
- * be forwarded to the TSP instance.
+ * input methods it has available (i.e. an inputstream or a buffered reader over the
+ * input data. Additionally, any TSP may have TupleFlowParameters in its formal argument
+ * list, and the parameters provided to the UniversalParser will be forwarded to the
+ * TSP instance.
  *
  * @author trevor, sjh, irmarc
  */
 @Verified
 @InputClass(className = "org.lemurproject.galago.core.types.DocumentSplit")
-@OutputClass(className = "org.lemurproject.galago.core.parse.Document")
-public class ParserSelector extends StandardStep<DocumentSplit, Document> {
+@OutputClass(className = "org.lemurproject.galago.core.types.DocumentSplit")
+public class ParserCounter extends StandardStep<DocumentSplit, DocumentSplit> {
 
     // The built-in type map
     static String[][] sFileTypeLookup = {
@@ -75,19 +75,19 @@ public class ParserSelector extends StandardStep<DocumentSplit, Document> {
   private Closeable source;
   private byte[] subCollCheck = "subcoll".getBytes();
 
-  public ParserSelector() {
+  public ParserCounter() {
     this(new Parameters());
   }
 
-  public ParserSelector(Parameters p) {
+  public ParserCounter(Parameters p) {
     this.tfParameters = null;
     this.parameters = p;
     buildFileTypeMap();
   }
 
-  public ParserSelector(TupleFlowParameters parameters) {
+  public ParserCounter(TupleFlowParameters parameters) {
     this.tfParameters = parameters;
-    documentCounter = parameters.getCounter("Documents Parsed");
+    documentCounter = parameters.getCounter("Documents Counted");
     this.parameters = parameters.getJSON();
     buildFileTypeMap();
   }
@@ -116,9 +116,8 @@ public class ParserSelector extends StandardStep<DocumentSplit, Document> {
   @Override
   public void process(DocumentSplit split) throws IOException {
     DocumentStreamParser parser = null;
-    int count = 0;
+    long count = 0;
     long limit = Long.MAX_VALUE;
-    int offset = split.startDocument;
 
     // Determine the file type either from the parameters
     // or from the guess in the splits
@@ -147,19 +146,10 @@ public class ParserSelector extends StandardStep<DocumentSplit, Document> {
     // downstream.
     Document document;
     while ((document = parser.nextDocument()) != null) {
-      // Numbering based on the offset + # seen in this split
-      document.identifier = offset + count;
-      processor.process(document);
       if (documentCounter != null) {
         documentCounter.increment();
       }
       count++;
-
-      // Enforces limitations imposed by the endKey subcollection specifier.
-      // See DocumentSource for details.
-      if (count >= limit) {
-        break;
-      }
 
       if (count % 10000 == 0) {
     	  Logger.getLogger(getClass().toString()).log(Level.WARNING, "Read " + count + " from split: " + split.fileName);
@@ -169,6 +159,10 @@ public class ParserSelector extends StandardStep<DocumentSplit, Document> {
     if (parser != null) {
 	parser.close();
     }
+
+    // Set the count for this split
+    split.numDocuments = (int) count;
+    processor.process(split);
   }
 
   // Try like Hell to match up the formal parameter list with the available
@@ -240,7 +234,8 @@ public class ParserSelector extends StandardStep<DocumentSplit, Document> {
       return false;
   }
 
-  public BufferedReader getLocalBufferedReader(DocumentSplit split) throws IOException {
+  public BufferedReader getLocalBufferedReader(DocumentSplit split)
+      throws IOException {
     BufferedReader br = getBufferedReader(split);
     source = br;
     return br;
@@ -257,7 +252,8 @@ public class ParserSelector extends StandardStep<DocumentSplit, Document> {
       } else { // BZip2
         BufferedInputStream bis = new BufferedInputStream(stream);
         //bzipHeaderCheck(bis);
-        reader = new BufferedReader(new InputStreamReader(new BZip2CompressorInputStream(bis)));
+        reader =
+	    new BufferedReader(new InputStreamReader(new BZip2CompressorInputStream(bis)));
       }
     } else {
       reader = new BufferedReader(new InputStreamReader(stream));
@@ -265,18 +261,21 @@ public class ParserSelector extends StandardStep<DocumentSplit, Document> {
     return reader;
   }
 
-  public static BufferedReader getBufferedReader(DocumentSplit split) throws IOException {
+  public static BufferedReader getBufferedReader(DocumentSplit split)
+      throws IOException {
     FileInputStream stream = StreamCreator.realInputStream(split.fileName);
     BufferedReader reader;
 
     if (split.isCompressed) {
       // Determine compression type
       if (split.fileName.endsWith("gz")) { // Gzip
-        reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(stream)));
+        reader =
+	    new BufferedReader(new InputStreamReader(new GZIPInputStream(stream)));
       } else { // BZip2
         BufferedInputStream bis = new BufferedInputStream(stream);
         //bzipHeaderCheck(bis);
-        reader = new BufferedReader(new InputStreamReader(new BZip2CompressorInputStream(bis)));
+        reader =
+	    new BufferedReader(new InputStreamReader(new BZip2CompressorInputStream(bis)));
       }
     } else {
       reader = new BufferedReader(new InputStreamReader(stream));
@@ -284,13 +283,15 @@ public class ParserSelector extends StandardStep<DocumentSplit, Document> {
     return reader;
   }
 
-  public BufferedInputStream getLocalBufferedInputStream(DocumentSplit split) throws IOException {
+  public BufferedInputStream getLocalBufferedInputStream(DocumentSplit split)
+      throws IOException {
     BufferedInputStream bis = getBufferedInputStream(split);
     source = bis;
     return bis;
   }
 
-  public static BufferedInputStream getBufferedInputStream(DocumentSplit split) throws IOException {
+  public static BufferedInputStream getBufferedInputStream(DocumentSplit split)
+      throws IOException {
     FileInputStream fileStream = StreamCreator.realInputStream(split.fileName);
     BufferedInputStream stream;
 
@@ -299,7 +300,8 @@ public class ParserSelector extends StandardStep<DocumentSplit, Document> {
       if (split.fileName.endsWith("gz")) { // Gzip
         stream = new BufferedInputStream(new GZIPInputStream(fileStream));
       } else if (split.fileName.endsWith("xz")) {
-          stream = new BufferedInputStream(new XZInputStream(fileStream), 10*1024);
+          stream =
+	      new BufferedInputStream(new XZInputStream(fileStream), 10*1024);
       } else { // bzip2
         BufferedInputStream bis = new BufferedInputStream(fileStream);
         //bzipHeaderCheck(bis);

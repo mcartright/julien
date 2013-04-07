@@ -22,9 +22,6 @@ public class Document implements Serializable {
   public String text;
   public List<String> terms;
   public List<Tag> tags;
-  // other data - used to generate an identifier; these values can not be serialized!
-  public int fileId = -1;
-  public int totalFileCount = -1;
 
   public Document() {
     metadata = new HashMap();
@@ -43,8 +40,6 @@ public class Document implements Serializable {
     this.text = d.text;
     this.terms = new ArrayList(d.terms);
     this.tags = new ArrayList(d.tags);
-    this.fileId = d.fileId;
-    this.totalFileCount = d.totalFileCount;
   }
 
   public String toString() {
@@ -77,7 +72,7 @@ public class Document implements Serializable {
       sb.append("\nText :").append(text);
     }
     sb.append("\n");
-    
+
     return sb.toString();
   }
 
@@ -219,13 +214,13 @@ public class Document implements Serializable {
       // metadata
       int metadataCount = input.readInt();
       d.metadata = new HashMap(metadataCount);
-      
+
       for (int i = 0; i < metadataCount; i++) {
 	blen = input.readInt();
 	buffer = sizeCheck(buffer, blen);
         input.readFully(buffer, 0, blen);
         String key = Utility.toString(buffer, 0, blen);
-	
+
 	blen = input.readInt();
 	buffer = sizeCheck(buffer, blen);
         input.readFully(buffer, 0, blen);

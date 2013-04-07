@@ -26,7 +26,7 @@ import java.io.IOException;
 @InputClass(className = "org.lemurproject.galago.core.types.DocumentSplit")
 @OutputClass(className = "org.lemurproject.galago.core.parse.Document")
 public class OpenLibraryRecordParser extends StandardStep<DocumentSplit, Document> {
- 
+
   Counter documentsRead, splitsOpened;
 
   public OpenLibraryRecordParser(TupleFlowParameters parameters) {
@@ -44,8 +44,6 @@ public class OpenLibraryRecordParser extends StandardStep<DocumentSplit, Documen
       String id = parts[1];
       String json = parts[4];
       Document doc = new Document(id, json);
-      doc.fileId = split.fileId;
-      doc.totalFileCount = split.totalFileCount;
       processor.process(doc);
       if (documentsRead != null) {
 	documentsRead.increment();

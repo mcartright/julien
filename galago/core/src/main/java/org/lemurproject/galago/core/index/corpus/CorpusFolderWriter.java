@@ -3,7 +3,6 @@ package org.lemurproject.galago.core.index.corpus;
 
 import java.io.IOException;
 import org.lemurproject.galago.core.index.GenericElement;
-import org.lemurproject.galago.core.index.merge.CorpusMerger;
 import org.lemurproject.galago.core.parse.Document;
 import org.lemurproject.galago.core.types.KeyValuePair;
 import org.lemurproject.galago.tupleflow.IncompatibleProcessorException;
@@ -38,7 +37,6 @@ public class CorpusFolderWriter implements Processor<Document>, Source<KeyValueP
     // create a writer;
     corpusParams.set("writerClass", getClass().getName());
     corpusParams.set("readerClass", CorpusReader.class.getName());
-    corpusParams.set("mergerClass", CorpusMerger.class.getName());
     writer = new SplitBTreeValueWriter(parameters);
 
     // figure out what the key actually is

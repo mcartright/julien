@@ -53,6 +53,7 @@ public class DocumentSourceTest extends TestCase {
     File tempFile = Utility.createTemporary();
     Parameters p = new Parameters();
     p.set("filename", tempFile.getAbsolutePath());
+    p.set("inputPolicy", "warn");
     DocumentSource source = new DocumentSource(new FakeParameters(p));
     FakeProcessor processor = new FakeProcessor();
     source.setProcessor(processor);

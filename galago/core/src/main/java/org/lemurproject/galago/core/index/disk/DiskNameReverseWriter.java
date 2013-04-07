@@ -4,7 +4,6 @@ package org.lemurproject.galago.core.index.disk;
 import java.io.IOException;
 import java.util.logging.Logger;
 import org.lemurproject.galago.core.index.GenericElement;
-import org.lemurproject.galago.core.index.merge.DocumentNameReverseMerger;
 import org.lemurproject.galago.core.types.NumberedDocumentData;
 import org.lemurproject.galago.tupleflow.Counter;
 import org.lemurproject.galago.tupleflow.InputClass;
@@ -15,9 +14,9 @@ import org.lemurproject.galago.tupleflow.Utility;
 import org.lemurproject.galago.tupleflow.execution.ErrorHandler;
 
 /**
- * 
+ *
  * Writes a mapping from document names to document numbers
- * 
+ *
  * Does not assume that the data is sorted
  *  - as data would need to be sorted into both key and value order
  *  - instead this class takes care of the re-sorting
@@ -39,7 +38,6 @@ public class DiskNameReverseWriter implements Processor<NumberedDocumentData> {
 
     Parameters p = parameters.getJSON();
     p.set("writerClass", DiskNameReverseWriter.class.getName());
-    p.set("mergerClass", DocumentNameReverseMerger.class.getName());
     p.set("readerClass", DiskNameReverseReader.class.getName());
 
     writer = new DiskBTreeWriter(filename, p);
@@ -67,7 +65,7 @@ public class DiskNameReverseWriter implements Processor<NumberedDocumentData> {
         Logger.getLogger(this.getClass().getName()).info("WARNING: identical document names written to names.reverse index");
       }
     }
-    
+
     writer.add(new GenericElement(
             Utility.fromString(ndd.identifier),
             Utility.fromInt(ndd.number)));

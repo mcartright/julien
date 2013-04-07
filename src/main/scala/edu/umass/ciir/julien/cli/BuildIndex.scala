@@ -7,6 +7,7 @@ import org.lemurproject.galago.core.index.corpus._
 import org.lemurproject.galago.core.index.disk.DiskNameReader
 import org.lemurproject.galago.core.index.disk.PositionFieldIndexWriter
 import org.lemurproject.galago.core.index.disk.PositionIndexWriter
+import org.lemurproject.galago.core.index.disk.PositionContentWriter
 import org.lemurproject.galago.core.util.BuildStageTemplates._
 import org.lemurproject.galago.core.parse._
 import org.lemurproject.galago.core.types._
@@ -33,37 +34,44 @@ import scala.collection.JavaConversions._
 object BuildIndex extends TupleFlowFunction {
   val slash = File.separator
 
+  def getOffsetSplitStage: Stage = {
+    return new Stage("offsetting").
+      addInput("countedSplits", new DocumentSplit.FileIdOrder).
+      addOutput("offsetSplits", new DocumentSplit.FileIdOrder).
+      add(new InputStep("countedSplits")).
+      add(new Step(classOf[SplitOffsetter])).
+      add(new OutputStep("offsetSplits"))
+  }
+
+  def getCountDocumentsStage: Stage = {
+    return new Stage("countDocuments").
+      addInput("splits", new DocumentSplit.FileIdOrder()).
+      addOutput("countedSplits", new DocumentSplit.FileIdOrder()).
+      add(new InputStep("splits")).
+      add(new Step(classOf[ParserCounter])).
+      add(new OutputStep("countedSplits"))
+  }
+
   def getParsePostingsStage(bp : Parameters) : Stage = {
     val stage = new Stage("parsePostings").
-      addInput("splits", new DocumentSplit.FileIdOrder()).
+      addInput("offsetSplits", new DocumentSplit.FileIdOrder()).
       addOutput("fieldLengthData", new FieldLengthData.FieldDocumentOrder()).
       addOutput("numberedDocumentDataNumbers",
         new NumberedDocumentData.NumberOrder()).
       addOutput("numberedDocumentDataNames",
         new NumberedDocumentData.IdentifierOrder()).
-      addOutput("storeKeys", new KeyValuePair.KeyOrder()).
       addOutput("numberedPostings",
-        new NumberWordPosition.WordDocumentPositionOrder())
-
-    if (!bp.getMap("tokenizer").getList("fields").isEmpty()) {
-      stage.addOutput("numberedExtents",
-        new NumberedExtent.ExtentNameNumberBeginOrder())
-    }
-    if (!bp.getMap("tokenizer").getMap("formats").isEmpty()) {
-      stage.addOutput("numberedFields",
+        new NumberWordPosition.WordDocumentPositionOrder()).
+      addOutput("numberedExtentPostings",
+        new FieldNumberWordPosition.FieldWordDocumentPositionOrder()).
+      addOutput("encoded-fields",
         new NumberedField.FieldNameNumberOrder())
     }
 
-    if (bp.getBoolean("fieldIndex")) {
-      stage.addOutput("numberedExtentPostings",
-        new FieldNumberWordPosition.FieldWordDocumentPositionOrder())
-    }
-
     // Steps
-    stage.add(new InputStep("splits")).
+    stage.add(new InputStep("offsetSplits")).
       add(getParserStep(bp)).
-      add(getTokenizerStep(bp)).
-      add(getNumberingStep(bp))
+      add(getTokenizerStep(bp))
     val processingFork = new MultiStep()
 
     // these forks are always executed
@@ -88,29 +96,18 @@ object BuildIndex extends TupleFlowFunction {
       addGroup("postings",
         getExtractionSteps("numberedPostings",
 	  classOf[NumberedPostingsPositionExtractor],
-	  new NumberWordPosition.WordDocumentPositionOrder()))
-
-    // now optional forks
-    if (!bp.getMap("tokenizer").getList("fields").isEmpty()) {
-      processingFork.addGroup("extents",
-	getExtractionSteps("numberedExtents",
-	  classOf[NumberedExtentExtractor],
-	  new NumberedExtent.ExtentNameNumberBeginOrder()))
-    }
-    if (!bp.getMap("tokenizer").getMap("formats").isEmpty()) {
-      processingFork.addGroup("comparable Fields",
-	getExtractionSteps("numberedFields",
-	  classOf[NumberedFieldExtractor],
-	  bp,
-	  new NumberedField.FieldNameNumberOrder()))
-    }
-
-    if (bp.getBoolean("fieldIndex")) {
-      processingFork.addGroup("fieldIndex",
+	  new NumberWordPosition.WordDocumentPositionOrder())).
+      addGroup("fieldIndex",
 	getExtractionSteps("numberedExtentPostings",
 	  classOf[NumberedExtentPostingsExtractor],
 	  new FieldNumberWordPosition.FieldWordDocumentPositionOrder()))
-    }
+    // one fork path for each field recorded
+    processingFork.addGroup("encode-fields",
+      getExtractionSteps("encoded-fields",
+        classOf[ContentEncoder],
+        bp.getMap("tokenizer"),
+        new NumberedField.FieldNameNumberOrder()))
+
     return stage.add(processingFork)
   }
 
@@ -158,26 +155,9 @@ object BuildIndex extends TupleFlowFunction {
     if (!globalParameters.containsKey("indexPath")) {
       errorLog.add("Parameter 'indexPath' is required. It should be a string.")
     } else {
-    val indexPath = globalParameters.getString("indexPath")
-    globalParameters.set("indexPath", (new File(indexPath).getAbsolutePath()))
+      val indexPath = globalParameters.getString("indexPath")
+      globalParameters.set("indexPath", (new File(indexPath).getAbsolutePath()))
     }
-
-    // ensure there are some default parameters
-    val storeParams = new Parameters()
-    storeParams.set("readerClass", classOf[CorpusReader].getName())
-    storeParams.set("writerClass", classOf[CorpusFolderWriter].getName())
-    // we need a small block size because the stored values are small
-    storeParams.set("blockSize", globalParameters.get("storeBlockSize", 512))
-    storeParams.set("filename",
-      globalParameters.getString("indexPath") + slash + "store")
-
-    // copy from the other parameters in case the client added some manually
-    if (globalParameters.isMap("storeParams")) {
-      storeParams.copyFrom(globalParameters.getMap("storeParams"))
-    }
-
-    // insert back into the globalParams
-    globalParameters.set("storeParams", storeParams)
 
     // tokenizer/fields must be a list of strings [optional parameter]
     // defaults
@@ -189,23 +169,6 @@ object BuildIndex extends TupleFlowFunction {
         val tokenizerParams = globalParameters.getMap("tokenizer")
         fieldNames =
           tokenizerParams.getAsList("fields").asInstanceOf[List[String]].toSet
-        if (!fieldNames.isEmpty) globalParameters.set("fieldIndex", true)
-
-        // tokenizer/format is a mapping from fields to types [optional]
-        //  each type needs to be indexable {string,int,long,float,double,date}
-        if (tokenizerParams.isMap("formats")) {
-          val formats = tokenizerParams.getMap("formats")
-          val pat = """string|int|long|float|double|date""".r
-          if (formats.getKeys.exists(!fieldNames(_))) {
-            errorLog.add("Found a format for one or more unknown fields: " +
-              formats.getKeys.filter(fieldNames(_)).mkString(","))
-          }
-          val fieldTypes = formats.getKeys.map(formats.getString(_))
-          if (fieldTypes.exists(ft => pat misses ft)) {
-            errorLog.add("Unknown format(s): " +
-              fieldTypes.filter(ft => pat misses ft).mkString(","))
-          }
-        }
       }
     }
 
@@ -233,7 +196,6 @@ object BuildIndex extends TupleFlowFunction {
 
     // common steps + connections
     val splitParameters = bp.get("parser", new Parameters()).clone()
-    splitParameters.set("storePieces", bp.get("distrib", 10))
     if (bp.isMap("parser")) {
       splitParameters.set("parser", bp.getMap("parser"))
     }
@@ -242,73 +204,61 @@ object BuildIndex extends TupleFlowFunction {
       splitParameters.set("filetype", bp.getString("filetype"))
     }
     val job = new Job()
-    job.add(getSplitStage(
-      bp.getAsList("inputPath").asInstanceOf[List[String]],
-      classOf[DocumentSource],
-      new DocumentSplit.FileIdOrder(),
-      splitParameters)).
+    job.add(
+      getSplitStage(bp.getAsList("inputPath").asInstanceOf[List[String]],
+        classOf[DocumentSource],
+        new DocumentSplit.FileIdOrder(),
+        splitParameters)).
+      add(getCountDocumentsStage).
+      each("inputSplit", "countDocuments").
+      add(getOffsetSplitStage).
+      combined("countDocuments", "offsetting").
       add(getParsePostingsStage(bp)).
-      add(getWriteNamesStage(
-        "writeNames",
-        new File(indexPath, "names"),
-        "numberedDocumentDataNumbers")).
-      add(getWriteNamesRevStage(
-        "writeNamesRev",
-        new File(indexPath, "names.reverse"),
-        "numberedDocumentDataNames")).
-      add(getWriteLengthsStage(
-        "writeLengths",
-        new File(indexPath, "lengths"),
-        "fieldLengthData")).
-      each("inputSplit", "parsePostings").
-      combined("parsePostings", "writeLengths").
-      combined("parsePostings", "writeNames").
-      combined("parsePostings", "writeNamesRev").
+      each("offsetting", "parsePostings").
+      add(getWritePostingsStage(
+        bp,
+        "writeContent",
+        "encoded-fields",
+        new NumberedField.FieldNameNumberOrder,
+        new File(indexPath, "content"),
+        classOf[PositionContentWriter])).
+      combined("parsePostings", "writeContent").
       add(getParallelIndexKeyWriterStage(
         "writeStoreKeys",
         "storeKeys",
         bp.getMap("storeParams"))).
       combined("parsePostings", "writeStoreKeys").
+      add(getWriteNamesStage(
+        "writeNames",
+        new File(indexPath, "names"),
+        "numberedDocumentDataNumbers")).
+      combined("parsePostings", "writeNames").
+      add(getWriteNamesRevStage(
+        "writeNamesRev",
+        new File(indexPath, "names.reverse"),
+        "numberedDocumentDataNames")).
+      combined("parsePostings", "writeNamesRev").
+      add(getWriteLengthsStage(
+        "writeLengths",
+        new File(indexPath, "lengths"),
+        "fieldLengthData")).
+      combined("parsePostings", "writeLengths").
       add(getWritePostingsStage(bp,
         "writePostings",
         "numberedPostings",
         new NumberWordPosition.WordDocumentPositionOrder(),
         "postings",
         classOf[PositionIndexWriter])).
-      combined("parsePostings", "writePostings")
-
-    // if we have at least one field - write extents
-    if (!bp.getMap("tokenizer").getList("fields").isEmpty()) {
-      job.add(getWriteExtentsStage(
-        "writeExtents",
-        new File(indexPath, "extents"),
-        "numberedExtents")).
-        combined("parsePostings", "writeExtents")
-    }
-
-    // if we have at least one field format - write fields
-    if (!bp.getMap("tokenizer").getMap("formats").isEmpty()) {
-      val p = new Parameters()
-      p.set("tokenizer", bp.getMap("tokenizer"))
-      job.add(getWriteFieldsStage(
-        "writeFields",
-        new File(indexPath, "fields"),
-        "numberedFields",
-        p)).
-        combined("parsePostings", "writeFields")
-    }
-
-    // field indexes
-    if (bp.getBoolean("fieldIndex")) {
-      job.add(getWritePostingsStage(
+      combined("parsePostings", "writePostings").
+      add(getWritePostingsStage(
         bp,
         "writeExtentPostings",
         "numberedExtentPostings",
         new FieldNumberWordPosition.FieldWordDocumentPositionOrder(),
         "field.",
         classOf[PositionFieldIndexWriter])).
-        combined("parsePostings", "writeExtentPostings")
-    }
+      combined("parsePostings", "writeExtentPostings")
+
     return job
   }
 

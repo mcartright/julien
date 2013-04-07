@@ -1,5 +1,7 @@
 package edu.umass.ciir
 
+import edu.umass.ciir.macros.Macros._
+
 package object julien {
 
 /** Correctness enforced using value classes for any value we might throw
@@ -137,4 +139,14 @@ package object julien {
   type TEI = ExtentIterator
   type TCI = CountIterator
   type MLI = LengthsReader.LengthsIterator
+
+  // For debugging/timing purposes, until I can figure out a macro to
+  // compile this out - At least moving the definition will be easy.
+  def time[R](label:String)(block: => R): R = {
+    val t0 = System.currentTimeMillis
+    val result = block
+    val t1 = System.currentTimeMillis
+    debugf("%s: %d ms\n", label, (t1-t0).toInt)  // this is a test macro
+    result
+  }
 }

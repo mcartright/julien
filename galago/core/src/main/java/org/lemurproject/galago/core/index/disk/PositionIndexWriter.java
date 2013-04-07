@@ -10,7 +10,6 @@ import org.lemurproject.galago.core.index.CompressedRawByteBuffer;
 import org.lemurproject.galago.core.index.IndexElement;
 import org.lemurproject.galago.core.index.KeyListReader;
 import org.lemurproject.galago.core.index.mem.MemoryPositionalIndex;
-import org.lemurproject.galago.core.index.merge.PositionIndexMerger;
 import org.lemurproject.galago.core.types.NumberWordPosition;
 import org.lemurproject.galago.tupleflow.InputClass;
 import org.lemurproject.galago.tupleflow.Parameters;
@@ -71,7 +70,6 @@ public class PositionIndexWriter implements
     actualParams = parameters.getJSON();
     actualParams.set("writerClass", getClass().getName());
     actualParams.set("readerClass", PositionIndexReader.class.getName());
-    actualParams.set("mergerClass", PositionIndexMerger.class.getName());
     actualParams.set("memoryClass", MemoryPositionalIndex.class.getName());
     actualParams.set("defaultOperator", "counts");
 

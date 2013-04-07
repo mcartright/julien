@@ -412,11 +412,6 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
     }
 
     @Override
-    public ExtentArray getData() {
-      return extents();
-    }
-
-    @Override
     public int maximumCount() {
       return Integer.MAX_VALUE;
     }

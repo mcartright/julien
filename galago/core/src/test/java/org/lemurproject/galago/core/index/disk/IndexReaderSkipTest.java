@@ -84,38 +84,4 @@ public class IndexReaderSkipTest extends TestCase {
       temp.delete();
     }
   }
-
-  public void testWindowIndexSkipping() throws Exception {
-    Random r = new Random();
-    File temp = Utility.createTemporary();
-
-    try {
-      Parameters parameters = new Parameters();
-      parameters.set("filename", temp.getAbsolutePath());
-      parameters.set("skipDistance", 10);
-      parameters.set("skipResetDistance", 5);
-      WindowIndexWriter writer = new WindowIndexWriter(new FakeParameters(parameters));
-
-      writer.processExtentName(Utility.fromString("key"));
-      for (int doc = 0; doc < 1000; doc++) {
-        writer.processNumber(doc);
-        for (int begin = 0; begin < 100; begin++) {
-          writer.processBegin(begin);
-          writer.processTuple(begin + r.nextInt(128) + 128); // end is between 128 and 256 after begin
-        }
-      }
-      writer.close();
-
-      WindowIndexReader reader = new WindowIndexReader(parameters.getString("filename"));
-      for (int i = 1; i < 1000; i++) {
-        Iterator extents = reader.getTermExtents(Utility.fromString("key"));
-        extents.syncTo(i);
-        assertEquals(extents.currentCandidate(), i);
-
-      }
-
-    } finally {
-      temp.delete();
-    }
-  }
 }

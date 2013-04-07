@@ -9,14 +9,11 @@ import org.lemurproject.galago.core.index.disk.DiskLengthsWriter;
 import org.lemurproject.galago.core.index.disk.DiskNameReverseWriter;
 import org.lemurproject.galago.core.index.disk.DiskNameWriter;
 import org.lemurproject.galago.core.index.disk.FieldIndexWriter;
-import org.lemurproject.galago.core.index.disk.WindowIndexWriter;
-import org.lemurproject.galago.core.parse.DocumentNumberer;
 import org.lemurproject.galago.core.parse.ParserSelector;
 import org.lemurproject.galago.core.parse.TagTokenizer;
 import org.lemurproject.galago.core.types.DocumentSplit;
 import org.lemurproject.galago.core.types.FieldLengthData;
 import org.lemurproject.galago.core.types.NumberedDocumentData;
-import org.lemurproject.galago.core.types.NumberedExtent;
 import org.lemurproject.galago.core.types.NumberedField;
 import org.lemurproject.galago.tupleflow.Order;
 import org.lemurproject.galago.tupleflow.Parameters;
@@ -121,16 +118,6 @@ public class BuildStageTemplates {
             DiskNameReverseWriter.class, new NumberedDocumentData.IdentifierOrder(), p);
   }
 
-  public static Stage getWriteExtentsStage(String stageName, File destination, String inputPipeName) throws IOException {
-    return getGenericWriteStage(stageName, destination, inputPipeName,
-            WindowIndexWriter.class, new NumberedExtent.ExtentNameNumberBeginOrder(), new Parameters());
-  }
-
-  public static Stage getWriteExtentsStage(String stageName, File destination, String inputPipeName, Parameters p) throws IOException {
-    return getGenericWriteStage(stageName, destination, inputPipeName,
-            WindowIndexWriter.class, new NumberedExtent.ExtentNameNumberBeginOrder(), p);
-  }
-
   public static Stage getWriteFieldsStage(String stageName, File destination, String inputPipeName) throws IOException {
     return getGenericWriteStage(stageName, destination, inputPipeName,
             FieldIndexWriter.class, new NumberedField.FieldNameNumberOrder(), new Parameters());
@@ -142,11 +129,11 @@ public class BuildStageTemplates {
   }
 
   public static Stage getSplitStage(List<String> inputPaths, Class sourceClass) throws IOException {
-    return getSplitStage(inputPaths, sourceClass, new DocumentSplit.FileIdOrder(), new Parameters());
+    return getSplitStage(inputPaths, sourceClass, new DocumentSplit.FileNameOrder(), new Parameters());
   }
 
   public static Stage getSplitStage(List<String> inputPaths, Class sourceClass, Parameters p) throws IOException {
-    return getSplitStage(inputPaths, sourceClass, new DocumentSplit.FileIdOrder(), p);
+    return getSplitStage(inputPaths, sourceClass, new DocumentSplit.FileNameOrder(), p);
   }
 
   public static Stage getSplitStage(List<String> inputPaths, Class sourceClass, Order order, Parameters p)
@@ -174,14 +161,6 @@ public class BuildStageTemplates {
     stage.add(Utility.getSorter(order));
     stage.add(new OutputStep("splits"));
     return stage;
-  }
-
-  public static Step getNumberingStep(Parameters p) {
-      return getNumberingStep(p, DocumentNumberer.class);
-  }
-
-  public static Step getNumberingStep(Parameters p, Class defaultClass) {
-    return getGenericStep("numberer", p, defaultClass);
   }
 
   public static Step getParserStep(Parameters p) {

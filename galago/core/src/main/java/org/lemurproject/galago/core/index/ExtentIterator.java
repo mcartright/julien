@@ -6,9 +6,9 @@ import org.lemurproject.galago.core.util.ExtentArray;
 /**
  * This describes an iterator that returns extents - actual spans of text
  * that denote a region in the underlying document.
- * 
+ *
  * @author irmarc
  */
-public interface ExtentIterator extends DataIterator<ExtentArray>, CountIterator {
+public interface ExtentIterator extends CountIterator {
     public ExtentArray extents();
 }

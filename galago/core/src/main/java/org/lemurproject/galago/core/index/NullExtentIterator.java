@@ -55,11 +55,6 @@ public class NullExtentIterator implements ExtentIterator {
     }
 
     @Override
-    public ExtentArray getData() {
-        return array;
-    }
-
-    @Override
     public long totalEntries() {
         return 0;
     }

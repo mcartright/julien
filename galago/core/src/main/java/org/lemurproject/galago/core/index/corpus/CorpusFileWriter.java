@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.lemurproject.galago.core.index.GenericElement;
 import org.lemurproject.galago.core.index.disk.DiskBTreeWriter;
-import org.lemurproject.galago.core.index.merge.CorpusMerger;
 import org.lemurproject.galago.core.parse.Document;
 import org.lemurproject.galago.tupleflow.Counter;
 import org.lemurproject.galago.tupleflow.InputClass;
@@ -21,7 +20,7 @@ import org.lemurproject.galago.tupleflow.execution.Verification;
  * are in '.corpus' format, which can be fed to UniversalParser as an input
  * to indexing.  The '.corpus' format is also convenient for quickly
  * finding individual documents.
- * 
+ *
  * @author trevor
  */
 @InputClass(className = "org.lemurproject.galago.core.parse.Document")
@@ -36,7 +35,6 @@ public class CorpusFileWriter implements Processor<Document> {
     // create a writer;
     corpusParams.set("writerClass", getClass().getName());
     corpusParams.set("readerClass", CorpusReader.class.getName());
-    corpusParams.set("mergerClass", CorpusMerger.class.getName());
     writer = new DiskBTreeWriter(parameters.getJSON().getString("filename"), corpusParams);
     documentsWritten = parameters.getCounter("Documents Written");
   }
