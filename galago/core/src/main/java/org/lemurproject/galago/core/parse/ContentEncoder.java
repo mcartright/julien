@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import org.lemurproject.galago.core.types.NumberedField;
+import org.lemurproject.galago.tupleflow.Counter;
 import org.lemurproject.galago.tupleflow.InputClass;
 import org.lemurproject.galago.tupleflow.OutputClass;
 import org.lemurproject.galago.tupleflow.StandardStep;
@@ -28,10 +29,14 @@ import org.xerial.snappy.SnappyOutputStream;
 public class ContentEncoder extends StandardStep<Document, NumberedField> {
 
   HashSet<String> fieldsOfInterest;
+  private Counter fieldCounter = null;
+  private Counter tagCounter = null;
 
   public ContentEncoder(TupleFlowParameters parameters) {
     fieldsOfInterest =
-	new HashSet(parameters.getJSON().getAsList("field"));
+	new HashSet(parameters.getJSON().getAsList("fields"));
+    fieldCounter = parameters.getCounter("Field Occurrences Encoded");
+    tagCounter = parameters.getCounter("Tags Encountered");
   }
 
   @Override
@@ -40,6 +45,7 @@ public class ContentEncoder extends StandardStep<Document, NumberedField> {
 	  new HashMap<String, List<List<String>>>();
       HashMap<String, TIntArrayList> positions = new
 	  HashMap<String, TIntArrayList>();
+      if (tagCounter != null) tagCounter.incrementBy(document.tags.size());
       for (Tag t : document.tags) {
 	  if (fieldsOfInterest.contains(t.name)) {
 	      if (!entries.containsKey(t.name)) {
@@ -93,11 +99,14 @@ public class ContentEncoder extends StandardStep<Document, NumberedField> {
 	  dos.flush();
 	  output.writeInt(contentBytes.size());
 	  output.write(contentBytes.toByteArray());
-
+	  output.close();
 	  NumberedField nf =
 	      new NumberedField(Utility.fromString(fieldName),
 				(long) document.identifier,
 				bytes.toByteArray());
+	  if (fieldCounter != null) {
+	      fieldCounter.increment();
+	  }
 	  processor.process(nf);
       }
   }

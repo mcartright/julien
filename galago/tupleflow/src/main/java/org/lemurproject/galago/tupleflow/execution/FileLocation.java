@@ -20,7 +20,12 @@ public class FileLocation implements Serializable, Comparable<FileLocation> {
     }
 
     public int compareTo(FileLocation location) {
-        int result = fileName.compareTo(location.fileName);
+	int result;
+	if (this.fileName == null || location.fileName == null) {
+	    result = 0;
+	} else {
+	    result = fileName.compareTo(location.fileName);
+	}
         if (result == 0) {
             result = lineNumber - location.lineNumber;
         }

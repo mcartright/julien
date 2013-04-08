@@ -50,8 +50,8 @@ import org.tukaani.xz.XZInputStream;
  * @author trevor, sjh, irmarc
  */
 @Verified
-@InputClass(className = "org.lemurproject.galago.core.types.DocumentSplit")
-@OutputClass(className = "org.lemurproject.galago.core.types.DocumentSplit")
+@InputClass(className = "org.lemurproject.galago.core.types.DocumentSplit", order = {"+fileName"})
+@OutputClass(className = "org.lemurproject.galago.core.types.DocumentSplit", order = {"+fileName"})
 public class ParserCounter extends StandardStep<DocumentSplit, DocumentSplit> {
 
     // The built-in type map

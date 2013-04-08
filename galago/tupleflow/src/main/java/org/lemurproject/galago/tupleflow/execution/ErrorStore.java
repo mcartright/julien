@@ -67,10 +67,12 @@ public class ErrorStore {
     ArrayList<Statement> warnings = new ArrayList();
 
     public void addError(FileLocation location, String message) {
+	assert (location != null);
         errors.add(new Statement(location, message));
     }
 
     public void addWarning(FileLocation location, String message) {
+	assert (location != null);
         warnings.add(new Statement(location, message));
     }
 
@@ -108,6 +110,9 @@ public class ErrorStore {
     }
 
     void addError(String filename, SAXParseException e) {
-        addError(new FileLocation(filename, e.getLineNumber(), e.getColumnNumber()), e.getMessage());
+        addError(new FileLocation(filename,
+				  e.getLineNumber(),
+				  e.getColumnNumber()),
+		 e.getMessage());
     }
 }

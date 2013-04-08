@@ -9,8 +9,8 @@ import org.lemurproject.galago.tupleflow.StandardStep;
 import org.lemurproject.galago.tupleflow.execution.Verified;
 
 @Verified
-@InputClass(className = "org.lemurproject.galago.core.types.DocumentSplit")
-@OutputClass(className = "org.lemurproject.galago.core.types.DocumentSplit")
+@InputClass(className = "org.lemurproject.galago.core.types.DocumentSplit", order = {"+fileName"})
+@OutputClass(className = "org.lemurproject.galago.core.types.DocumentSplit", order = {"+fileName"})
 public class SplitOffsetter extends StandardStep<DocumentSplit, DocumentSplit> {
 
     int lastEnd = 0;

@@ -65,7 +65,9 @@ object BuildIndex extends TupleFlowFunction {
       addOutput("numberedExtentPostings",
         new FieldNumberWordPosition.FieldWordDocumentPositionOrder()).
       addOutput("encoded-fields",
-        new NumberedField.FieldNameNumberOrder())
+        new NumberedField.FieldNameNumberOrder()).
+      addOutput("storeKeys",
+        new KeyValuePair.KeyOrder())
 
     // Steps
     stage.add(new InputStep("offsetSplits")).
@@ -158,6 +160,13 @@ object BuildIndex extends TupleFlowFunction {
       globalParameters.set("indexPath", (new File(indexPath).getAbsolutePath()))
     }
 
+    // Make a separate map for corpus stuff
+    val storeP = new Parameters
+    storeP.set("blockSize", globalParameters.get("corpusBlockSize", 512));
+    storeP.set("filename",
+      s"${globalParameters.getString("indexPath")}${slash}corpus");
+    globalParameters.set("storeParams", storeP);
+
     // tokenizer/fields must be a list of strings [optional parameter]
     // defaults
     var fieldNames : Set[String] = Set.empty
@@ -166,8 +175,10 @@ object BuildIndex extends TupleFlowFunction {
         errorLog.add("Parameter 'tokenizer' must be a map.\n")
       } else {
         val tokenizerParams = globalParameters.getMap("tokenizer")
-        fieldNames =
-          tokenizerParams.getAsList("fields").asInstanceOf[List[String]].toSet
+        fieldNames = tokenizerParams.
+          getAsList("fields").
+          asInstanceOf[java.util.List[String]].
+          toSet
       }
     }
 
@@ -204,7 +215,8 @@ object BuildIndex extends TupleFlowFunction {
     }
     val job = new Job()
     job.add(
-      getSplitStage(bp.getAsList("inputPath").asInstanceOf[List[String]],
+      getSplitStage(
+        bp.getAsList("inputPath").asInstanceOf[java.util.List[String]],
         classOf[DocumentSource],
         new DocumentSplit.FileNameOrder(),
         splitParameters)).

@@ -12,7 +12,11 @@ object Julien {
   def run(argv: Array[String], out : PrintStream = Console.out) : Unit = {
     // Use experimental reflection capabilities to find all CLIFunctions
     val names = findApps().map(a => (a.name, a)).toMap
-    Console.printf("Found apps: %s\n", names.keys.mkString(","))
+    if (argv.size < 1 || argv.toSet("help")) {
+      out.printf("Available functions:\n\n%s\n",
+        names.keys.toList.sorted.mkString(","))
+      return
+    }
     val (fnName: String, remaining: Array[String]) = (argv.head, argv.tail)
     if (names.contains(fnName)) {
       names(fnName).run(remaining, out)
@@ -22,19 +26,6 @@ object Julien {
     }
   }
 
-  def findApps() : Iterable[CLIFunction] = {
-    val mirror = runtimeMirror(getClass.getClassLoader)
-    val cliPkg = mirror.staticPackage("edu.umass.ciir.julien.cli")
-    Console.printf("Looking at pkg symbol: %s\n", cliPkg)
-    val apps = cliPkg.typeSignature.members.filter { s =>
-      // Anything that is a subtype of CLIFuction
-      Console.printf("testing symbol '%s' : %b\n",
-        s, s.typeSignature <:< typeOf[CLIFunction])
-      s.typeSignature <:< typeOf[CLIFunction]
-    } map { sym =>
-      // take that symbol (as a ModuleSymbol), and get the object instance
-      mirror.reflectModule(sym.asModule).instance.asInstanceOf[CLIFunction]
-    }
-    apps
-  }
+  def findApps() : Iterable[CLIFunction] =
+    List[CLIFunction](BuildIndex)
 }
