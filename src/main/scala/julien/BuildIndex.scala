@@ -1,5 +1,5 @@
 // BSD License (http://lemurproject.org/galago-license)
-package edu.umass.ciir.julien.cli
+package julien
 
 import java.io.File
 import java.io.PrintStream
@@ -21,7 +21,6 @@ import org.lemurproject.galago.tupleflow.execution.MultiStep
 import org.lemurproject.galago.tupleflow.execution.OutputStep
 import org.lemurproject.galago.tupleflow.execution.Stage
 import org.lemurproject.galago.tupleflow.execution.Step
-import edu.umass.ciir.julien.Utils._
 
 import scala.collection.mutable.{ListBuffer,HashSet}
 import scala.collection.JavaConversions._

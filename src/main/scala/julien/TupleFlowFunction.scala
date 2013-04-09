@@ -1,4 +1,4 @@
-package edu.umass.ciir.julien.cli
+package julien
 
 import java.io.PrintStream;
 import org.lemurproject.galago.tupleflow.Parameters;

@@ -1,4 +1,4 @@
-package edu.umass.ciir.julien
+package julien
 
 import java.util.Properties
 import scala.collection.JavaConversions._
