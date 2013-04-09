@@ -1,4 +1,5 @@
 package julien
+package access
 
 /** Encapsulation of a single posting in the index.
   * An Index object can produce a [julien.seq.PostingSeq]]

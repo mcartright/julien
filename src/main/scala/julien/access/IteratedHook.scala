@@ -1,5 +1,5 @@
 package julien
-package index
+package access
 
 /** Indicates behavior of an [[IndexHook]] that contains
   * an [[org.lemurproject.galago.core.index.Iterator]]

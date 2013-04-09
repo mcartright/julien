@@ -1,5 +1,5 @@
 package julien
-package index
+package access
 
 /** Behavior needed by anything that connects to an index.
   * This trait also acts as a marker to indicate that

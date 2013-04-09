@@ -1,4 +1,5 @@
-package edu.umass.ciir.julien
+package julien
+package access
 
 import org.lemurproject.galago.core.index.DataIterator
 import scala.collection.JavaConversions._

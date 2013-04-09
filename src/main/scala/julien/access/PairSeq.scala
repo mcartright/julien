@@ -1,4 +1,5 @@
-package edu.umass.ciir.julien
+package julien
+package access
 
 import scala.collection.LinearSeq
 import org.lemurproject.galago.core.index.KeyIterator

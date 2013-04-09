@@ -1,4 +1,5 @@
-package edu.umass.ciir.julien
+package julien
+package access
 
 import org.lemurproject.galago.core.index.KeyIterator
 import org.lemurproject.galago.tupleflow.Utility
