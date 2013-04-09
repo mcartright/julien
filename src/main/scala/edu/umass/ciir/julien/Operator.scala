@@ -38,6 +38,7 @@ object Operator {
 
 // Views provide Values to the Features
 trait ViewOp extends Operator
+trait BooleanView extends ViewOp with BoolSrc
 trait CountView extends ViewOp with CountSrc with StatisticsSrc
 trait PositionsView extends CountView with PositionSrc
 trait DataView[T] extends ViewOp with DataSrc[T]

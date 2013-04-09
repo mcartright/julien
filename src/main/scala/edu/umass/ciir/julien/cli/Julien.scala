@@ -27,5 +27,5 @@ object Julien {
   }
 
   def findApps() : Iterable[CLIFunction] =
-    List[CLIFunction](BuildIndex)
+    List[CLIFunction](BuildIndex, DumpKeys, DocCount)
 }
