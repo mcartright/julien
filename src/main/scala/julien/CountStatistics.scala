@@ -1,4 +1,4 @@
-package edu.umass.ciir.julien
+package julien
 
 object CountStatistics {
   def apply() = new CountStatistics(

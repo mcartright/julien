@@ -1,4 +1,4 @@
-package edu.umass.ciir.julien
+package julien
 
 import org.lemurproject.galago.core.index.ExtentIterator
 
@@ -14,7 +14,12 @@ object Term { def apply(s: String) = new Term(s) }
 final class Term(val t: String)
     extends ChildlessOp
     with IteratedHook[ExtentIterator] {
+
   override def toString: String =
     s"$t:" + (if (isAttached) index.toString else "")
+
+  /** Definition of how this class retrieves its underlying
+    * iterator from a given [[Index]] instance.
+    *
   def getIterator(i: Index): ExtentIterator = i.iterator(t)
 }

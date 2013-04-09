@@ -1,4 +1,4 @@
-package edu.umass.ciir.julien
+package julien
 
 trait StatisticsSrc { def statistics: CountStatistics }
 trait BoolSrc { def isMatch: Boolean }

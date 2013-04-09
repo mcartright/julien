@@ -1,10 +1,9 @@
-package edu.umass.ciir.julien
-
-
+package julien
 
 /** A view of a single Document in the collection.
-  * An Index can support an Iterator over the collection
-  * for this kind of object.
+  * An [[Index]] can support a [[julien.seq.DocumentSeq]]
+  * over its collection for instances that implement this
+  * behavior.
   */
 trait Document extends LengthsSrc {
   def length: Length

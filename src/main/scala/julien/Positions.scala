@@ -1,4 +1,4 @@
-package edu.umass.ciir.julien
+package julien
 
 import scala.collection.{IndexedSeqOptimized,IndexedSeqLike}
 import scala.collection.generic._
@@ -6,6 +6,9 @@ import scala.collection.immutable.Vector
 import scala.collection.mutable.{ArrayBuffer,Builder}
 import org.lemurproject.galago.core.util.ExtentArray
 
+/** Replacement for the [[org.lemurproject.galago.core.util.ExtentArray]]
+  * class. This class can directly be treated as a [[scala.collection.Seq]].
+  */
 class Positions(underlying: Array[Int])
     extends IndexedSeqOptimized[Int, Positions] {
   def apply(idx: Int): Int = underlying(idx)
