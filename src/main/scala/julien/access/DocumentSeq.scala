@@ -8,7 +8,7 @@ import org.lemurproject.galago.core.index.corpus.CorpusReader._
 import scala.collection.JavaConversions._
 import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable.{Builder,ListBuffer}
-import edu.umass.ciir.julien.IndexBasedDocument._
+import IndexBasedDocument._
 
 object DocumentSeq {
   def apply(idx: Index): DocumentSeq = new DocumentSeq(idx)
@@ -37,7 +37,8 @@ class DocumentSeq(index: Index)
   (implicit factory: (DataIterator[GDoc], Index) => Document)
     extends LinearSeq[Document] {
 
-  val underlying: DataIterator[GDoc] = index.
+  val underlying: DataIterator[GDoc] =
+    index.
     underlying.
     getIndexPart("corpus").
     asInstanceOf[CorpusReader].

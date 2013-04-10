@@ -1,4 +1,5 @@
-package edu.umass.ciir.julien
+package julien
+package retrieval
 
 object JelinekMercer {
   def apply(op: CountView, l: LengthsView): JelinekMercer = apply(op, l, 1500)

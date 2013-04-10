@@ -1,4 +1,5 @@
-package edu.umass.ciir.julien
+package julien
+package retrieval
 
 import scala.collection.{Traversable,TraversableLike}
 import scala.collection.immutable.List
@@ -12,6 +13,11 @@ trait Operator extends Traversable[Operator] {
     // ironically...
     for (c <- children) c foreach f
   }
+
+  def hooks: Traversable[IndexHook] = this.
+    filter(_.isInstanceOf[IndexHook]).
+    map(_.asInstanceOf[IndexHook]).
+    toList
 
   override def toString: String = {
     val b = new StringBuilder()

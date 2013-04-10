@@ -1,4 +1,5 @@
-package edu.umass.ciir.julien
+package julien
+package retrieval
 
 abstract class MultiTermView(terms: Seq[Term])
     extends PositionsView

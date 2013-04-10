@@ -7,18 +7,14 @@ import scala.collection.JavaConversions._
 class IndexBasedDocument extends Document {
   var index: Index = null
   var underlying: GDoc = null
+  def identifier: Docid = Docid(underlying.identifier)
+  def name: String = underlying.name
   def length = new Length(index.length(underlying.name))
   def content: String = underlying.text
 
   // These depend on the term vector being present
+  def termVector: List[String] = underlying.terms.toList
   def vocabulary: Set[String] = underlying.terms.toSet
-  def histogram: Map[String, Int] =
-    underlying.terms.groupBy { case s => s }.mapValues(_.size)
-  def multinomial: Map[String, Double] = {
-    val h = underlying.terms.groupBy { case s => s }.mapValues(_.size)
-    val sum = h.values.sum
-    h.mapValues(_.toDouble / sum)
-  }
   def copy: Document = DocumentClone(this)
 }
 

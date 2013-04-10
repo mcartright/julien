@@ -1,4 +1,5 @@
-package edu.umass.ciir.julien
+package julien
+package retrieval
 
 object Dirichlet {
   def apply(op: CountView, l: LengthsView): Dirichlet = apply(op, l, 1500)

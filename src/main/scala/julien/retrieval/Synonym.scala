@@ -1,4 +1,5 @@
-package edu.umass.ciir.julien
+package julien
+package retrieval
 
 import scala.collection.mutable.TreeSet
 

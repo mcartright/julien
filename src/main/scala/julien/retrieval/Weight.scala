@@ -1,4 +1,5 @@
-package edu.umass.ciir.julien
+package julien
+package retrieval
 
 object Weight {
   def apply(op: FeatureOp, weight: Double) = new Weight(op, weight)

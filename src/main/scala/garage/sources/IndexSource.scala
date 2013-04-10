@@ -35,7 +35,7 @@ object IndexSource {
 }
 
 class IndexSource(index: Index) extends FreeSource with Stored {
-  import edu.umass.ciir.julien._
+  import julien._
 
   private val lengthsIterator = index.getLengthsIterator
   private val collectionStats =

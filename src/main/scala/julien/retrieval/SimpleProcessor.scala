@@ -1,6 +1,6 @@
-package edu.umass.ciir.julien
+package julien
+package retrieval
 
-import edu.umass.ciir.julien.Utils._
 import scala.collection.mutable.PriorityQueue
 
 object SimpleProcessor {

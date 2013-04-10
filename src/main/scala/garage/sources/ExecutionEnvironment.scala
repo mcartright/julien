@@ -9,8 +9,8 @@ import org.lemurproject.galago.core.index.LengthsReader
 import org.lemurproject.galago.core.index.Iterator
 import org.lemurproject.galago.tupleflow.{Parameters,Utility}
 
-import edu.umass.ciir.julien.Utils._
-import edu.umass.ciir.julien.{ScoredDocument, ScoredDocumentOrdering}
+import julien.retrieval.Utils._
+import julien.{ScoredDocument, ScoredDocumentOrdering}
 
 abstract class ExecutionEnvironment {
   val iterators : List[Iterator] = List.empty

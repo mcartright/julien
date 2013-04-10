@@ -1,4 +1,5 @@
 package julien
+package retrieval
 
 import org.lemurproject.galago.core.index.ExtentIterator
 
@@ -20,6 +21,6 @@ final class Term(val t: String)
 
   /** Definition of how this class retrieves its underlying
     * iterator from a given [[Index]] instance.
-    *
+    */
   def getIterator(i: Index): ExtentIterator = i.iterator(t)
 }

@@ -55,7 +55,8 @@ class Index(label: String, val underlying: GIndex) {
   def numDocuments: Long = collectionStats.documentCount
   def vocabularySize: Long = postingsStats.vocabCount
 
-  def length(targetId: String): Int =
+  def length(d: Docid): Length = Length(underlying.getLength(d))
+  def length(targetId: String): Length =
     underlying.getLength(underlying.getIdentifier(targetId))
 
   def positions(key: String, targetId: String): ExtentArray = {
@@ -82,20 +83,15 @@ class Index(label: String, val underlying: GIndex) {
   def count(key: String, targetId: String): Int = positions(key, targetId).size
   def collectionCount(key: String): Long = getKeyedStatistics(key).nodeFrequency
   def docFreq(key: String): Long = getKeyedStatistics(key).nodeDocumentCount
+  def document(docid: Docid): Document =
+    IndexBasedDocument(underlying.getItem(underlying.getName(docid.underlying),
+      Parameters.empty), this)
   def document(targetId: String): Document =
     IndexBasedDocument(underlying.getItem(targetId, Parameters.empty), this)
 
   def terms(targetId: String): List[String] = {
     val doc = underlying.getItem(targetId, Parameters.empty)
     doc.terms.toList
-  }
-
-  def attach(op: Operator): Unit = {
-    if (op.isInstanceOf[Term]) op.asInstanceOf[Term].attach(this)
-    for (o <- op) o match {
-      case t: Term => t.attach(this)
-      case _ => Unit
-    }
   }
 
   private def getKeyedStatistics(key: String) : NS = {

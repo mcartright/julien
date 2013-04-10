@@ -1,4 +1,5 @@
-package edu.umass.ciir.julien
+package julien
+package retrieval
 
 object SingleTermView { def apply(t: Term) = new SingleTermView(t) }
 

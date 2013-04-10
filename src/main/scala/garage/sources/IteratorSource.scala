@@ -1,10 +1,9 @@
 package sources
 
-import org.lemurproject.galago.core.index.ExtentIterator
 import org.lemurproject.galago.core.util.{ExtentArray,ExtentArrayIterator}
 import org.lemurproject.galago.tupleflow.Parameters
 import org.lemurproject.galago.core.index._
-import edu.umass.ciir.julien._
+import julien._
 
 object IteratorSource {
   def gatherStatistics(e: ExtentIterator) : NS = {

@@ -1,4 +1,5 @@
-package edu.umass.ciir.julien
+package julien
+package retrieval
 
 trait QueryProcessor {
   protected var _indexes = Set[Index]()
@@ -14,6 +15,11 @@ trait QueryProcessor {
   def prepare: Unit
   def run: List[ScoredDocument]
 
+  def clear: Unit = {
+    _indexes = Set[Index]()
+    _models = Set[FeatureOp]()
+  }
+
   // This probably needs work -- should probably refactor to objects as
   // a "canProcess" check - will help with Processor selection.
   def validated: Boolean = {
@@ -23,8 +29,7 @@ trait QueryProcessor {
     // Also will guarantee that if any hooks are attached to an
     // unknown index, it's added to the list of known indexes.
     for (m <- _models) {
-      val hooks =
-        m.filter(_.isInstanceOf[IndexHook]).map(_.asInstanceOf[IndexHook])
+      val hooks = m.hooks
 
       // Add all previously unknown indexes from attached hooks
       _indexes = hooks.filter(_.isAttached).map(_.attachedIndex) ++: _indexes

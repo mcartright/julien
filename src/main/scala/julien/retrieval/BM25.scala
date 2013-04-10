@@ -1,4 +1,5 @@
-package edu.umass.ciir.julien
+package julien
+package retrieval
 
 object BM25 {
   def apply(op: CountView, l: LengthsView): BM25 = apply(op, l, 0.75, 1.2)

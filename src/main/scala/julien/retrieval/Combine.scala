@@ -1,4 +1,5 @@
-package edu.umass.ciir.julien
+package julien
+package retrieval
 
 object Combine {
   def apply(ops: FeatureOp*) = new Combine(ops, summer)

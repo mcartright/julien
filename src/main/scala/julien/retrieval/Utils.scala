@@ -1,7 +1,10 @@
 package julien
+package retrieval
 
 import scala.collection.mutable.PriorityQueue
 import scala.collection.JavaConversions._
+import julien._
+import julien.access._
 
 /** Provides printing methods for lists of [[ScoredDocument]]s.
   * Most likely will be factored out in the future.
