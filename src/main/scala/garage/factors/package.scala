@@ -16,4 +16,6 @@ package garage
   * framework. My hope is to provide some examples of doing this.
   */
 package object factors {
+  type Index = org.lemurproject.galago.core.index.Index
+  type DiskIndex = org.lemurproject.galago.core.index.disk.DiskIndex
 }

@@ -1,3 +1,4 @@
+package garage
 package sources
 
 class BM25(

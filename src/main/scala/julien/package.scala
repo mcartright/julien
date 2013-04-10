@@ -22,17 +22,24 @@ package object julien {
     * Underlying class is Double.
     */
   implicit class Score(val underlying: Double) extends AnyVal  {
-    def *[@specialized(AllNumeric) T](t: T): Score =
-      new Score(underlying * t)
-    def +[@specialized(AllNumeric) T](t: T): Score =
-      new Score(underlying + t)
-    def -[@specialized(AllNumeric) T](t: T): Score =
-      new Score(underlying - t)
-    def /[@specialized(AllNumeric) T](t: T): Score =
-      new Score(underlying / t)
+    def *(l: Long): Score = new Score(underlying * l)
+    def *(f: Float): Score = new Score(underlying * f)
+    def +(l: Long): Score = new Score(underlying + l)
+    def +(f: Float): Score = new Score(underlying + f)
+    def -(l: Long): Score = new Score(underlying - l)
+    def -(f: Float): Score = new Score(underlying - f)
+    def /(l: Long): Score = new Score(underlying / l)
+    def /(f: Float): Score = new Score(underlying / f)
+
+    // These are type-erased to cover doubles as well
     def *(s: Score): Score = new Score(underlying * s.underlying)
     def +(s: Score): Score = new Score(underlying + s.underlying)
     def /(s: Score): Score = new Score(underlying / s.underlying)
+    def -(s: Score): Score = new Score(underlying - s.underlying)
+    // And these are type-erased to cover ints as well
+    def *(l: Length): Score = new Score(underlying * l.underlying)
+    def +(l: Length): Score = new Score(underlying + l.underlying)
+    def -(l: Length): Score = new Score(underlying - l.underlying)
     def /(l: Length): Score = new Score(underlying / l.underlying)
   }
   implicit def score2dbl(s: Score): Double = s.underlying
@@ -43,12 +50,12 @@ package object julien {
   }
 
   /** The number of targets (docs) a particular key (term) occurs in.
-    * Underlying class is Int.
+    * Underlying class is Long.
     */
   implicit class DocFreq(val underlying: Long) extends AnyVal {
-    def +(d: Double): Double = d + underlying
     def +(l: Long): DocFreq = DocFreq(underlying + l)
     def +(i: Int): DocFreq = DocFreq(underlying + i)
+    def +(d: Double): Double = d + underlying
   }
 
   /** Number of targets (documents) in the universe (collection).

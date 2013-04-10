@@ -1,3 +1,4 @@
+package garage
 package sources
 
 import org.lemurproject.galago.core.util.ExtentArray

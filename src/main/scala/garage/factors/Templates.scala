@@ -1,3 +1,4 @@
+package garage
 package factors
 
 object Templates {

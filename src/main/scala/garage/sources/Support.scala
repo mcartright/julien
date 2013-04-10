@@ -1,3 +1,4 @@
+package garage
 package sources
 
 sealed trait Support {

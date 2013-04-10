@@ -1,7 +1,6 @@
+package garage
 package sources
 
-import org.lemurproject.galago.core.index.disk.DiskIndex
-import org.lemurproject.galago.core.index.mem.MemoryIndex
 import org.lemurproject.galago.core.index._
 import org.lemurproject.galago.core.index.AggregateReader._
 import org.lemurproject.galago.core.util.ExtentArray

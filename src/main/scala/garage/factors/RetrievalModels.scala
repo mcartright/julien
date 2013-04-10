@@ -1,7 +1,5 @@
+package garage
 package factors
-
-import scala.collection.immutable.List
-import org.lemurproject.galago.core.index.disk.DiskIndex
 
 object RetrievalModels {
   type ReduceFunction = FactorGenerator => RandomVariableGenerator

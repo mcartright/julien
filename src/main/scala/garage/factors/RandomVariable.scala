@@ -1,6 +1,6 @@
+package garage
 package factors
 
-import org.lemurproject.galago.core.index.Index
 
 abstract class RandomVariable
 case class Term(t: String, src: Index) extends RandomVariable

@@ -1,6 +1,5 @@
+package garage
 package factors
-
-import scala.collection.immutable.List
 
 object FactorGenerator {
   def apply(rvg: RandomVariableGenerator, mapFn: RandomVariable => Factor) = new FactorGenerator(rvg, mapFn)

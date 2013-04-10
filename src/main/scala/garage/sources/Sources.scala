@@ -1,6 +1,6 @@
+package garage
 package sources
 
-import org.lemurproject.galago.core.index.disk.DiskIndex
 import org.lemurproject.galago.tupleflow.Utility
 import java.util.Properties
 import java.io.{File,FileReader}
