@@ -1,20 +1,24 @@
 package julien
+package cli
 package examples
 
 import scala.collection.mutable.PriorityQueue
 import scala.collection.JavaConversions._
 import org.lemurproject.galago.tupleflow.Parameters
+import java.io.PrintStream
 
 import julien.retrieval._
+import julien.retrieval.Utils._
 
 /** Simple example showing how to compute a bag-of-words
   * query using Dirichlet smoothing.
   */
 object BagOfWords extends Example {
-  lazy val help: String = "Under construction"
+  lazy val name: String = "bow"
 
-  def run(args: Array[String]): Boolean = {
-    val params = new Parameters(args)
+  lazy val help: String = "Execute a query as a bag of words."
+
+  def run(params: Parameters, out: PrintStream): Unit = {
     val query = params.getString("query").split(" ").map(Term(_))
     val ql = Combine(query.map(a => Dirichlet(a, LengthsView())): _*)
 
@@ -33,7 +37,6 @@ object BagOfWords extends Example {
     // run it and get results
     val results = processor.run
 
-    // At some point we should verify correctness or print or something.
-    return true
+    printResults(results, index, out)
   }
 }

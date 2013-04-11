@@ -109,7 +109,7 @@
         <configuration>
 	  <archive>
 	    <manifest>
-	      <mainClass>edu.umass.ciir.julien.cli.Julien</mainClass>
+	      <mainClass>julien.cli.Julien</mainClass>
 	    </manifest>
 	  </archive>
         </configuration>

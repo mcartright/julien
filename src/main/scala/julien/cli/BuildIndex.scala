@@ -1,26 +1,29 @@
 // BSD License (http://lemurproject.org/galago-license)
 package julien
+package cli
+
+// Aliasing for shorthand
+import org.lemurproject.galago.{core => gcore, tupleflow => gt}
 
 import java.io.File
 import java.io.PrintStream
-import org.lemurproject.galago.core.index.corpus._
-import org.lemurproject.galago.core.index.disk.DiskNameReader
-import org.lemurproject.galago.core.index.disk.PositionFieldIndexWriter
-import org.lemurproject.galago.core.index.disk.PositionIndexWriter
-import org.lemurproject.galago.core.index.disk.PositionContentWriter
-import org.lemurproject.galago.core.util.BuildStageTemplates._
-import org.lemurproject.galago.core.parse._
-import org.lemurproject.galago.core.types._
-import org.lemurproject.galago.tupleflow.Order
-import org.lemurproject.galago.tupleflow.Parameters
-import org.lemurproject.galago.tupleflow.Utility
-import org.lemurproject.galago.tupleflow.execution.ConnectionAssignmentType
-import org.lemurproject.galago.tupleflow.execution.InputStep
-import org.lemurproject.galago.tupleflow.execution.Job
-import org.lemurproject.galago.tupleflow.execution.MultiStep
-import org.lemurproject.galago.tupleflow.execution.OutputStep
-import org.lemurproject.galago.tupleflow.execution.Stage
-import org.lemurproject.galago.tupleflow.execution.Step
+import gcore.index.corpus._
+import gcore.index.disk.DiskNameReader
+import gcore.index.disk.PositionFieldIndexWriter
+import gcore.index.disk.PositionIndexWriter
+import gcore.index.disk.PositionContentWriter
+import gcore.util.BuildStageTemplates._
+import gcore.parse._
+import gcore.types._
+import gt.Order
+import gt.Utility
+import gt.execution.ConnectionAssignmentType
+import gt.execution.InputStep
+import gt.execution.Job
+import gt.execution.MultiStep
+import gt.execution.OutputStep
+import gt.execution.Stage
+import gt.execution.Step
 
 import scala.collection.mutable.{ListBuffer,HashSet}
 import scala.collection.JavaConversions._

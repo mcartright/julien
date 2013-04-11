@@ -1,4 +1,5 @@
 package julien
+package cli
 
 /** Contains examples of programmatically using Julien to complete various
   * tasks. As new implementations come up, or faster ways to get things done

@@ -1,4 +1,5 @@
 package julien
+package cli
 package examples
 
 import scala.collection.mutable.PriorityQueue
@@ -7,12 +8,17 @@ import org.lemurproject.galago.tupleflow.Parameters
 
 // Pull in retrieval definitions
 import julien.retrieval._
+import julien.retrieval.Utils._
 
-object SDM extends Example {
-  lazy val help: String = "Under construction"
+import java.io.PrintStream
 
-  def run(args: Array[String]): Boolean = {
-    val params = new Parameters(args)
+object SequentialDependenceModel extends Example {
+  lazy val name: String = "sdm"
+
+  lazy val help: String =
+"""Shows automatic expansion of a set of unigrams into the SDM."""
+
+  def run(params: Parameters, out: PrintStream): Unit = {
     val query = params.getString("query").split(" ").map(Term(_))
     val sdm =
       Combine(
@@ -40,7 +46,6 @@ object SDM extends Example {
     // run it and get results
     val results = processor.run
 
-    // At some point we should verify correctness or print or something.
-    return true
+    printResults(results, index, out)
   }
 }

@@ -1,7 +1,9 @@
 package julien
+package cli
 package examples
 
 import julien.retrieval._
+import julien.retrieval.Utils._
 
 import scala.collection.mutable.{ListBuffer,PriorityQueue,HashMap,LinkedHashMap}
 import org.lemurproject.galago.core.parse.{Tag,TagTokenizer}
@@ -10,12 +12,14 @@ import scala.collection.JavaConversions._
 import scala.collection.immutable.Set
 import scala.collection.Map
 
-object RelModel extends Example {
-  lazy val help: String = "Under construction"
+import java.io.PrintStream
 
-  def run(args: Array[String]): Boolean = {
+object RelevanceModel extends Example {
+  lazy val name: String = "relmodel"
+  lazy val help: String = "Executes the RM3 variant of the Relevance Model."
+
+  def run(params: Parameters, out: PrintStream): Unit = {
     // Set up to perform the first run
-    val params = new Parameters(args)
     val query = params.getString("query").split(" ").map(Term(_))
     val ql = Combine(query.map(a => Dirichlet(a, LengthsView())): _*)
 
@@ -41,18 +45,17 @@ object RelModel extends Example {
       Weight(Dirichlet(Term(gram.term), LengthsView()), gram.score)
     }
 
-    val rm3 =
-      Combine(
-        Weight(ql, 0.7),
-        Weight(Combine(wrappedGrams: _*), 0.3)
-      )
+    val rm3 = Combine(
+      Weight(ql, 0.7),
+      Weight(Combine(wrappedGrams: _*), 0.3)
+    )
 
     processor.clear
     rm3.hooks.foreach(_.attach(index))
     processor.add(rm3)
 
     val finalResults = processor.run
-    return true
+    printResults(results, index, out)
   }
 
   def extractGrams(initial: List[ScoredDocument], index: Index): List[Gram] = {
