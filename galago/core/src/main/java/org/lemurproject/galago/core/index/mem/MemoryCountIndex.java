@@ -140,7 +140,7 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
   // try to free up memory.
   @Override
   public void close() throws IOException {
-    postings = null;
+    // no op
   }
 
   @Override

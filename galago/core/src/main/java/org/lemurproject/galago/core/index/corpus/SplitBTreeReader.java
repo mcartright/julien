@@ -129,15 +129,6 @@ public class SplitBTreeReader extends BTreeReader {
       return new BufferedFileDataStream(dataFiles[file], getValueStart(), getValueEnd());
     }
 
-    @Override
-    public MappedByteBuffer getValueMemoryMap() throws IOException{
-      MappedByteBuffer buffer;
-      synchronized(dataFiles[file]){
-        buffer = dataFiles[file].getChannel().map(FileChannel.MapMode.READ_ONLY, getValueStart(), getValueEnd());
-      }
-      return buffer;
-    }
-
     /**
      * Returns the value as a buffered stream.
      */
@@ -229,15 +220,6 @@ public class SplitBTreeReader extends BTreeReader {
   @Override
   public Parameters getManifest() {
     return vocabIndex.getManifest();
-  }
-
-  /**
-   * Returns the vocabulary structure for this DiskBTreeReader.  Note that the vocabulary
-   * contains only the first key in each block.
-   */
-  @Override
-  public VocabularyReader getVocabulary() {
-    return vocabIndex.getVocabulary();
   }
 
   /**

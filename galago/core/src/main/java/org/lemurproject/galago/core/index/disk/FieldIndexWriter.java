@@ -168,7 +168,9 @@ public class FieldIndexWriter implements NumberedField.FieldNameNumberOrder.Shre
 
   @Override
   public Step setProcessor(Step processor) throws IncompatibleProcessorException {
-    writer.setProcessor(processor);
+    if (writer instanceof Source) {
+      ((Source) writer).setProcessor(processor);
+    }
     return processor;
   }
 }

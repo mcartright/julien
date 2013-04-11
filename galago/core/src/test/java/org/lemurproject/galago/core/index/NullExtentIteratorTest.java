@@ -7,8 +7,8 @@
  */
 package org.lemurproject.galago.core.index;
 
-import org.lemurproject.galago.core.index.NullExtentIterator;
 import junit.framework.*;
+import org.lemurproject.galago.tupleflow.Utility;
 
 /**
  *
@@ -21,7 +21,8 @@ public class NullExtentIteratorTest extends TestCase {
   }
 
   public void testIsDone() {
-    NullExtentIterator instance = new NullExtentIterator();
+    NullExtentIterator instance = 
+            new NullExtentIterator(Utility.fromString("none"));
     assertEquals(true, instance.isDone());
   }
 }

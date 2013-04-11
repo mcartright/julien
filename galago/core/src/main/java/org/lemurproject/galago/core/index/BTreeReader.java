@@ -1,9 +1,7 @@
 // BSD License (http://lemurproject.org/galago-license)
 package org.lemurproject.galago.core.index;
 
-import org.lemurproject.galago.core.index.disk.VocabularyReader;
 import java.io.IOException;
-import java.nio.MappedByteBuffer;
 import org.lemurproject.galago.tupleflow.DataStream;
 import org.lemurproject.galago.tupleflow.Parameters;
 import org.lemurproject.galago.tupleflow.Utility;
@@ -30,11 +28,13 @@ import org.lemurproject.galago.tupleflow.Utility;
  * requirement that keys be Strings. It makes the mapping from other
  * classes/primitives to Strings really restrictive if they always have to be
  * mapped to Strings. Therefore, mapping byte[] keys to the client keyspace is
- * the responsibility of the client of the DiskBTreeReader.</p>
+ * the responsibility of the client of the BTreeReader.</p>
  *
- * Comments copied from DiskBTreeReader: author trevor, irmarc, sjh
+ * <p> (4/11/2013, irmarc): Removed getVocabulary from class requirement.
+ *     The vocabulary is private to the underlying disk-based readers.
+ *     The memory reader may not require it.</p>
  *
- * @author sjh
+ * @author sjh, irmarc
  */
 public abstract class BTreeReader {
   public abstract class BTreeIterator implements Comparable<BTreeIterator> {
@@ -92,12 +92,6 @@ public abstract class BTreeReader {
      */
     public abstract long getValueEnd() throws IOException;
 
-    /**
-     * Returns a memory mapped buffer for the current value - warning using this
-     * function may incur a very large memory requirement
-     */
-    public abstract MappedByteBuffer getValueMemoryMap() throws IOException;
-
     //**********************//
     // Implemented Functions
     /**
@@ -122,6 +116,7 @@ public abstract class BTreeReader {
     /**
      * Comparator - allows iterators to be read in parallel efficiently
      */
+    @Override
     public int compareTo(BTreeReader.BTreeIterator i) {
       return Utility.compare(this.getKey(), i.getKey());
     }
@@ -135,12 +130,6 @@ public abstract class BTreeReader {
    * collection.
    */
   public abstract Parameters getManifest();
-
-  /**
-   * Returns the vocabulary structure for this DiskBTreeReader. - Note that the
-   * vocabulary contains only the first key in each block.
-   */
-  public abstract VocabularyReader getVocabulary();
 
   /**
    * Returns an iterator pointing to the very first key in the index. This is
@@ -201,21 +190,5 @@ public abstract class BTreeReader {
       return null;
     }
     return iter.getValueStream();
-  }
-
-  /**
-   * Gets the value stored in the index associated with this key.
-   *
-   * @param key
-   * @return The index value for this key, or null if there is no such value.
-   * @throws java.io.IOException
-   */
-  public MappedByteBuffer getValueMemoryMap(byte[] key) throws IOException {
-    BTreeIterator iter = getIterator(key);
-
-    if (iter == null) {
-      return null;
-    }
-    return iter.getValueMemoryMap();
   }
 }

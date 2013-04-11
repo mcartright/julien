@@ -37,75 +37,23 @@ import org.lemurproject.galago.tupleflow.Step;
  * 
  * @author sjh
  */
-public abstract class BTreeWriter implements KeyValuePair.KeyValueOrder.ShreddedProcessor, Source<KeyValuePair> {
+public interface BTreeWriter {
         
     /**
-     * Returns the current copy of the manifest, which will be stored in
-     * the completed index file.  This data is not written until close() is called.
+     * Returns the current copy of the manifest.
      */
     public abstract Parameters getManifest();
 
     /**
-     * Adds a key-value pair of byte[]s to the index
-     *  - when in this form neither the key nor the bytes need to fit into availiable RAM
-     *  - this allows multi-gigabyte values to be written to the index
+     * Adds a key-value pair of byte[]s to the index. No size requirement for
+     * either the key or value is imposed at this level.
      */
     public abstract void add(IndexElement list) throws IOException ;
 
-
     /**
-     * Closes the index writer
-     *  - flushes all buffers and closes the file writers
+     * Closes the writer and finalizes index structure. Adding new IndexElement 
+     * objects after this call should result in an Exception, as the index 
+     * structure has already been finalized.
      */
     public abstract void close() throws IOException;
-
-
-    /**************/
-    // block based index functions
-    //  - these avoid buffering long posting lists to disk
-    //  - sjh - i made these optional so as not to clutter up the IndexWriter
-    //        - TODO: ParallelIndexValueWriter does implement them (needs more work)
-
-
-    /**
-     * Adds a key to the index
-     * - writer waits for all valueBlocks to be added before writing the key
-     *
-     */
-    public void processKey(byte[] key) throws IOException{
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    /**
-     * Adds a valueBlock to the index (many blocks may be added for any given key)
-     *  - write will throw an exception if the valueBlock is larger than the ValueBlockSize
-     *  - this check can be avoided by using the (add) function above
-     */
-    public void processValue(byte[] value) throws IOException{
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    /**
-     * Finalizes a key-value pair
-     */
-    public void processTuple() throws IOException{
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    /**
-     * Returns the value block size
-     * This allows the writers to create appropriately sized blocks of data
-     */
-    public long getValueBlockSize(){
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    /**
-     * setProcessor allows the writer class to pass data on to the next step.
-     *  - Useful for ParallelIndexes passing data to a central key indexer
-     *  - not implemented for single-file Indexes
-     */
-    public Step setProcessor(Step processor) throws IncompatibleProcessorException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 }

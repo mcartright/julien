@@ -146,7 +146,7 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
   // try to free up memory.
   @Override
   public void close() throws IOException {
-    postings = null;
+    // no op
   }
 
   @Override

@@ -13,6 +13,7 @@ class IndexBasedDocument extends Document {
   def content: String = underlying.text
 
   // These depend on the term vector being present
+  def hasTermVector: Boolean = (underlying.terms != null)
   def termVector: List[String] = underlying.terms.toList
   def vocabulary: Set[String] = underlying.terms.toSet
   def copy: Document = DocumentClone(this)

@@ -197,7 +197,7 @@
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <manifestEntries>
-                    <Main-Class>edu.umass.ciir.julien.cli.Julien</Main-Class>
+                    <Main-Class>julien.cli.Julien</Main-Class>
                     <Build-Number>1</Build-Number>
                   </manifestEntries>
                 </transformer>

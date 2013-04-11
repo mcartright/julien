@@ -15,8 +15,16 @@ import java.io.PrintStream
 object SequentialDependenceModel extends Example {
   lazy val name: String = "sdm"
 
-  lazy val help: String =
-"""Shows automatic expansion of a set of unigrams into the SDM."""
+  def checksOut(p: Parameters): Boolean =
+    (p.containsKey("query") && p.containsKey("index"))
+
+  val help: String = """
+Shows automatic expansion of a set of unigrams into the SDM.
+Required parameters:
+
+    query        string form of desired query
+    index        location of an existing index
+"""
 
   def run(params: Parameters, out: PrintStream): Unit = {
     val query = params.getString("query").split(" ").map(Term(_))
@@ -31,8 +39,8 @@ object SequentialDependenceModel extends Example {
         }.toSeq: _*), 0.05)
       )
 
-    // Open a small in-memory index
-    val index : Index = Index.memory(params.getString("indexFiles"))
+    // Open an index
+    val index : Index = Index.disk(params.getString("index"))
 
     // Make a processor to run it
     val processor = SimpleProcessor()

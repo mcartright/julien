@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import org.lemurproject.galago.core.index.GenericElement;
 import org.lemurproject.galago.core.index.BTreeWriter;
 import org.lemurproject.galago.core.index.IndexElement;
 import org.lemurproject.galago.core.types.KeyValuePair;
@@ -16,6 +15,7 @@ import org.lemurproject.galago.tupleflow.Parameters;
 import org.lemurproject.galago.tupleflow.Linkage;
 import org.lemurproject.galago.tupleflow.OutputClass;
 import org.lemurproject.galago.tupleflow.Processor;
+import org.lemurproject.galago.tupleflow.Source;
 import org.lemurproject.galago.tupleflow.Step;
 import org.lemurproject.galago.tupleflow.StreamCreator;
 import org.lemurproject.galago.tupleflow.TupleFlowParameters;
@@ -43,8 +43,8 @@ import org.lemurproject.galago.tupleflow.execution.Verification;
  */
 @InputClass(className = "org.lemurproject.galago.core.types.KeyValuePair")
 @OutputClass(className = "org.lemurproject.galago.core.types.KeyValuePair")
-public class SplitBTreeValueWriter extends BTreeWriter
-        implements KeyValuePair.KeyValueOrder.ShreddedProcessor {
+public class SplitBTreeValueWriter implements BTreeWriter,
+        KeyValuePair.KeyValueOrder.ShreddedProcessor, Source<KeyValuePair> {
 
   public static final long MAGIC_NUMBER = 0x2b3c4d5e6f7a8b9cL;
   public Processor<KeyValuePair> processor;
@@ -87,11 +87,6 @@ public class SplitBTreeValueWriter extends BTreeWriter
       valueOffset += list.dataLength();
       valueLength += list.dataLength();
       list.write(valueOutput);
-  }
-
-  @Override
-  public long getValueBlockSize() {
-    return manifest.get("valueBlockSize", valueBlockSize);
   }
 
   @Override

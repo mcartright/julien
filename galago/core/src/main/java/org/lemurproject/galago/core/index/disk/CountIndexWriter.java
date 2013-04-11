@@ -13,6 +13,7 @@ import org.lemurproject.galago.core.types.NumberWordCount;
 import org.lemurproject.galago.tupleflow.IncompatibleProcessorException;
 import org.lemurproject.galago.tupleflow.InputClass;
 import org.lemurproject.galago.tupleflow.Parameters;
+import org.lemurproject.galago.tupleflow.Source;
 import org.lemurproject.galago.tupleflow.Step;
 import org.lemurproject.galago.tupleflow.TupleFlowParameters;
 import org.lemurproject.galago.tupleflow.Utility;
@@ -47,7 +48,7 @@ public class CountIndexWriter implements
   int options = 0;
   int skipDistance;
   int skipResetDistance;
-  
+
   /**
    * Creates a new instance of CountIndexWriter
    */
@@ -129,7 +130,9 @@ public class CountIndexWriter implements
   }
 
   public void setProcessor(Step processor) throws IncompatibleProcessorException {
-    writer.setProcessor(processor);
+    if (writer instanceof Source) {
+      ((Source) writer).setProcessor(processor);
+    }
   }
 
   public class CountsList implements IndexElement {

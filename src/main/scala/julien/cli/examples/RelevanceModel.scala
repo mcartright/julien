@@ -16,15 +16,27 @@ import java.io.PrintStream
 
 object RelevanceModel extends Example {
   lazy val name: String = "relmodel"
-  lazy val help: String = "Executes the RM3 variant of the Relevance Model."
+
+  def checksOut(p: Parameters): Boolean =
+    (p.containsKey("query") && p.containsKey("index"))
+
+  val help: String = """
+Executes the RM3 variant of the Relevance Model.
+Required parameters:
+
+    query        string form of desired query
+    index        location existing index
+"""
+
+
 
   def run(params: Parameters, out: PrintStream): Unit = {
     // Set up to perform the first run
     val query = params.getString("query").split(" ").map(Term(_))
     val ql = Combine(query.map(a => Dirichlet(a, LengthsView())): _*)
 
-    // Open a small in-memory index
-    val index : Index = Index.memory(params.getString("indexFiles"))
+    // Open an index
+    val index : Index = Index.disk(params.getString("index"))
 
     // Make a processor to run it
     val processor = SimpleProcessor()
@@ -76,14 +88,15 @@ object RelevanceModel extends Example {
     // get the actual documents, and count the grams
     val tokenizer = new TagTokenizer()
     val dummy = new Parameters()
-    // load and tokenize docs
-    val docs = initialResults.map { SD =>
-      val d = index.document(SD.docid)
-      if (d.termVector == null || d.termVector.size == 0)
-        Document(tokenizer.tokenize(d.content))
-      else
-        d
-    }
+    // load and tokenize docs if needed
+    val docs = index.
+      documents(initialResults.map(_.docid)).
+      map { d =>
+        if (!d.hasTermVector)
+          Document(tokenizer.tokenize(d.content))
+        else
+          d
+      }
 
     // Get stopwords to filter
     val stopwords = Stopwords.inquery

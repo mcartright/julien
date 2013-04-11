@@ -162,7 +162,7 @@ public class DiskIndex implements Index {
     if (part != null) {
       result = part.getIterator(key);
       if (result == null) {
-        result = new NullExtentIterator();
+        result = new NullExtentIterator(key);
       }
     }
     return result;

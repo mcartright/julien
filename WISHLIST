@@ -6,9 +6,13 @@ High-Level Features:
 - scoring a single document (repeatedly, but with different parameters)
 
 THINGS TO FIX/IMPROVE:
-- How do we memoize statistics functions?
+- How do we memoize
+  - decompression
+  - basic feature calculation?
+
 - Annotations. We want them, particularly for debugging. How to cleanly
   add them?
+
 - When instantiating iterators we need to track the following:
   - what score tree is connected to what iterators (and vice-versa)
   - a map of the weights (again, both ways would be good)
@@ -18,6 +22,5 @@ THINGS TO FIX/IMPROVE:
   but are built into Scala more cleanly than JSON)
 
 TODO:
-- Need a place to put the aggregate statistics for the collection - make a
-  manifest for the "whole thing"?
 - Add some tests back in.
+- Iterator unification

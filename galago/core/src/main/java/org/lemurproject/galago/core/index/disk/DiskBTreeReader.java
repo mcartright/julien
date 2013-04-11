@@ -225,24 +225,6 @@ public class DiskBTreeReader extends BTreeReader {
       return new BufferedFileDataStream(input, absoluteStart, absoluteEnd);
     }
 
-    @Override
-    public MappedByteBuffer getValueMemoryMap() throws IOException {
-      return null;
-//      MappedByteBuffer buffer;
-//      synchronized (input) {
-//        long start = getValueStart();
-//        long end = getValueEnd();
-//        if(true) return null;
-//        try {
-//          buffer = input.getChannel().map(MapMode.READ_ONLY, start, end);
-//        } catch (IOException e) {
-//          System.out.println("Failed to open MemoryMap over key-value" + e.getMessage());
-//          throw e;
-//        }
-//      }
-//      return buffer;
-    }
-
     private void cacheKeys() throws IOException {
       for (int i = 0; i < cacheGroupSize; i++) {
         // if we are done
@@ -347,15 +329,6 @@ public class DiskBTreeReader extends BTreeReader {
   @Override
   public Parameters getManifest() {
     return manifest;
-  }
-
-  /**
-   * Returns the vocabulary structure for this DiskBTreeReader.  Note that the vocabulary
-   * contains only the first key in each block.
-   */
-  @Override
-  public VocabularyReader getVocabulary() {
-    return vocabulary;
   }
 
   /**

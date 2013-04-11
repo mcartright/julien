@@ -44,9 +44,7 @@ package object julien {
   }
   implicit def score2dbl(s: Score): Double = s.underlying
   implicit object ScoreOrdering extends Ordering[Score] {
-    def compare(a: Score, b: Score) = {
-      a.underlying compare b.underlying
-    }
+    def compare(a: Score, b: Score) = a.underlying compare b.underlying
   }
 
   /** The number of targets (docs) a particular key (term) occurs in.
@@ -105,6 +103,9 @@ package object julien {
     * Underlying class is an Int.
     */
   implicit class Docid(val underlying: Int) extends AnyVal
+  implicit object DocidOrder extends Ordering[Docid] {
+    def compare(a: Docid, b: Docid) = a.underlying compare b.underlying
+  }
 
   /** The size of the collection.
     * Underlying class is Long.

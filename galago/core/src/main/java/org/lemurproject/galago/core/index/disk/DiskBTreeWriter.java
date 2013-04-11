@@ -11,11 +11,12 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.zip.GZIPOutputStream;
 import org.lemurproject.galago.core.index.BTreeWriter;
 import org.lemurproject.galago.core.index.IndexElement;
 import org.lemurproject.galago.tupleflow.Counter;
+import org.lemurproject.galago.tupleflow.IncompatibleProcessorException;
 import org.lemurproject.galago.tupleflow.Parameters;
+import org.lemurproject.galago.tupleflow.Step;
 import org.lemurproject.galago.tupleflow.TupleFlowParameters;
 import org.lemurproject.galago.tupleflow.Utility;
 
@@ -34,7 +35,7 @@ import org.lemurproject.galago.tupleflow.Utility;
  * 
  * @author trevor
  */
-public class DiskBTreeWriter extends BTreeWriter {
+public class DiskBTreeWriter implements BTreeWriter {
 
   public static final long MAGIC_NUMBER = 0x1a2b3c4d5e6f7a8bL;
   private DataOutputStream output;
@@ -356,7 +357,7 @@ public class DiskBTreeWriter extends BTreeWriter {
 
     return wordByteStream.toByteArray();
   }
-
+  
   // private class to hold a list of index elements (key-value_ pairs)
   private static class ListData {
 

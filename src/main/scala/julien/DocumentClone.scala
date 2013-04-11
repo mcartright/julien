@@ -7,7 +7,7 @@ object DocumentClone {
     new DocumentClone(
       Docid(gd.identifier),
       gd.name,
-      new Length(gd.terms.size),
+      Length(gd.terms.size),
       gd.text,
       gd.terms.toList,
       gd.terms.toSet)
@@ -31,4 +31,5 @@ class DocumentClone(
   val vocabulary: Set[String]
 ) extends Document {
   def copy: DocumentClone = DocumentClone(this)
+  def hasTermVector: Boolean = (termVector != null)
 }

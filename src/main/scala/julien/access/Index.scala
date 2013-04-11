@@ -75,8 +75,17 @@ class Index(label: String, val underlying: GIndex) {
   def postings(key:String): PostingSeq[PositionsPosting] =
     new PostingSeq(iterator(key), this)
   def documents: DocumentSeq = DocumentSeq(this)
+  def documents(docids: List[Docid]): List[Document] = {
+    val sortedNames = docids.sorted.map(underlying.getName(_))
+    val gdocs: scala.collection.mutable.Map[String, GDoc] =
+      underlying.getItems(sortedNames, Parameters.empty)
+    val jdocs = gdocs.values.map(DocumentClone(_)).toList
+    jdocs.sortBy(_.identifier)
+  }
   def vocabulary: KeySeq = new KeySeq(underlying.getIndexPart("postings").keys)
   def name(docid: Int) : String = underlying.getName(docid)
+  def identifier(name: String): Docid =
+    new Docid(underlying.getIdentifier(name))
   def names: PairSeq[String] =
     new PairSeq[String](underlying.getIndexPart("names").keys,
     (k: KeyIterator) => Utility.toString(k.getValueBytes) : String )

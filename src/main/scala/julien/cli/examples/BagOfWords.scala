@@ -16,14 +16,23 @@ import julien.retrieval.Utils._
 object BagOfWords extends Example {
   lazy val name: String = "bow"
 
-  lazy val help: String = "Execute a query as a bag of words."
+  def checksOut(p: Parameters): Boolean =
+    (p.containsKey("query") && p.containsKey("index"))
+
+  val help: String = """
+Execute a query as a bag of words.
+Required parameters:
+
+    query        string form of desired query
+    index        location of an existing index
+"""
 
   def run(params: Parameters, out: PrintStream): Unit = {
     val query = params.getString("query").split(" ").map(Term(_))
     val ql = Combine(query.map(a => Dirichlet(a, LengthsView())): _*)
 
     // Open a small in-memory index
-    val index : Index = Index.memory(params.getString("indexFiles"))
+    val index : Index = Index.disk(params.getString("index"))
 
     // Make a processor to run it
     val processor = SimpleProcessor()

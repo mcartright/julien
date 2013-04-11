@@ -19,7 +19,6 @@ import org.lemurproject.galago.core.parse.Document;
 import org.lemurproject.galago.core.parse.stem.Porter2Stemmer;
 import org.lemurproject.galago.core.index.NullExtentIterator;
 import org.lemurproject.galago.core.index.corpus.CorpusReader;
-import org.lemurproject.galago.tupleflow.FakeParameters;
 import org.lemurproject.galago.tupleflow.InputClass;
 import org.lemurproject.galago.tupleflow.Parameters;
 import org.lemurproject.galago.tupleflow.TupleFlowParameters;
@@ -81,6 +80,9 @@ public class MemoryIndex implements DynamicIndex, Index {
     parts.put("names", new MemoryDocumentNames(partParams.clone()));
     parts.put("lengths", new MemoryDocumentLengths(partParams.clone()));
 
+    if (makecorpus) {
+      parts.put("corpus", new MemoryCorpus(partParams.clone()));
+    }
     if (nonstemming) {
       parts.put("postings", new MemoryPositionalIndex(partParams.clone()));
     }
@@ -102,8 +104,8 @@ public class MemoryIndex implements DynamicIndex, Index {
     return (documentCount - documentNumberOffset);
   }
 
+  @Override
   public void process(Document doc) throws IOException {
-    System.err.printf("Indexing: %s\n", (doc == null) ? "NULL" : doc.name);
     doc.identifier = documentCount;
     for (MemoryIndexPart part : parts.values()) {
       part.addDocument(doc);
@@ -154,12 +156,12 @@ public class MemoryIndex implements DynamicIndex, Index {
   @Override
   public Iterator getIterator(byte[] key, Parameters p) throws IOException {
     Iterator result = null;
-    IndexPartReader part = getIndexPart(p.getString("part"));
+    IndexPartReader part = getIndexPart(p.get("part", "postings"));
     if (part != null) {
       result = part.getIterator(key);
       // modify(result, node);
       if (result == null) {
-        result = new NullExtentIterator();
+        result = new NullExtentIterator(key);
       }
     }
     return result;
@@ -186,13 +188,7 @@ public class MemoryIndex implements DynamicIndex, Index {
 
   @Override
   public void close() throws IOException {
-    // TESTING: try flushing:
-    //(new FlushToDisk()).flushMemoryIndex(this, "./flush/", false);
-
-    for (IndexPartReader part : parts.values()) {
-      part.close();
-    }
-    parts = null;
+      // Does nothing here
   }
 
   @Override
@@ -244,6 +240,9 @@ public class MemoryIndex implements DynamicIndex, Index {
 
   @Override
   public LengthsIterator getLengthsIterator() throws IOException {
+    assert(parts != null);
+    assert(parts.containsKey("lengths"));
+    assert(parts.get("lengths") != null);
     return ((MemoryDocumentLengths) parts.get("lengths")).getLengthsIterator();
   }
 

@@ -5,25 +5,16 @@ package cli
 // Aliasing for shorthand
 import org.lemurproject.galago.{core => gcore, tupleflow => gt}
 
-import java.io.File
-import java.io.PrintStream
+import java.io.{File, PrintStream}
 import gcore.index.corpus._
-import gcore.index.disk.DiskNameReader
-import gcore.index.disk.PositionFieldIndexWriter
-import gcore.index.disk.PositionIndexWriter
-import gcore.index.disk.PositionContentWriter
+import gcore.index.disk.{DiskNameReader,PositionFieldIndexWriter}
+import gcore.index.disk.{PositionIndexWriter,PositionContentWriter}
 import gcore.util.BuildStageTemplates._
 import gcore.parse._
 import gcore.types._
-import gt.Order
-import gt.Utility
+import gt.{Order,Utility}
 import gt.execution.ConnectionAssignmentType
-import gt.execution.InputStep
-import gt.execution.Job
-import gt.execution.MultiStep
-import gt.execution.OutputStep
-import gt.execution.Stage
-import gt.execution.Step
+import gt.execution.{Job,InputStep,MultiStep,OutputStep, Stage, Step}
 
 import scala.collection.mutable.{ListBuffer,HashSet}
 import scala.collection.JavaConversions._
@@ -194,12 +185,7 @@ object BuildIndex extends TupleFlowFunction {
     }
   }
 
-  def getIndexJob(unchecked: Parameters) : Job = {
-    val bp = checkBuildIndexParameters(unchecked)
-    if (bp == null) {
-      return null
-    }
-
+  def getIndexJob(bp: Parameters) : Job = {
     val indexPath = new File(bp.getString("indexPath")).getAbsolutePath()
     // ensure the index folder exists
     val buildManifest = new File(indexPath, "buildManifest.json")
@@ -275,17 +261,16 @@ object BuildIndex extends TupleFlowFunction {
     return job
   }
 
-  def name : String = "build"
-
-  def help : String =
-    """galago build [flags] --indexPath=<index> (--inputPath+<input>)
-
+  val name : String = "build"
+  def checksOut(p: Parameters): Boolean = (checkBuildIndexParameters(p) == null)
+  def help : String = """
   Builds a Galago StructuredIndex with TupleFlow, using one thread
   for each CPU core on your computer.  While some debugging output
   will be displayed on the screen, most of the status information will
   appear on a web page.  A URL should appear in the command output
   that will direct you to the status page.
 
+Required Parameters:
 <input>:  Can be either a file or directory, and as many can be
           specified as you like.  Galago can read html, xml, txt,
           arc (Heritrix), warc, trectext, trecweb and store files.
@@ -295,16 +280,10 @@ object BuildIndex extends TupleFlowFunction {
 Algorithm Flags:
   --tokenizer/fields+{field-name}:
                            Selects field parts to index.
-                           [omitted]
+                           default: [none]
 """
 
   def run(p: Parameters, out: PrintStream) : Unit = {
-    // build index input
-    if (!p.isString("indexPath") && !p.isList("inputPath")) {
-      out.println(help)
-      return
-    }
-
     val job = getIndexJob(p)
     runTupleFlowJob(job, p, out)
     out.println("Done Indexing.")

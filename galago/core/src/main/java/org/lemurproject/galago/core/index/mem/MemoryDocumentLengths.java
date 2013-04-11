@@ -141,7 +141,7 @@ public class MemoryDocumentLengths implements MemoryIndexPart, LengthsReader {
 
   @Override
   public void close() throws IOException {
-    lengths = null;
+    // no op
   }
 
   @Override
