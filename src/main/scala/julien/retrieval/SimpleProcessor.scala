@@ -2,6 +2,7 @@ package julien
 package retrieval
 
 import scala.collection.mutable.PriorityQueue
+import julien._
 
 object SimpleProcessor {
   def apply() = new SimpleProcessor()

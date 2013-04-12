@@ -5,8 +5,6 @@ object JelinekMercer {
   def apply(op: CountView, l: LengthsView): JelinekMercer = apply(op, l, 1500)
   def apply(op: CountView, l: LengthsView, lambda: Double): JelinekMercer =
     new JelinekMercer(op, l, lambda)
-  def apply(t: Term, l: LengthsView, lambda: Double = 1500): JelinekMercer =
-    apply(t, l, lambda)
 }
 
 class JelinekMercer(

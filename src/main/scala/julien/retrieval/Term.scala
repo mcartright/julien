@@ -14,8 +14,7 @@ object Term { def apply(s: String) = new Term(s) }
   */
 final class Term(val t: String)
     extends IteratedHook[ExtentIterator]
-    with CountSrc
-    with PositionSrc {
+    with PositionsView {
 
   override def toString: String =
     s"$t:" + (if (isAttached) index.toString else "")
@@ -32,7 +31,7 @@ final class Term(val t: String)
   def positions: Positions = Positions(underlying.extents())
 
   lazy val statistics: CountStatistics = {
-    val ns = attachedIndex.asInstanceOf[ARNA].getStatistics
+    val ns = it.get.asInstanceOf[ARNA].getStatistics
     val cs = attachedIndex.lengthsIterator.asInstanceOf[ARCA].getStatistics
     CountStatistics(
       new CollFreq(ns.nodeFrequency),

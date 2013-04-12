@@ -1,5 +1,6 @@
 import edu.umass.ciir.macros.Macros._
-import scala.Specializable._
+import scala.annotation.elidable
+
 
 /** Provides classes that are typically used by Julien applications.
   *  ==Overview==
@@ -210,4 +211,9 @@ package object julien {
     debugf("%s: %d ms\n", label, (t1-t0).toInt)  // this is a test macro
     result
   }
+
+  // For debugging. This one is elidable, meaning given the correct flag,
+  // the compiler will not remove the call and the bytecode for this
+  // function
+  @elidable(elidable.FINEST) def debug(msg: String) = Console.err.println(msg)
 }

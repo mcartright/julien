@@ -5,9 +5,6 @@ object Dirichlet {
   def apply(op: CountView, l: LengthsView): Dirichlet = apply(op, l, 1500)
   def apply(op: CountView, l: LengthsView, mu: Double): Dirichlet =
     new Dirichlet(op, l, mu)
-
-  def apply(t: Term, l: LengthsView, mu: Double = 1500): Dirichlet =
-    apply(t, l, mu)
 }
 
 class Dirichlet(op: CountView, lengths: LengthsView, mu: Double)

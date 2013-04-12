@@ -5,9 +5,6 @@ object BM25 {
   def apply(op: CountView, l: LengthsView): BM25 = apply(op, l, 0.75, 1.2)
   def apply(op: CountView, l: LengthsView, b: Double, k: Double): BM25 =
     new BM25(op, l, b, k)
-
-  def apply(t: Term, l: LengthsView, b: Double = 0.75, k: Double = 1.2): BM25 =
-    apply(t, l, b, k)
 }
 
 class BM25(op: CountView, lengths: LengthsView,  b: Double, k: Double) {
