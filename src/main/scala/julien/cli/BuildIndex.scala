@@ -114,8 +114,8 @@ object BuildIndex extends TupleFlowFunction {
     indexWriter: Class[_]) : Stage = {
     val p = new Parameters()
     p.set("filename", bp.getString("indexPath") + slash + indexName)
-    p.set("skipping", bp.getBoolean("skipping"))
-    p.set("skipDistance", bp.getLong("skipDistance"))
+    p.set("skipping", bp.get("skipping", true))
+    p.set("skipDistance", bp.get("skipDistance", 500L))
     return new Stage(stageName).addInput(inputName, inputOrder).
       add(new InputStep(inputName)).
       add(new Step(indexWriter, p))
@@ -163,6 +163,7 @@ object BuildIndex extends TupleFlowFunction {
     // tokenizer/fields must be a list of strings [optional parameter]
     // defaults
     var fieldNames : Set[String] = Set.empty
+    val tokenizerParams = new Parameters()
     if (globalParameters.containsKey("tokenizer")) {
       if (!globalParameters.isMap("tokenizer")) {
         errorLog.add("Parameter 'tokenizer' must be a map.\n")
@@ -173,7 +174,11 @@ object BuildIndex extends TupleFlowFunction {
           asInstanceOf[java.util.List[String]].
           toSet
       }
+    } else {
+      globalParameters.set("tokenizer", tokenizerParams)
     }
+    tokenizerParams.set("fields", fieldNames)
+    tokenizerParams.set("formats", new Parameters())
 
     if (errorLog.isEmpty()) {
       return globalParameters
@@ -262,7 +267,7 @@ object BuildIndex extends TupleFlowFunction {
   }
 
   val name : String = "build"
-  def checksOut(p: Parameters): Boolean = (checkBuildIndexParameters(p) == null)
+  def checksOut(p: Parameters): Boolean = (checkBuildIndexParameters(p) != null)
   def help : String = """
   Builds a Galago StructuredIndex with TupleFlow, using one thread
   for each CPU core on your computer.  While some debugging output
