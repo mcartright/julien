@@ -22,5 +22,10 @@ THINGS TO FIX/IMPROVE:
   but are built into Scala more cleanly than JSON)
 
 TODO:
-- Add some tests back in.
-- Iterator unification
+- Add some tests back in. ScalaTest, I think.
+- Maxscore
+- WAND
+- Cascade Ranking Model
+- Cost-Estimate? (check paper)
+- Delayed execution
+- feature-rewriting (delta-fns)

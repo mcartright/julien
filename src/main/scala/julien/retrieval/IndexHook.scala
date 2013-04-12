@@ -7,10 +7,7 @@ package retrieval
   */
 trait IndexHook {
   /** The index attached to this hook. */
-  protected[this] var i: Option[Index] = None
-
-  protected def index: Option[Index] = i
-  protected def index_=(idx: Index) = i = Some(idx)
+  protected[this] var index: Option[Index] = None
 
   /** Accessor for the attached index, if present. */
   def attachedIndex: Index = {
@@ -22,7 +19,7 @@ trait IndexHook {
   /** Attaches the provided index to this hook. Implementing
     * classes may add functionality to this method.
     */
-  def attach(i: Index) { index = i }
+  def attach(i: Index) { index = Some(i) }
 
   def isAttached: Boolean = index.isDefined
 }

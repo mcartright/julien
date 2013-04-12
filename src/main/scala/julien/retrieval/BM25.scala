@@ -7,7 +7,7 @@ object BM25 {
     new BM25(op, l, b, k)
 
   def apply(t: Term, l: LengthsView, b: Double = 0.75, k: Double = 1.2): BM25 =
-    apply(new SingleTermView(t), l, b, k)
+    apply(t, l, b, k)
 }
 
 class BM25(op: CountView, lengths: LengthsView,  b: Double, k: Double) {
@@ -19,9 +19,17 @@ class BM25(op: CountView, lengths: LengthsView,  b: Double, k: Double) {
   lazy val avgDocLength = stats.collLength / stats.numDocs
   lazy val idf = scala.math.log(stats.numDocs / (stats.docFreq + 0.5))
 
-  def eval: Score = {
-    val num = op.count + (k + 1)
-    val den = op.count + (k * (1 - b + (b * lengths.length / avgDocLength)))
+  // Yay - plays nice w/ the bounds.
+  val lowerBound: Score = new Score(0)
+  lazy val upperBound: Score = {
+    val maxtf = op.statistics.max
+    score(maxtf, maxtf)
+  }
+
+  def eval: Score = score(op.count, lengths.length)
+  def score(c: Count, l: Length) = {
+    val num = c + (k + 1)
+    val den = c + (k * (1 - b + (b * l / avgDocLength)))
     new Score(idf * num / den)
   }
 }

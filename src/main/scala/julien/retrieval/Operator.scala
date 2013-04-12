@@ -32,6 +32,10 @@ trait Operator extends Traversable[Operator] {
 }
 
 object Operator {
+  // Slight simplification
+  implicit def op2feature(op: Operator): FeatureOp = op.asInstanceOf[FeatureOp]
+  implicit def op2view(op: Operator): ViewOp = op.asInstanceOf[ViewOp]
+
   implicit def canBuildFrom: CanBuildFrom[Operator, Operator, List[Operator]] =
     new CanBuildFrom[Operator, Operator, List[Operator]] {
       def apply(): Builder[Operator, List[Operator]] = newBuilder
@@ -43,7 +47,11 @@ object Operator {
 // Views
 
 // Views provide Values to the Features
-trait ViewOp extends Operator
+trait ViewOp extends Operator {
+  def size: Int
+  def isDense: Boolean
+  def isSparse: Boolean = !isDense
+}
 trait BooleanView extends ViewOp with BoolSrc
 trait CountView extends ViewOp with CountSrc with StatisticsSrc
 trait PositionsView extends CountView with PositionSrc
@@ -58,6 +66,8 @@ trait ChildlessOp extends Operator {
 trait FeatureOp extends Operator {
   def views: Set[ViewOp]
   def eval: Score
+  def upperBound: Score = new Score(Double.PositiveInfinity)
+  def lowerBound: Score = new Score(Double.NegativeInfinity)
 }
 
 // A FeatureView is a store-supplied feature -

@@ -7,7 +7,7 @@ object Dirichlet {
     new Dirichlet(op, l, mu)
 
   def apply(t: Term, l: LengthsView, mu: Double = 1500): Dirichlet =
-    apply(new SingleTermView(t), l, mu)
+    apply(t, l, mu)
 }
 
 class Dirichlet(op: CountView, lengths: LengthsView, mu: Double)
@@ -20,9 +20,18 @@ class Dirichlet(op: CountView, lengths: LengthsView, mu: Double)
     ((stats.collFreq + 0.5) / stats.collLength)
   }
 
-  def eval: Score = {
-    val num = op.count + (mu*cf)
-    val den = lengths.length + mu
+  override lazy val upperBound: Score = {
+    val maxtf = op.statistics.max
+    score(maxtf, maxtf)
+  }
+
+  // this is a filthy estimation - want something better
+  override lazy val lowerBound: Score = score(0, 600)
+
+  def eval: Score = score(op.count, lengths.length)
+  def score(c: Count, l: Length):Score = {
+    val num = c + (mu*cf)
+    val den = l + mu
     new Score(scala.math.log(num / den))
   }
 }

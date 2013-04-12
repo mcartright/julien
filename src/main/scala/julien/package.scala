@@ -84,6 +84,10 @@ package object julien {
   /** Value for the maximum count of a particular count op.
     */
   implicit class MaximumCount(val underlying: Int) extends AnyVal
+  implicit def maxcount2count(mc: MaximumCount): Count =
+    new Count(mc.underlying)
+  implicit def maxcount2len(mc: MaximumCount): Length =
+    new Length(mc.underlying)
 
   /** The number of times a key (term) occurs in a particular target (doc).
     * Underlying class is Int.

@@ -6,7 +6,7 @@ object JelinekMercer {
   def apply(op: CountView, l: LengthsView, lambda: Double): JelinekMercer =
     new JelinekMercer(op, l, lambda)
   def apply(t: Term, l: LengthsView, lambda: Double = 1500): JelinekMercer =
-    apply(new SingleTermView(t), l, lambda)
+    apply(t, l, lambda)
 }
 
 class JelinekMercer(
@@ -23,10 +23,17 @@ class JelinekMercer(
     ((stats.collFreq + 0.5) / stats.collLength)
   }
 
-  def eval: Score = {
-    val foreground = op.count / lengths.length
-    new Score(scala.math.log((lambda*foreground) + ((1.0-lambda)*cf)))
+  lazy val upperBound: Score = {
+    val maxtf = op.statistics.max
+    score(maxtf, maxtf)
   }
+
+  // Crappy estimate. What's better?
+  lazy val lowerBound: Score = score(0, 600)
+
+  def eval: Score = score(op.count, lengths.length)
+  def score(c: Count, l: Length) =
+    new Score(scala.math.log((lambda*(c/l)) + ((1.0-lambda)*cf)))
 }
 
 

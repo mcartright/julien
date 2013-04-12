@@ -44,4 +44,7 @@ class OrderedWindow(val width: Int, val terms: Seq[Term])
     }
     hits.result
   }
+
+  override def isDense: Boolean = terms.forall(_.isDense)
+  override def size: Int = statistics.docFreq.underlying.toInt
 }

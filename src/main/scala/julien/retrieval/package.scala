@@ -9,16 +9,14 @@ package julien
   * by the access API.
   */
 package object retrieval {
-  implicit def term2op(t: Term): SingleTermView = SingleTermView(t)
-
   type Combiner = (Seq[FeatureOp]) => julien.Score
 
   // Bring in local references to some of the access structures
   type Index = julien.access.Index
   val Index = julien.access.Index
 
-    // Trickier part - set up for 2nd run
   import org.lemurproject.{galago => G}
+  // Stopwords here - somewhere else?
   object Stopwords {
     def inquery =
       G.tupleflow.Utility.readStreamToStringSet(

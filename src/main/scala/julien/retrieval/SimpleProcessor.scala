@@ -22,7 +22,7 @@ class SimpleProcessor extends QueryProcessor {
   def prepare(): Unit = {
 
     val unprepped: Set[Operator] =
-      models.flatMap(m => m.filter(_.isInstanceOf[NeedsPreparing]))
+      models.flatMap(m => m.filter(_.isInstanceOf[NeedsPreparing])).toSet
     if (unprepped.size == 0) return // Got lucky, all done!
 
     // We now need to get the iterators of the unprepped nodes, zip down them

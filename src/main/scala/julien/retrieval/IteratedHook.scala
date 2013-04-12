@@ -5,12 +5,12 @@ package retrieval
   * an [[org.lemurproject.galago.core.index.Iterator]]
   * as its underlying data source.
   */
-trait IteratedHook[I <: GIterator] extends IndexHook {
+trait IteratedHook[I <: GIterator]
+    extends ViewOp
+    with ChildlessOp
+    with IndexHook {
   /** The iterator attached to this hook. */
   protected[this] var it: Option[I] = None
-
-  protected def iter: Option[I] = it
-  protected def iter_=(it: I) = this.it = Some(it)
 
   /** Iterator getter. */
   protected def getIterator(i: Index): I
@@ -20,7 +20,7 @@ trait IteratedHook[I <: GIterator] extends IndexHook {
     */
   override def attach(i: Index) {
     super.attach(i)
-    iter = getIterator(i)
+    it = Some(getIterator(i))
   }
 
   /** Returns the underlying iterator. If it is not defined,
@@ -28,8 +28,17 @@ trait IteratedHook[I <: GIterator] extends IndexHook {
     *  using it. Doy.
     */
   def underlying: I = {
-    assume(iter.isDefined,
+    assume(it.isDefined,
       s"Tried to use iterator of ${toString} before attaching")
-    iter.get
+    it.get
   }
+
+  /** We have an iterator, so we can determine if its dense (has an entry
+    * for every retrieval item in the collection).
+    */
+  override def isDense: Boolean = it.get.hasAllCandidates
+
+  /** The estimated number of entries in this view.
+    */
+  override def size: Int = it.get.totalEntries.toInt
 }

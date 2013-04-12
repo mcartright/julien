@@ -69,6 +69,13 @@ class Index(label: String, val underlying: GIndex) {
   }
 
   def partReader(name: String): IndexPartReader = underlying.getIndexPart(name)
+  val iteratorCache = scala.collection.mutable.HashMap[String, ExtentIterator]()
+  def shareableIterator(key: String): ExtentIterator = {
+    if (!iteratorCache.contains(key)) {
+      iteratorCache(key) = iterator(key)
+    }
+    iteratorCache(key)
+  }
   def iterator(key: String): ExtentIterator =
     underlying.getIterator(key, Parameters.empty).asInstanceOf[ExtentIterator]
 

@@ -3,12 +3,12 @@ package retrieval
 
 trait QueryProcessor {
   protected var _indexes = Set[Index]()
-  protected var _models = Set[FeatureOp]()
+  protected var _models = List[FeatureOp]()
   var numResults: Int = 100
   def add(i: Index) { _indexes = indexes + i }
   def add(f: FeatureOp*) { _models = f ++: models }
   def indexes: Set[Index] = _indexes
-  def models: Set[FeatureOp] = _models
+  def models: List[FeatureOp] = _models
 
   // The things that need implementing in subclasses
   // makes sure that all views are ready to provide info upwards
@@ -17,7 +17,7 @@ trait QueryProcessor {
 
   def clear: Unit = {
     _indexes = Set[Index]()
-    _models = Set[FeatureOp]()
+    _models = List[FeatureOp]()
   }
 
   // This probably needs work -- should probably refactor to objects as
@@ -45,4 +45,8 @@ trait QueryProcessor {
     }
     return true
   }
+
+  def isBounded(op: FeatureOp): Boolean =
+    op.upperBound < Double.PositiveInfinity &&
+  op.lowerBound > Double.NegativeInfinity
 }

@@ -26,4 +26,7 @@ class Synonym(terms: Seq[Term])
     }
     Positions(hits.toArray)
   }
+
+  override def isDense: Boolean = terms.forall(_.isDense)
+  override def size: Int = statistics.docFreq.underlying.toInt
 }
