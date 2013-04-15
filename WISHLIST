@@ -23,9 +23,14 @@ THINGS TO FIX/IMPROVE:
 
 TODO:
 - Add some tests back in. ScalaTest, I think.
-- Maxscore
 - WAND
 - Cascade Ranking Model
 - Cost-Estimate? (check paper)
 - Delayed execution
 - feature-rewriting (delta-fns)
+
+
+Completed today:
+----------------
+- Added ScalaTest plugins.
+- Added PositionsSpec.

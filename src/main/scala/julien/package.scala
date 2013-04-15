@@ -177,10 +177,6 @@ package object julien {
     b.toList
   }
 
-  // Makes byte-array calls much less annoying
-  implicit def string2bytes(s: String) =
-    org.lemurproject.galago.tupleflow.Utility.fromString(s)
-
   /** Provides an ordering for [[ScoredDocument]]s. */
   implicit object ScoredDocumentOrdering extends Ordering[ScoredDocument] {
     def compare(a: ScoredDocument, b: ScoredDocument) =

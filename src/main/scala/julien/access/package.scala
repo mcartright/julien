@@ -9,4 +9,7 @@ package julien
   * Key/Value pairs. I plan to add more to that, time permitting.
   */
 package object access {
+  // Makes byte-array calls much less annoying
+  implicit def string2bytes(s: String) =
+    org.lemurproject.galago.tupleflow.Utility.fromString(s)
 }

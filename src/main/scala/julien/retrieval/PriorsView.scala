@@ -2,6 +2,7 @@ package julien
 package retrieval
 
 import org.lemurproject.galago.core.index.ScoreIterator
+import julien.access._
 
 // Simple class that grabs stored priors and presents them as a hybrid
 // feature/view.
