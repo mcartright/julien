@@ -22,6 +22,9 @@ object DocumentClone {
       original.vocabulary)
 }
 
+/** An implementation of the [[Document]] interface that does not require
+  * an existing connection to an underlying [[Index]].
+  */
 class DocumentClone(
   val identifier: Docid,
   val name: String,

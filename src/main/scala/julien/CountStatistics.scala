@@ -1,5 +1,6 @@
 package julien
 
+/** A mix of collection-level and view-specific statistics. */
 object CountStatistics {
   def apply() = new CountStatistics(
       new CollFreq(0),

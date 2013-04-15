@@ -14,12 +14,12 @@ object JulienProperties {
   def sources = s
 
   def loadProperties(propertiesFile : String) = {
-     println("try loading julien loading properties: " + propertiesFile)
+     println(s"try loading julien loading properties: $propertiesFile")
      try {
        val properties = System.getProperties()
        val propStream = new FileReader(new File(propertiesFile))
        properties.load(propStream)
-       System.out.println("...loaded from "+propertiesFile)
+       println(s"...loaded from $propertiesFile")
        conf = properties
      } catch {
        case e: Throwable =>
@@ -37,7 +37,6 @@ object JulienProperties {
       map.update(sym, v) }
     map
   }
-
 
   def printProperties() {
     println("JulienProperties:")

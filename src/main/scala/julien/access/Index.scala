@@ -3,7 +3,7 @@ package access
 
 import org.lemurproject.galago.core.index.disk.DiskIndex
 import org.lemurproject.galago.core.index.mem.MemoryIndex
-import org.lemurproject.galago.core.index._
+import org.lemurproject.galago.core.index.{Index=> _, _}
 import org.lemurproject.galago.core.index.AggregateReader._
 import org.lemurproject.galago.core.util.ExtentArray
 import org.lemurproject.galago.core.parse.{Document => _, _}
@@ -13,6 +13,7 @@ import scala.collection.JavaConversions._
 object Index {
   def apply(i: DiskIndex) = new Index("unknown", i)
   def apply(m: MemoryIndex) = new Index("unknown", m)
+  def apply(i: GIndex) = new Index("unknown", i)
   def disk(s: String) = new Index(s, new DiskIndex(s))
   def memory(s: String*) : Index = {
     // Try to use the components from the Galago pipeline to
@@ -39,15 +40,17 @@ class Index(label: String, val underlying: GIndex) {
     val b = new StringBuilder()
     val hdr = if (underlying.isInstanceOf[MemoryIndex])
       b ++= "memory:"
-    else
+    else if (underlying.isInstanceOf[DiskIndex])
       b ++= "disk:"
+    else
+      b ++= "interface:"
     b ++= label
     b.result
   }
 
   val lengthsIterator = underlying.getLengthsIterator
   private val collectionStats =
-    lengthsIterator.asInstanceOf[ARCA].getStatistics
+    underlying.getCollectionStatistics("postings")
   private val postingsStats =
     underlying.getIndexPartStatistics("postings")
 

@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map;
 import org.lemurproject.galago.core.index.AggregateReader;
+import org.lemurproject.galago.core.index.AggregateReader.CollectionAggregateIterator;
+import org.lemurproject.galago.core.index.AggregateReader.CollectionStatistics;
 import org.lemurproject.galago.core.index.AggregateReader.IndexPartStatistics;
 import org.lemurproject.galago.core.index.DynamicIndex;
 import org.lemurproject.galago.core.index.Index;
@@ -22,6 +24,7 @@ import org.lemurproject.galago.core.index.corpus.CorpusReader;
 import org.lemurproject.galago.tupleflow.InputClass;
 import org.lemurproject.galago.tupleflow.Parameters;
 import org.lemurproject.galago.tupleflow.TupleFlowParameters;
+import org.lemurproject.galago.tupleflow.Utility;
 import org.lemurproject.galago.tupleflow.execution.Verified;
 
 /*
@@ -259,5 +262,14 @@ public class MemoryIndex implements DynamicIndex, Index {
   @Override
   public Set<String> getPartNames() {
     return parts.keySet();
+  }
+
+  @Override
+  public CollectionStatistics getCollectionStatistics(String part) {
+    try {
+      return ((CollectionAggregateIterator)parts.get("lengths").getIterator(Utility.fromString(part))).getStatistics();
+    } catch (IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
   }
 }

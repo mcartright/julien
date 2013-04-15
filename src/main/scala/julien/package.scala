@@ -147,8 +147,7 @@ package object julien {
       */
     def matches(s: String): Boolean = underlying.pattern.matcher(s).matches
 
-    /**
-      * @see #matches(s: String)
+    /** @see #matches(s: String)
       */
     def ==(s: String): Boolean = matches(s)
 
@@ -156,8 +155,7 @@ package object julien {
       */
     def misses(s: String): Boolean = (matches(s) == false)
 
-    /**
-      * @see #misses(s: String)
+    /** @see #misses(s: String)
       */
     def !=(s: String): Boolean = misses(s)
   }
@@ -213,8 +211,9 @@ package object julien {
   type TCI = CountIterator
   type MLI = LengthsReader.LengthsIterator
 
-  // For debugging/timing purposes, until I can figure out a macro to
-  // compile this out - At least moving the definition will be easy.
+  /** For debugging/timing purposes, until I can figure out a macro to
+    * compile this out - At least moving the definition will be easy.
+    */
   def time[R](label:String)(block: => R): R = {
     val t0 = System.currentTimeMillis
     val result = block
@@ -223,8 +222,8 @@ package object julien {
     result
   }
 
-  // For debugging. This one is elidable, meaning given the correct flag,
-  // the compiler will not remove the call and the bytecode for this
-  // function
+  /** For debugging. This one is elidable, meaning given the correct flag,
+    * the compiler will remove the call and the bytecode for this function.
+    */
   @elidable(elidable.FINEST) def debug(msg: String) = Console.err.println(msg)
 }

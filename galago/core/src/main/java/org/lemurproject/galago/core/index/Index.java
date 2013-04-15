@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.lemurproject.galago.core.index.AggregateReader.CollectionStatistics;
 import org.lemurproject.galago.core.index.AggregateReader.IndexPartStatistics;
 import org.lemurproject.galago.core.index.LengthsReader.LengthsIterator;
 import org.lemurproject.galago.core.parse.Document;
@@ -29,8 +30,18 @@ public interface Index {
 
   public Iterator getIterator(byte[] key, Parameters p) throws IOException;
 
+  /**
+   * This contains statistics gathered for a particular field, from a
+   * posting-list oriented view.
+   */
   public IndexPartStatistics getIndexPartStatistics(String part);
 
+  /**
+   * This contains statistics gathered for a particular field, from a
+   * document oriented view.
+   */
+  public CollectionStatistics getCollectionStatistics(String part);
+  
   public void close() throws IOException;
 
   public int getLength(int identifier) throws IOException;

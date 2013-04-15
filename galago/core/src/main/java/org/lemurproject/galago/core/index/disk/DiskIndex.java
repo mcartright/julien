@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.lemurproject.galago.core.index.AggregateReader.AggregateIndexPart;
+import org.lemurproject.galago.core.index.AggregateReader.CollectionAggregateIterator;
+import org.lemurproject.galago.core.index.AggregateReader.CollectionStatistics;
 import org.lemurproject.galago.core.index.AggregateReader.IndexPartStatistics;
 import org.lemurproject.galago.core.index.BTreeFactory;
 import org.lemurproject.galago.core.index.BTreeReader;
@@ -26,6 +28,7 @@ import org.lemurproject.galago.core.index.corpus.CorpusReader;
 import org.lemurproject.galago.core.index.corpus.SplitBTreeReader;
 import org.lemurproject.galago.core.parse.Document;
 import org.lemurproject.galago.tupleflow.Parameters;
+import org.lemurproject.galago.tupleflow.Utility;
 
 /**
  * This is the main class for a disk based index structure
@@ -168,6 +171,15 @@ public class DiskIndex implements Index {
     return result;
   }
 
+  @Override
+  public CollectionStatistics getCollectionStatistics(String part) {
+    try { 
+      return ((CollectionAggregateIterator) lengthsReader.getIterator(Utility.fromString(part))).getStatistics();
+    } catch (IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
+  }
+  
   @Override
   public IndexPartStatistics getIndexPartStatistics(String part) {
     if (parts.containsKey(part)) {
