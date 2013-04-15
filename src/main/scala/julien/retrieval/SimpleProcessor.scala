@@ -67,7 +67,7 @@ class SimpleProcessor extends QueryProcessor {
 
     // Go
     val numResults: Int = 100
-    val resultQueue = PriorityQueue[ScoredDocument]()(ScoredDocumentOrdering)
+    val resultQueue = PriorityQueue[ScoredDocument]()
     while (iterators.exists(_.isDone == false)) {
       val candidate = iterators.filterNot(_.isDone).map(_.currentCandidate).min
       lengths.syncTo(candidate)
@@ -78,7 +78,7 @@ class SimpleProcessor extends QueryProcessor {
         var score = scorers.foldLeft(new Score(0.0)) { (score,op) =>
           score + op.eval
         }
-        resultQueue.enqueue(ScoredDocument(candidate, score.underlying))
+        resultQueue.enqueue(ScoredDocument(candidate, score))
         if (resultQueue.size > numResults) resultQueue.dequeue
       }
       iterators.foreach(_.movePast(candidate))

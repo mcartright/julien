@@ -181,10 +181,25 @@ package object julien {
   implicit def string2bytes(s: String) =
     org.lemurproject.galago.tupleflow.Utility.fromString(s)
 
+  /** Provides an ordering for [[ScoredDocument]]s. */
+  implicit object ScoredDocumentOrdering extends Ordering[ScoredDocument] {
+    def compare(a: ScoredDocument, b: ScoredDocument) =
+      // TODO: This works, but gross.
+      b.score.underlying compare a.score.underlying
+  }
+
+  /** Provides an [[scala.math.Ordering]] for [[Gram]]s. */
+  implicit object GramOrdering extends Ordering[Gram] {
+    def compare(a: Gram, b: Gram) = {
+      val result = b.score compare a.score
+      if (result == 0) a.term compare b.term else result
+    }
+  }
+
+
   /** Type definitions, most of which are for aliasing in the
     * package.
     */
-
 
   // To bring the packages in scope...
   import org.lemurproject.galago.core.index._

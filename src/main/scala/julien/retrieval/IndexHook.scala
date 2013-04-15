@@ -3,7 +3,7 @@ package retrieval
 
 /** Behavior needed by anything that connects to an index.
   * This trait also acts as a marker to indicate that
-  * an attachment call is needed for the hook can be used.
+  * an attachment call is needed for the hook to be used.
   */
 trait IndexHook {
   /** The index attached to this hook. */

@@ -14,6 +14,14 @@ trait Operator extends Traversable[Operator] {
     for (c <- children) c foreach f
   }
 
+  def grab[T]: Traversable[T] = this.
+    filter(_.isInstanceOf[T]).
+    map(_.asInstanceOf[T]).
+    toList
+
+  def iHooks: Traversable[IteratedHook[_ <: GIterator]] =
+    grab[IteratedHook[_ <: GIterator]]
+
   def hooks: Traversable[IndexHook] = this.
     filter(_.isInstanceOf[IndexHook]).
     map(_.asInstanceOf[IndexHook]).
