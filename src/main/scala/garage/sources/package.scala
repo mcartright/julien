@@ -26,4 +26,7 @@ package garage
 package object sources {
   type DiskIndex = org.lemurproject.galago.core.index.disk.DiskIndex
   type MemoryIndex = org.lemurproject.galago.core.index.mem.MemoryIndex
+
+  import org.lemurproject.galago.tupleflow.Utility
+  implicit def str2bytes(str: String): Array[Byte] = Utility.fromString(str)
 }
