@@ -56,6 +56,7 @@ package object julien {
     def +(i: Int): DocFreq = DocFreq(underlying + i)
     def +(d: Double): Double = d + underlying
   }
+  implicit def df2long(df: DocFreq): Long = df.underlying
 
   /** Number of targets (documents) in the universe (collection).
     * Underlying class is Long.
@@ -63,6 +64,7 @@ package object julien {
   implicit class NumDocs(val underlying: Long) extends AnyVal {
     def /(d: Double): Double = underlying.toDouble / d
   }
+  implicit def numdocs2long(nd: NumDocs): Long = nd.underlying
 
   /** Number of keys (terms) in the universe (collection).
     * Underlying class is Long.
