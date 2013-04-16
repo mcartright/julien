@@ -2,7 +2,7 @@ package julien
 package retrieval
 
 abstract class MultiTermView(terms: Seq[Term])
-    extends PositionsView
+    extends PositionStatsView
     with NeedsPreparing {
   // Make sure we're not making a single view of multiple indexes - that's weird
   lazy val verified =

@@ -29,7 +29,7 @@ Required parameters:
 
   def run(params: Parameters, out: PrintStream): Unit = {
     val query = params.getString("query").split(" ").map(Term(_))
-    val ql = Combine(query.map(a => Dirichlet(a, LengthsView())): _*)
+    val ql = Combine(query.map(a => Dirichlet(a, IndexLengths())): _*)
 
     // Open a small in-memory index
     val index : Index = Index.disk(params.getString("index"))

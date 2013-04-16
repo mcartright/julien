@@ -2,32 +2,45 @@ package julien
 package retrieval
 
 object JelinekMercer {
-  def apply(op: CountView, l: LengthsView): JelinekMercer = apply(op, l, 1500)
-  def apply(op: CountView, l: LengthsView, lambda: Double): JelinekMercer =
-    new JelinekMercer(op, l, lambda)
+  private val defLambda = 0.3
+  def apply(
+    op: PositionStatsView,
+    l: LengthsView,
+    lambda: Double = defLambda
+  ): JelinekMercer = new JelinekMercer(op, l, op, lambda)
+  def apply(
+    c: CountView,
+    l: LengthsView,
+    s: StatisticsView,
+    lambda: Double): JelinekMercer =
+    new JelinekMercer(c, l, s, lambda)
 }
 
 class JelinekMercer(
-  val op: CountView,
-  val lengths: LengthsView,
+  op: CountView,
+  lengths: LengthsView,
+  statsrc: StatisticsView,
   lambda: Double)
-{
-  lazy val children: Seq[Operator] = List[Operator](op, lengths)
-  lazy val views: Set[ViewOp] = Set[ViewOp](op, lengths)
+    extends FeatureOp {
+  lazy val children: Seq[Operator] = Set[Operator](op, lengths, statsrc).toList
+  lazy val views: Set[ViewOp] = Set[ViewOp](op, lengths, statsrc)
 
   // Runs when asked for the first time, and runs only once
   lazy val cf = {
-    val stats: CountStatistics = op.statistics
-    ((stats.collFreq + 0.5) / stats.collLength)
+    val stats: CountStatistics = statsrc.statistics
+    if (stats.collFreq == 0)
+      0.5 / stats.collLength
+    else
+      stats.collFreq.toDouble / stats.collLength
   }
 
-  lazy val upperBound: Score = {
-    val maxtf = op.statistics.max
+  override lazy val upperBound: Score = {
+    val maxtf = statsrc.statistics.max
     score(maxtf, maxtf)
   }
 
   // Crappy estimate. What's better?
-  lazy val lowerBound: Score = score(0, 600)
+  override lazy val lowerBound: Score = score(0, 600)
 
   def eval: Score = score(op.count, lengths.length)
   def score(c: Count, l: Length) =

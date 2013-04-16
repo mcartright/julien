@@ -16,6 +16,22 @@
         <updatePolicy>always</updatePolicy>
       </snapshots>
     </repository>
+    <repository>
+      <id>Sonatype</id>
+      <name>Sonatype Snapshots</name>
+      <releases>
+	<enabled>false</enabled>
+	<updatePolicy>always</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>daily</updatePolicy>
+        <checksumPolicy>fail</checksumPolicy>
+      </snapshots>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <layout>default</layout>
+    </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
@@ -42,7 +58,7 @@
     <dependency>
       <groupId>org.scalamock</groupId>
       <artifactId>scalamock-scalatest-support_2.10</artifactId>
-      <version>3.0.1</version>
+      <version>3.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>edu.umass.ciir</groupId>

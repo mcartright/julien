@@ -81,10 +81,13 @@ package object julien {
     def *(l: Long): Long = underlying * l
     def *(d: Double): Double = underlying * d
   }
+  implicit def cf2long(cf: CollFreq): Long = cf.underlying
+
 
   /** Value for the maximum count of a particular count op.
     */
   implicit class MaximumCount(val underlying: Int) extends AnyVal
+  implicit def maxcount2int(mc: MaximumCount): Int = mc.underlying
   implicit def maxcount2count(mc: MaximumCount): Count =
     new Count(mc.underlying)
   implicit def maxcount2len(mc: MaximumCount): Length =

@@ -60,9 +60,13 @@ trait ViewOp extends Operator {
   def isDense: Boolean
   def isSparse: Boolean = !isDense
 }
+
 trait BooleanView extends ViewOp with BoolSrc
-trait CountView extends ViewOp with CountSrc with StatisticsSrc
+trait CountView extends ViewOp with CountSrc
+trait StatisticsView extends ViewOp with StatisticsSrc
 trait PositionsView extends CountView with PositionSrc
+trait PositionStatsView extends PositionsView with StatisticsView
+trait LengthsView extends ViewOp with LengthsSrc
 trait DataView[T] extends ViewOp with DataSrc[T]
 trait ChildlessOp extends Operator {
   lazy val children: Seq[Operator] = List.empty

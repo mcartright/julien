@@ -14,7 +14,7 @@ object Term { def apply(s: String) = new Term(s) }
   */
 final class Term(val t: String)
     extends IteratedHook[ExtentIterator]
-    with PositionsView {
+    with PositionStatsView {
 
   override def toString: String =
     s"$t:" + (if (isAttached) index.toString else "")

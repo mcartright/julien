@@ -62,23 +62,33 @@ class Index(label: String, val underlying: GIndex) {
   def length(targetId: String): Length =
     underlying.getLength(underlying.getIdentifier(targetId))
 
-  def positions(key: String, targetId: String): ExtentArray = {
+  def positions(key: String, targetId: String): Positions = {
     val it =
       underlying.getIterator(key, Parameters.empty).asInstanceOf[ExtentIterator]
-    if (it.isInstanceOf[NullExtentIterator]) return ExtentArray.empty
+    if (it.isInstanceOf[NullExtentIterator]) return Positions.empty
     val docid = underlying.getIdentifier(targetId)
     it.syncTo(docid)
-    if (it.hasMatch(docid)) it.extents else ExtentArray.empty
+    if (it.hasMatch(docid)) Positions(it.extents) else Positions.empty
   }
 
+  /** Provided because the underlying interface provides it. However it's a
+    * breach in the abstraction, and should go away in the future.
+    */
+  @deprecated
   def partReader(name: String): IndexPartReader = underlying.getIndexPart(name)
-  val iteratorCache = scala.collection.mutable.HashMap[String, ExtentIterator]()
+  private val iteratorCache =
+    scala.collection.mutable.HashMap[String, ExtentIterator]()
+
+  /** Produces a cached ExtentIterator if possible. If not found, a new iterator
+    * is constructed and cached for later.
+    */
   def shareableIterator(key: String): ExtentIterator = {
     if (!iteratorCache.contains(key)) {
       iteratorCache(key) = iterator(key)
     }
     iteratorCache(key)
   }
+
   def iterator(key: String): ExtentIterator =
     underlying.getIterator(key, Parameters.empty).asInstanceOf[ExtentIterator]
 
@@ -92,8 +102,9 @@ class Index(label: String, val underlying: GIndex) {
     val jdocs = gdocs.values.map(DocumentClone(_)).toList
     jdocs.sortBy(_.identifier)
   }
-  def vocabulary: KeySeq = new KeySeq(underlying.getIndexPart("postings").keys)
-  def name(docid: Int) : String = underlying.getName(docid)
+  def vocabulary: KeySet =
+    new KeySet(underlying.getIndexPart("postings").keys _)
+  def name(docid: Docid) : String = underlying.getName(docid)
   def identifier(name: String): Docid =
     new Docid(underlying.getIdentifier(name))
   def names: PairSeq[String] =

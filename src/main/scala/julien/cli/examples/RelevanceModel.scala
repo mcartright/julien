@@ -33,7 +33,7 @@ Required parameters:
   def run(params: Parameters, out: PrintStream): Unit = {
     // Set up to perform the first run
     val query = params.getString("query").split(" ").map(Term(_))
-    val ql = Combine(query.map(a => Dirichlet(a, LengthsView())): _*)
+    val ql = Combine(query.map(a => Dirichlet(a, IndexLengths())): _*)
 
     // Open an index
     val index : Index = Index.disk(params.getString("index"))
@@ -54,7 +54,7 @@ Required parameters:
 
     // Prep for adding to model
     val wrappedGrams = selectedGrams.map { gram =>
-      Weight(Dirichlet(Term(gram.term), LengthsView()), gram.score)
+      Weight(Dirichlet(Term(gram.term), IndexLengths()), gram.score)
     }
 
     val rm3 = Combine(

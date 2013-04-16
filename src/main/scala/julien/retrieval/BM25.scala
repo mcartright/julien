@@ -2,24 +2,42 @@ package julien
 package retrieval
 
 object BM25 {
-  def apply(op: CountView, l: LengthsView): BM25 = apply(op, l, 0.75, 1.2)
-  def apply(op: CountView, l: LengthsView, b: Double, k: Double): BM25 =
-    new BM25(op, l, b, k)
+  private val defB = 0.75
+  private val defK = 1.2
+  def apply(
+    op: PositionStatsView,
+    l: LengthsView,
+    b: Double = defB,
+    k: Double = defK
+  ): BM25 = new BM25(op, l, op, defB, defK)
+  def apply(c: CountView, l: LengthsView, s: StatisticsView): BM25 =
+    new BM25(c, l, s, defB, defK)
+  def apply(
+    c: CountView,
+    l: LengthsView,
+    s: StatisticsView,
+    b: Double,
+    k: Double) = new BM25(c, l, s, b, k)
 }
 
-class BM25(op: CountView, lengths: LengthsView,  b: Double, k: Double) {
-  lazy val children: Seq[Operator] = List[Operator](op, lengths)
-  lazy val views: Set[ViewOp] = Set[ViewOp](op, lengths)
+class BM25(
+  op: CountView,
+  lengths: LengthsView,
+  statsrc: StatisticsView,
+  b: Double,
+  k: Double) {
+  lazy val children: Seq[Operator] = Set[Operator](op, lengths,statsrc).toList
+  lazy val views: Set[ViewOp] = Set[ViewOp](op, lengths, statsrc)
 
   // Runs when asked for the first time, and runs only once
-  lazy val stats = op.statistics
+  lazy val stats = statsrc.statistics
   lazy val avgDocLength = stats.collLength / stats.numDocs
   lazy val idf = scala.math.log(stats.numDocs / (stats.docFreq + 0.5))
 
   // Yay - plays nice w/ the bounds.
   val lowerBound: Score = new Score(0)
   lazy val upperBound: Score = {
-    val maxtf = op.statistics.max
+    val maxtf = statsrc.statistics.max
     score(maxtf, maxtf)
   }
 
