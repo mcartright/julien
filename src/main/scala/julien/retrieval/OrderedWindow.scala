@@ -4,10 +4,10 @@ package retrieval
 import scala.collection.BufferedIterator
 
 object OrderedWindow {
-  def apply(w: Int, t: Term*) = new OrderedWindow(w, t)
+  def apply(w: Int, t: PositionStatsView*) = new OrderedWindow(w, t)
 }
 
-class OrderedWindow(val width: Int, val terms: Seq[Term])
+class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     extends MultiTermView(terms) {
   // update the statistics object w/ our notion of "collection length"
   // We *could* say it's dependent on the size of the gram and width, but
@@ -17,13 +17,14 @@ class OrderedWindow(val width: Int, val terms: Seq[Term])
   override def updateStatistics = {
     super.updateStatistics
     statistics.collLength =
-      terms.head.attachedIndex.collectionLength - adjustment
+      terms.head.statistics.collLength - adjustment
   }
 
   override def positions: Positions = {
     val hits = Positions.newBuilder
-    val iterators : Seq[BufferedIterator[Int]] = terms.map(t =>
-      Positions(t.underlying.extents).iterator.buffered)
+    val iterators : Seq[BufferedIterator[Int]] = terms.map { t =>
+      t.positions.iterator.buffered
+    }
     while (iterators.forall(_.hasNext)) {
       // Make sure an iterator is after its preceding one
       iterators.reduceLeft { (i1, i2) =>
@@ -46,5 +47,5 @@ class OrderedWindow(val width: Int, val terms: Seq[Term])
   }
 
   override def isDense: Boolean = terms.forall(_.isDense)
-  override def size: Int = statistics.docFreq.underlying.toInt
+  override def size: Int = statistics.docFreq.toInt
 }

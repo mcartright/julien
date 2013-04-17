@@ -4,21 +4,22 @@ package retrieval
 import org.lemurproject.galago.core.util._
 
 object UnorderedWindow {
-  def apply(w: Int, t: Term*) = new UnorderedWindow(w, t)
+  def apply(w: Int, t: PositionStatsView*) = new UnorderedWindow(w, t)
 }
 
-class UnorderedWindow(val width: Int, val terms: Seq[Term])
+class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     extends MultiTermView(terms) {
   // Again, being lazy about this number
   override def updateStatistics = {
     super.updateStatistics
-    statistics.collLength = terms.head.attachedIndex.collectionLength
+    statistics.collLength = terms.head.statistics.collLength
   }
 
   override def positions:  Positions = {
     val hits = Positions.newBuilder
-    val iterators: Seq[BufferedIterator[Int]] = terms.map(t =>
-      Positions(t.underlying.extents).iterator.buffered)
+    val iterators: Seq[BufferedIterator[Int]] = terms.map { t =>
+      t.positions.iterator.buffered
+    }
     while (iterators.forall(_.hasNext == true)) {
       val currentPositions = iterators.map(_.head)
       // Find bounds
@@ -35,5 +36,5 @@ class UnorderedWindow(val width: Int, val terms: Seq[Term])
   }
 
   override def isDense: Boolean = terms.forall(_.isDense)
-  override def size: Int = statistics.docFreq.underlying.toInt
+  override def size: Int = statistics.docFreq.toInt
 }

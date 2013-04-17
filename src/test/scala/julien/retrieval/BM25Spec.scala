@@ -109,4 +109,7 @@ class BM25Spec extends FlatSpec with MockFactory {
     val expScore = d.idf * numerator / denominator
     expect (expScore) { d.eval.underlying }
   }
+
+
+
 }
