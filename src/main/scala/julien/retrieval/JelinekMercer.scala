@@ -2,6 +2,7 @@ package julien
 package retrieval
 
 object JelinekMercer {
+  private val totallyMadeUpValue = 600
   private val defLambda = 0.3
   def apply(
     op: PositionStatsView,
@@ -17,12 +18,12 @@ object JelinekMercer {
 }
 
 class JelinekMercer(
-  op: CountView,
-  lengths: LengthsView,
-  statsrc: StatisticsView,
-  lambda: Double)
+  val op: CountView,
+  val lengths: LengthsView,
+  val statsrc: StatisticsView,
+  val lambda: Double)
     extends FeatureOp {
-  require(lambda >= 0.0 && lambda <= 1.0, s"Lambda must be [0,1].Got: $lambda")
+  require(lambda >= 0.0 && lambda <= 1.0, s"Lambda must be [0,1]. Got: $lambda")
   lazy val children: Seq[Operator] = Set[Operator](op, lengths, statsrc).toList
   lazy val views: Set[ViewOp] = Set[ViewOp](op, lengths, statsrc)
 
@@ -41,7 +42,8 @@ class JelinekMercer(
   }
 
   // Crappy estimate. What's better?
-  override lazy val lowerBound: Score = score(0, 600)
+  override lazy val lowerBound: Score =
+    score(0, JelinekMercer.totallyMadeUpValue)
 
   def eval: Score = score(op.count, lengths.length)
   def score(c: Count, l: Length) =

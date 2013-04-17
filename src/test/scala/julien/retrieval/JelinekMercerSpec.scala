@@ -38,54 +38,52 @@ class JelinekMercerSpec extends FlatSpec with MockFactory {
   it should "complain if the provided lambda is outside [0,1]" in {
     val f = fixture
     import f._
+
     intercept[IllegalArgumentException] {
       val jm = JelinekMercer(mockCV, mockLV, mockStat, 1.2)
     }
+
+    intercept[IllegalArgumentException] {
+      val jm = JelinekMercer(mockCV, mockLV, mockStat, -0.03)
+    }
   }
 
-  it should "produce the correct upper bound" in (pending)
-/*
-{
+  it should "produce the correct upper bound" in {
     val f = fixture
     import f._
 
     mockStat.expects('statistics)().returning(fakeCountStats).noMoreThanTwice
-    val mu = 1633
-    val d = JelinekMercer(mockCV, mockLV, mockStat, mu)
+    val lambda = 0.5
+    val d = JelinekMercer(mockCV, mockLV, mockStat, lambda)
     val max = fakeCountStats.max.toDouble
-    val expScore = scala.math.log((max + (mu * d.cf)) / (max + mu))
+    val expScore = scala.math.log(lambda + ((1.0-lambda) * d.cf))
     expect (expScore) { d.upperBound.underlying }
   }
-*/
 
-  it should "produce the correct lower bound" in (pending)
-/*{
+  it should "produce the correct lower bound" in {
     val f = fixture
     import f._
 
     mockStat.expects('statistics)().returning(fakeCountStats).noMoreThanTwice
-    val mu = 1800
-    val d = JelinekMercer(mockCV, mockLV, mockStat, mu)
-    val expScore =
-      scala.math.log((mu * d.cf) / (JelinekMercer.totallyMadeUpValue + mu))
+    val lambda = 0.3
+    val d = JelinekMercer(mockCV, mockLV, mockStat, lambda)
+    val expScore = scala.math.log((1.0-lambda) * d.cf)
     expect (expScore) { d.lowerBound.underlying }
-  }*/
+  }
 
-  it should "produce the correct score" in (pending)
-/*
-{
+  it should "produce the correct score" in {
     val f = fixture
     import f._
 
-    val c = 5
-    val l = 150
-    val mu = 1750
+    val c = 23
+    val l = 312
+    val lambda = 0.45
     mockStat.expects('statistics)().returning(fakeCountStats).noMoreThanTwice
     mockCV.expects('count)().returning(c)
     mockLV.expects('length)().returning(l)
-    val d = JelinekMercer(mockCV, mockLV, mockStat, mu)
-    val expScore = scala.math.log((c + (mu*d.cf)) / (mu + l))
+    val d = JelinekMercer(mockCV, mockLV, mockStat, lambda)
+    val expScore =
+      scala.math.log((lambda*(c.toDouble/l)) + ((1.0-lambda)*(d.cf)))
     expect (expScore) { d.eval.underlying }
   }
- */
 }

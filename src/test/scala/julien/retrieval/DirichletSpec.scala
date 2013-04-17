@@ -34,6 +34,14 @@ class DirichletSpec extends FlatSpec with MockFactory {
     expect(expectedCF) { d.cf }
   }
 
+  it should "complain if it receives a negative mu" in {
+    val f = fixture
+    import f._
+
+    intercept[IllegalArgumentException] {
+      val d = Dirichlet(mockCV, mockLV, mockStat, -100)
+    }
+  }
 
   it should "produce the correct upper bound" in {
     val f = fixture

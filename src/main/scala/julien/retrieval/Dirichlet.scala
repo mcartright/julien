@@ -17,11 +17,13 @@ object Dirichlet {
 }
 
 class Dirichlet(
-  op: CountView,
-  lengths: LengthsView,
-  statsrc: StatisticsView,
-  mu: Double)
+  val op: CountView,
+  val lengths: LengthsView,
+  val statsrc: StatisticsView,
+  val mu: Double)
     extends FeatureOp {
+  require(mu > 0, s"Mu must be positive. Received $mu")
+
   lazy val children: Seq[Operator] = Set[Operator](op, lengths, statsrc).toList
   lazy val views: Set[ViewOp] = Set[ViewOp](op, lengths, statsrc)
   // Runs when asked for the first time, and runs only once

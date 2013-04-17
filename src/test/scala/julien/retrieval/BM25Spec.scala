@@ -34,8 +34,27 @@ class BM25Spec extends FlatSpec with MockFactory {
     expect(expectedADL) { d.avgDocLength }
   }
 
-  it should "complain if it receives a negative b parameter" in (pending)
-  it should "complain if it receives a negative k parameter" in (pending)
+  it should "complain if it receives a b parameter outside interval [0,1]" in {
+    val f = fixture
+    import f._
+
+    intercept[IllegalArgumentException] {
+      val d = BM25(mockCV, mockLV, mockStat, -0.1, 34)
+    }
+
+    intercept[IllegalArgumentException] {
+      val d = BM25(mockCV, mockLV, mockStat, 3.4, 110)
+    }
+  }
+
+  it should "complain if it receives a negative k parameter" in {
+    val f = fixture
+    import f._
+
+    intercept[IllegalArgumentException] {
+      val d = BM25(mockCV, mockLV, mockStat, 0.7, -1.1)
+    }
+  }
 
   it should "calculate the correct inv. doc. freq. (IDF)" in {
     val f = fixture

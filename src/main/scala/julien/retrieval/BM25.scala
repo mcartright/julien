@@ -21,11 +21,13 @@ object BM25 {
 }
 
 class BM25(
-  op: CountView,
-  lengths: LengthsView,
-  statsrc: StatisticsView,
-  b: Double,
-  k: Double) {
+  val op: CountView,
+  val lengths: LengthsView,
+  val statsrc: StatisticsView,
+  val b: Double,
+  val k: Double) {
+  require(b > 0.0 && b < 1.0, s"b must be in [0,1]. Got $b")
+  require(k > 0.0, s"k must be positive. Got $k")
   lazy val children: Seq[Operator] = Set[Operator](op, lengths,statsrc).toList
   lazy val views: Set[ViewOp] = Set[ViewOp](op, lengths, statsrc)
 
