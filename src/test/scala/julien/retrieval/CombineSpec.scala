@@ -9,15 +9,49 @@ class CombineSpec extends FlatSpec with MockFactory {
     val mock1 = mock[FeatureOp]
     val mock2 = mock[FeatureOp]
     val mock3 = mock[FeatureOp]
-
-    mock1.expects('eval)
   }
 
   "A combine operator" should "by default sum its children" in {
+    val f = fixture
+    import f._
 
+    val v1 = 3.7
+    val v2 = 12.9
+    val v3 = 11.13
+    mock1.expects('eval)().returning(v1)
+    mock2.expects('eval)().returning(v2)
+    mock3.expects('eval)().returning(v3)
+    val c = Combine(mock1, mock2, mock3)
+    expect(Score(v1+v2+v3)) { c.eval }
   }
-  it should "accept other viable reduce functions" in (pending)
-  it should "return the passed in feature ops as children" in (pending)
+
+  it should "accept other viable reduce functions" in {
+    val f = fixture
+    import f._
+
+    val v1 = 0.98
+    val v2 = 0.55
+    val v3 = 0.78887
+    mock1.expects('eval)().returning(v1)
+    mock2.expects('eval)().returning(v2)
+    mock3.expects('eval)().returning(v3)
+    val prod = (s: Seq[FeatureOp]) =>
+    s.foldLeft(Score(1.0))((s , feat) => s * feat.eval)
+    val c = Combine(prod, mock1, mock2, mock3)
+    expect(Score(v1*v2*v3)) { c.eval }
+  }
+
+  it should "return the passed in feature ops as children" in {
+    val f = fixture
+    import f._
+
+    val c = Combine(mock1, mock2, mock3)
+    expect(3) { c.children.size }
+    assert(c.children.exists(_ == mock1))
+    assert(c.children.exists(_ == mock2))
+    assert(c.children.exists(_ == mock3))
+  }
+
   it should "return the set union view of its children" in (pending)
 
 }

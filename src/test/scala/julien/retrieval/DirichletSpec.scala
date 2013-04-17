@@ -14,10 +14,7 @@ object DirichletSpec {
     new MaximumCount(345))
 }
 
-class DirichletSpec
-    extends FlatSpec
-    with MockFactory
-    with StandardSmoothingOperatorBehavior {
+class DirichletSpec extends FlatSpec with MockFactory {
   def fixture = new {
     // Set up the needed mock objects
     val mockCV = mock[CountView]
