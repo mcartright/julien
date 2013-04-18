@@ -75,9 +75,7 @@ class SimpleProcessor extends QueryProcessor {
       if (iterators.exists(_.hasMatch(candidate))) {
         // Time to score
         val len = new Length(lengths.getCurrentLength)
-        var score = scorers.foldLeft(new Score(0.0)) { (score,op) =>
-          score + op.eval
-        }
+        val score = scorers.map(_.eval).sum
         resultQueue.enqueue(ScoredDocument(candidate, score))
         if (resultQueue.size > numResults) resultQueue.dequeue
       }

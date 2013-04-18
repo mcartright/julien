@@ -64,7 +64,8 @@ public class ParserSelector extends StandardStep<DocumentSplit, Document> {
 	{"trectext", TrecTextParser.class.getName()},
 	{"trecweb", TrecWebParser.class.getName()},
 	{"twitter", TwitterParser.class.getName()},
-	{"wiki", WikiParser.class.getName()}
+	{"wiki", WikiParser.class.getName()},
+	{"wikiwex", WikiWexParser.class.getName()}
     };
 
   private HashMap<String, Class> fileTypeMap;
@@ -310,17 +311,4 @@ public class ParserSelector extends StandardStep<DocumentSplit, Document> {
     }
     return stream;
   }
-
-  /* -- this now cases errors...
-  private static void bzipHeaderCheck(BufferedInputStream stream) throws IOException {
-    char[] header = new char[2];
-    stream.mark(4);
-    header[0] = (char) stream.read();
-    header[1] = (char) stream.read();
-    String hdrStr = new String(header);
-    if (hdrStr.equals("BZ") == false) {
-      stream.reset();
-    }
-  }
-  */
 }

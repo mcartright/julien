@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -1122,6 +1124,9 @@ public class JobExecutor {
 
   public static boolean runLocally(Job job, ErrorStore store, Parameters p) throws IOException,
           InterruptedException, ExecutionException, Exception {
+      Logger logger = Logger.getLogger(JobExecutor.class.toString());
+      logger.setLevel(Level.INFO);
+
     // Extraction from parameters can go here now
     String tempPath = p.get("galagoJobDir", "");
     File tempFolder = Utility.createTemporaryDirectory(tempPath);
@@ -1156,7 +1161,7 @@ public class JobExecutor {
     }
 
     StageExecutor executor = StageExecutorFactory.newInstance(mode, params);
-    System.err.printf("Created executor: %s\n", executor.toString());
+    logger.info(String.format("Created executor: %s\n", executor.toString()));
     JobExecutor jobExecutor = new JobExecutor(job, tempFolder.getAbsolutePath(), store);
     jobExecutor.prepare();
 
@@ -1167,7 +1172,7 @@ public class JobExecutor {
     if (p.get("server", true)) {
       Server server = new Server(port);
       server.start();
-      System.out.println("Status: http://localhost:" + port);
+      logger.info("Status: http://localhost:" + port);
       try {
         jobExecutor.runWithServer(executor, server, command);
       } finally {
@@ -1175,7 +1180,7 @@ public class JobExecutor {
         executor.shutdown();
       }
     } else {
-      System.err.println("running without server!");
+      logger.warning("running without server!");
       try {
         jobExecutor.runWithoutServer(executor);
       } finally {

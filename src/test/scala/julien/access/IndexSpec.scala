@@ -40,7 +40,7 @@ class IndexSpec extends FlatSpec with MockFactory with GivenWhenThen {
     // Expectations during initialization
     (gidx.getLengthsIterator _).expects().returning(mockLengths)
       (gidx.getCollectionStatistics _).
-      expects("postings").
+      expects("document").
       returning(fakeCollStats)
       (gidx.getIndexPartStatistics _).
       expects("postings").

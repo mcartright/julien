@@ -15,7 +15,7 @@ import org.lemurproject.galago.tupleflow.Utility;
 /**
  * Meant to implement both the BTreeWriter and BTreeReader
  * interfaces. All in memory.
- * 
+ *
  * @author irmarc
  */
 public class MemoryBTree extends BTreeReader implements BTreeWriter {
@@ -23,7 +23,7 @@ public class MemoryBTree extends BTreeReader implements BTreeWriter {
   private Parameters manifest;
   private TreeMap<byte[], byte[]> btree;
   private TObjectLongHashMap<byte[]> lhash;
-  
+
   public MemoryBTree() {
     this(new Parameters());
   }
@@ -48,8 +48,8 @@ public class MemoryBTree extends BTreeReader implements BTreeWriter {
     // add to the length map - need to update all keys below this one
     byte[] k = btree.lowerKey(list.key());
     if (k != null) {
-      for (byte[] newkey = btree.higherKey(k); 
-              newkey != null; 
+      for (byte[] newkey = btree.higherKey(k);
+              newkey != null;
               newkey = btree.higherKey(k)) {
         long start = lhash.get(k);
         long len = btree.get(k).length;
@@ -69,7 +69,7 @@ public class MemoryBTree extends BTreeReader implements BTreeWriter {
   /**
    * Returns an iterator pointing to the first key in the BTree.
    * @return
-   * @throws IOException 
+   * @throws IOException
    */
   @Override
   public BTreeIterator getIterator() throws IOException {
@@ -131,7 +131,8 @@ public class MemoryBTree extends BTreeReader implements BTreeWriter {
     }
 
     @Override
-    public DataStream getSubValueStream(long offset, long length) throws IOException {
+    public DataStream getSubValueStream(long offset, long length)
+	throws IOException {
       assert(btree.containsKey(currentKey));
       byte[] value = btree.get(currentKey);
       return new MemoryDataStream(value, (int)offset, (int)length);
@@ -141,7 +142,7 @@ public class MemoryBTree extends BTreeReader implements BTreeWriter {
      * This value is kept via a parallel btree to avoid having to compute it
      * all on the fly.
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     @Override
     public long getValueStart() throws IOException {

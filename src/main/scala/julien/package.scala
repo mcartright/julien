@@ -1,6 +1,6 @@
 import edu.umass.ciir.macros.Macros._
 import scala.annotation.elidable
-
+import scala.math.Numeric
 
 /** Provides classes that are typically used by Julien applications.
   *  ==Overview==
@@ -43,10 +43,21 @@ package object julien {
     def -(l: Length): Score = new Score(underlying - l.underlying)
     def /(l: Length): Score = new Score(underlying / l.underlying)
   }
-  implicit def score2dbl(s: Score): Double = s.underlying
-  implicit object ScoreOrdering extends Ordering[Score] {
+
+  implicit object ScoreNumeric extends Numeric[Score] {
     def compare(a: Score, b: Score) = a.underlying compare b.underlying
+    def fromInt(i: Int) = Score(i.toDouble)
+    def minus(x: Score, y: Score) = Score(x.underlying - y.underlying)
+    def negate(x: Score) = Score(-(x.underlying))
+    def plus(x: Score, y: Score) = Score(x.underlying + y.underlying)
+    def times(x: Score, y: Score) = Score (x.underlying * y.underlying)
+    def toDouble(x: Score) = x.underlying
+    def toFloat(x: Score) = x.underlying.toFloat
+    def toInt(x: Score) = x.underlying.toInt
+    def toLong(x: Score) = x.underlying.toLong
   }
+  implicit def score2dbl(s: Score): Double = s.underlying
+
 
   /** The number of targets (docs) a particular key (term) occurs in.
     * Underlying class is Long.

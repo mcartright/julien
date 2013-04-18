@@ -267,7 +267,13 @@ object BuildIndex extends TupleFlowFunction {
   }
 
   val name : String = "build"
-  def checksOut(p: Parameters): Boolean = (checkBuildIndexParameters(p) != null)
+  def checksOut(p: Parameters): Boolean =
+    try {
+      (checkBuildIndexParameters(p) != null)
+    } catch {
+      case e: Exception =>
+        false
+    }
   def help : String = """
   Builds a Galago StructuredIndex with TupleFlow, using one thread
   for each CPU core on your computer.  While some debugging output
@@ -289,8 +295,9 @@ Algorithm Flags:
 """
 
   def run(p: Parameters, out: PrintStream) : Unit = {
-    val job = getIndexJob(p)
-    runTupleFlowJob(job, p, out)
+    val checked = checkBuildIndexParameters(p)
+    val job = getIndexJob(checked)
+    runTupleFlowJob(job, checked, out)
     out.println("Done Indexing.")
 
     // sanity check - get the number of documents out of ./names
@@ -298,3 +305,4 @@ Algorithm Flags:
     out.println("Documents Indexed: " + names.getManifest.getLong("keyCount"))
   }
 }
+

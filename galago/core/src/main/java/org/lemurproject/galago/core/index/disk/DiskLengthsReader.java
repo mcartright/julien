@@ -142,7 +142,7 @@ public class DiskLengthsReader extends KeyListReader implements LengthsReader {
         this.avgLength = streamBuffer.readDouble();
         this.maxLength = streamBuffer.readLong();
         this.minLength = streamBuffer.readLong();
-      } else {        
+      } else {
         this.nonZeroDocumentCount = streamBuffer.readInt();
         this.collectionLength = streamBuffer.readInt();
         this.avgLength = streamBuffer.readDouble();

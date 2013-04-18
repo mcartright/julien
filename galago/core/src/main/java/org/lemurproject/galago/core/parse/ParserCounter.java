@@ -64,7 +64,8 @@ public class ParserCounter extends StandardStep<DocumentSplit, DocumentSplit> {
 	{"trectext", TrecTextParser.class.getName()},
 	{"trecweb", TrecWebParser.class.getName()},
 	{"twitter", TwitterParser.class.getName()},
-	{"wiki", WikiParser.class.getName()}
+	{"wiki", WikiParser.class.getName()},
+	{"wikiwex", WikiWexParser.class.getName()}
     };
 
   private HashMap<String, Class> fileTypeMap;

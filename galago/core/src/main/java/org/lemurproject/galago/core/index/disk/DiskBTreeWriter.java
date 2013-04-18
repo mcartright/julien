@@ -22,17 +22,19 @@ import org.lemurproject.galago.tupleflow.Utility;
 
 /**
  * This class writes index files, which are used for most Galago indexes.
- * 
- * An index is a mapping between a key and a value, much like a TreeMap.  The keys are
- * sorted to allow iteration over the whole file.  Keys are stored using prefix
- * compression to save space.  The structure is designed for fast random access on disk.
- * 
- * For indexes, we assume that the data in each value is already compressed, so DiskBTreeWriter
- * does no additional compression.  However, if the isCompressed flag is set, DiskBTreeWriter
- * will compress the value data.  This is convenient for storing documents in an index.
- * 
+ *
+ * An index is a mapping between a key and a value, much like a TreeMap.
+ * The keys are sorted to allow iteration over the whole file.  Keys are stored
+ * using prefix compression to save space.  The structure is designed for fast
+ * random access on disk.
+ *
+ * For indexes, we assume that the data in each value is already compressed, so
+ * DiskBTreeWriter does no additional compression.  However, if the isCompressed
+ * flag is set, DiskBTreeWriter  will compress the value data.  This is
+ * convenient for storing documents in an index.
+ *
  * Keys cannot be longer than 256 bytes, and they must be added in sorted order.
- * 
+ *
  * @author trevor
  */
 public class DiskBTreeWriter implements BTreeWriter {
@@ -64,14 +66,14 @@ public class DiskBTreeWriter implements BTreeWriter {
     blockSize = (int) parameters.get("blockSize", 16383);
     keySize = (int) parameters.get("keySize", Math.min(blockSize, 16383));
     keyOverlap = keySize;
-    
+
     output = new DataOutputStream(new BufferedOutputStream(
             new FileOutputStream(outputFilename)));
     vocabulary = new VocabularyWriter();
     manifest = new Parameters();
     manifest.copyFrom(parameters);
     lists = new ArrayList<IndexElement>();
-    
+
     manifest.set("blockSize", blockSize);
     manifest.set("maxKeySize", keySize);
     //manifest.set("maxKeyOverlap", keyOverlap);
@@ -82,7 +84,8 @@ public class DiskBTreeWriter implements BTreeWriter {
     this(outputFilename, new Parameters());
   }
 
-  public DiskBTreeWriter(TupleFlowParameters parameters) throws FileNotFoundException, IOException {
+  public DiskBTreeWriter(TupleFlowParameters parameters)
+      throws FileNotFoundException, IOException {
     this(parameters.getJSON().getString("filename"), parameters.getJSON());
     blocksWritten = parameters.getCounter("Blocks Written");
     recordsWritten = parameters.getCounter("Records Written");
@@ -284,7 +287,7 @@ public class DiskBTreeWriter implements BTreeWriter {
   /**
    * Returns true if the lists are sorted in ascending order by
    * key.
-   * 
+   *
    * @param blockLists
    */
   private boolean wordsInOrder(List<IndexElement> blockLists) {
@@ -357,7 +360,7 @@ public class DiskBTreeWriter implements BTreeWriter {
 
     return wordByteStream.toByteArray();
   }
-  
+
   // private class to hold a list of index elements (key-value_ pairs)
   private static class ListData {
 

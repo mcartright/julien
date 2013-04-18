@@ -99,7 +99,7 @@ class MaxscoreProcessor extends SimpleProcessor {
 
     // establish upper bound of all features - every document starts at
     // this value and is progressively lowered to the true score
-    val startingScore = sentinels.map(_.feat.upperBound).reduceLeft(_+_)
+    val startingScore = sentinels.map(_.feat.upperBound).sum
     val resultQueue = PriorityQueue[ScoredDocument]()
     // direct access to the underlying iterators
     val iterators = _models.flatMap(_.iHooks.map(_.underlying)).toSet
@@ -109,8 +109,7 @@ class MaxscoreProcessor extends SimpleProcessor {
       val candidate =
         sentinels.map(_.iter).filterNot(_.isDone).map(_.currentCandidate).min
       iterators.foreach(_.syncTo(candidate))
-      val score =
-        sentinels.map(_.feat).foldLeft(new Score(0.0)) { (s,o) => s + o.eval }
+      val score = sentinels.map(_.feat.eval).sum
       resultQueue.enqueue(ScoredDocument(candidate, score))
     }
 
@@ -138,7 +137,7 @@ class MaxscoreProcessor extends SimpleProcessor {
         threshold = resultQueue.head.score
         (lengths +: drivers).foreach(_.syncTo(candidate))
         // Sum the active sentinels
-        val senscore = sentinels.take(sidx).map(_.feat.eval).reduceLeft(_+_)
+        val senscore = sentinels.take(sidx).map(_.feat.eval).sum
 
         // Now add the rest of them until we're done or it's below threshold
         // doing this via tail recursion

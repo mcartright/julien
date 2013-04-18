@@ -50,7 +50,7 @@ class Index(label: String, val underlying: GIndex) {
 
   val lengthsIterator = underlying.getLengthsIterator
   private val collectionStats =
-    underlying.getCollectionStatistics("postings")
+    underlying.getCollectionStatistics("document")
   private val postingsStats =
     underlying.getIndexPartStatistics("postings")
 

@@ -48,7 +48,8 @@ public class DiskIndex implements Index {
   protected Parameters manifest = new Parameters();
   protected LengthsReader lengthsReader = null;
   protected NamesReader namesReader = null;
-  protected Map<String, IndexPartReader> parts = new HashMap<String, IndexPartReader>();
+  protected Map<String, IndexPartReader> parts =
+      new HashMap<String, IndexPartReader>();
 
   // useful to assemble an index from odd pieces
   public DiskIndex(Collection<String> indexParts) throws IOException {
@@ -56,7 +57,8 @@ public class DiskIndex implements Index {
 
     for (String indexPart : indexParts) {
       File part = new File(indexPart);
-      IndexComponentReader component = openIndexComponent(part.getAbsolutePath());
+      IndexComponentReader component =
+	  openIndexComponent(part.getAbsolutePath());
       initializeComponent(part.getName(), component);
     }
     // Initialize these now b/c they're so common
@@ -172,14 +174,14 @@ public class DiskIndex implements Index {
   }
 
   @Override
-  public CollectionStatistics getCollectionStatistics(String part) {
-    try { 
-      return ((CollectionAggregateIterator) lengthsReader.getIterator(Utility.fromString(part))).getStatistics();
+  public CollectionStatistics getCollectionStatistics(String field) {
+    try {
+      return ((CollectionAggregateIterator) lengthsReader.getIterator(Utility.fromString(field))).getStatistics();
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
     }
   }
-  
+
   @Override
   public IndexPartStatistics getIndexPartStatistics(String part) {
     if (parts.containsKey(part)) {
