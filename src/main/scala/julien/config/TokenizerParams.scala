@@ -1,5 +1,6 @@
 package julien
 package config
 
-case class TokenizerParams
-extends StandardParameters
+case class TokenizerParams(
+  fields: List[String] = List[String]()
+)extends StandardParameters

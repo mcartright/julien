@@ -22,12 +22,12 @@ import org.lemurproject.galago.tupleflow.execution.Verified;
 
 /**
  * <p>This class processes document text into tokens that can be indexed.</p>
- * 
+ *
  * <p>The text is assumed to contain some HTML/XML tags.  The tokenizer tries
  * to extract as much data as possible from each document, even if it is not
  * well formed (e.g. there are start tags with no ending tags).  The resulting
- * document object contains an array of terms and an array of tags.</p> 
- * 
+ * document object contains an array of terms and an array of tags.</p>
+ *
  * @author trevor
  */
 @Verified
@@ -52,7 +52,7 @@ public class TagTokenizer extends StandardStep<Document, Document> {
   HashMap<String, ArrayList<BeginTag>> openTags;
   ArrayList<ClosedTag> closedTags;
   ArrayList<Pair> tokenPositions;
-  
+
   private boolean tokenizeTagContent = true;
 
   public static class Pair {
@@ -252,13 +252,13 @@ public class TagTokenizer extends StandardStep<Document, Document> {
       closedTags.add(closedTag);
 
       tagList.remove(last);
-      
+
       // switch out of Do not tokenize mode.
       if (!tokenizeTagContent) {
           tokenizeTagContent = true;
       }
     }
-    
+
   }
 
   protected int indexOfNonSpace(int start) {
