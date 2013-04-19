@@ -57,11 +57,10 @@ class SimpleProcessor extends QueryProcessor {
     // extract iterators
     val index = _indexes.head
     val model = _models.head
-    val iterators: Set[GIterator] =
+    val iterators: Set[GIterator] = model.iHooks.map(_.underlying).toSet
       model.filter(_.isInstanceOf[IteratedHook[_ <: GIterator]]).map { t =>
         t.asInstanceOf[IteratedHook[_ <: GIterator]].underlying
     }.toSet.filterNot(_.hasAllCandidates)
-    val lengths = index.lengthsIterator
     // Need to fix this
     val scorers : List[FeatureOp] = List[FeatureOp](model)
 
@@ -70,11 +69,9 @@ class SimpleProcessor extends QueryProcessor {
     val resultQueue = PriorityQueue[ScoredDocument]()
     while (iterators.exists(_.isDone == false)) {
       val candidate = iterators.filterNot(_.isDone).map(_.currentCandidate).min
-      lengths.syncTo(candidate)
       iterators.foreach(_.syncTo(candidate))
       if (iterators.exists(_.hasMatch(candidate))) {
         // Time to score
-        val len = new Length(lengths.getCurrentLength)
         val score = scorers.map(_.eval).sum
         resultQueue.enqueue(ScoredDocument(candidate, score))
         if (resultQueue.size > numResults) resultQueue.dequeue

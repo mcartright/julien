@@ -44,7 +44,7 @@ package object julien {
     def /(l: Length): Score = new Score(underlying / l.underlying)
   }
 
-  implicit object ScoreNumeric extends Numeric[Score] {
+  implicit object Score extends Numeric[Score] {
     def compare(a: Score, b: Score) = a.underlying compare b.underlying
     def fromInt(i: Int) = Score(i.toDouble)
     def minus(x: Score, y: Score) = Score(x.underlying - y.underlying)
@@ -119,6 +119,19 @@ package object julien {
     def /(l: Length): Double = underlying.toDouble / l.underlying
   }
 
+  implicit object Count extends Numeric[Count] {
+    def compare(a: Count, b: Count) = a.underlying compare b.underlying
+    def fromInt(i: Int) = Count(i)
+    def minus(x: Count, y: Count) = Count(x.underlying - y.underlying)
+    def negate(x: Count) = Count(-(x.underlying))
+    def plus(x: Count, y: Count) = Count(x.underlying + y.underlying)
+    def times(x: Count, y: Count) = Count (x.underlying * y.underlying)
+    def toDouble(x: Count) = x.underlying.toDouble
+    def toFloat(x: Count) = x.underlying.toFloat
+    def toInt(x: Count) = x.underlying
+    def toLong(x: Count) = x.underlying.toLong
+  }
+
   /**
     * Value for a document identifier.
     * Underlying class is an Int.
@@ -145,6 +158,19 @@ package object julien {
     def *(i: Int): Int = underlying * i
     def *(l: Long): Long = underlying * l
     def *(d: Double): Double = underlying * d
+  }
+
+  implicit object Length extends Numeric[Length] {
+    def compare(a: Length, b: Length) = a.underlying compare b.underlying
+    def fromInt(i: Int) = Length(i)
+    def minus(x: Length, y: Length) = Length(x.underlying - y.underlying)
+    def negate(x: Length) = Length(-(x.underlying))
+    def plus(x: Length, y: Length) = Length(x.underlying + y.underlying)
+    def times(x: Length, y: Length) = Length (x.underlying * y.underlying)
+    def toDouble(x: Length) = x.underlying.toDouble
+    def toFloat(x: Length) = x.underlying.toFloat
+    def toInt(x: Length) = x.underlying
+    def toLong(x: Length) = x.underlying.toLong
   }
 
   import scala.util.matching.Regex
@@ -225,7 +251,7 @@ package object julien {
   type CS = AggregateReader.CollectionStatistics
   type TEI = ExtentIterator
   type TCI = CountIterator
-  type MLI = LengthsReader.LengthsIterator
+  type LI = LengthsReader.LengthsIterator
 
   /** For debugging/timing purposes, until I can figure out a macro to
     * compile this out - At least moving the definition will be easy.

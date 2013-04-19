@@ -102,7 +102,7 @@ class MaxscoreProcessor extends SimpleProcessor {
     val startingScore = sentinels.map(_.feat.upperBound).sum
     val resultQueue = PriorityQueue[ScoredDocument]()
     // direct access to the underlying iterators
-    val iterators = _models.flatMap(_.iHooks.map(_.underlying)).toSet
+    val iterators = _models.flatMap(m => m.iHooks.map(_.underlying)).toSet
     val numResults:Int = 100
     // Have to warm up the queue
     for (i <- 0 until numResults) {
@@ -120,7 +120,7 @@ class MaxscoreProcessor extends SimpleProcessor {
     var sidx = getSentinelIndex(sentinels, 0, startingScore)
 
     // HACK - would like this to be cleaner
-    val lengths = _indexes.head.lengthsIterator
+    val lengths = iterators.filter(_.isInstanceOf[LI]).head
 
     // Scala does not natively support a "break" construct, so let's avoid it.
     // We simply need to set the candidate once before entering the while

@@ -22,10 +22,7 @@ trait Operator extends Traversable[Operator] {
   def iHooks: Traversable[IteratedHook[_ <: GIterator]] =
     grab[IteratedHook[_ <: GIterator]]
 
-  def hooks: Traversable[IndexHook] = this.
-    filter(_.isInstanceOf[IndexHook]).
-    map(_.asInstanceOf[IndexHook]).
-    toList
+  def hooks: Traversable[IndexHook] = grab[IndexHook]
 
   override def toString: String = {
     val b = new StringBuilder()

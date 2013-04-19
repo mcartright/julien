@@ -70,7 +70,7 @@ public class DiskLengthsReader extends KeyListReader implements LengthsReader {
     return new StreamLengthsIterator(doc, i);
   }
 
-  // Default this puppy to "documents" to get the document lengths
+  // Default this puppy to "document" to get the document lengths
   @Override
   public Iterator getIterator(byte[] key) throws IOException {
     BTreeIterator i = reader.getIterator(key);

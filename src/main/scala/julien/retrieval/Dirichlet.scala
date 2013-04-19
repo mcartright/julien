@@ -47,7 +47,7 @@ class Dirichlet(
     score(0, Dirichlet.totallyMadeUpValue)
 
   def eval: Score = score(op.count, lengths.length)
-  def score(c: Count, l: Length):Score = {
+  def score(c: Count, l: Length): Score = {
     val num = c + (mu*cf)
     val den = l + mu
     new Score(scala.math.log(num / den))

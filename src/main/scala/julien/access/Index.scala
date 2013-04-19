@@ -9,6 +9,7 @@ import org.lemurproject.galago.core.util.ExtentArray
 import org.lemurproject.galago.core.parse.{Document => _, _}
 import org.lemurproject.galago.tupleflow.{Parameters,Utility,Source}
 import scala.collection.JavaConversions._
+import julien._
 
 object Index {
   def apply(i: DiskIndex) = new Index("unknown", i)
@@ -48,11 +49,14 @@ class Index(label: String, val underlying: GIndex) {
     b.result
   }
 
-  val lengthsIterator = underlying.getLengthsIterator
+  private val lengthsIterator = underlying.getLengthsIterator
   private val collectionStats =
     underlying.getCollectionStatistics("document")
   private val postingsStats =
     underlying.getIndexPartStatistics("postings")
+
+  def lengthsIterator(field: String = "document"): LI =
+    underlying.getIndexPart("lengths").getIterator(field).asInstanceOf[LI]
 
   def collectionLength: Long = collectionStats.collectionLength
   def numDocuments: Long = collectionStats.documentCount
@@ -82,15 +86,22 @@ class Index(label: String, val underlying: GIndex) {
   /** Produces a cached ExtentIterator if possible. If not found, a new iterator
     * is constructed and cached for later.
     */
-  def shareableIterator(key: String): ExtentIterator = {
+  def shareableIterator(
+    key: String,
+    field: String = "postings"): ExtentIterator = {
     if (!iteratorCache.contains(key)) {
-      iteratorCache(key) = iterator(key)
+      iteratorCache(key) = iterator(key, field)
     }
     iteratorCache(key)
   }
 
-  def iterator(key: String): ExtentIterator =
-    underlying.getIterator(key, Parameters.empty).asInstanceOf[ExtentIterator]
+  def iterator(key: String, field: String = "postings"): ExtentIterator = {
+    val label = if (field.startsWith("postings")) field else s"field.$field"
+    underlying.
+      getIndexPart(label).
+      getIterator(key).
+      asInstanceOf[ExtentIterator]
+  }
 
   def postings(key:String): PostingSeq[PositionsPosting] =
     new PostingSeq(iterator(key), this)

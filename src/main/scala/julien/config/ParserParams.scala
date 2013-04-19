@@ -8,5 +8,5 @@ case class ParserParams(
 
 case class ExtParserParams(
   filetype: String,
-  class: String
+  classname: String
 ) extends StandardParameters

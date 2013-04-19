@@ -33,7 +33,7 @@ Required parameters:
   def run(params: Parameters, out: PrintStream): Unit = {
     // Set up to perform the first run
     val query = params.getString("query").split(" ").map(Term(_))
-    val ql = Combine(query.map(a => Dirichlet(a, IndexLengths())): _*)
+    val ql = Combine(query.map(a => Dirichlet(a, IndexLengths())))
 
     // Open an index
     val index : Index = Index.disk(params.getString("index"))
@@ -58,8 +58,8 @@ Required parameters:
     }
 
     val rm3 = Combine(
-      Weight(ql, 0.7),
-      Weight(Combine(wrappedGrams: _*), 0.3)
+      List[FeatureOp](Weight(ql, 0.7),
+      Weight(Combine(wrappedGrams), 0.3))
     )
 
     processor.clear

@@ -29,15 +29,15 @@ Required parameters:
   def run(params: Parameters, out: PrintStream): Unit = {
     val query = params.getString("query").split(" ").map(Term(_))
     val sdm =
-      Combine(
-        Weight(Combine(query.map(a => Dirichlet(a,IndexLengths())): _*), 0.8),
+      Combine(List[FeatureOp](
+        Weight(Combine(query.map(a => Dirichlet(a,IndexLengths()))), 0.8),
         Weight(Combine(query.sliding(2,1).map { p =>
           Dirichlet(OrderedWindow(1, p: _*), IndexLengths())
-        }.toSeq: _*), 0.15),
+        }.toSeq), 0.15),
         Weight(Combine(query.sliding(2,1).map { p =>
           Dirichlet(UnorderedWindow(8, p: _*), IndexLengths())
-        }.toSeq: _*), 0.05)
-      )
+        }.toSeq), 0.05)
+      ))
 
     // Open an index
     val index : Index = Index.disk(params.getString("index"))
