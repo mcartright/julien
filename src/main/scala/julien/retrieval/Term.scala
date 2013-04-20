@@ -20,7 +20,7 @@ final class Term private (val t: String, val field: String)
     with PositionStatsView {
 
   override def toString: String =
-    s"$t:" + (if (isAttached) index.toString else "")
+    s"$t: " + (if (isAttached) index.toString else "")
 
   /** Definition of how this class retrieves its underlying
     * iterator from a given [[Index]] instance.

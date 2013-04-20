@@ -2,6 +2,7 @@ package julien
 package access
 
 import org.lemurproject.galago.core.index.disk.DiskIndex
+import org.lemurproject.galago.core.index.corpus.CorpusReader
 import org.lemurproject.galago.core.index.mem.MemoryIndex
 import org.lemurproject.galago.core.index.{Index=> _, _}
 import org.lemurproject.galago.core.index.AggregateReader._
@@ -12,6 +13,7 @@ import scala.collection.JavaConversions._
 import julien._
 
 object Index {
+  private val dummyBytes = Utility.fromString("dummy")
   def apply(i: DiskIndex) = new Index("unknown", i)
   def apply(m: MemoryIndex) = new Index("unknown", m)
   def apply(i: GIndex) = new Index("unknown", i)
@@ -74,6 +76,14 @@ class Index(label: String, val underlying: GIndex) {
     it.syncTo(docid)
     if (it.hasMatch(docid)) Positions(it.extents) else Positions.empty
   }
+
+  def documentIterator(): DataIterator[GDoc] =
+    underlying.
+      getIndexPart("corpus").
+      asInstanceOf[CorpusReader].
+      getIterator(Index.dummyBytes).
+      asInstanceOf[DataIterator[GDoc]]
+
 
   /** Provided because the underlying interface provides it. However it's a
     * breach in the abstraction, and should go away in the future.

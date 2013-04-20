@@ -14,7 +14,7 @@ object AbsoluteDiscount {
     l: LengthsView,
     s: StatisticsView,
     d: DocumentView,
-    delta: Double): AbsoluteDiscount = new AbsoluteDiscount(op, l, s, s, delta)
+    delta: Double): AbsoluteDiscount = new AbsoluteDiscount(op, l, s, d, delta)
 }
 
 class AbsoluteDiscount(
@@ -52,11 +52,12 @@ class AbsoluteDiscount(
     )
 
   def eval: Score = {
-    val terms = docsrc.document.terms
-    score(op.count, lengths.length, terms.toSet.size.toDouble / terms.size)
+    val doc = docsrc.data
+    val ratio = doc.vocabulary.size.toDouble / doc.termVector.size
+    score(op.count, lengths.length, ratio)
   }
   def score(c: Count, l: Length, ratio: Double): Score = {
-    val foreground = scala.math.max(c - delta, 0.0) / l.toDouble
+    val foreground = scala.math.max(c.toDouble - delta, 0.0) / l.toDouble
     val background = delta * ratio * cf
     new Score(scala.math.log(foreground + background))
   }

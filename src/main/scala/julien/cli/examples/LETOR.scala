@@ -50,7 +50,7 @@ Required parameters:
     modelFeatures ++= fields.map { f =>
       val lView = IndexLengths(f)
       // Turn it into a feature
-      new FeatureOp {
+      new FeatureOp with ChildlessOp {
         def eval: Score = new Score(lView.length.toDouble)
         lazy val views: Set[ViewOp] = Set[ViewOp](lView)
       }
@@ -81,10 +81,14 @@ Required parameters:
     // Note we don't have a section for "extracted title"
     // since it's a synthetic field.
     // TODO: Support for synthetic fields
-    val models = List(AbsoluteDiscount, BM25, Dirichlet, JelinekMercer)
-    for (f <- fields; m <- models) {
-      modelFeatures += Combine(queryTerms.map {
-        a => m(Term(a, f), IndexLengths(f))
+    for (f <- fields) {
+      val l = IndexLengths(f)
+      modelFeatures += Combine(queryTerms.map { a => BM25(Term(a, f), l) })
+      modelFeatures += Combine(queryTerms.map { a => Dirichlet(Term(a, f), l) })
+      modelFeatures +=
+        Combine(queryTerms.map { a => JelinekMercer(Term(a, f), l) })
+      modelFeatures += Combine(queryTerms.map { a =>
+        AbsoluteDiscount(Term(a, f), l, DocumentView())
       })
     }
 

@@ -21,7 +21,7 @@ class CombineSpec extends FlatSpec with MockFactory {
     mock1.expects('eval)().returning(v1)
     mock2.expects('eval)().returning(v2)
     mock3.expects('eval)().returning(v3)
-    val c = Combine(mock1, mock2, mock3)
+    val c = Combine(List(mock1, mock2, mock3))
     expect(Score(v1+v2+v3)) { c.eval }
   }
 
@@ -37,7 +37,7 @@ class CombineSpec extends FlatSpec with MockFactory {
     mock3.expects('eval)().returning(v3)
     val prod = (s: Seq[FeatureOp]) =>
     s.foldLeft(Score(1.0))((s , feat) => s * feat.eval)
-    val c = Combine(prod, mock1, mock2, mock3)
+    val c = Combine(prod, List(mock1, mock2, mock3))
     expect(Score(v1*v2*v3)) { c.eval }
   }
 
@@ -45,7 +45,7 @@ class CombineSpec extends FlatSpec with MockFactory {
     val f = fixture
     import f._
 
-    val c = Combine(mock1, mock2, mock3)
+    val c = Combine(List(mock1, mock2, mock3))
     expect(3) { c.children.size }
     assert(c.children.exists(_ == mock1))
     assert(c.children.exists(_ == mock2))
