@@ -357,6 +357,8 @@ public class DRMAAStageExecutor extends RemoteStageExecutor {
           "-Dfile.encoding=" + DEFAULT_ENCODING,
 	   "-cp", classPath, className, jobPaths.get(i)};
 
+	System.out.println(String.format("Found 'java.class.path' property as: %s", classPath));
+
 
         // Create the fill a DRMAA job template.
         JobTemplate template = session.createJobTemplate();

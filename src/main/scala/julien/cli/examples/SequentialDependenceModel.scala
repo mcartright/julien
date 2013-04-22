@@ -19,14 +19,18 @@ object SequentialDependenceModel extends Example {
     (p.containsKey("query") && p.containsKey("index"))
 
   val help: String = """
-Shows automatic expansion of a set of unigrams into the SDM.
+Shows automatic expansion of a set of unigrams into the
+Sequential Dependence Model, from
+"A Markov random field model for term dependencies"
+by Metzler and Croft, SIGIR 2005.
+
 Required parameters:
 
     query        string form of desired query
     index        location of an existing index
 """
 
-  def run(params: Parameters, out: PrintStream): Unit = {
+  def run(params: Parameters, out: PrintStream) {
     val query = params.getString("query").split(" ").map(Term(_))
     val sdm =
       Combine(List[FeatureOp](
