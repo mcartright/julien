@@ -5,6 +5,7 @@ import scala.collection.{Traversable,TraversableLike}
 import scala.collection.immutable.List
 import scala.collection.mutable.{Builder,ListBuffer,Queue}
 import scala.collection.generic.CanBuildFrom
+import scala.reflect.Manifest
 
 trait Operator extends Traversable[Operator] {
   def children: Seq[Operator]
@@ -14,15 +15,22 @@ trait Operator extends Traversable[Operator] {
     for (c <- children) c foreach f
   }
 
-  def grab[T]: Traversable[T] = this.
-    filter(_.isInstanceOf[T]).
-    map(_.asInstanceOf[T]).
+  /* This needs some work - should use TypeTags from reflect...I think...
+  def grab[T](implicit m: Manifest[T]): Traversable[T] = this.
+    filter(_.getClass <:< m.runtimeClass).
+    map(_.asInstanceOf[m.runtimeClass]).
+    toList
+   */
+
+  def iHooks: Traversable[IteratedHook[_ <: GIterator]] = this.
+    filter(_.isInstanceOf[IteratedHook[_ <: GIterator]]).
+    map(_.asInstanceOf[IteratedHook[_ <: GIterator]]).
     toList
 
-  def iHooks: Traversable[IteratedHook[_ <: GIterator]] =
-    grab[IteratedHook[_ <: GIterator]]
-
-  def hooks: Traversable[IndexHook] = grab[IndexHook]
+  def hooks: Traversable[IndexHook] = this.
+    filter(_.isInstanceOf[IndexHook]).
+    map(_.asInstanceOf[IndexHook]).
+    toList
 
   override def toString: String = {
     val b = new StringBuilder()
