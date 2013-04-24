@@ -5,7 +5,7 @@ import scala.collection.{Traversable,TraversableLike}
 import scala.collection.immutable.List
 import scala.collection.mutable.{Builder,ListBuffer,Queue}
 import scala.collection.generic.CanBuildFrom
-import scala.reflect.Manifest
+import scala.reflect._
 
 trait Operator extends Traversable[Operator] {
   def children: Seq[Operator]
@@ -16,11 +16,11 @@ trait Operator extends Traversable[Operator] {
   }
 
   /* This needs some work - should use TypeTags from reflect...I think...
-  def grab[T](implicit m: Manifest[T]): Traversable[T] = this.
+   */
+  def grab[T](implicit m: TypeTag[T]): Traversable[T] = this.
     filter(_.getClass <:< m.runtimeClass).
     map(_.asInstanceOf[m.runtimeClass]).
     toList
-   */
 
   def iHooks: Traversable[IteratedHook[_ <: GIterator]] = this.
     filter(_.isInstanceOf[IteratedHook[_ <: GIterator]]).
