@@ -5,7 +5,7 @@ import scala.collection.{Traversable,TraversableLike}
 import scala.collection.immutable.List
 import scala.collection.mutable.{Builder,ListBuffer,Queue}
 import scala.collection.generic.CanBuildFrom
-import scala.reflect._
+import scala.reflect.runtime.universe._
 
 trait Operator extends Traversable[Operator] {
   def children: Seq[Operator]
@@ -15,11 +15,12 @@ trait Operator extends Traversable[Operator] {
     for (c <- children) c foreach f
   }
 
-  /* This needs some work - should use TypeTags from reflect...I think...
-   */
-  def grab[T](implicit m: TypeTag[T]): Traversable[T] = this.
-    filter(_.getClass <:< m.runtimeClass).
-    map(_.asInstanceOf[m.runtimeClass]).
+
+  // Isn't there a method that does this in the reflect API?
+  def getType[T](x: T)(implicit tag: TypeTag[T]) = tag.tpe
+  def grab[T](implicit tag: TypeTag[T]): Traversable[T] = this.
+    filter(item => getType(item) <:< tag.tpe).
+    map(_.asInstanceOf[T]).
     toList
 
   def iHooks: Traversable[IteratedHook[_ <: GIterator]] = this.
