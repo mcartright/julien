@@ -26,6 +26,8 @@ object Index {
   def disk(s: String): Index = disk(s, "all")
   def disk(s: String, defaultPart: String): Index =
     new Index(s, new DiskIndex(s), defaultPart)
+  def memory(s: String, defPart: String = "all"): Index =
+    memory(Seq(s), defPart)
   def memory(s: Seq[String]): Index = memory(s, "all")
   def memory(s: Seq[String], defaultPart: String): Index = {
     // Try to use the components from the Galago pipeline to
