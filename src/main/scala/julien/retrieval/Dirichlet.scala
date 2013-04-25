@@ -48,8 +48,12 @@ class Dirichlet(
 
   def eval: Score = score(op.count, lengths.length)
   def score(c: Count, l: Length): Score = {
-    val num = c + (mu*cf)
+    val collbackground = (mu*cf)
+    val background = if (collbackground <= 0) {0.00000001} else collbackground
+    val num = c + background
     val den = l + mu
-    new Score(scala.math.log(num / den))
+    val s = new Score(scala.math.log(num / den))
+    debug("DIRICHLET " + op.toString  + "freq:"+c.underlying  + " smoothed:" + num + " smoothedLen:" + den + " logprob:" + s.underlying)
+    s
   }
 }

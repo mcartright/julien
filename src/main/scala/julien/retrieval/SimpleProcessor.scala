@@ -72,6 +72,7 @@ class SimpleProcessor extends QueryProcessor {
       iterators.foreach(_.syncTo(candidate))
       if (iterators.exists(_.hasMatch(candidate))) {
         // Time to score
+        debug("scoring candidate: " + candidate + " " + index.name(candidate))
         val score = scorers.map(_.eval).sum
         resultQueue.enqueue(ScoredDocument(candidate, score))
         if (resultQueue.size > numResults) resultQueue.dequeue

@@ -52,9 +52,9 @@ class IndexSpec extends FlatSpec with MockFactory with GivenWhenThen {
     import f._
 
     val testingIndex = Index(gidx)
-    expect(fakeCollStats.collectionLength) { testingIndex.collectionLength }
-    expect(fakeCollStats.documentCount) { testingIndex.numDocuments }
-    expect(fakePartStats.vocabCount) { testingIndex.vocabularySize }
+    expectResult(fakeCollStats.collectionLength) { testingIndex.collectionLength }
+    expectResult(fakeCollStats.documentCount) { testingIndex.numDocuments }
+    expectResult(fakePartStats.vocabCount) { testingIndex.vocabularySize }
   }
 
   it should "provide the lengths of documents by docid" in {
