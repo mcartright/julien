@@ -10,14 +10,14 @@ import java.util.logging.{Level,Logger}
 import org.scalatest._
 import julien.cli.BuildIndex
 
-class IndexingSpec extends FlatSpec with BeforeAndAfter {
+class IndexingSpec extends FlatSpec with BeforeAndAfterAll {
   val tmpForInput: File =
     new File(Utility.createTemporary.getAbsolutePath + ".gz")
   val tmpForIndex: File = Utility.createTemporaryDirectory("tmpindex")
 
   // Extract our source docs, write to an index, run the tests over the
   // read-only structure, then clean up.
-  before {
+  override def beforeAll() {
     // Turn off logging so the tests aren't diluted.
     Logger.getLogger("").setLevel(Level.OFF)
     Logger.getLogger(classOf[JobExecutor].toString).setLevel(Level.OFF)
@@ -51,6 +51,11 @@ class IndexingSpec extends FlatSpec with BeforeAndAfter {
     receiver.close
   }
 
+  override def afterAll() {
+    tmpForInput.delete()
+    Utility.deleteDirectory(tmpForIndex)
+  }
+
   // Start tests
 
   "A built index" should "have 77 documents" in {
@@ -78,11 +83,5 @@ class IndexingSpec extends FlatSpec with BeforeAndAfter {
     val index = Index.disk(tmpForIndex.getAbsolutePath)
     val iterator = index.iterator("snufalufagus")
     assert ( iterator.isInstanceOf[NullExtentIterator] )
-  }
-
-  after {
-    // Clean up the small index
-    tmpForInput.delete()
-    Utility.deleteDirectory(tmpForIndex)
   }
 }
