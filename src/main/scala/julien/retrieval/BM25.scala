@@ -34,21 +34,21 @@ class BM25(
 
   // Runs when asked for the first time, and runs only once
   lazy val stats = statsrc.statistics
-  lazy val avgDocLength = stats.collLength / stats.numDocs
+  lazy val avgDocLength = stats.collLength.toDouble / stats.numDocs
   lazy val idf = scala.math.log(stats.numDocs / (stats.docFreq + 0.5))
 
   // Yay - plays nice w/ the bounds.
-  override val lowerBound: Score = new Score(0)
-  override lazy val upperBound: Score = {
+  override val lowerBound: Double = 0.0
+  override lazy val upperBound: Double = {
     val maxtf = statsrc.statistics.max
     score(maxtf, maxtf)
   }
 
-  def eval: Score = score(op.count, lengths.length)
-  def score(c: Count, l: Length) = {
+  def eval: Double = score(op.count, lengths.length)
+  def score(c: Int, l: Int) = {
     val num = c + (k + 1)
     val den = c + (k * (1 - b + (b * l / avgDocLength)))
-    new Score(idf * num / den)
+    idf * num / den
   }
 }
 

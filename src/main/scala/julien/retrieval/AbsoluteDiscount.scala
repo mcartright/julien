@@ -38,7 +38,7 @@ class AbsoluteDiscount(
       stats.collFreq.toDouble / stats.collLength
   }
 
-  override lazy val upperBound: Score = {
+  override lazy val upperBound: Double = {
     val maxtf = statsrc.statistics.max
     score(maxtf, maxtf, 1.0)
   }
@@ -46,19 +46,19 @@ class AbsoluteDiscount(
   // this is a filthy estimation - want something better
   // problem is that it's the longest document *not* seen by
   // the underlying view.
-  override lazy val lowerBound: Score =
+  override lazy val lowerBound: Double =
     score(0, AbsoluteDiscount.totallyMadeUpValue,
       1.0 / AbsoluteDiscount.totallyMadeUpValue
     )
 
-  def eval: Score = {
+  def eval: Double = {
     val doc = docsrc.data
     val ratio = doc.vocabulary.size.toDouble / doc.termVector.size
     score(op.count, lengths.length, ratio)
   }
-  def score(c: Count, l: Length, ratio: Double): Score = {
+  def score(c: Int, l: Int, ratio: Double): Double = {
     val foreground = scala.math.max(c.toDouble - delta, 0.0) / l.toDouble
     val background = delta * ratio * cf
-    new Score(scala.math.log(foreground + background))
+    scala.math.log(foreground + background)
   }
 }

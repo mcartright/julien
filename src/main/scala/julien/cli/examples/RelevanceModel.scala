@@ -121,7 +121,7 @@ Required parameters:
       val score = initialResults.map { SD =>
         val tf =
           hists(SD.docid).getOrElse(T, 0).toDouble / doclengths(SD.docid)
-        (SD.score * tf).underlying   // TODO: Really want to fix this
+        (SD.score * tf)
       }.sum
       Gram(T, score)
     }

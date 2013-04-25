@@ -12,7 +12,7 @@ package julien
 import scala.reflect.runtime.universe._
 
 package object retrieval {
-  type Combiner = (Seq[FeatureOp]) => julien.Score
+  type Combiner = (Seq[FeatureOp]) => Double
 
   // Bring in local references to some of the access structures
   type Index = julien.access.Index

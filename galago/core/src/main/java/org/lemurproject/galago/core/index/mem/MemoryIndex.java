@@ -87,14 +87,14 @@ public class MemoryIndex implements DynamicIndex, Index {
       parts.put("corpus", new MemoryCorpus(partParams.clone()));
     }
     if (nonstemming) {
-      parts.put("postings", new MemoryPositionalIndex(partParams.clone()));
+      parts.put("all.postings", new MemoryPositionalIndex(partParams.clone()));
     }
     if (stemming) {
       Parameters stemParams = partParams.clone();
       // should change this to support several stemmers...
       stemParams.set("stemmer",
 		     manifest.get("stemmer", Porter2Stemmer.class.getName()));
-      parts.put("postings.porter", new MemoryPositionalIndex(stemParams));
+      parts.put("all.postings.porter", new MemoryPositionalIndex(stemParams));
     }
     dirty = false;
   }
@@ -130,11 +130,11 @@ public class MemoryIndex implements DynamicIndex, Index {
     }
 
     // otherwise, try to default
-    if (parts.containsKey("postings.porter")) {
-      return "postings.porter";
+    if (parts.containsKey("all.postings.porter")) {
+      return "all.postings.porter";
     }
     if (parts.containsKey("postings")) {
-      return "postings";
+      return "all.postings";
     }
     // otherwise - anything will do.
     return parts.keySet().iterator().next();
@@ -159,7 +159,7 @@ public class MemoryIndex implements DynamicIndex, Index {
   @Override
   public Iterator getIterator(byte[] key, Parameters p) throws IOException {
     Iterator result = null;
-    IndexPartReader part = getIndexPart(p.get("part", "postings"));
+    IndexPartReader part = getIndexPart(p.getString("part"));
     if (part != null) {
       result = part.getIterator(key);
       // modify(result, node);

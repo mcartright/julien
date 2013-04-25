@@ -51,7 +51,7 @@ Required parameters:
       val lView = IndexLengths(f)
       // Turn it into a feature
       new FeatureOp with ChildlessOp {
-        def eval: Score = new Score(lView.length.toDouble)
+        def eval: Double = lView.length.toDouble
         lazy val views: Set[ViewOp] = Set[ViewOp](lView)
       }
     }

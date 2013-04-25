@@ -7,7 +7,7 @@ object DocumentClone {
     new DocumentClone(
       Docid(gd.identifier),
       gd.name,
-      Length(gd.terms.size),
+      gd.terms.size,
       gd.text,
       gd.terms.toList,
       gd.terms.toSet)
@@ -28,7 +28,7 @@ object DocumentClone {
 class DocumentClone(
   val identifier: Docid,
   val name: String,
-  val length: Length,
+  val length: Int,
   val content: String,
   val termVector: List[String],
   val vocabulary: Set[String]

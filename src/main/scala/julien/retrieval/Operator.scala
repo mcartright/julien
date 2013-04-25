@@ -62,7 +62,9 @@ object Operator {
 
 // Views
 
-// Views provide Values to the Features
+/** Views provide values to the Features, but this line is
+  *  blurry.
+  */
 trait ViewOp extends Operator {
   def size: Int
   def isDense: Boolean
@@ -82,22 +84,24 @@ trait ChildlessOp extends Operator {
   override def foreach[U](f: Operator => U) = f(this)
 }
 
-// Root of all Features
+/** Root of all Features */
 trait FeatureOp extends Operator {
   def views: Set[ViewOp]
-  def eval: Score
-  def upperBound: Score = new Score(Double.PositiveInfinity)
-  def lowerBound: Score = new Score(Double.NegativeInfinity)
+  def eval: Double
+  def upperBound: Double = Double.PositiveInfinity
+  def lowerBound: Double = Double.NegativeInfinity
 }
 
-// A FeatureView is a store-supplied feature -
-// basically anything precomputed.
+/** A FeatureView is a store-supplied feature -basically anything precomputed,
+  * but that definition is quite loose.
+  */
 trait FeatureView extends ViewOp with FeatureOp with ChildlessOp
 
-// This is a marker trait that indicates the need for preparation
-// prior to execution. A typical example is an OrderedWindow view
-// needs to calculate some statistics before scoring takes place to
-// ensure accurate scoring
+/** This is a marker trait that indicates the need for preparation
+  * prior to execution. A typical example is an OrderedWindow view
+  * needs to calculate some statistics before scoring takes place to
+  * ensure accurate scoring.
+  */
 trait NeedsPreparing {
   def updateStatistics
 }

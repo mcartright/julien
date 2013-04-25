@@ -28,5 +28,5 @@ class Synonym(terms: Seq[Term])
   }
 
   override def isDense: Boolean = terms.forall(_.isDense)
-  override def size: Int = statistics.docFreq.underlying.toInt
+  override def size: Int = statistics.docFreq.toInt
 }

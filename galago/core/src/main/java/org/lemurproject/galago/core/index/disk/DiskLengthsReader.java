@@ -47,7 +47,7 @@ public class DiskLengthsReader extends KeyListReader implements LengthsReader {
 
   public void init() throws IOException {
     if (!reader.getManifest().get("emptyIndexFile", false)) {
-      doc = Utility.fromString("document");
+      doc = Utility.fromString("all");
     }
   }
 
@@ -70,7 +70,7 @@ public class DiskLengthsReader extends KeyListReader implements LengthsReader {
     return new StreamLengthsIterator(doc, i);
   }
 
-  // Default this puppy to "document" to get the document lengths
+  // Default this puppy to "all" to get the document-scale lengths
   @Override
   public Iterator getIterator(byte[] key) throws IOException {
     BTreeIterator i = reader.getIterator(key);

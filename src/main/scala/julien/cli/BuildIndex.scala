@@ -251,7 +251,7 @@ object BuildIndex extends TupleFlowFunction {
         "writePostings",
         "numberedPostings",
         new NumberWordPosition.WordDocumentPositionOrder(),
-        "postings",
+        "all.postings",
         classOf[PositionIndexWriter])).
       combined("parsePostings", "writePostings").
       add(getWritePostingsStage(
@@ -259,7 +259,7 @@ object BuildIndex extends TupleFlowFunction {
         "writeExtentPostings",
         "numberedExtentPostings",
         new FieldNumberWordPosition.FieldWordDocumentPositionOrder(),
-        "field.",
+        ".postings",
         classOf[PositionFieldIndexWriter])).
       combined("parsePostings", "writeExtentPostings")
 

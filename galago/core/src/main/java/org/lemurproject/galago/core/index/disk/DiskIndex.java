@@ -163,7 +163,7 @@ public class DiskIndex implements Index {
   @Override
   public Iterator getIterator(byte[] key, Parameters p) throws IOException {
     Iterator result = null;
-    IndexPartReader part = parts.get(p.get("part", "postings"));
+    IndexPartReader part = parts.get(p.getString("part"));
     if (part != null) {
       result = part.getIterator(key);
       if (result == null) {

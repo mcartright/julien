@@ -4,8 +4,8 @@ package retrieval
 import org.lemurproject.galago.core.index.ExtentIterator
 
 object Term {
-  def apply(s: String) = new Term(s, "postings")
-  def apply(s: String, f: String) = new Term(s, f)
+  def apply(s: String) = new Term(s, None)
+  def apply(s: String, f: String) = new Term(s, Some(f))
 }
 
 /** Represents a direct connection to an index via a key specified
@@ -15,7 +15,7 @@ object Term {
   *
   * These are always 1-to-1.
   */
-final class Term private (val t: String, val field: String)
+final class Term private (val t: String, val field: Option[String])
     extends IteratedHook[ExtentIterator]
     with PositionStatsView {
 
@@ -28,7 +28,7 @@ final class Term private (val t: String, val field: String)
   def getIterator(i: Index): ExtentIterator = i.shareableIterator(t, field)
 
   /** Returns the current count of the underlying iterator. */
-  def count: Count = new Count(underlying.count)
+  def count: Int = underlying.count
 
   /** Returns the current positions of the underlying iterator. */
   def positions: Positions = Positions(underlying.extents())
@@ -40,11 +40,11 @@ final class Term private (val t: String, val field: String)
       asInstanceOf[ARCA].
       getStatistics
     CountStatistics(
-      new CollFreq(ns.nodeFrequency),
-      new NumDocs(cs.documentCount),
-      new CollLength(cs.collectionLength),
-      new DocFreq(ns.nodeDocumentCount),
-      new MaximumCount(ns.maximumCount.toInt)
+      ns.nodeFrequency,
+      cs.documentCount,
+      cs.collectionLength,
+      ns.nodeDocumentCount,
+      ns.maximumCount.toInt
     )
   }
 }

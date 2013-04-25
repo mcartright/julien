@@ -26,15 +26,12 @@ class TFIDF(
     scala.math.log(stats.numDocs / (stats.docFreq + 0.5))
   }
 
-  override lazy val upperBound: Score = {
+  override lazy val upperBound: Double = {
     val maxtf = statsrc.statistics.max
     score(maxtf, maxtf)
   }
 
-  override lazy val lowerBound: Score = Score(0.0)
-  def eval: Score = score(op.count, lengths.length)
-  def score(c: Count, l: Length): Score = {
-    val tf = c.toDouble / l.toDouble
-    new Score(tf * idf)
-  }
+  override lazy val lowerBound: Double = 0.0
+  def eval: Double = score(op.count, lengths.length)
+  def score(c: Int, l: Int): Double = (c.toDouble / l.toDouble) * idf
 }

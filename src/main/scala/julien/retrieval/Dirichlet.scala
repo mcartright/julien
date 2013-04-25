@@ -35,7 +35,7 @@ class Dirichlet(
       stats.collFreq.toDouble / stats.collLength
   }
 
-  override lazy val upperBound: Score = {
+  override lazy val upperBound: Double = {
     val maxtf = statsrc.statistics.max
     score(maxtf, maxtf)
   }
@@ -43,13 +43,13 @@ class Dirichlet(
   // this is a filthy estimation - want something better
   // problem is that it's the longest document *not* seen by
   // the underlying view.
-  override lazy val lowerBound: Score =
+  override lazy val lowerBound: Double =
     score(0, Dirichlet.totallyMadeUpValue)
 
-  def eval: Score = score(op.count, lengths.length)
-  def score(c: Count, l: Length): Score = {
+  def eval: Double = score(op.count, lengths.length)
+  def score(c: Int, l: Int): Double = {
     val num = c + (mu*cf)
     val den = l + mu
-    new Score(scala.math.log(num / den))
+    scala.math.log(num / den)
   }
 }

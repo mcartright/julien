@@ -82,7 +82,7 @@ public class MemoryDocumentLengths implements MemoryIndexPart, LengthsReader {
     this.params = params;
     this.params.set("writerClass",
 		    "org.lemurproject.galago.core.index.DocumentLengthsWriter");
-    this.document = new Bytes(Utility.fromString("document"));
+    this.document = new Bytes(Utility.fromString("all"));
 
     if (!lengths.containsKey(document)) {
       lengths.put(document, new FieldLengthPostingList(document));

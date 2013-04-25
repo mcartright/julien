@@ -7,11 +7,11 @@ import julien._
 
 object JelinekMercerSpec {
   def countStats = CountStatistics(
-    new CollFreq(10306507L),
-    new NumDocs(25199354),
-    new CollLength(13162442311L),
-    new DocFreq(103045),
-    new MaximumCount(345))
+    collFreq = 10306507L,
+    numDocs = 25199354,
+    collLength = 13162442311L,
+    docFreq = 103045,
+    max = 345)
 }
 
 class JelinekMercerSpec extends FlatSpec with MockFactory {
@@ -57,7 +57,7 @@ class JelinekMercerSpec extends FlatSpec with MockFactory {
     val d = JelinekMercer(mockCV, mockLV, mockStat, lambda)
     val max = fakeCountStats.max.toDouble
     val expScore = scala.math.log(lambda + ((1.0-lambda) * d.cf))
-    expect (expScore) { d.upperBound.underlying }
+    expect (expScore) { d.upperBound }
   }
 
   it should "produce the correct lower bound" in {
@@ -68,7 +68,7 @@ class JelinekMercerSpec extends FlatSpec with MockFactory {
     val lambda = 0.3
     val d = JelinekMercer(mockCV, mockLV, mockStat, lambda)
     val expScore = scala.math.log((1.0-lambda) * d.cf)
-    expect (expScore) { d.lowerBound.underlying }
+    expect (expScore) { d.lowerBound }
   }
 
   it should "produce the correct score" in {
@@ -84,6 +84,6 @@ class JelinekMercerSpec extends FlatSpec with MockFactory {
     val d = JelinekMercer(mockCV, mockLV, mockStat, lambda)
     val expScore =
       scala.math.log((lambda*(c.toDouble/l)) + ((1.0-lambda)*(d.cf)))
-    expect (expScore) { d.eval.underlying }
+    expect (expScore) { d.eval }
   }
 }

@@ -7,11 +7,11 @@ import julien._
 
 object DirichletSpec {
   def countStats = CountStatistics(
-    new CollFreq(10306507L),
-    new NumDocs(25199354),
-    new CollLength(13162442311L),
-    new DocFreq(103045),
-    new MaximumCount(345))
+    collFreq = 10306507L,
+    numDocs = 25199354,
+    collLength = 13162442311L,
+    docFreq = 103045,
+    max = 345)
 }
 
 class DirichletSpec extends FlatSpec with MockFactory {
@@ -52,7 +52,7 @@ class DirichletSpec extends FlatSpec with MockFactory {
     val d = Dirichlet(mockCV, mockLV, mockStat, mu)
     val max = fakeCountStats.max.toDouble
     val expScore = scala.math.log((max + (mu * d.cf)) / (max + mu))
-    expect (expScore) { d.upperBound.underlying }
+    expect (expScore) { d.upperBound }
   }
 
   it should "produce the correct lower bound" in {
@@ -64,7 +64,7 @@ class DirichletSpec extends FlatSpec with MockFactory {
     val d = Dirichlet(mockCV, mockLV, mockStat, mu)
     val expScore =
       scala.math.log((mu * d.cf) / (Dirichlet.totallyMadeUpValue + mu))
-    expect (expScore) { d.lowerBound.underlying }
+    expect (expScore) { d.lowerBound }
   }
 
   it should "produce the correct score" in {

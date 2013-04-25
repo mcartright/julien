@@ -15,8 +15,8 @@ class IDF(val statsrc: StatisticsView) extends FeatureOp {
     scala.math.log(stats.numDocs / (stats.docFreq + 0.5))
   }
 
-  override lazy val upperBound: Score = idf
-  override lazy val lowerBound: Score = idf
-  lazy val score: Score = idf
-  val eval: Score = score
+  override lazy val upperBound: Double = idf
+  override lazy val lowerBound: Double = idf
+  lazy val score: Double = idf
+  val eval: Double = score
 }

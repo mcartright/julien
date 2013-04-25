@@ -10,5 +10,5 @@ class Weight(val op: FeatureOp, val weight: Double)
   val w = weight
   lazy val children: Seq[Operator] = List[Operator](op)
   def views: Set[ViewOp] = op.views
-  def eval : Score = weight * op.eval
+  def eval : Double = weight * op.eval
 }

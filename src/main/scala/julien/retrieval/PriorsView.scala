@@ -14,7 +14,8 @@ class PriorsView
   def getIterator(i: Index): ScoreIterator = {
     i.partReader("priors").getIterator("priors").asInstanceOf[ScoreIterator]
   }
+
   lazy val views: Set[ViewOp] = Set[ViewOp](this)
-  def eval: Score = Score(it.get.score)
-  def score: Score = Score(it.get.score)
+  def eval: Double = it.get.score
+  def score: Double = it.get.score
 }

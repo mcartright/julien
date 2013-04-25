@@ -8,7 +8,7 @@ package julien
 trait Document extends LengthsSrc {
   def identifier: Docid
   def name: String
-  def length: Length
+  def length: Int
   def content: String
   def hasTermVector: Boolean
   def termVector: List[String]

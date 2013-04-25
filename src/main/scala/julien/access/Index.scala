@@ -14,11 +14,20 @@ import julien._
 
 object Index {
   private val dummyBytes = Utility.fromString("dummy")
-  def apply(i: DiskIndex) = new Index("unknown", i)
-  def apply(m: MemoryIndex) = new Index("unknown", m)
-  def apply(i: GIndex) = new Index("unknown", i)
-  def disk(s: String) = new Index(s, new DiskIndex(s))
-  def memory(s: String*) : Index = {
+  def apply(i: DiskIndex):Index = apply(i, "all")
+  def apply(i: DiskIndex, defaultPart: String): Index =
+    new Index("unknown", i, defaultPart)
+  def apply(m: MemoryIndex):Index = apply(m, "all")
+  def apply(m: MemoryIndex, defaultPart: String): Index =
+    new Index("unknown", m, defaultPart)
+  def apply(i: GIndex): Index = apply(i, "all")
+  def apply(i: GIndex, defaultPart: String): Index =
+    new Index("unknown", i, defaultPart)
+  def disk(s: String): Index = disk(s, "all")
+  def disk(s: String, defaultPart: String): Index =
+    new Index(s, new DiskIndex(s), defaultPart)
+  def memory(s: Seq[String]): Index = memory(s, "all")
+  def memory(s: Seq[String], defaultPart: String): Index = {
     // Try to use the components from the Galago pipeline to
     // 1) Chop the file into a DocumentSource
     val docsource = new DocumentSource(s: _*)
@@ -34,11 +43,18 @@ object Index {
     // Run it
     docsource.run()
     // Return it
-    return new Index(s.mkString(","), memoryIndex)
+    return new Index(s.mkString(","), memoryIndex, defaultPart)
   }
 }
 
-class Index(label: String, val underlying: GIndex) {
+class Index private(
+  label: String,
+  val underlying: GIndex,
+  private[this] var currentDefault: String) {
+  // Make sure the default isn't a crock
+  assume(underlying.containsPart(s"$currentDefault.postings"),
+    s"$currentDefault is not a part in this index")
+
   override def toString: String = {
     val b = new StringBuilder()
     val hdr = if (underlying.isInstanceOf[MemoryIndex])
@@ -51,31 +67,35 @@ class Index(label: String, val underlying: GIndex) {
     b.result
   }
 
+  /** Returns the current default part */
+  def defaultPart: String = currentDefault
+
+  /**
+    * Sets the current default part. If the part doesn't
+    * exist, fails an assertion.
+    */
+  def defaultPart_=(newDefault: String): Unit = {
+    assume(underlying.containsPart(s"$newDefault.postings"),
+      s"$newDefault is not a part in this index")
+    currentDefault = newDefault
+  }
+
   private val lengthsIterator = underlying.getLengthsIterator
   private val collectionStats =
-    underlying.getCollectionStatistics("document")
+    underlying.getCollectionStatistics(currentDefault)
   private val postingsStats =
-    underlying.getIndexPartStatistics("postings")
+    underlying.getIndexPartStatistics(getLabel(currentDefault))
 
-  def lengthsIterator(field: String = "document"): LI =
-    underlying.getIndexPart("lengths").getIterator(field).asInstanceOf[LI]
+  /** In theory, releases the resources associated with this index. In theory.*/
+  def close: Unit = underlying.close
 
   def collectionLength: Long = collectionStats.collectionLength
   def numDocuments: Long = collectionStats.documentCount
   def vocabularySize: Long = postingsStats.vocabCount
 
-  def length(d: Docid): Length = Length(underlying.getLength(d))
-  def length(targetId: String): Length =
+  def length(d: Docid): Int = underlying.getLength(d)
+  def length(targetId: String): Int =
     underlying.getLength(underlying.getIdentifier(targetId))
-
-  def positions(key: String, targetId: String): Positions = {
-    val it =
-      underlying.getIterator(key, Parameters.empty).asInstanceOf[ExtentIterator]
-    if (it.isInstanceOf[NullExtentIterator]) return Positions.empty
-    val docid = underlying.getIdentifier(targetId)
-    it.syncTo(docid)
-    if (it.hasMatch(docid)) Positions(it.extents) else Positions.empty
-  }
 
   def documentIterator(): DataIterator[GDoc] =
     underlying.
@@ -93,24 +113,43 @@ class Index(label: String, val underlying: GIndex) {
   private val iteratorCache =
     scala.collection.mutable.HashMap[String, ExtentIterator]()
 
+  def lengthsIterator(field: String): LI =
+    underlying.getIndexPart("lengths").getIterator(field).asInstanceOf[LI]
+
+  def lengthsIterator(field: Option[String]): LI =
+    lengthsIterator(field.getOrElse(currentDefault))
+
+  def shareableIterator(
+    key: String,
+    field: Option[String]): ExtentIterator =
+    shareableIterator(key, field.getOrElse(currentDefault))
+
   /** Produces a cached ExtentIterator if possible. If not found, a new iterator
     * is constructed and cached for later.
     */
-  def shareableIterator(
-    key: String,
-    field: String = "postings"): ExtentIterator = {
+  def shareableIterator(key: String, field: String): ExtentIterator = {
     if (!iteratorCache.contains(key)) {
       iteratorCache(key) = iterator(key, field)
     }
     iteratorCache(key)
   }
 
+  /** Used to allow for using a default field. If a None is provided, then
+    * the current default field is used. Otherwise it will unwrap the
+    * Option and use the provided field.
+    */
+  def iterator(
+    key: String,
+    field: Option[String] = None): ExtentIterator =
+    iterator(key, field.getOrElse(currentDefault))
+
   /** Returns an ExtentIterator from the underlying index. If the requested
     * index part is missing, an assertion fails. If the key is missing, a
     * NullExtentIterator is returned.
     */
-  def iterator(key: String, field: String = "postings"): ExtentIterator = {
-    val part = underlying.getIndexPart(getLabel(field))
+  def iterator(key: String, field: String): ExtentIterator = {
+    val label = getLabel(field)
+    val part = underlying.getIndexPart(label)
     val iter = part.getIterator(key)
     if (iter != null) iter.asInstanceOf[ExtentIterator]
     else new NullExtentIterator(label)
@@ -127,18 +166,21 @@ class Index(label: String, val underlying: GIndex) {
     jdocs.sortBy(_.identifier)
   }
 
-  @inline private def getLabel(f: String): String = {
-    val label = if (f.startsWith("postings")) f else s"field.$f"
-    assume(underlying.containsPart(label), s"Part $label is not in this index")
-    label
+
+  def positions(key: String, targetId: String): Positions = {
+    val it =
+      underlying.getIterator(key, Parameters.empty).asInstanceOf[ExtentIterator]
+    if (it.isInstanceOf[NullExtentIterator]) return Positions.empty
+    val docid = underlying.getIdentifier(targetId)
+    it.syncTo(docid)
+    if (it.hasMatch(docid)) Positions(it.extents) else Positions.empty
   }
 
   /** Returns a view of the set of keys of a given index part.
     * An assertion fails if the part is not found.
    */
-  def vocabulary(field: String = "document"): KeySet = {
+  def vocabulary(field: String = currentDefault): KeySet =
     new KeySet(underlying.getIndexPart(getLabel(field)).keys _)
-  }
   def name(docid: Docid) : String = underlying.getName(docid)
   def identifier(name: String): Docid =
     new Docid(underlying.getIdentifier(name))
@@ -182,5 +224,12 @@ class Index(label: String, val underlying: GIndex) {
       e.movePast(e.currentCandidate())
     }
     stats
+  }
+
+  private def getLabel(field: String): String = {
+    val label = s"$field.postings"
+    assume (underlying.containsPart(label),
+      s"$label is not a part in this index")
+    label
   }
 }

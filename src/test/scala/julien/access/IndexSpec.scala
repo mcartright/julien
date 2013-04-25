@@ -38,12 +38,14 @@ class IndexSpec extends FlatSpec with MockFactory with GivenWhenThen {
     fakePartStats.vocabCount = 51354292
 
     // Expectations during initialization
+    (gidx.containsPart _).
+      expects("all.postings").returning(true).noMoreThanTwice()
     (gidx.getLengthsIterator _).expects().returning(mockLengths)
       (gidx.getCollectionStatistics _).
-      expects("document").
+      expects("all").
       returning(fakeCollStats)
       (gidx.getIndexPartStatistics _).
-      expects("postings").
+      expects("all.postings").
       returning(fakePartStats)
   }
 
@@ -52,9 +54,9 @@ class IndexSpec extends FlatSpec with MockFactory with GivenWhenThen {
     import f._
 
     val testingIndex = Index(gidx)
-    expect(fakeCollStats.collectionLength) { testingIndex.collectionLength }
-    expect(fakeCollStats.documentCount) { testingIndex.numDocuments }
-    expect(fakePartStats.vocabCount) { testingIndex.vocabularySize }
+    expectResult(fakeCollStats.collectionLength)(testingIndex.collectionLength)
+    expectResult(fakeCollStats.documentCount) { testingIndex.numDocuments }
+    expectResult(fakePartStats.vocabCount) { testingIndex.vocabularySize }
   }
 
   it should "provide the lengths of documents by docid" in {
@@ -68,7 +70,7 @@ class IndexSpec extends FlatSpec with MockFactory with GivenWhenThen {
     // Our call sequence
     val testingIndex = Index(gidx)
     for ((k,v) <- lmap) {
-      expect(new Length(v)) { testingIndex.length(k) }
+      expectResult(v) { testingIndex.length(k) }
     }
   }
 
@@ -78,7 +80,7 @@ class IndexSpec extends FlatSpec with MockFactory with GivenWhenThen {
 
     (gidx.getLength _).expects(1).returning(0)
     val testingIndex = Index(gidx)
-    expect(new Length(0)) { testingIndex.length(1) }
+    expectResult(0) { testingIndex.length(1) }
   }
 
   it should "be able to access a document length by name" in (pending)
@@ -86,6 +88,10 @@ class IndexSpec extends FlatSpec with MockFactory with GivenWhenThen {
   it should "return the count of key occuring in a doc" in (pending)
   it should "return an iterator given a valid key" in (pending)
   it should "return a cached iterator given a previously seen key" in (pending)
+  it should "fail an assertion when asking for a missing part" in (pending)
+  it should "fail an assertion when asking for a cached iterator" in (pending)
+  it should "be able to set a new default part to an existing part" in (pending)
+  it should "fail an assertion to set default to a missing part" in (pending)
   it should "return a list of docs given a valid list of docids" in (pending)
   it should "return the name of a document given the docid" in (pending)
   it should "return the docid of a document given the name" in (pending)

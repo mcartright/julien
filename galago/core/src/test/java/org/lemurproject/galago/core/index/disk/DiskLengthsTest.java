@@ -33,7 +33,7 @@ public class DiskLengthsTest extends TestCase {
       p.set("filename", len.getAbsolutePath());
       DiskLengthsWriter writer = new DiskLengthsWriter(new FakeParameters(p));
 
-      byte[] key = Utility.fromString("document");
+      byte[] key = Utility.fromString("all");
       for (int i = 10; i <= 100; i++) {
         writer.process(new FieldLengthData(key, i, i + 1));
       }
@@ -52,7 +52,7 @@ public class DiskLengthsTest extends TestCase {
 
       KeyIterator ki = reader.keys();
       StreamLengthsIterator streamItr = ki.getStreamValueIterator();
-            
+
 
       streamItr.syncTo(50);
       assertEquals(streamItr.currentCandidate(), 50);

@@ -9,7 +9,7 @@ class IndexBasedDocument extends Document {
   var underlying: GDoc = null
   def identifier: Docid = Docid(underlying.identifier)
   def name: String = underlying.name
-  def length = new Length(index.length(underlying.name))
+  def length = index.length(underlying.name)
   def content: String = underlying.text
 
   // These depend on the term vector being present

@@ -7,171 +7,31 @@ import scala.math.Numeric
   *
   */
 package object julien {
-
 /** Correctness enforced using value classes for any value we might throw
-  * around the in the system. Might be a little overkill, but it allows
-  * for strong type-checking at compile time.
+  *  around the in the system. Might be a little overkill, but it allows
+  *  for strong type-checking at compile time.
   *
-  *  See SIP-15 (http://docs.scala-lang.org/sips/pending/value-classes.html)
-  *  for value class details.
+  *   See SIP-15 (http://docs.scala-lang.org/sips/pending/value-classes.html)
+  *   for value class details.
   *
-  * Also using SIP-13, implicit classes
-  * (http://docs.scala-lang.org/sips/pending/implicit-classes.html)
+  *  Also using SIP-13, implicit classes
+  *  (http://docs.scala-lang.org/sips/pending/implicit-classes.html)
   */
 
-  /** A belief assigned by a Feature.
-    * Underlying class is Double.
-    */
-  implicit class Score(val underlying: Double) extends AnyVal  {
-    def *(l: Long): Score = new Score(underlying * l)
-    def *(f: Float): Score = new Score(underlying * f)
-    def +(l: Long): Score = new Score(underlying + l)
-    def +(f: Float): Score = new Score(underlying + f)
-    def -(l: Long): Score = new Score(underlying - l)
-    def -(f: Float): Score = new Score(underlying - f)
-    def /(l: Long): Score = new Score(underlying / l)
-    def /(f: Float): Score = new Score(underlying / f)
-
-    // These are type-erased to cover doubles as well
-    def *(s: Score): Score = new Score(underlying * s.underlying)
-    def +(s: Score): Score = new Score(underlying + s.underlying)
-    def /(s: Score): Score = new Score(underlying / s.underlying)
-    def -(s: Score): Score = new Score(underlying - s.underlying)
-    // And these are type-erased to cover ints as well
-    def *(l: Length): Score = new Score(underlying * l.underlying)
-    def +(l: Length): Score = new Score(underlying + l.underlying)
-    def -(l: Length): Score = new Score(underlying - l.underlying)
-    def /(l: Length): Score = new Score(underlying / l.underlying)
-  }
-
-  implicit object Score extends Numeric[Score] {
-    def compare(a: Score, b: Score) = a.underlying compare b.underlying
-    def fromInt(i: Int) = Score(i.toDouble)
-    def minus(x: Score, y: Score) = Score(x.underlying - y.underlying)
-    def negate(x: Score) = Score(-(x.underlying))
-    def plus(x: Score, y: Score) = Score(x.underlying + y.underlying)
-    def times(x: Score, y: Score) = Score (x.underlying * y.underlying)
-    def toDouble(x: Score) = x.underlying
-    def toFloat(x: Score) = x.underlying.toFloat
-    def toInt(x: Score) = x.underlying.toInt
-    def toLong(x: Score) = x.underlying.toLong
-  }
-  implicit def score2dbl(s: Score): Double = s.underlying
-
-
-  /** The number of targets (docs) a particular key (term) occurs in.
-    * Underlying class is Long.
-    */
-  implicit class DocFreq(val underlying: Long) extends AnyVal {
-    def +(l: Long): DocFreq = DocFreq(underlying + l)
-    def +(i: Int): DocFreq = DocFreq(underlying + i)
-    def +(d: Double): Double = d + underlying
-  }
-  implicit def df2long(df: DocFreq): Long = df.underlying
-
-  /** Number of targets (documents) in the universe (collection).
-    * Underlying class is Long.
-    */
-  implicit class NumDocs(val underlying: Long) extends AnyVal {
-    def /(d: Double): Double = underlying.toDouble / d
-  }
-  implicit def numdocs2long(nd: NumDocs): Long = nd.underlying
-
-  /** Number of keys (terms) in the universe (collection).
-    * Underlying class is Long.
-    */
-  implicit class VocabSize(val underlying: Long) extends AnyVal
-
-  /** The count of how many times a key (term) occurs in the
-    * universe (collection).
-    * Underlying class is Long.
-    */
-  implicit class CollFreq(val underlying: Long) extends AnyVal  {
-    def +(i: Int): Long = underlying + i
-    def +(l: Long): Long = underlying + l
-    def +(d: Double): Double = underlying + d
-    def *(i: Int): Long = underlying * i
-    def *(l: Long): Long = underlying * l
-    def *(d: Double): Double = underlying * d
-  }
-  implicit def cf2long(cf: CollFreq): Long = cf.underlying
-
-
-  /** Value for the maximum count of a particular count op.
-    */
-  implicit class MaximumCount(val underlying: Int) extends AnyVal
-  implicit def maxcount2int(mc: MaximumCount): Int = mc.underlying
-  implicit def maxcount2count(mc: MaximumCount): Count =
-    new Count(mc.underlying)
-  implicit def maxcount2len(mc: MaximumCount): Length =
-    new Length(mc.underlying)
-
-  /** The number of times a key (term) occurs in a particular target (doc).
-    * Underlying class is Int.
-    */
-  implicit class Count(val underlying: Int) extends AnyVal  {
-    def +(i: Int): Int = underlying + i
-    def +(l: Long): Long = underlying + l
-    def +(d: Double): Double = underlying + d
-    def *(i: Int): Int = underlying * i
-    def *(l: Long): Long = underlying * l
-    def *(d: Double): Double = underlying * d
-    def /(l: Length): Double = underlying.toDouble / l.underlying
-  }
-
-  implicit object Count extends Numeric[Count] {
-    def compare(a: Count, b: Count) = a.underlying compare b.underlying
-    def fromInt(i: Int) = Count(i)
-    def minus(x: Count, y: Count) = Count(x.underlying - y.underlying)
-    def negate(x: Count) = Count(-(x.underlying))
-    def plus(x: Count, y: Count) = Count(x.underlying + y.underlying)
-    def times(x: Count, y: Count) = Count (x.underlying * y.underlying)
-    def toDouble(x: Count) = x.underlying.toDouble
-    def toFloat(x: Count) = x.underlying.toFloat
-    def toInt(x: Count) = x.underlying
-    def toLong(x: Count) = x.underlying.toLong
-  }
-
   /**
-    * Value for a document identifier.
-    * Underlying class is an Int.
+    * Value for a document identifier. We "wrap" these with a value class
+    * because even though the underlying type is an Int, we don't want to
+    * treat it as a numeric (i.e. multiplying two docs is meaningless).
+    *
+    * Good use of a value class - when you want an AnyVal, but you want to
+    * actually *remove* some of the functionality of the AnyVal.
     */
   implicit class Docid(val underlying: Int) extends AnyVal
   implicit object DocidOrder extends Ordering[Docid] {
     def compare(a: Docid, b: Docid) = a.underlying compare b.underlying
   }
-
-  /** The size of the collection.
-    * Underlying class is Long.
-    */
-  implicit class CollLength(val underlying: Long) extends AnyVal {
-    def /(nd: NumDocs): Double = underlying.toDouble / nd.underlying
-  }
-
-  /** The length of any retrievable item.
-    * Underlying value is Int.
-    */
-  implicit class Length(val underlying: Int) extends AnyVal  {
-    def +(i: Int): Int = underlying + i
-    def +(l: Long): Long = underlying + l
-    def +(d: Double): Double = underlying + d
-    def *(i: Int): Int = underlying * i
-    def *(l: Long): Long = underlying * l
-    def *(d: Double): Double = underlying * d
-  }
-
-  implicit object Length extends Numeric[Length] {
-    def compare(a: Length, b: Length) = a.underlying compare b.underlying
-    def fromInt(i: Int) = Length(i)
-    def minus(x: Length, y: Length) = Length(x.underlying - y.underlying)
-    def negate(x: Length) = Length(-(x.underlying))
-    def plus(x: Length, y: Length) = Length(x.underlying + y.underlying)
-    def times(x: Length, y: Length) = Length (x.underlying * y.underlying)
-    def toDouble(x: Length) = x.underlying.toDouble
-    def toFloat(x: Length) = x.underlying.toFloat
-    def toInt(x: Length) = x.underlying
-    def toLong(x: Length) = x.underlying.toLong
-  }
+  // Do we want this?
+  implicit def docid2int(d: Docid): Int = d.underlying
 
   import scala.util.matching.Regex
   /** Implicit extension to the Regex class (done via composition)
@@ -202,10 +62,6 @@ package object julien {
     def !=(s: String): Boolean = misses(s)
   }
 
-  implicit def docid2int(d: Docid): Int = d.underlying
-  implicit def len2int(l: Length): Int = l.underlying
-  implicit def cl2long(cl: CollLength) = cl.underlying
-
   /** Implicit lift of Regex to RichRegex. */
   implicit def regexToRichRegex(r: Regex) = new RichRegex(r)
 
@@ -219,9 +75,7 @@ package object julien {
 
   /** Provides an ordering for [[ScoredDocument]]s. */
   implicit object ScoredDocumentOrdering extends Ordering[ScoredDocument] {
-    def compare(a: ScoredDocument, b: ScoredDocument) =
-      // TODO: This works, but gross.
-      b.score.underlying compare a.score.underlying
+    def compare(a: ScoredDocument, b: ScoredDocument) = b.score compare a.score
   }
 
   /** Provides an [[scala.math.Ordering]] for [[Gram]]s. */
@@ -231,7 +85,6 @@ package object julien {
       if (result == 0) a.term compare b.term else result
     }
   }
-
 
   /** Type definitions, most of which are for aliasing in the
     * package.

@@ -59,15 +59,14 @@ class MaxscoreProcessor extends SimpleProcessor {
 
   override def run: List[ScoredDocument] = {
     // Need this in scope already
-    var threshold = new Score(0.0)
-
+    var threshold = 0.0
 
     // Helper functions that are internally defined
     @tailrec
     def conditionalAddSentinel(
       sents: Seq[Sentinel],
       idx: Int,
-      oldScore: Score): Tuple2[Score, Int] =
+      oldScore: Double): Tuple2[Double, Int] =
       // base case
       if (idx == sents.size || oldScore < threshold)
         (oldScore, idx)
@@ -78,7 +77,7 @@ class MaxscoreProcessor extends SimpleProcessor {
     def getSentinelIndex(
       sents: Seq[Sentinel],
       idx: Int,
-      currentScore: Score): Int =
+      currentScore: Double): Int =
       if (idx == sents.size || currentScore < threshold)
         return idx
       else

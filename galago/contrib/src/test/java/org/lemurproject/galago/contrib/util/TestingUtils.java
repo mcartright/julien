@@ -75,9 +75,9 @@ public class TestingUtils {
     Assert.assertTrue(childPath.exists());
 
     // some postings must exist
-    File childPath1 = new File(indexPath, "postings");
-    File childPath2 = new File(indexPath, "postings.porter");
-    File childPath3 = new File(indexPath, "postings.krovetz");
+    File childPath1 = new File(indexPath, "all.postings");
+    File childPath2 = new File(indexPath, "all.postings.porter");
+    File childPath3 = new File(indexPath, "all.postings.krovetz");
     Assert.assertTrue(childPath1.exists() || childPath2.exists() || childPath3.exists());
 
   }

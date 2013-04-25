@@ -36,18 +36,18 @@ class JelinekMercer(
       stats.collFreq.toDouble / stats.collLength
   }
 
-  override lazy val upperBound: Score = {
+  override lazy val upperBound: Double = {
     val maxtf = statsrc.statistics.max
     score(maxtf, maxtf)
   }
 
   // Crappy estimate. What's better?
-  override lazy val lowerBound: Score =
+  override lazy val lowerBound: Double =
     score(0, JelinekMercer.totallyMadeUpValue)
 
-  def eval: Score = score(op.count, lengths.length)
-  def score(c: Count, l: Length) =
-    new Score(scala.math.log((lambda*(c/l)) + ((1.0-lambda)*cf)))
+  def eval: Double = score(op.count, lengths.length)
+  def score(c: Int, l: Int) =
+    scala.math.log((lambda*(c.toDouble/l)) + ((1.0-lambda)*cf))
 }
 
 

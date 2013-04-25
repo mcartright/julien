@@ -7,11 +7,11 @@ import julien._
 
 object BM25Spec {
   def countStats = CountStatistics(
-    new CollFreq(10306507L),
-    new NumDocs(25199354),
-    new CollLength(13162442311L),
-    new DocFreq(103045),
-    new MaximumCount(345))
+    collFreq = 10306507L,
+    numDocs = 25199354,
+    collLength = 13162442311L,
+    docFreq = 103045,
+    max = 345)
 }
 
 class BM25Spec extends FlatSpec with MockFactory {
@@ -27,11 +27,12 @@ class BM25Spec extends FlatSpec with MockFactory {
     val f = fixture
     import f._
 
-    mockStat.expects('statistics)().returning(fakeCountStats).noMoreThanOnce
+    mockStat.expects('statistics)().
+      returning(fakeCountStats).noMoreThanOnce
     val d = BM25(mockCV, mockLV, mockStat)
     val expectedADL =
       fakeCountStats.collLength.toDouble / fakeCountStats.numDocs
-    expect(expectedADL) { d.avgDocLength }
+    expectResult(expectedADL) { d.avgDocLength }
   }
 
   it should "complain if it receives a b parameter outside interval [0,1]" in {
@@ -80,7 +81,7 @@ class BM25Spec extends FlatSpec with MockFactory {
     val numerator = max + (k + 1)
     val denominator = max + (k * (1 - b + (b * max / d.avgDocLength)));
     val expScore = d.idf * numerator / denominator
-    expect (expScore) { d.upperBound.underlying }
+    expect (expScore) { d.upperBound }
   }
 
   it should "produce the correct lower bound" in {
@@ -89,7 +90,7 @@ class BM25Spec extends FlatSpec with MockFactory {
 
     mockStat.expects('statistics)().returning(fakeCountStats).noMoreThanTwice
     val d = BM25(mockCV, mockLV, mockStat)
-    expect (0) { d.lowerBound.underlying }
+    expect (0) { d.lowerBound }
   }
 
   it should "produce the correct score" in {
@@ -107,9 +108,6 @@ class BM25Spec extends FlatSpec with MockFactory {
     val numerator = c + (k + 1)
     val denominator = c + (k * (1 - b + (b * l / d.avgDocLength)));
     val expScore = d.idf * numerator / denominator
-    expect (expScore) { d.eval.underlying }
+    expect (expScore) { d.eval }
   }
-
-
-
 }

@@ -100,7 +100,7 @@ public class BuildSketchIndex extends AppFunction {
     LocalRetrieval r = new LocalRetrieval(indexPath, new Parameters());
     CollectionStatistics collectionStatistics = r.getCollectionStatistics("#lengths:document:part=lengths()");
     long collectionLength = collectionStatistics.collectionLength;
-    long universe = 256; // each array unit is a byte //    
+    long universe = 256; // each array unit is a byte //
 
     Random rnd = new Random();
     int depth = (int) buildParameters.getLong("depth");
