@@ -3,6 +3,8 @@ package retrieval
 
 import scala.io.Source
 import org.lemurproject.galago.tupleflow.{Parameters,Utility}
+import org.lemurproject.galago.tupleflow.execution.JobExecutor
+import org.lemurproject.galago.core.index.NullExtentIterator
 import java.io.{File,InputStream,PrintStream,ByteArrayOutputStream}
 import java.util.logging.{Level,Logger}
 import org.scalatest._
@@ -13,10 +15,12 @@ class IndexingSpec extends FlatSpec with BeforeAndAfter {
     new File(Utility.createTemporary.getAbsolutePath + ".gz")
   val tmpForIndex: File = Utility.createTemporaryDirectory("tmpindex")
 
-  // Extract our source docs, write to an index, and run some tests.
+  // Extract our source docs, write to an index, run the tests over the
+  // read-only structure, then clean up.
   before {
     // Turn off logging so the tests aren't diluted.
     Logger.getLogger("").setLevel(Level.OFF)
+    Logger.getLogger(classOf[JobExecutor].toString).setLevel(Level.OFF)
 
     // Extract resource
     val istream = getClass.getResourceAsStream("/wikisample.gz")
@@ -47,11 +51,7 @@ class IndexingSpec extends FlatSpec with BeforeAndAfter {
     receiver.close
   }
 
-  // Clean up the small index
-  after {
-    tmpForInput.delete()
-    Utility.deleteDirectory(tmpForIndex)
-  }
+  // Start tests
 
   "A built index" should "have 77 documents" in {
     val index = Index.disk(tmpForIndex.getAbsolutePath)
@@ -66,5 +66,23 @@ class IndexingSpec extends FlatSpec with BeforeAndAfter {
   it should "have 184629 term instances" in {
     val index = Index.disk(tmpForIndex.getAbsolutePath)
     expect(184629L) { index.collectionLength }
+  }
+
+  it should "provide a valid lengths iterator for the default key" in {
+    val index = Index.disk(tmpForIndex.getAbsolutePath)
+    val iterator = index.lengthsIterator("document")
+    assert( iterator != null )
+  }
+
+  it should "provide a null extent iterator for a OOV term" in {
+    val index = Index.disk(tmpForIndex.getAbsolutePath)
+    val iterator = index.iterator("snufalufagus")
+    assert ( iterator.isInstanceOf[NullExtentIterator] )
+  }
+
+  after {
+    // Clean up the small index
+    tmpForInput.delete()
+    Utility.deleteDirectory(tmpForIndex)
   }
 }

@@ -8,6 +8,9 @@ package julien
   * This package makes substantial use of the functionality provided
   * by the access API.
   */
+
+import scala.reflect.runtime.universe._
+
 package object retrieval {
   type Combiner = (Seq[FeatureOp]) => julien.Score
 
@@ -23,4 +26,6 @@ package object retrieval {
         classOf[G.core.index.Index].getResourceAsStream("/stopwords/inquery")
       )
   }
+
+  def getType[T](x: T)(implicit tag: TypeTag[T]) = tag.tpe
 }

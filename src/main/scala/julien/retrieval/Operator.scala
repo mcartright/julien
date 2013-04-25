@@ -15,13 +15,15 @@ trait Operator extends Traversable[Operator] {
     for (c <- children) c foreach f
   }
 
-
-  // Isn't there a method that does this in the reflect API?
-  def getType[T](x: T)(implicit tag: TypeTag[T]) = tag.tpe
-  def grab[T](implicit tag: TypeTag[T]): Traversable[T] = this.
-    filter(item => getType(item) <:< tag.tpe).
-    map(_.asInstanceOf[T]).
-    toList
+  // It works, but for generic types (i.e. passing in A[_]) causes
+  // debug spam to show up. Use at your own risk for now :)
+  def grab[T](implicit tag: TypeTag[T]): Traversable[T] = {
+    val m = runtimeMirror(this.getClass.getClassLoader)
+    this.
+      filter(item => m.reflect(item).symbol.selfType <:< tag.tpe).
+      map(_.asInstanceOf[T]).
+      toList
+  }
 
   def iHooks: Traversable[IteratedHook[_ <: GIterator]] = this.
     filter(_.isInstanceOf[IteratedHook[_ <: GIterator]]).

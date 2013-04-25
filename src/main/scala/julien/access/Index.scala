@@ -105,12 +105,15 @@ class Index(label: String, val underlying: GIndex) {
     iteratorCache(key)
   }
 
+  /** Returns an ExtentIterator from the underlying index. If the requested
+    * index part is missing, an assertion fails. If the key is missing, a
+    * NullExtentIterator is returned.
+    */
   def iterator(key: String, field: String = "postings"): ExtentIterator = {
-    val label = if (field.startsWith("postings")) field else s"field.$field"
-    underlying.
-      getIndexPart(label).
-      getIterator(key).
-      asInstanceOf[ExtentIterator]
+    val part = underlying.getIndexPart(getLabel(field))
+    val iter = part.getIterator(key)
+    if (iter != null) iter.asInstanceOf[ExtentIterator]
+    else new NullExtentIterator(label)
   }
 
   def postings(key:String): PostingSeq[PositionsPosting] =
@@ -123,8 +126,19 @@ class Index(label: String, val underlying: GIndex) {
     val jdocs = gdocs.values.map(DocumentClone(_)).toList
     jdocs.sortBy(_.identifier)
   }
-  def vocabulary: KeySet =
-    new KeySet(underlying.getIndexPart("postings").keys _)
+
+  @inline private def getLabel(f: String): String = {
+    val label = if (f.startsWith("postings")) f else s"field.$f"
+    assume(underlying.containsPart(label), s"Part $label is not in this index")
+    label
+  }
+
+  /** Returns a view of the set of keys of a given index part.
+    * An assertion fails if the part is not found.
+   */
+  def vocabulary(field: String = "document"): KeySet = {
+    new KeySet(underlying.getIndexPart(getLabel(field)).keys _)
+  }
   def name(docid: Docid) : String = underlying.getName(docid)
   def identifier(name: String): Docid =
     new Docid(underlying.getIdentifier(name))
@@ -132,8 +146,8 @@ class Index(label: String, val underlying: GIndex) {
     new PairSeq[String](underlying.getIndexPart("names").keys,
     (k: KeyIterator) => Utility.toString(k.getValueBytes) : String )
   def count(key: String, targetId: String): Int = positions(key, targetId).size
-  def collectionCount(key: String): Long = getKeyedStatistics(key).nodeFrequency
-  def docFreq(key: String): Long = getKeyedStatistics(key).nodeDocumentCount
+  def collectionCount(key: String): Long = getKeyStatistics(key).nodeFrequency
+  def docFreq(key: String): Long = getKeyStatistics(key).nodeDocumentCount
   def document(docid: Docid): Document =
     IndexBasedDocument(underlying.getItem(underlying.getName(docid.underlying),
       Parameters.empty), this)
@@ -145,7 +159,7 @@ class Index(label: String, val underlying: GIndex) {
     doc.terms.toList
   }
 
-  private def getKeyedStatistics(key: String) : NS = {
+  private def getKeyStatistics(key: String) : NS = {
     val it = underlying.getIterator(key, Parameters.empty)
     it match {
       case n: NullExtentIterator => AggregateReader.NodeStatistics.zero
