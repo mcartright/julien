@@ -1,7 +1,6 @@
 package julien
 package retrieval
 
-import scala.collection.mutable.PriorityQueue
 import julien._
 
 object SimpleProcessor {
@@ -21,7 +20,6 @@ class SimpleProcessor extends QueryProcessor {
   }
 
   def prepare(): Unit = {
-
     val unprepped: Set[Operator] =
       models.flatMap(m => m.filter(_.isInstanceOf[NeedsPreparing])).toSet
     if (unprepped.size == 0) return // Got lucky, all done!
@@ -49,7 +47,8 @@ class SimpleProcessor extends QueryProcessor {
     iterators.map(_.reset)
   }
 
-  def run: List[ScoredDocument] = {
+  def run[T <: ScoredObject[T]](acc: Accumulator[T] =
+    DefaultAccumulator[ScoredDocument]): List[T] = {
     // Make sure we can do the next stuff easily
     assume(validated, s"Unable to validate given model/index combination")
     prepare()
@@ -62,23 +61,25 @@ class SimpleProcessor extends QueryProcessor {
         t.asInstanceOf[IteratedHook[_ <: GIterator]].underlying
     }.toSet.filterNot(_.hasAllCandidates)
     // Need to fix this
-    val scorers : List[FeatureOp] = List[FeatureOp](model)
+    val scorers : List[FeatureOp] = List(model)
 
     // Go
-    val numResults: Int = 100
-    val resultQueue = PriorityQueue[ScoredDocument]()
     while (iterators.exists(_.isDone == false)) {
       val candidate = iterators.filterNot(_.isDone).map(_.currentCandidate).min
       iterators.foreach(_.syncTo(candidate))
       if (iterators.exists(_.hasMatch(candidate))) {
         // Time to score
-        debug("scoring candidate: " + candidate + " " + index.name(candidate))
         val score = scorers.map(_.eval).sum
-        resultQueue.enqueue(ScoredDocument(candidate, score))
-        if (resultQueue.size > numResults) resultQueue.dequeue
+        // How do we instantiate an object without knowing what it is, and
+        // knowing what it needs? One method in the QueryProcessor?
+
+        // For now, put a nasty hack in to make it work.
+        // SAFETY OFF
+        val hackedAcc = acc.asInstanceOf[Accumulator[ScoredDocument]]
+        hackedAcc += ScoredDocument(candidate, score)
       }
       iterators.foreach(_.movePast(candidate))
     }
-    resultQueue.reverse
+    acc.result
   }
 }

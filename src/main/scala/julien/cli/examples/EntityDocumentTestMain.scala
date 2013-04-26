@@ -59,8 +59,6 @@ object EntityDocumentTestMain extends App {
   processor.add(sdm)
 
   // run it and get results
-  val results = processor.run
-
-
+  val results = processor.run()
   printResults(results, diskIndex)
 }

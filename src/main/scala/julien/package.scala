@@ -73,19 +73,6 @@ package object julien {
     b.toList
   }
 
-  /** Provides an ordering for [[ScoredDocument]]s. */
-  implicit object ScoredDocumentOrdering extends Ordering[ScoredDocument] {
-    def compare(a: ScoredDocument, b: ScoredDocument) = b.score compare a.score
-  }
-
-  /** Provides an [[scala.math.Ordering]] for [[Gram]]s. */
-  implicit object GramOrdering extends Ordering[Gram] {
-    def compare(a: Gram, b: Gram) = {
-      val result = b.score compare a.score
-      if (result == 0) a.term compare b.term else result
-    }
-  }
-
   /** Type definitions, most of which are for aliasing in the
     * package.
     */

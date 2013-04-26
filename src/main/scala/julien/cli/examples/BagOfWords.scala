@@ -44,8 +44,7 @@ Required parameters:
     processor.add(ql)
 
     // run it and get results
-    val results = processor.run
-
+    val results = processor.run()
     printResults(results, index, out)
   }
 }

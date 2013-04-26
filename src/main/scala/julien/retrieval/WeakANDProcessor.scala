@@ -1,7 +1,6 @@
 package julien
 package retrieval
 
-import scala.collection.mutable.PriorityQueue
 import scala.annotation.tailrec
 import julien._
 
@@ -65,28 +64,28 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimpleProcessor {
     _models = _models.flatMap(c => c.children.map(_.asInstanceOf[FeatureOp]))
   }
 
-  override def run: List[ScoredDocument] = {
+  override def run[T <: ScoredObject[T]](acc: Accumulator[T] =
+    DefaultAccumulator[ScoredDocument]()): List[T] = {
     // Main Method
     assume(validated, s"Unable to validate given model/index combination")
     prepare()
 
+    val hackedAcc = acc.asInstanceOf[DefaultAccumulator[ScoredDocument]]
     // Build the sentinel list - sort will change over time
     val sentinels = _models.map { feat =>
       val it = feat.iHooks.filter(_.isSparse).head.underlying
       Sentinel(feat, it)
     }.toArray
 
-    val resultQueue = PriorityQueue[ScoredDocument]()
     // direct access to the underlying iterators
     val iterators = _models.flatMap(_.iHooks.map(_.underlying)).toSet
-    val numResults:Int = 100
     // Have to warm up the queue
-    for (i <- 0 until numResults) {
+    for (i <- 0 until hackedAcc.limit) {
       val candidate =
         sentinels.map(_.iter).filterNot(_.isDone).map(_.currentCandidate).min
       iterators.foreach(_.syncTo(candidate))
       val score = sentinels.map(_.feat.eval).sum
-      resultQueue.enqueue(ScoredDocument(candidate, score))
+      hackedAcc += ScoredDocument(candidate, score)
     }
 
     // At this point we've scored "numResults" docs, and we need to find the
@@ -101,7 +100,7 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimpleProcessor {
     val scoreMinimum = sortedSentinels.map(_.feat.lowerBound).sum
 
     var running = true
-    var threshold = resultQueue.head.score * factor // Soft limit
+    var threshold = hackedAcc.head.score * factor // Soft limit
     var lastScored = -1
     while (running) {
       val pivotPos = findPivot(sortedSentinels, scoreMinimum, threshold)
@@ -122,9 +121,8 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimpleProcessor {
           val score = sortedSentinels.map(_.feat.eval).sum
           if (score > threshold) {
             // Pass muster, put it in the queue and update the threshold
-            resultQueue.enqueue(ScoredDocument(pivot, score))
-            resultQueue.dequeue // pop off the extra
-            threshold = resultQueue.head.score * factor
+            hackedAcc += ScoredDocument(pivot, score)
+            threshold = hackedAcc.head.score * factor
           }
         } else {
           // Iterators in line before the pivot iterator are not lined
@@ -137,7 +135,7 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimpleProcessor {
     }
 
     // All done - return
-    resultQueue.reverse
+    acc.result
   }
 
   // Assumption: limit is NOT negative infinity. We assume this b/c the method

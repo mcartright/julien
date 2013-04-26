@@ -1,6 +1,7 @@
 package julien
 package retrieval
 
+/** Generic definition of a query processor. */
 trait QueryProcessor {
   protected var _indexes = Set[Index]()
   protected var _models = List[FeatureOp]()
@@ -13,7 +14,7 @@ trait QueryProcessor {
   // The things that need implementing in subclasses
   // makes sure that all views are ready to provide info upwards
   def prepare: Unit
-  def run: List[ScoredDocument]
+  def run[T <: ScoredObject[T]](acc: Accumulator[T]): List[T]
 
   def clear: Unit = {
     _indexes = Set[Index]()

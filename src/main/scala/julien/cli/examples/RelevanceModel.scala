@@ -48,7 +48,7 @@ Required parameters:
     processor.add(ql)
 
     // run it and get results for the first run
-    val results = processor.run
+    val results = processor.run()
 
     val selectedGrams = extractGrams(results, index)
 
@@ -66,7 +66,7 @@ Required parameters:
     rm3.hooks.foreach(_.attach(index))
     processor.add(rm3)
 
-    val finalResults = processor.run
+    val finalResults = processor.run()
     printResults(results, index, out)
   }
 
@@ -128,6 +128,6 @@ Required parameters:
 
     // Sort and keep top "fbTerms"
     val fbTerms = 20
-    grams.toList.sorted(GramOrdering).take(fbTerms)
+    grams.toList.sorted.take(fbTerms)
   }
 }

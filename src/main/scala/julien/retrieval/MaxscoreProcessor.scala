@@ -57,7 +57,8 @@ class MaxscoreProcessor extends SimpleProcessor {
     _models = _models.flatMap(c => c.children.map(_.asInstanceOf[FeatureOp]))
   }
 
-  override def run: List[ScoredDocument] = {
+  override def run[T <: ScoredObject[T]](acc: Accumulator[T] =
+    DefaultAccumulator[ScoredDocument]()): List[T] = {
     // Need this in scope already
     var threshold = 0.0
 
@@ -88,6 +89,8 @@ class MaxscoreProcessor extends SimpleProcessor {
     assume(validated, s"Unable to validate given model/index combination")
     prepare()
 
+    val hackedAcc = acc.asInstanceOf[DefaultAccumulator[ScoredDocument]]
+
     // Build the sentinel list - sort is on idf
     val sentinels = _models.map { feat =>
       val it = feat.iHooks.filter(_.isSparse).head.underlying
@@ -99,17 +102,16 @@ class MaxscoreProcessor extends SimpleProcessor {
     // establish upper bound of all features - every document starts at
     // this value and is progressively lowered to the true score
     val startingScore = sentinels.map(_.feat.upperBound).sum
-    val resultQueue = PriorityQueue[ScoredDocument]()
     // direct access to the underlying iterators
     val iterators = _models.flatMap(m => m.iHooks.map(_.underlying)).toSet
-    val numResults:Int = 100
+
     // Have to warm up the queue
-    for (i <- 0 until numResults) {
+    for (i <- 0 until hackedAcc.limit) {
       val candidate =
         sentinels.map(_.iter).filterNot(_.isDone).map(_.currentCandidate).min
       iterators.foreach(_.syncTo(candidate))
       val score = sentinels.map(_.feat.eval).sum
-      resultQueue.enqueue(ScoredDocument(candidate, score))
+      hackedAcc += ScoredDocument(candidate, score)
     }
 
     // At this point we've scored "numResults" docs, and we need to find the
@@ -133,7 +135,7 @@ class MaxscoreProcessor extends SimpleProcessor {
     while (candidate < Int.MaxValue) {
       val drivers = sentinels.take(sidx).map(_.iter)
       if (drivers.exists(_.hasMatch(candidate))) {
-        threshold = resultQueue.head.score
+        threshold = hackedAcc.head.score
         (lengths +: drivers).foreach(_.syncTo(candidate))
         // Sum the active sentinels
         val senscore = sentinels.take(sidx).map(_.feat.eval).sum
@@ -143,8 +145,7 @@ class MaxscoreProcessor extends SimpleProcessor {
         val (score, pos) = conditionalAddSentinel(sentinels, sidx, senscore)
 
         if (pos == sentinels.size && score > threshold) {
-          resultQueue.dequeue // We know this will happen
-          resultQueue.enqueue(ScoredDocument(candidate, score))
+          hackedAcc += ScoredDocument(candidate, score)
           sidx = getSentinelIndex(sentinels, 0, startingScore)
         }
       }
@@ -158,6 +159,6 @@ class MaxscoreProcessor extends SimpleProcessor {
     }
 
     // All done - return
-    resultQueue.reverse
+    acc.result
   }
 }
