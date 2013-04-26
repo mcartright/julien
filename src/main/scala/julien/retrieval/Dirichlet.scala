@@ -7,6 +7,11 @@ object Dirichlet {
   def apply(op: PositionStatsView, l: LengthsView) = {
     new Dirichlet(op, l, op, defMu)
   }
+
+  def apply(op: PositionStatsView, l: LengthsView, mu : Double) = {
+    new Dirichlet(op, l, op, mu)
+  }
+
   def apply(c: CountView, l: LengthsView, s: StatisticsView) =
     new Dirichlet(c, l, s, defMu)
   def apply(

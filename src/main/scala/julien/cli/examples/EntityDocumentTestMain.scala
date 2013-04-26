@@ -6,7 +6,6 @@ import julien._
 import access.Index
 import retrieval._
 import retrieval.Utils._
-import org.lemurproject.galago.tupleflow.Utility
 
 /**
 * User: jdalton
@@ -36,12 +35,12 @@ object EntityDocumentTestMain extends App {
 
   val sdm =
     Combine(List[FeatureOp](
-      Weight(Combine(query.map(a => Dirichlet(a,IndexLengths()))), 0.8),
+      Weight(Combine(query.map(a => Dirichlet(a,IndexLengths(), 50))), 0.8),
       Weight(Combine(query.sliding(2,1).map { p =>
-        Dirichlet(OrderedWindow(1, p: _*), IndexLengths())
+        Dirichlet(OrderedWindow(1, p: _*), IndexLengths(), 50)
       }.toSeq), 0.15),
       Weight(Combine(query.sliding(2,1).map { p =>
-        Dirichlet(UnorderedWindow(8, p: _*), IndexLengths())
+        Dirichlet(UnorderedWindow(8, p: _*), IndexLengths(), 50)
       }.toSeq), 0.05)
     ))
    modelFeatures += sdm

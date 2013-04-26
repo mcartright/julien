@@ -2,6 +2,8 @@ package julien
 package retrieval
 
 import julien._
+import org.lemurproject.galago.tupleflow.Utility
+import org.lemurproject.galago
 
 object SimpleProcessor {
   def apply() = new SimpleProcessor()
@@ -56,8 +58,7 @@ class SimpleProcessor extends QueryProcessor {
     // extract iterators
     val index = _indexes.head
     val model = _models.head
-    val iterators: Set[GIterator] = model.iHooks.map(_.underlying).toSet
-      model.filter(_.isInstanceOf[IteratedHook[_ <: GIterator]]).map { t =>
+    val iterators: Set[GIterator] = model.filter(_.isInstanceOf[IteratedHook[_ <: GIterator]]).map { t =>
         t.asInstanceOf[IteratedHook[_ <: GIterator]].underlying
     }.toSet.filterNot(_.hasAllCandidates)
     // Need to fix this
@@ -66,6 +67,9 @@ class SimpleProcessor extends QueryProcessor {
     // Go
     while (iterators.exists(_.isDone == false)) {
       val candidate = iterators.filterNot(_.isDone).map(_.currentCandidate).min
+
+      iterators.filterNot(_.isDone).foreach(i => println(Utility.toString(i.key()) +  " cand:" + i.currentCandidate))
+
       iterators.foreach(_.syncTo(candidate))
       if (iterators.exists(_.hasMatch(candidate))) {
         // Time to score

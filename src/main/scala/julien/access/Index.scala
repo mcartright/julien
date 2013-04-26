@@ -90,7 +90,6 @@ class Index private(
 
   /** In theory, releases the resources associated with this index. In theory.*/
   def close: Unit = underlying.close
-
   def collectionLength: Long = collectionStats.collectionLength
   def numDocuments: Long = collectionStats.documentCount
   def vocabularySize: Long = postingsStats.vocabCount
