@@ -26,7 +26,7 @@ class Dirichlet(
   val lengths: LengthsView,
   val statsrc: StatisticsView,
   val mu: Double)
-    extends FeatureOp {
+    extends ScalarWeightedFeature {
   require(mu > 0, s"Mu must be positive. Received $mu")
 
   lazy val children: Seq[Operator] = Set[Operator](op, lengths, statsrc).toList

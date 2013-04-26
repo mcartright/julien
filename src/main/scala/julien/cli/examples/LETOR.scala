@@ -50,7 +50,7 @@ Required parameters:
     modelFeatures ++= fields.map { f =>
       val lView = IndexLengths(f)
       // Turn it into a feature
-      new FeatureOp with ChildlessOp {
+      new ScalarWeightedFeature with ChildlessOp {
         def eval: Double = lView.length.toDouble
         lazy val views: Set[ViewOp] = Set[ViewOp](lView)
       }

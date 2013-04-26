@@ -16,7 +16,7 @@ class TFIDF(
   val op: CountView,
   val lengths: LengthsView,
   val statsrc: StatisticsView)
-    extends FeatureOp {
+    extends ScalarWeightedFeature {
 
   lazy val children: Seq[Operator] = Set[Operator](op, lengths, statsrc).toList
   lazy val views: Set[ViewOp] = Set[ViewOp](op, lengths, statsrc)

@@ -6,7 +6,7 @@ object IDF { def apply(s: StatisticsView) = new IDF(s) }
 /** Just an Inverse Document Frequency (IDF) feature. Calculates
   *  the feature once (lazily) then caches it.
   */
-class IDF(val statsrc: StatisticsView) extends FeatureOp {
+class IDF(val statsrc: StatisticsView) extends ScalarWeightedFeature {
   lazy val children: Seq[Operator] = List[Operator](statsrc)
   lazy val views: Set[ViewOp] = Set[ViewOp](statsrc)
   // Runs when asked for the first time, and runs only once

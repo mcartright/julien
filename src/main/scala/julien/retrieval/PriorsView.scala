@@ -8,9 +8,7 @@ import julien.access._
 // feature/view.
 class PriorsView
     extends IteratedHook[ScoreIterator]
-    with FeatureView
-    with ScoreSrc {
-
+    with ScalarWeightedFeature {
   def getIterator(i: Index): ScoreIterator = {
     i.partReader("priors").getIterator("priors").asInstanceOf[ScoreIterator]
   }

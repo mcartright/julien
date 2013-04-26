@@ -5,7 +5,7 @@ object TF { def apply(c: CountView, l: LengthsView) = new TF(c, l) }
 
 /** Simple Term Frequency (# times the term occurs in D / |D|) feature. */
 class TF(val op: CountView, val lengths: LengthsView)
-    extends FeatureOp {
+    extends ScalarWeightedFeature {
   lazy val children: Seq[Operator] = Set[Operator](op, lengths).toList
   lazy val views: Set[ViewOp] = Set[ViewOp](op, lengths)
   override val upperBound: Double = 1.0

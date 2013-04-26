@@ -22,7 +22,7 @@ class JelinekMercer(
   val lengths: LengthsView,
   val statsrc: StatisticsView,
   val lambda: Double)
-    extends FeatureOp {
+    extends ScalarWeightedFeature {
   require(lambda >= 0.0 && lambda <= 1.0, s"Lambda must be [0,1]. Got: $lambda")
   lazy val children: Seq[Operator] = Set[Operator](op, lengths, statsrc).toList
   lazy val views: Set[ViewOp] = Set[ViewOp](op, lengths, statsrc)

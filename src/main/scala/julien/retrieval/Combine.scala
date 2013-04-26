@@ -2,17 +2,39 @@ package julien
 package retrieval
 
 object Combine {
-  def apply(c: Combiner, ops: Seq[FeatureOp]) = new Combine(ops, c)
-  def apply(ops: Seq[FeatureOp]) = new Combine(ops, summer)
+  def apply(children: Seq[FeatureOp]) =
+    new Combine(children, () => 1.0, summer)
+
+  def apply(children: Seq[FeatureOp], weight: Double) =
+    new Combine(children, () => weight, summer)
+
+  def apply(children: Seq[FeatureOp], weight: Double, combiner: Combiner) =
+    new Combine(children, () => weight, combiner)
+
+  def apply(children: Seq[FeatureOp], weight: () => Double) =
+    new Combine(children, weight, summer)
+
+  def apply(children: Seq[FeatureOp], combiner: Combiner) =
+    new Combine(children, () => 1.0, combiner)
+
+  def apply(
+    children: Seq[FeatureOp],
+    weight: () => Double,
+    combiner: Combiner) = new Combine(children, weight, combiner)
+
   val summer: Combiner = (sops: Seq[FeatureOp]) => {
     sops.foldLeft(0.0) { (score, op) => score + op.eval }
   }
 }
 
-class Combine(val ops: Seq[FeatureOp], combineFn: Combiner)
-    extends FeatureOp {
+class Combine private(
+  val ops: Seq[FeatureOp],
+  w: () => Double,
+  var combiner: Combiner)
+    extends FunctionWeightedFeature {
+  this.weight = w
   lazy val children: Seq[Operator] = ops
   def views: Set[ViewOp] =
     ops.foldLeft(Set[ViewOp]()) { (s, op) => s ++ op.views }
-  def eval : Double = combineFn(ops)
+  def eval : Double = combiner(ops)
 }

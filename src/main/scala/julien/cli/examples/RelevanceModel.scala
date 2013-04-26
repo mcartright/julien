@@ -54,12 +54,14 @@ Required parameters:
 
     // Prep for adding to model
     val wrappedGrams = selectedGrams.map { gram =>
-      Weight(Dirichlet(Term(gram.term), IndexLengths()), gram.score)
+      Dirichlet(Term(gram.term), IndexLengths(), gram.score)
     }
 
+    // Set weights using a single parameter (which ties them properly)
+    val lambda = 0.7
+    ql.weight = lambda
     val rm3 = Combine(
-      List[FeatureOp](Weight(ql, 0.7),
-      Weight(Combine(wrappedGrams), 0.3))
+      List(ql, Combine(children = wrappedGrams, weight = (1-lambda)))
     )
 
     processor.clear

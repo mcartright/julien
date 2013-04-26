@@ -23,9 +23,8 @@ class AbsoluteDiscount(
   val statsrc: StatisticsView,
   val docsrc: DocumentView,
   val delta: Double)
-    extends FeatureOp {
+    extends ScalarWeightedFeature {
   require(delta > 0, s"Delta must be positive. Received $delta")
-
   lazy val children: Seq[Operator] =
     Set[Operator](op, lengths, statsrc, docsrc).toList
   lazy val views: Set[ViewOp] = Set[ViewOp](op, lengths, statsrc, docsrc)
