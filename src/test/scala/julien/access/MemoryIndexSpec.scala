@@ -10,11 +10,13 @@ import java.util.logging.{Level,Logger}
 import org.scalatest._
 import julien.cli.BuildIndex
 
-class DiskIndexSpec extends FlatSpec with BeforeAndAfterAll {
+class MemoryIndexSpec extends FlatSpec with BeforeAndAfterAll {
   val tmpForInput: File =
     new File(Utility.createTemporary.getAbsolutePath)
   val tmpForIndex: File = Utility.createTemporaryDirectory("tmpindex")
-  var index: Index = null
+  // Our indexes
+  var diskIndex: Index = null
+  var memoryIndex: Index = null
 
   // Extract our source docs, write to an index, run the tests over the
   // read-only structure, then clean up.
@@ -23,7 +25,7 @@ class DiskIndexSpec extends FlatSpec with BeforeAndAfterAll {
     Logger.getLogger("").setLevel(Level.OFF)
     Logger.getLogger(classOf[JobExecutor].toString).setLevel(Level.OFF)
 
-    // Extract resource - small 5 doc collection for checking statistics
+    // Extract resource - small 5 doc collection for correctness testing
     val istream = getClass.getResourceAsStream("/wiki-trectext-5.dat")
     assert (istream != null)
     Utility.copyStreamToFile(istream, tmpForInput)
@@ -46,47 +48,57 @@ class DiskIndexSpec extends FlatSpec with BeforeAndAfterAll {
 
     // Sort of a "/dev/null"
     val receiver = new PrintStream(new ByteArrayOutputStream)
-
     BuildIndex.run(params, receiver)
     receiver.close
-    index = Index.disk(tmpForIndex.getAbsolutePath)
+    diskIndex = Index.disk(tmpForIndex.getAbsolutePath)
+
+    // Make the memory index too
+    memoryIndex = Index.memory(tmpForInput.getAbsolutePath)
   }
 
   override def afterAll() {
-    index.close
+
+    diskIndex.close
     tmpForInput.delete()
     Utility.deleteDirectory(tmpForIndex)
+
+    memoryIndex.close
   }
 
   // Start tests
-  "A built index" should "have 5 documents" in {
-    expectResult(5L) { index.numDocuments } // currently we have some loss
+  "A memory index" should
+  "have the same number of docs as the disk version" in {
+    expectResult(diskIndex.numDocuments) { memoryIndex.numDocuments }
   }
 
-  it should "have 86 unique terms" in {
-    expect(86L) { index.vocabularySize }
+  it should "have the same number of unique terms" in {
+    expectResult(diskIndex.vocabularySize) {
+      memoryIndex.vocabularySize
+    }
   }
 
-  it should "have 123 term instances" in {
-    expect(123L) { index.collectionLength }
+  it should "have the same collection length" in {
+    expectResult(diskIndex.collectionLength) {
+      diskIndex.collectionLength
+    }
   }
 
-  it should "provide a valid lengths iterator for the default key" in {
-    val iterator = index.lengthsIterator(index.defaultPart)
-    assert( iterator != null )
+  it should "validate a valid lengths iterator for the default key" in {
+    val iterator = memoryIndex.lengthsIterator(memoryIndex.defaultPart)
+    assert ( iterator != null )
   }
 
   it should "provide the default without arguments as well" in {
-    val iterator = index.lengthsIterator()
-    expect(index.defaultPart) { Utility.toString(iterator.key) }
+    val iterator = memoryIndex.lengthsIterator()
+    expect(memoryIndex.defaultPart) { Utility.toString(iterator.key) }
   }
 
   it should "provide a null extent iterator for a OOV term" in {
-    val iterator = index.iterator("snufalufagus")
+    val iterator = memoryIndex.iterator("snufalufagus")
     assert ( iterator.isInstanceOf[NullExtentIterator] )
   }
 
   it should "fail an assertion when asking for a non-existent part" in {
-    intercept[AssertionError] { index.iterator("chocula", "bert") }
+    intercept[AssertionError] { memoryIndex.iterator("chocula", "bert") }
   }
 }

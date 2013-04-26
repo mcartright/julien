@@ -118,12 +118,12 @@ class Index private(
   def lengthsIterator(field: String): LI =
     underlying.getIndexPart("lengths").getIterator(field).asInstanceOf[LI]
 
-  def lengthsIterator(field: Option[String]): LI =
+  def lengthsIterator(field: Option[String] = None): LI =
     lengthsIterator(field.getOrElse(currentDefault))
 
   def shareableIterator(
     key: String,
-    field: Option[String]): ExtentIterator =
+    field: Option[String] = None): ExtentIterator =
     shareableIterator(key, field.getOrElse(currentDefault))
 
   /** Produces a cached ExtentIterator if possible. If not found, a new iterator
