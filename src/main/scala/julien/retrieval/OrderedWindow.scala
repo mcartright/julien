@@ -37,7 +37,6 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
       if (iterators.exists(!_.hasNext)) return hits.result
 
       // Now see if we have a valid match
-      iterators.foreach(s => println(s.head))
       val matched = iterators.sliding(2, 1).map {
         P =>
         // Map pairs of iterators to booleans. All true = have match

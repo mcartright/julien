@@ -13,7 +13,7 @@ class OrderedWindowSpec extends FlatSpec with MockFactory {
     val mock3 = mock[PositionStatsView]
   }
 
-  "An unordered window" should
+  "An ordered window" should
   "require all children to be from the same index" in (pending)
 
   it should "complain if given a window size < 1" in (pending)
