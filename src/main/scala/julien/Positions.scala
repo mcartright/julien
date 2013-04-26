@@ -15,6 +15,9 @@ class Positions(underlying: Array[Int])
   def length: Int = underlying.length
   def seq: IndexedSeq[Int] = Vector(underlying: _*)
   def newBuilder : Builder[Int, Positions] = Positions.newBuilder
+  override def equals(obj: Any) = {
+    obj.isInstanceOf[Positions] && obj.asInstanceOf[Positions].seq == this.seq
+  }
 }
 
 object Positions {
