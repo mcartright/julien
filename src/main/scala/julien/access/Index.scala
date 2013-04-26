@@ -57,8 +57,11 @@ class Index(label: String, val underlying: GIndex) {
   private val postingsStats =
     underlying.getIndexPartStatistics("postings")
 
-  def lengthsIterator(field: String = "document"): LI =
+  def lengthsIterator(field: String = "document"): LI =   {
+    // remove this after merge field in old galago the key needed to be "document" for lengths.
+   // val realField = "document"
     underlying.getIndexPart("lengths").getIterator(field).asInstanceOf[LI]
+  }
 
   def collectionLength: Long = collectionStats.collectionLength
   def numDocuments: Long = collectionStats.documentCount
