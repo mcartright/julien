@@ -1,7 +1,7 @@
 package garage
 package sources
 
-import org.lemurproject.galago.tupleflow.Utility
+import julien.galago.tupleflow.Utility
 import java.util.Properties
 import java.io.{File,FileReader}
 import scala.collection.JavaConversions._

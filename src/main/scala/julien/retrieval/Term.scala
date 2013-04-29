@@ -1,7 +1,7 @@
 package julien
 package retrieval
 
-import org.lemurproject.galago.core.index.ExtentIterator
+import julien.galago.core.index.ExtentIterator
 
 object Term {
   def apply(s: String) = new Term(s, None)

@@ -1,7 +1,7 @@
 package julien
 package access
 
-import org.lemurproject.galago.core.index.ExtentIterator
+import julien.galago.core.index.ExtentIterator
 
 class PositionsPosting protected (
   var docid: Docid,

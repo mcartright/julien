@@ -18,7 +18,7 @@ package object retrieval {
   type Index = julien.access.Index
   val Index = julien.access.Index
 
-  import org.lemurproject.{galago => G}
+  import julien.{galago => G}
   // Stopwords here - somewhere else?
   object Stopwords {
     def inquery =

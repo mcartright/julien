@@ -16,10 +16,10 @@ object EntityDocumentTestMain extends App {
   // load index into memory
   var index : Index = null
 
-  val memIndex = Index.memory("/usr/dan/users4/jdalton/code/julien/src/main/resources/wiki-trectext-5.dat")
-  val diskIndex = Index.disk("/usr/dan/users4/jdalton/code/julien/data/test-index")
+  val memIndex = Index.memory("/usr/dan/users4/jdalton/code/julien/src/test/resources/wiki-trectext-5.dat")
+  //val diskIndex = Index.disk("/usr/dan/users4/jdalton/code/julien/data/test-index")
 
-  index = diskIndex
+  index = memIndex
 
   val lengths = index.underlying.getIndexPart("lengths")
   val keys = lengths.keys()
@@ -62,5 +62,5 @@ object EntityDocumentTestMain extends App {
 
   // run it and get results
   val results = processor.run()
-  printResults(results, diskIndex)
+  printResults(results, index)
 }

@@ -1,7 +1,7 @@
 package julien
 package retrieval
 
-import org.lemurproject.galago.core.index.DataIterator
+import julien.galago.core.index.DataIterator
 
 object DocumentView {
   def apply() = new DocumentView()

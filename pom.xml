@@ -60,7 +60,14 @@
       <artifactId>scalamock-scalatest-support_2.10</artifactId>
       <version>3.1-SNAPSHOT</version>
     </dependency>
+<!--
     <dependency>
+           <groupId>edu.umass.ciir</groupId>
+           <artifactId>ciirshared</artifactId>
+           <version>1.0</version>
+     </dependency>
+-->  
+  <dependency>
       <groupId>edu.umass.ciir</groupId>
       <artifactId>macros</artifactId>
       <version>0.1</version>
@@ -96,6 +103,13 @@
       <artifactId>core</artifactId>
       <version>3.3-JULIEN</version>
     </dependency>
+<!--
+    <dependency>
+      <groupId>org.lemurproject.galago</groupId>
+      <artifactId>core</artifactId>
+      <version>3.4</version>
+    </dependency>
+-->
     <dependency>
       <groupId>org.lemurproject.galago</groupId>
       <artifactId>tupleflow</artifactId>
@@ -161,6 +175,16 @@
 	  </execution>
 	</executions>
       </plugin>
+
+<plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-idea-plugin</artifactId>
+  <configuration>
+    <exclude>garage/**/*.scala</exclude>
+    <exclude>**/learning/**/*.scala</exclude>
+  </configuration>
+</plugin>
+
       <plugin>
 	<groupId>net.alchim31.maven</groupId>
 	<artifactId>scala-maven-plugin</artifactId>

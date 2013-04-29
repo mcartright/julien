@@ -1,7 +1,7 @@
 package julien
 package access
 
-import org.lemurproject.galago.core.index.CountIterator
+import julien.galago.core.index.CountIterator
 
 class CountPosting protected (var docid: Docid, var count: Int)
     extends Posting[CountPosting]

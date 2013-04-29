@@ -78,13 +78,13 @@ package object julien {
     */
 
   // To bring the packages in scope...
-  import org.lemurproject.galago.core.index._
-  import org.lemurproject.galago.core.index.corpus._
+  import julien.galago.core.index._
+  import julien.galago.core.index.corpus._
 
   // Because the names are ridiculously long...
-  type GIndex = org.lemurproject.galago.core.index.Index
-  type GDoc = org.lemurproject.galago.core.parse.Document
-  type GIterator = org.lemurproject.galago.core.index.Iterator
+  type GIndex = julien.galago.core.index.Index
+  type GDoc = julien.galago.core.parse.Document
+  type GIterator = julien.galago.core.index.Iterator
   type ARCA = AggregateReader.CollectionAggregateIterator
   type ARNA = AggregateReader.NodeAggregateIterator
   type NS = AggregateReader.NodeStatistics

@@ -1,14 +1,14 @@
 package julien
 package access
 
-import org.lemurproject.galago.core.index.disk.DiskIndex
-import org.lemurproject.galago.core.index.corpus.CorpusReader
-import org.lemurproject.galago.core.index.mem.MemoryIndex
-import org.lemurproject.galago.core.index.{Index=> _, _}
-import org.lemurproject.galago.core.index.AggregateReader._
-import org.lemurproject.galago.core.util.ExtentArray
-import org.lemurproject.galago.core.parse.{Document => _, _}
-import org.lemurproject.galago.tupleflow.{Parameters,Utility,Source}
+import julien.galago.core.index.disk.DiskIndex
+import julien.galago.core.index.corpus.CorpusReader
+import julien.galago.core.index.mem.MemoryIndex
+import julien.galago.core.index.{Index=> _, _}
+import julien.galago.core.index.AggregateReader._
+import julien.galago.core.util.ExtentArray
+import julien.galago.core.parse.{Document => _, _}
+import julien.galago.tupleflow.{Parameters,Utility,Source}
 import scala.collection.JavaConversions._
 import julien._
 

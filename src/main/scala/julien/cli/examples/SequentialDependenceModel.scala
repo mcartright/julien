@@ -4,7 +4,7 @@ package examples
 
 import scala.collection.mutable.PriorityQueue
 import scala.collection.JavaConversions._
-import org.lemurproject.galago.tupleflow.Parameters
+import julien.galago.tupleflow.Parameters
 
 // Pull in retrieval definitions
 import julien.retrieval._

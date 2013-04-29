@@ -6,8 +6,8 @@ import julien.retrieval._
 import julien.retrieval.Utils._
 
 import scala.collection.mutable.{ListBuffer,PriorityQueue,HashMap,LinkedHashMap}
-import org.lemurproject.galago.core.parse.{Tag,TagTokenizer}
-import org.lemurproject.galago.tupleflow.Parameters
+import julien.galago.core.parse.{Tag,TagTokenizer}
+import julien.galago.tupleflow.Parameters
 import scala.collection.JavaConversions._
 import scala.collection.immutable.Set
 import scala.collection.Map

@@ -1,7 +1,7 @@
 package julien
 package retrieval
 
-import org.lemurproject.galago.core.index.LengthsReader._
+import julien.galago.core.index.LengthsReader._
 
 object IndexLengths {
   def apply() = new IndexLengths(None)

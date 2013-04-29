@@ -2,9 +2,9 @@ package julien
 package access
 
 import scala.io.Source
-import org.lemurproject.galago.tupleflow.{Parameters,Utility}
-import org.lemurproject.galago.tupleflow.execution.JobExecutor
-import org.lemurproject.galago.core.index.NullExtentIterator
+import julien.galago.tupleflow.{Parameters,Utility}
+import julien.galago.tupleflow.execution.JobExecutor
+import julien.galago.core.index.NullExtentIterator
 import java.io.{File,InputStream,PrintStream,ByteArrayOutputStream}
 import java.util.logging.{Level,Logger}
 import org.scalatest._

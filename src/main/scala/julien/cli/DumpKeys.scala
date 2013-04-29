@@ -1,10 +1,10 @@
 package julien
 
 import java.io.{PrintStream,File}
-import org.lemurproject.galago.core.index.IndexPartReader;
-import org.lemurproject.galago.core.index.KeyIterator;
-import org.lemurproject.galago.core.index.disk.DiskIndex;
-import org.lemurproject.galago.tupleflow.Parameters;
+import julien.galago.core.index.IndexPartReader;
+import julien.galago.core.index.KeyIterator;
+import julien.galago.core.index.disk.DiskIndex;
+import julien.galago.tupleflow.Parameters;
 
 object DumpKeys extends CLIFunction {
   def name = "dumpkeys"

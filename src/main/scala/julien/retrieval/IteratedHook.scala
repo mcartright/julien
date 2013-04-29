@@ -2,7 +2,7 @@ package julien
 package retrieval
 
 /** Indicates behavior of an [[IndexHook]] that contains
-  * an [[org.lemurproject.galago.core.index.Iterator]]
+  * an [[julien.galago.core.index.Iterator]]
   * as its underlying data source.
   */
 trait IteratedHook[I <: GIterator]

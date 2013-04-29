@@ -2,8 +2,8 @@ package julien
 package retrieval
 
 import julien._
-import org.lemurproject.galago.tupleflow.Utility
-import org.lemurproject.galago
+import julien.galago.tupleflow.Utility
+import julien.galago
 
 object SimpleProcessor {
   def apply() = new SimpleProcessor()
@@ -68,7 +68,7 @@ class SimpleProcessor extends QueryProcessor {
     while (iterators.exists(_.isDone == false)) {
       val candidate = iterators.filterNot(_.isDone).map(_.currentCandidate).min
 
-      iterators.filterNot(_.isDone).foreach(i => println(Utility.toString(i.key()) +  " cand:" + i.currentCandidate))
+      //iterators.filterNot(_.isDone).foreach(i => println(Utility.toString(i.key()) +  " cand:" + i.currentCandidate))
 
       iterators.foreach(_.syncTo(candidate))
       if (iterators.exists(_.hasMatch(candidate))) {
