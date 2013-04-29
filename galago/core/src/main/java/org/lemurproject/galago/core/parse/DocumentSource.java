@@ -42,8 +42,8 @@ public class DocumentSource implements ExNihiloSource<DocumentSplit> {
   private Logger logger;
   private String inputPolicy;
 
-  public DocumentSource(String... sources) {
-    this.parameters = new Parameters();
+  public DocumentSource(List<String> sources, Parameters p) {
+      this.parameters = p;
     ArrayList<String> dirs = new ArrayList<String>();
     parameters.set("directory", dirs);
     ArrayList<String> files = new ArrayList<String>();

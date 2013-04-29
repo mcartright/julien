@@ -5,9 +5,8 @@ package retrieval
 trait QueryProcessor {
   protected var _indexes = Set[Index]()
   protected var _models = List[FeatureOp]()
-  var numResults: Int = 100
-  def add(i: Index) { _indexes = indexes + i }
-  def add(f: FeatureOp*) { _models = f ++: models }
+  def add(i: Index) { _indexes = _indexes + i }
+  def add(f: FeatureOp*) { _models = f ++: _models }
   def indexes: Set[Index] = _indexes
   def models: List[FeatureOp] = _models
 

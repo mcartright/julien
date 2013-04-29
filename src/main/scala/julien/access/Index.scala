@@ -26,26 +26,29 @@ object Index {
   def disk(s: String): Index = disk(s, "all")
   def disk(s: String, defaultPart: String): Index =
     new Index(s, new DiskIndex(s), defaultPart)
-  def memory(s: String, defPart: String = "all"): Index =
-    memory(Seq(s), defPart)
-  def memory(s: Seq[String]): Index = memory(s, "all")
-  def memory(s: Seq[String], defaultPart: String): Index = {
+  def memory(
+    input: String,
+    defaultPart: String = "all",
+    parameters: Parameters = Parameters.empty): Index = {
+    val parserParams = parameters.get("parser", Parameters.empty)
+    val tokenizerParams = parameters.get("tokenizer", Parameters.empty)
+
     // Try to use the components from the Galago pipeline to
     // 1) Chop the file into a DocumentSource
-    val docsource = new DocumentSource(s: _*)
+    val docsource = new DocumentSource(List(input), parameters)
 
     // Establish the pipeline
     val memoryIndex = docsource.asInstanceOf[Source[_]].
-      setProcessor(new ParserCounter()).asInstanceOf[Source[_]].
+      setProcessor(new ParserCounter(parserParams)).asInstanceOf[Source[_]].
       setProcessor(new SplitOffsetter()).asInstanceOf[Source[_]].
-      setProcessor(new ParserSelector()).asInstanceOf[Source[_]].
-      setProcessor(new TagTokenizer()).asInstanceOf[Source[_]].
+      setProcessor(new ParserSelector(parserParams)).asInstanceOf[Source[_]].
+      setProcessor(new TagTokenizer(tokenizerParams)).asInstanceOf[Source[_]].
       setProcessor(new MemoryIndex()).asInstanceOf[MemoryIndex]
 
     // Run it
     docsource.run()
     // Return it
-    return new Index(s.mkString(","), memoryIndex, defaultPart)
+    return new Index(input, memoryIndex, defaultPart)
   }
 }
 

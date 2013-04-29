@@ -16,7 +16,8 @@ object EntityDocumentTestMain extends App {
   // load index into memory
   var index : Index = null
 
-  val memIndex = Index.memory("/usr/dan/users4/jdalton/code/julien/src/main/resources/wiki-trectext-5.dat")
+  val memIndex =
+    Index.memory("/usr/dan/users4/jdalton/code/julien/src/main/resources/wiki-trectext-5.dat")
   val diskIndex = Index.disk("/usr/dan/users4/jdalton/code/julien/data/test-index")
 
   index = diskIndex

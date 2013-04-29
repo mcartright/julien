@@ -6,7 +6,7 @@ import org.lemurproject.galago.core.util.ExtentArray
 trait PositionsBehaviors { this: FlatSpec =>
   def emptyPositions(emptyP: => Positions) {
     it should "have no elements" in {
-      assert(emptyP.length === 0)
+      expectResult(0) { emptyP.length }
     }
 
     it should "throw an exception if we access anything in it" in {

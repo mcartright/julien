@@ -79,10 +79,13 @@ public class TagTokenizer extends StandardStep<Document, Document> {
   }
 
   public TagTokenizer(TupleFlowParameters parameters) {
+    this(parameters.getJSON());
+  }
+
+  public TagTokenizer(Parameters parameters) {
     this();
-    Parameters tokenizerParams = parameters.getJSON();
-    if (tokenizerParams.isList("fields") || tokenizerParams.isString("fields")) {
-      for (String value : (List<String>) tokenizerParams.getAsList("fields")) {
+    if (parameters.isList("fields") || parameters.isString("fields")) {
+      for (String value : (List<String>) parameters.getAsList("fields")) {
         whitelist.add(Pattern.compile(value));
       }
     }
