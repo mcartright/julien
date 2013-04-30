@@ -19,8 +19,11 @@ class CombineSpec extends FlatSpec with MockFactory {
     val v2 = 12.9
     val v3 = 11.13
     mock1.expects('eval)().returning(v1)
+    mock1.expects('weight)().returning(1.0)
     mock2.expects('eval)().returning(v2)
+    mock2.expects('weight)().returning(1.0)
     mock3.expects('eval)().returning(v3)
+    mock3.expects('weight)().returning(1.0)
     val c = Combine(List(mock1, mock2, mock3))
     expect(v1+v2+v3) { c.eval }
   }

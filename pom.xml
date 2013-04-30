@@ -105,13 +105,11 @@
       <artifactId>core</artifactId>
       <version>3.3</version>
     </dependency>
-<!--
     <dependency>
       <groupId>org.lemurproject.galago</groupId>
       <artifactId>core</artifactId>
       <version>3.4</version>
     </dependency>
--->
     <dependency>
       <groupId>julien.galago</groupId>
       <artifactId>tupleflow</artifactId>
