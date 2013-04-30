@@ -10,6 +10,8 @@ object DefaultAccumulator {
     new DefaultAccumulator[T](new PriorityQueue[T](), size)
   def apply[T <: ScoredObject[T]](): DefaultAccumulator[T] =
     new DefaultAccumulator[T](new PriorityQueue[T](), defaultSize)
+
+  /** We assume the provided queue has an ordering of "least is first". */
   def apply[T <: ScoredObject[T]](
     q: PriorityQueue[T],
     l: Int = defaultSize): DefaultAccumulator[T] =
@@ -25,6 +27,7 @@ class DefaultAccumulator[T <: ScoredObject[T]] private(
   private[this] val q: PriorityQueue[T], val limit: Int)
     extends Accumulator[T] {
   override val hasLimit: Boolean = true
+  override def atCapacity: Boolean = q.size >= limit
 
   override def clear: Unit = q.clear
   override def +=(elem: T): this.type = {
@@ -37,8 +40,9 @@ class DefaultAccumulator[T <: ScoredObject[T]] private(
     * the contents of the Accumulator.
     */
   override def result(): List[T] = {
-    val b = List.newBuilder[T]
-    while (!q.isEmpty) b += q.dequeue
+    val b = scala.collection.mutable.ListBuffer[T]()
+    // building it back-to-front (i.e. a series of prepends)
+    while (!q.isEmpty) q.dequeue +=: b
     b.result
   }
 

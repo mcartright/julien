@@ -19,77 +19,23 @@ object WeakANDProcessor {
   *
   * This model exists for pedagogical purposes more than being
   * recent state-of-the-art.
+  *
+  * Assumptions:
+  *    - No complex views are used (technically means that features
+  *      with more than 1 sparse view are disallowed)
+  *    - Only 1 index is being used
+  *    - Query is a bag of words (term independence assumption)
   */
-class WeakANDProcessor(factor: Double = 1.0) extends SimpleProcessor {
-  // For encapsulation - note we assume 1-to-1
-  // of features to non-lengths iterators
-  case class Sentinel(feat: FeatureOp, iter: GIterator)
-
-  // Also want an ordering on the Sentinels
-  object SentinelOrdering extends Ordering[Sentinel] {
-    def compare(s1: Sentinel, s2: Sentinel): Int =
-      if (s2.iter.isDone) -1
-      else if (s1.iter.isDone) 1
-      else (s1.iter.currentCandidate - s2.iter.currentCandidate)
-  }
-
-  override def validated: Boolean = {
-    val simpleCheck = super.validated
-    if (simpleCheck == false) return simpleCheck
-
-    // Structural check for something like:
-    // Combine(f1, f2, f3, ...)
-    // All top-level operators in _models should look like this.
-    var result: Boolean = _models.forall(_.isInstanceOf[Combine])
-    // Make sure for each combiner, each child is a feature with
-    // actual bounds.
-    for (combiner <- _models) {
-      // Do children explicitly so we don't traverse the entire
-      // subtree rooted here.
-      result = result && combiner.children.forall { child =>
-        child.isInstanceOf[FeatureOp] &&
-        isBounded(child) &&
-        child.iHooks.filter(_.isSparse).size == 1 // make sure it's 1-to-1
-      }
-    }
-    return result
-  }
-
-  override def prepare(): Unit = {
-    super.prepare() // Do all the stuff we normally do
-
-    // Verified earlier that the models here consist of a
-    // bunch of combines with bounded FeatureOp children,
-    // (i.e. a bag-of-words type structure).
-    _models = _models.flatMap(c => c.children.map(_.asInstanceOf[FeatureOp]))
-  }
-
-  override def run[T <: ScoredObject[T]](acc: Accumulator[T] =
-    DefaultAccumulator[ScoredDocument]()): List[T] = {
-    // Main Method
-    assume(validated, s"Unable to validate given model/index combination")
-    prepare()
-
+class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
+  override def finishScoring[T <: ScoredObject[T]](
+    allSentinels: Seq[Sentinel],
+    unfinished: Seq[Sentinel],
+    acc: Accumulator[T] = DefaultAccumulator[ScoredDocument]()
+  ): List[T] = {
     val hackedAcc = acc.asInstanceOf[DefaultAccumulator[ScoredDocument]]
-    // Build the sentinel list - sort will change over time
-    val sentinels = _models.map { feat =>
-      val it = feat.iHooks.filter(_.isSparse).head.underlying
-      Sentinel(feat, it)
-    }.toArray
-
+    val sentinels = allSentinels.toArray
     // direct access to the underlying iterators
     val iterators = _models.flatMap(_.iHooks.map(_.underlying)).toSet
-    // Have to warm up the queue
-    for (i <- 0 until hackedAcc.limit) {
-      val candidate =
-        sentinels.map(_.iter).filterNot(_.isDone).map(_.currentCandidate).min
-      iterators.foreach(_.syncTo(candidate))
-      val score = sentinels.map(_.feat.eval).sum
-      hackedAcc += ScoredDocument(candidate, score)
-    }
-
-    // At this point we've scored "numResults" docs, and we need to find the
-    // next candidate to score, however we are changing strategy here.
 
     // This is the WeakAND strategy - before scoring fully, we decide whether
     // this document has the potential to make it into the final list. If so,
@@ -142,6 +88,7 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimpleProcessor {
   // is not called in the above code until after warming up the queue.
   def findPivot(s: Array[Sentinel], min: Double, limit: Double): Int = {
     // Small recursive function here
+    @tailrec
     def sumif(s: Array[Sentinel], i: Int, sum: Double, lim: Double): Int = {
       if (i >= s.length) -1
       else if (sum > lim) i

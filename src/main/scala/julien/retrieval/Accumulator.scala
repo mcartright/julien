@@ -17,4 +17,5 @@ trait Accumulator[T <: ScoredObject[T]]
 
   // Need overriding
   def hasLimit: Boolean = false
+  def atCapacity: Boolean = false
 }

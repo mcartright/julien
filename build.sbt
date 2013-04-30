@@ -10,8 +10,6 @@ resolvers ++= Seq("Galago" at "http://ayr.cs.umass.edu/m2/repository",
 	  "Mvn Repo" at "http://repo1.maven.org/maven2"
 )
 
-
-
 libraryDependencies ++= Seq(
   "edu.umass.ciir" % "macros" % "0.1",
   "org.antlr" % "antlr4-runtime" % "4.0",

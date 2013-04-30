@@ -12,15 +12,17 @@ object KeySet {
       def compare(x: String, y: String): Int =
         Utility.compare(Utility.fromString(x), Utility.fromString(y))
     }
+
+  def apply(g: () => KeyIterator) = new KeySet(g, None, None)
+  def apply(g: () => KeyIterator, lo: String, hi: String) =
+    new KeySet(g, Some(lo), Some(hi))
 }
 
-class KeySet(
+class KeySet private(
   iterGen:() => KeyIterator,
   lokey: Option[String],
   hikey: Option[String]) // specifically want a "generator"
     extends SortedSet[String] {
-  def this(gen:() => KeyIterator) = this(gen, None, None)
-
   private[this] val underlying = iterGen()
 
   def +(elem: String): KeySet =

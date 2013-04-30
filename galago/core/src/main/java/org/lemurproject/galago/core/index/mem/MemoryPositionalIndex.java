@@ -391,7 +391,7 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
       positions_reader = new VByteInput(
               new DataInputStream(
               new ByteArrayInputStream(postings.positions_cbb.getBytes())));
-
+      done = false;
       iteratedDocs = 0;
       currDocument = 0;
       currCount = 0;

@@ -30,7 +30,6 @@ package object julien {
   implicit object DocidOrder extends Ordering[Docid] {
     def compare(a: Docid, b: Docid) = a.underlying compare b.underlying
   }
-  // Do we want this?
   implicit def docid2int(d: Docid): Int = d.underlying
 
   import scala.util.matching.Regex

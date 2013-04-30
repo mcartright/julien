@@ -2,6 +2,7 @@ package julien
 package retrieval
 
 import org.scalatest._
+import org.scalatest.matchers.ShouldMatchers._
 import java.io.File
 import org.lemurproject.galago.tupleflow.{Utility,Parameters}
 import java.util.logging.{Level,Logger}
@@ -10,6 +11,81 @@ trait SimpleProcessorBehavior { this: FlatSpec =>
   def index: Index
   def tmpForInput: File
   def indexParams: Parameters
+  def vocabulary: Seq[String]
+  val epsilon: Double = 1.0E-10
+  def givenQuery: Option[List[String]]
+
+  // This is poorly named, but I just needed to factor out
+  // some code.
+  def anAccumulatorProcessor(
+    ref: => QueryProcessor,
+    pFactory: => QueryProcessor) {
+    it should "have the same results as the SimpleProcessor" in {
+      // Make a random 5-word query.
+      val randomTerms = givenQuery match {
+        case Some(terms) => terms
+        case None => scala.util.Random.shuffle(vocabulary).take(5)
+      }
+      val terms = randomTerms.mkString(";")
+
+      val l = IndexLengths()
+      val query = Combine(randomTerms.map(t => Dirichlet(Term(t), l)))
+
+      // Do the simple run
+      val sp = ref
+      sp add index
+      sp add query
+      val simpleResults = sp.run(DefaultAccumulator[ScoredDocument](3))
+
+      // Now do maxscore run
+      val alt = pFactory
+      alt add index
+      alt add query
+      val altResults = alt.run(DefaultAccumulator[ScoredDocument](3))
+
+      // And compare
+      simpleResults.size should equal (altResults.size)
+      for ((result, idx) <- simpleResults.zipWithIndex) {
+        withClue(s"@$idx, $result != ${altResults(idx)}, query=$terms") {
+          altResults(idx).docid should equal (result.docid)
+          altResults(idx).score should be (result.score plusOrMinus epsilon)
+        }
+      }
+    }
+
+    it should "return the same results when the accumulator is not full" in {
+      // Make a random 5-word query.
+      val randomTerms = givenQuery match {
+        case Some(terms) => terms
+        case None => scala.util.Random.shuffle(vocabulary).take(5)
+      }
+      val terms = randomTerms.mkString(";")
+
+      val l = IndexLengths()
+      val query = Combine(randomTerms.map(t => Dirichlet(Term(t), l)))
+
+      // Do the simple run
+      val sp = ref
+      sp add index
+      sp add query
+      val simpleResults = sp.run(DefaultAccumulator[ScoredDocument](10000))
+
+      // Now do maxscore run
+      val alt = pFactory
+      alt add index
+      alt add query
+      val altResults = alt.run(DefaultAccumulator[ScoredDocument](10000))
+
+      // And compare
+      simpleResults.size should equal (altResults.size)
+      for ((result, idx) <- simpleResults.zipWithIndex) {
+        withClue(s"@$idx, $result != ${altResults(idx)}, query=$terms") {
+          altResults(idx).docid should equal (result.docid)
+          altResults(idx).score should be (result.score plusOrMinus epsilon)
+        }
+      }
+    }
+  }
 
   def aSimpleProcessor(pFactory: => QueryProcessor) {
     it should "start with no models" in {
@@ -103,6 +179,18 @@ class SimpleProcessorSpec
     new File(Utility.createTemporary.getAbsolutePath + ".gz")
   var index: Index = null
   val indexParams = new Parameters()
+  val vocabulary = collection.mutable.ListBuffer[String]()
+
+  // use this variable to set a particular query to test
+  def givenQuery: Option[List[String]] = query
+  var query: Option[List[String]] = None
+  override def run(testName: Option[String], args: Args): Status = {
+    val configMap = args.configMap
+    if (configMap.contains("query")) {
+      query = Some(configMap("query").asInstanceOf[String].split(";").toList)
+    }
+    super.run(testName, args)
+  }
 
   override def beforeAll() {
     Logger.getLogger("").setLevel(Level.OFF)
@@ -116,6 +204,10 @@ class SimpleProcessorSpec
     indexParams.set("parser", parserParams)
     indexParams.set("filetype", "wikiwex")
     index = Index.memory(tmpForInput.getAbsolutePath, "all", indexParams)
+
+    // let's get that vocab out too
+    val vIter = index.vocabulary().iterator
+    while (vIter.hasNext) { vocabulary += vIter.next }
   }
 
   override def afterAll() {
@@ -132,10 +224,48 @@ class SimpleProcessorSpec
 
   "The SimpleProcessor" should
   behave like aSimpleProcessor(simpleProc)
-  "The MaxcoreProcessor" should
-  behave like aSimpleProcessor(maxProc)
-  "The WeakANDProcessor" should
-  behave like aSimpleProcessor(wandProc)
 
-  it should "iterate over and score every candidate document (stupidly)" in (pending)
+  it should "iterate over and score every candidate document (stupidly)" in {
+    val queryTerms =
+      List("arrangement", "baptist", "goethe", "liberal", "october")
+    val query = Combine(queryTerms.map(t => TermCount(t)))
+    val sp = simpleProc
+    sp add query
+    sp add index
+    val acc = DefaultAccumulator[ScoredDocument](size = 1000)
+    val results: List[ScoredDocument] = sp.run(acc)
+
+    // Now let's do this by hand, and compare results
+
+    val counts = scala.collection.mutable.ListBuffer[ScoredDocument]()
+    val iterators = queryTerms.map(t => index.iterator(t))
+    while (iterators.exists(!_.isDone)) {
+      val min = iterators.filterNot(_.isDone).map(_.currentCandidate).min
+      iterators.foreach(_.syncTo(min))
+      if (iterators.exists(_.hasMatch(min))) {
+        val total = iterators.map(_.count).sum
+        val candidate = ScoredDocument(Docid(min), total.toDouble)
+        counts += candidate
+      }
+      iterators.foreach(_.movePast(min))
+    }
+    val sorted = counts.sorted
+
+    // Now compare
+    for ((result, idx) <- sorted.zipWithIndex) {
+      withClue(s"@$idx, $result != ${results(idx)}") {
+        result.docid should equal (results(idx).docid)
+        results(idx).score should be (result.score plusOrMinus epsilon)
+      }
+    }
+  }
+
+  "The MaxcoreProcessor" should behave like aSimpleProcessor(maxProc)
+  it should behave like anAccumulatorProcessor(simpleProc, maxProc)
+
+  "The WeakANDProcessor" should behave like aSimpleProcessor(wandProc)
+  it should behave like anAccumulatorProcessor(simpleProc, wandProc)
+
+  "Maxscore and WeakAND" should
+  behave like anAccumulatorProcessor(maxProc, wandProc)
 }

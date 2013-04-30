@@ -123,6 +123,7 @@ class Index private(
   def lengthsIterator(field: Option[String] = None): LI =
     lengthsIterator(field.getOrElse(currentDefault))
 
+  def clearIteratorCache: Unit = iteratorCache.clear
   def shareableIterator(
     key: String,
     field: Option[String] = None): ExtentIterator =
@@ -184,7 +185,7 @@ class Index private(
     * An assertion fails if the part is not found.
    */
   def vocabulary(field: String = currentDefault): KeySet =
-    new KeySet(underlying.getIndexPart(getLabel(field)).keys _)
+    KeySet(underlying.getIndexPart(getLabel(field)).keys _)
   def name(docid: Docid) : String = underlying.getName(docid)
   def identifier(name: String): Docid =
     new Docid(underlying.getIdentifier(name))

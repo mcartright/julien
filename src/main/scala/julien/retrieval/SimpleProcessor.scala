@@ -35,28 +35,31 @@ class SimpleProcessor extends QueryProcessor {
 
   def prepare(): Unit = {
     val unprepped: Set[Operator] =
-      models.flatMap(m => m.filter(_.isInstanceOf[NeedsPreparing])).toSet
-    if (unprepped.size == 0) return // Got lucky, all done!
+      models.flatMap(m =>
+        m.filter(_.isInstanceOf[NeedsPreparing])).toSet
+    if (unprepped.size > 0) {
+      // We now need to get the iterators of the unprepped nodes, zip down them
+      // and update statistics until done, then reset.
+      val iterators: Set[GIterator] =
+        unprepped.flatMap(_.iHooks).map(_.underlying)
+          .toSet
+          .filterNot(_.hasAllCandidates)
 
-    // We now need to get the iterators of the unprepped nodes, zip down them
-    // and update statistics until done, then reset.
-    val iterators: Set[GIterator] =
-      unprepped.flatMap(_.iHooks).map(_.underlying)
-        .toSet
-        .filterNot(_.hasAllCandidates)
-
-    while (iterators.exists(!_.isDone)) {
-      val active = iterators.filterNot(_.isDone)
-      val candidate = active.map(_.currentCandidate).min
-      iterators.foreach(_.syncTo(candidate))
-      if (iterators.exists(_.hasMatch(candidate))) {
-        unprepped.foreach(_.asInstanceOf[NeedsPreparing].updateStatistics)
+      while (iterators.exists(!_.isDone)) {
+        val active = iterators.filterNot(_.isDone)
+        val candidate = active.map(_.currentCandidate).min
+        iterators.foreach(_.syncTo(candidate))
+        if (iterators.exists(_.hasMatch(candidate))) {
+          unprepped.foreach(_.asInstanceOf[NeedsPreparing].updateStatistics)
+        }
+        active.foreach(_.movePast(candidate))
       }
-      active.foreach(_.movePast(candidate))
+      unprepped.foreach(_.asInstanceOf[NeedsPreparing].prepared)
     }
 
-    // Should be all done - reset the iterators
-    iterators.map(_.reset)
+    // Do this regardless in case any iterators are recycled.
+    val hooks = models.flatMap(_.iHooks).toSet
+    for (h <- hooks) h.underlying.reset
   }
 
   def run[T <: ScoredObject[T]](acc: Accumulator[T] =
