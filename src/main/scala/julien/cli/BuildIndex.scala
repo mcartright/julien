@@ -259,7 +259,7 @@ object BuildIndex extends TupleFlowFunction {
         "writeExtentPostings",
         "numberedExtentPostings",
         new FieldNumberWordPosition.FieldWordDocumentPositionOrder(),
-        ".postings",
+        "",
         classOf[PositionFieldIndexWriter])).
       combined("parsePostings", "writeExtentPostings")
 

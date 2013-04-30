@@ -47,8 +47,9 @@ abstract class SimplePreloadingProcessor
     var drivers = iterators.filter(_.isSparse)
     preLoadAccumulator(sentinels, drivers, iterators, hackedAcc)
 
-    if (drivers.isEmpty) return acc.result
-    else finishScoring(sentinels, iterators, acc)
+    if (drivers.isEmpty) {
+      return acc.result
+    } else finishScoring(sentinels, iterators, acc)
   }
 
   // We don't do a finished check here - assume the finished iterators

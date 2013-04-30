@@ -91,7 +91,10 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
     i: Int = 0): Int = {
     if (i >= s.length) return -1
     else {
-      val newSum = if (s(i).iter.isDone) sum else sum + s(i).feat.upperBound
+      val newSum = if (s(i).iter.isDone)
+        sum
+      else
+        sum + (s(i).feat.upperBound - s(i).feat.lowerBound)
       if (newSum > limit) i
       else findPivot(s, newSum, limit, i+1)
     }

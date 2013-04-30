@@ -14,7 +14,29 @@ trait SimpleProcessorBehavior { this: FlatSpec =>
   def indexParams: Parameters
   def vocabulary: Seq[String]
   val epsilon: Double = 1.0E-10
-  def givenQuery: Option[List[String]]
+  def config: Map[String, Any]
+
+  def getQueryTerms(): List[String] = config.contains("query") match {
+    case true => config("query").asInstanceOf[String].split(";").toList
+    case false => Random.shuffle(vocabulary).take(5).toList
+  }
+
+  def getQuery(terms: List[String]): Tuple2[FeatureOp, String] = {
+    val models = List("BM25", "JM", "Dir")
+    val chosen = if (config.contains("scorer"))
+      config("scorer").asInstanceOf[String]
+    else
+      models(Random.nextInt(models.size))
+
+    val l = IndexLengths()
+    val query = chosen match {
+      case "BM25" => Combine(terms.map(t => BM25(Term(t), l)))
+      case "JM" => Combine(terms.map(t => JelinekMercer(Term(t), l)))
+      case "Dir" => Combine(terms.map(t => Dirichlet(Term(t), l)))
+    }
+    (query, chosen)
+  }
+
 
   // This is poorly named, but I just needed to factor out
   // some code.
@@ -23,18 +45,9 @@ trait SimpleProcessorBehavior { this: FlatSpec =>
     pFactory: => QueryProcessor) {
     it should "have the same results as the SimpleProcessor" in {
       // Make a random 5-word query.
-      val qterms = givenQuery match {
-        case Some(terms) => terms
-        case None => Random.shuffle(vocabulary).take(5)
-      }
-      val terms = qterms.mkString(";")
-
-      val l = IndexLengths()
-      val (query, scorerName) = Random.nextInt(3) match {
-        case 0 => (Combine(qterms.map(t => BM25(Term(t), l))), "BM25")
-        case 1 => (Combine(qterms.map(t => JelinekMercer(Term(t), l))), "JM")
-        case 2 => (Combine(qterms.map(t => Dirichlet(Term(t), l))), "Dir")
-      }
+      val qterms = getQueryTerms()
+      val (query, scorerName) = getQuery(qterms)
+      val genericClue = s"query=${qterms.mkString(";")},scorer=$scorerName"
 
       // Do the simple run
       val sp = ref
@@ -49,12 +62,12 @@ trait SimpleProcessorBehavior { this: FlatSpec =>
       val altResults = alt.run(DefaultAccumulator[ScoredDocument](3))
 
       // And compare
-      withClue(s"query=$terms,scorer=$scorerName") {
+      withClue(genericClue) {
         simpleResults.size should equal (altResults.size)
       }
 
       for ((result, idx) <- simpleResults.zipWithIndex) {
-        withClue(s"@$idx, $result != ${altResults(idx)}, query=$terms") {
+        withClue(s"@$idx, $result != ${altResults(idx)}, $genericClue") {
           altResults(idx).docid should equal (result.docid)
           altResults(idx).score should be (result.score plusOrMinus epsilon)
         }
@@ -63,18 +76,9 @@ trait SimpleProcessorBehavior { this: FlatSpec =>
 
     it should "return the same results when the accumulator is not full" in {
       // Make a random 5-word query.
-      val qterms = givenQuery match {
-        case Some(terms) => terms
-        case None => Random.shuffle(vocabulary).take(5)
-      }
-      val terms = qterms.mkString(";")
-
-      val l = IndexLengths()
-      val (query, scorerName) = Random.nextInt(3) match {
-        case 0 => (Combine(qterms.map(t => BM25(Term(t), l))), "BM25")
-        case 1 => (Combine(qterms.map(t => JelinekMercer(Term(t), l))), "JM")
-        case 2 => (Combine(qterms.map(t => Dirichlet(Term(t), l))), "Dir")
-      }
+      val qterms = getQueryTerms()
+      val (query, scorerName) = getQuery(qterms)
+      val genericClue = s"query=${qterms.mkString(";")},scorer=$scorerName"
 
       // Do the simple run
       val sp = ref
@@ -89,11 +93,11 @@ trait SimpleProcessorBehavior { this: FlatSpec =>
       val altResults = alt.run(DefaultAccumulator[ScoredDocument](10000))
 
       // And compare
-      withClue(s"query=$terms,scorer=$scorerName") {
+      withClue(genericClue) {
         simpleResults.size should equal (altResults.size)
       }
       for ((result, idx) <- simpleResults.zipWithIndex) {
-        withClue(s"@$idx, $result != ${altResults(idx)}, query=$terms") {
+        withClue(s"@$idx, $result != ${altResults(idx)}, $genericClue") {
           altResults(idx).docid should equal (result.docid)
           altResults(idx).score should be (result.score plusOrMinus epsilon)
         }
@@ -195,14 +199,12 @@ class SimpleProcessorSpec
   val indexParams = new Parameters()
   val vocabulary = collection.mutable.ListBuffer[String]()
 
-  // use this variable to set a particular query to test
-  def givenQuery: Option[List[String]] = query
-  var query: Option[List[String]] = None
+  // Extracts the configuration map to use in the test. These are set
+  // on the cli like "mvn test -Dconfig=<k1>=<v1>,<k2>=<v2>..."
+  var cMap: Map[String, Any] = Map.empty
+  def config = cMap
   override def run(testName: Option[String], args: Args): Status = {
-    val configMap = args.configMap
-    if (configMap.contains("query")) {
-      query = Some(configMap("query").asInstanceOf[String].split(";").toList)
-    }
+    cMap = args.configMap
     super.run(testName, args)
   }
 
