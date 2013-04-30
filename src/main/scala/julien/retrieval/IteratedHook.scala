@@ -41,4 +41,13 @@ trait IteratedHook[I <: GIterator]
   /** The estimated number of entries in this view.
     */
   override def size: Int = it.get.totalEntries.toInt
+
+
+  /** This should be refactored into a DenseIterator */
+  def matches(id: Int): Boolean = true
+  @inline def isDone: Boolean = underlying.isDone
+  @inline def at: Int = underlying.currentCandidate
+  @inline def moveTo(id: Int) = underlying.syncTo(id)
+  @inline def movePast(id: Int) = underlying.movePast(id)
+  @inline def totalEntries: Long = underlying.totalEntries
 }

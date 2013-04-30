@@ -16,7 +16,7 @@ object Term {
   * These are always 1-to-1.
   */
 final class Term private (val t: String, val field: Option[String])
-    extends IteratedHook[ExtentIterator]
+    extends SparseIterator[ExtentIterator]
     with PositionStatsView {
 
   override def toString: String =
@@ -28,7 +28,7 @@ final class Term private (val t: String, val field: Option[String])
   def getIterator(i: Index): ExtentIterator = i.shareableIterator(t, field)
 
   /** Returns the current count of the underlying iterator. */
-  def count: Int = underlying.count
+  def count: Int = if (matched) underlying.count else 0
 
   /** Returns the current positions of the underlying iterator. */
   def positions: Positions = Positions(underlying.extents())
@@ -49,7 +49,4 @@ final class Term private (val t: String, val field: Option[String])
       attachedIndex.collectionStats.maxLength.toInt
     )
   }
-
-  /** Diagnostic for determining the current location of this term. */
-  def current: Int = it.get.currentCandidate
 }

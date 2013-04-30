@@ -252,7 +252,9 @@ class SimpleProcessorSpec
       val min = iterators.filterNot(_.isDone).map(_.currentCandidate).min
       iterators.foreach(_.syncTo(min))
       if (iterators.exists(_.hasMatch(min))) {
-        val total = iterators.map(_.count).sum
+        val total = iterators.foldLeft(0) { (sum , iter) =>
+          if (iter.hasMatch(min)) sum + iter.count else sum
+        }
         val candidate = ScoredDocument(Docid(min), total.toDouble)
         counts += candidate
       }
@@ -272,10 +274,11 @@ class SimpleProcessorSpec
   "The MaxcoreProcessor" should behave like aSimpleProcessor(maxProc)
   it should behave like anAccumulatorProcessor(simpleProc, maxProc)
 
-/*
+
   "The WeakANDProcessor" should behave like aSimpleProcessor(wandProc)
   it should behave like anAccumulatorProcessor(simpleProc, wandProc)
 
+  /*
   "Maxscore and WeakAND" should
   behave like anAccumulatorProcessor(maxProc, wandProc)
  */

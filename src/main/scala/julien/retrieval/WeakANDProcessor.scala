@@ -2,6 +2,7 @@ package julien
 package retrieval
 
 import scala.annotation.tailrec
+import scala.math._
 import julien._
 
 object WeakANDProcessor {
@@ -29,7 +30,7 @@ object WeakANDProcessor {
 class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
   override def finishScoring[T <: ScoredObject[T]](
     allSentinels: Seq[Sentinel],
-    iterators: Set[GIterator],
+    iterators: Set[GHook],
     acc: Accumulator[T] = DefaultAccumulator[ScoredDocument]()
   ): List[T] = {
     val hackedAcc = acc.asInstanceOf[DefaultAccumulator[ScoredDocument]]
@@ -52,7 +53,7 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
         running = false
         debug("stopping")
       } else {
-        val pivot = sortedSentinels(pivotPos).iter.currentCandidate
+        val pivot = sortedSentinels(pivotPos).iter.at
         debug(s"pivot = $pivot, lastScored = $lastScored")
         if (pivot <= lastScored) {
           // The pivot is old news. Move the pivot iterator past it
@@ -60,9 +61,9 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
           val advancing = advancingSentinel(sortedSentinels, pivotPos, pivot)
           sortedSentinels(advancing).iter.movePast(pivot)
           shuffleDown(sortedSentinels, advancing)
-        } else if (sortedSentinels.head.iter.currentCandidate == pivot) {
+        } else if (sortedSentinels.head.iter.at == pivot) {
           // All iterators up to the pivot iterator are lined up. Score.
-          iterators.foreach(_.syncTo(pivot))
+          iterators.foreach(_.moveTo(pivot))
           val score = sortedSentinels.map(_.feat.eval).sum
           // Pass muster, put it in the queue and update the threshold
           debug(s"adding ($pivot, $score)")
@@ -72,7 +73,7 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
           // Iterators in line before the pivot iterator are not lined
           // up yet - pick one and move it to the pivot.
           val advancing = advancingSentinel(sortedSentinels, pivotPos, pivot)
-          sortedSentinels(advancing).iter.syncTo(pivot)
+          sortedSentinels(advancing).iter.moveTo(pivot)
           shuffleDown(sortedSentinels, advancing)
         }
       }
@@ -97,12 +98,21 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
     sumif(s, 0, min, limit)
   }
 
-  def advancingSentinel(s: Array[Sentinel], lim: Int, limDoc: Int): Int =
-    s.view(0, lim).
-      zipWithIndex.  // sentinel --> (sentinel, index in array)
-      filter(_._1.iter.currentCandidate < limDoc).
-      minBy(_._1.iter.totalEntries).
-      _2 // extracts the position
+  @tailrec
+  final def advancingSentinel(
+    s: Array[Sentinel],
+    lim: Int,
+    limDoc: Int,
+    idx: Int = 0,
+    m: Long = Long.MaxValue): Int = {
+    if (idx >= lim) idx // need (best min, pos)
+    else if (s(idx).iter.at >= limDoc)
+      advancingSentinel(s, lim, limDoc, idx+1, m)
+    else {
+      val newMin = min(m, s(idx).iter.totalEntries)
+      advancingSentinel(s, lim, limDoc, idx+1, newMin)
+    }
+  }
 
   def shuffleDown(s: Array[Sentinel], start: Int): Unit = {
     var i = start

@@ -22,6 +22,8 @@ object SimpleProcessor {
   * [[julien.retrieval.QueryProcessor QueryProcessor]] should be used.
   */
 class SimpleProcessor extends QueryProcessor {
+  type GHook = IteratedHook[_ <: GIterator]
+
   override def validated: Boolean = {
     val looseCheck = super.validated
     if (looseCheck == false) return looseCheck
@@ -40,16 +42,14 @@ class SimpleProcessor extends QueryProcessor {
     if (unprepped.size > 0) {
       // We now need to get the iterators of the unprepped nodes, zip down them
       // and update statistics until done, then reset.
-      val iterators: Set[GIterator] =
-        unprepped.flatMap(_.iHooks).map(_.underlying)
-          .toSet
-          .filterNot(_.hasAllCandidates)
+      val iterators: Set[GHook] =
+        unprepped.flatMap(_.iHooks).toSet.filterNot(_.isDense)
 
       while (iterators.exists(!_.isDone)) {
         val active = iterators.filterNot(_.isDone)
-        val candidate = active.map(_.currentCandidate).min
-        iterators.foreach(_.syncTo(candidate))
-        if (iterators.exists(_.hasMatch(candidate))) {
+        val candidate = active.map(_.at).min
+        iterators.foreach(_.moveTo(candidate))
+        if (iterators.exists(_.matches(candidate))) {
           unprepped.foreach(_.asInstanceOf[NeedsPreparing].updateStatistics)
         }
         active.foreach(_.movePast(candidate))
@@ -71,21 +71,27 @@ class SimpleProcessor extends QueryProcessor {
     // extract iterators
     val index = _indexes.head
     val model = _models.head
-    val iterators: Set[GIterator] = _models.
-      flatMap(_.iHooks).
-      map(_.underlying).
-      toSet
-    val drivers: Set[GIterator] = iterators.filterNot(_.hasAllCandidates)
+    val iterators: Set[GHook] = _models.
+      flatMap(_.iHooks).toSet
+    val drivers: Set[GHook] = iterators.filterNot(_.isDense)
 
     // Need to fix this
     val scorers : List[FeatureOp] = _models
 
+    val scoreMap =
+      scala.collection.mutable.HashMap[FeatureOp, Tuple3[Int,Double,Int]]()
+
     // Go
     while (drivers.exists(_.isDone == false)) {
-      val candidate = drivers.filterNot(_.isDone).map(_.currentCandidate).min
-      iterators.foreach(_.syncTo(candidate))
-      if (drivers.exists(_.hasMatch(candidate))) {
+      val candidate = drivers.filterNot(_.isDone).map(_.at).min
+      iterators.foreach(_.moveTo(candidate))
+      if (drivers.exists(_.matches(candidate))) {
         // Time to score
+        for (f <- scorers.head.children) {
+          val tc = f.grab[Term].head
+          if (!scoreMap.contains(f)) scoreMap(f) = (tc.at, f.eval, tc.count)
+          else if (scoreMap(f)._2 < f.eval) scoreMap(f) = (tc.at, f.eval, tc.count)
+        }
         val score = scorers.map(_.eval).sum
         // How do we instantiate an object without knowing what it is, and
         // knowing what it needs? One method in the QueryProcessor?
@@ -96,6 +102,9 @@ class SimpleProcessor extends QueryProcessor {
         hackedAcc += ScoredDocument(candidate, score)
       }
       drivers.foreach(_.movePast(candidate))
+    }
+    scoreMap.foreach { case (feat, result) =>
+        println(s"ACTUAL: $feat => $result")
     }
     acc.result
   }

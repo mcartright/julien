@@ -20,6 +20,11 @@ object BM25 {
     k: Double) = new BM25(c, l, s, b, k)
 }
 
+/** Smoothes raw counts according to the BM25 scoring model, as described by
+  * "Experimentation as a way of life: Okapi at TREC" by
+  * Robertson, Walker, and Beaulieu.
+  * (http://www.sciencedirect.com/science/article/pii/S0306457399000461)
+  */
 class BM25(
   val op: CountView,
   val lengths: LengthsView,
@@ -41,12 +46,15 @@ class BM25(
   override val lowerBound: Double = 0.0
   override lazy val upperBound: Double = {
     val maxtf = statsrc.statistics.max
-    score(maxtf, maxtf)
+    val r = score(maxtf, maxtf)
+    if (op.isInstanceOf[Term])
+      debug(s"MAXTF: ${op.asInstanceOf[Term].t} => $maxtf, score=$r, idf=$idf")
+    r
   }
 
   def eval: Double = score(op.count, lengths.length)
   def score(c: Int, l: Int) = {
-    val num = c + (k + 1)
+    val num = c * (k + 1)
     val den = c + (k * (1 - b + (b * l / avgDocLength)))
     idf * num / den
   }

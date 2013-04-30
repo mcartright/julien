@@ -15,5 +15,4 @@ class IndexLengths private (field: Option[String])
     s"lengths:" + (if (isAttached) index.toString else "")
   def getIterator(i: Index): LengthsIterator = i.lengthsIterator(field)
   def length: Int = it.get.getCurrentLength
-  def current: Int = it.get.currentCandidate
 }

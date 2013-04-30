@@ -7,7 +7,7 @@ import julien.access._
 // Simple class that grabs stored priors and presents them as a hybrid
 // feature/view.
 class PriorsView
-    extends IteratedHook[ScoreIterator]
+    extends SparseIterator[ScoreIterator]
     with ScalarWeightedFeature {
   def getIterator(i: Index): ScoreIterator = {
     i.partReader("priors").getIterator("priors").asInstanceOf[ScoreIterator]

@@ -78,7 +78,7 @@ class BM25Spec extends FlatSpec with MockFactory {
     val k = 1.9
     val d = BM25(mockCV, mockLV, mockStat, b, k)
     val max = fakeCountStats.max.toDouble
-    val numerator = max + (k + 1)
+    val numerator = max * (k + 1)
     val denominator = max + (k * (1 - b + (b * max / d.avgDocLength)));
     val expScore = d.idf * numerator / denominator
     expect (expScore) { d.upperBound }
@@ -105,7 +105,7 @@ class BM25Spec extends FlatSpec with MockFactory {
     mockCV.expects('count)().returning(c)
     mockLV.expects('length)().returning(l)
     val d = BM25(mockCV, mockLV, mockStat, b, k)
-    val numerator = c + (k + 1)
+    val numerator = c * (k + 1)
     val denominator = c + (k * (1 - b + (b * l / d.avgDocLength)));
     val expScore = d.idf * numerator / denominator
     expect (expScore) { d.eval }

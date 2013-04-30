@@ -7,6 +7,19 @@ import scala.math._
 
 abstract class SimplePreloadingProcessor
     extends SimpleProcessor {
+  // For encapsulation - note we assume 1-to-1
+  // of features to non-lengths iterators
+  case class Sentinel(feat: FeatureOp, iter: GHook, dec: Double)
+
+  // Also want an ordering on the Sentinels based on current location
+  object SentinelOrdering extends Ordering[Sentinel] {
+    def compare(s1: Sentinel, s2: Sentinel): Int =
+      if (s2.iter.isDone) -1
+      else if (s1.iter.isDone) 1
+      else (s1.iter.at - s2.iter.at)
+  }
+
+
   /** This is the method that executes after the accumulator has been
     * preloaded, and we still have unfinished iterators. The
     * [[julien.retrieval.MaxscoreProcessor Maxscore]] and
@@ -15,7 +28,7 @@ abstract class SimplePreloadingProcessor
     */
     def finishScoring[T <: ScoredObject[T]](
       allSentinels: Seq[Sentinel],
-      iterators: Set[GIterator],
+      iterators: Set[GHook],
       acc: Accumulator[T]): List[T]
 
   override def run[T <: ScoredObject[T]](acc: Accumulator[T] =
@@ -26,45 +39,33 @@ abstract class SimplePreloadingProcessor
     val hackedAcc = acc.asInstanceOf[DefaultAccumulator[ScoredDocument]]
     // Build the sentinel list
     val sentinels = _models.map { feat =>
-      val it = feat.iHooks.filter(_.isSparse).head.underlying
+      val it = feat.iHooks.filter(_.isSparse).head
       Sentinel(feat, it, feat.upperBound-feat.lowerBound)
     }
 
-    val iterators = _models.flatMap(_.iHooks).map(_.underlying).toSet
-    var drivers = iterators.filterNot(_.hasAllCandidates)
+    val iterators = _models.flatMap(_.iHooks).toSet
+    var drivers = iterators.filter(_.isSparse)
     preLoadAccumulator(sentinels, drivers, iterators, hackedAcc)
 
     if (drivers.isEmpty) return acc.result
     else finishScoring(sentinels, iterators, acc)
   }
 
-  // For encapsulation - note we assume 1-to-1
-  // of features to non-lengths iterators
-  case class Sentinel(feat: FeatureOp, iter: GIterator, dec: Double)
-
-  // Also want an ordering on the Sentinels based on current location
-  object SentinelOrdering extends Ordering[Sentinel] {
-    def compare(s1: Sentinel, s2: Sentinel): Int =
-      if (s2.iter.isDone) -1
-      else if (s1.iter.isDone) 1
-      else (s1.iter.currentCandidate - s2.iter.currentCandidate)
-  }
-
   // We don't do a finished check here - assume the finished iterators
   // have already been filtered out.
   @tailrec
   final def getMinCandidate(
-    drivers: Set[GIterator],
+    drivers: Set[GHook],
     m: Int = Int.MaxValue): Int = {
     if (drivers.isEmpty) return m
-    else getMinCandidate(drivers.tail, min(m, drivers.head.currentCandidate))
+    else getMinCandidate(drivers.tail, min(m, drivers.head.at))
   }
 
   @tailrec
   final def preLoadAccumulator(
     allSentinels: Seq[Sentinel],
-    drivers: Set[GIterator],
-    iterators: Set[GIterator],
+    drivers: Set[GHook],
+    iterators: Set[GHook],
     acc: Accumulator[ScoredDocument]): Unit = {
     // base case
     if (acc.atCapacity || drivers.isEmpty) {
@@ -72,10 +73,10 @@ abstract class SimplePreloadingProcessor
     } else {
       // otherwise throw a new candidate in there
       val candidate = getMinCandidate(drivers)
-      if (drivers.exists(_.hasMatch(candidate))) {
-        iterators.foreach(_.syncTo(candidate))
+      if (drivers.exists(_.matches(candidate))) {
+        iterators.foreach(_.moveTo(candidate))
         val score = allSentinels.map(_.feat.eval).sum
-        debug(s"preload: ($candidate, $score)")
+        debug(s"preload: $candidate, $score")
         acc += ScoredDocument(candidate, score)
       }
       drivers.foreach(_.movePast(candidate))
