@@ -46,10 +46,7 @@ class BM25(
   override val lowerBound: Double = 0.0
   override lazy val upperBound: Double = {
     val maxtf = statsrc.statistics.max
-    val r = score(maxtf, maxtf)
-    if (op.isInstanceOf[Term])
-      debug(s"MAXTF: ${op.asInstanceOf[Term].t} => $maxtf, score=$r, idf=$idf")
-    r
+    score(maxtf, maxtf)
   }
 
   def eval: Double = score(op.count, lengths.length)

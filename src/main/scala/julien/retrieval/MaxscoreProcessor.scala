@@ -38,8 +38,6 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
     // Build the sentinel list - sort is on idf
     val sentinels = allSentinels.sortBy(_.iter.totalEntries)
 
-    sentinels.foreach(s => debug(s.toString))
-
     // establish upper bound of all features - every document starts at
     // this value and is progressively lowered to the true score
     val startingScore = sentinels.map(_.feat.upperBound).sum
@@ -47,8 +45,6 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
     // Now start looking for cutoffs
     var threshold = hackedAcc.head.score
     var sidx = getSentinelIndex(sentinels, 0, threshold, startingScore)
-
-    debug(s"startingScore: $startingScore, threshold: $threshold, sidx=$sidx")
 
     // HACK - need to make this a "other" set
     val lengths = iterators.filter(_.isInstanceOf[IndexLengths]).head
@@ -60,9 +56,7 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
     var drivers = selected.map(_.iter).toSet.filterNot(_.isDone)
     val driverPos = drivers.map(_.at).mkString(",")
     val allPos = sentinels.map(_.iter.at).mkString(",")
-    debug(s"($driverPos) of ($allPos)")
     var candidate = getMinCandidate(drivers)
-    debug(s"found min: $candidate")
     while (candidate < Int.MaxValue) {
       if (drivers.exists(_.matches(candidate))) {
         lengths.moveTo(candidate)
@@ -72,14 +66,11 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
           val r = score + (sent.feat.eval - sent.feat.upperBound)
           r
         }
-        debug(s"partial: cand=$candidate, score=$senscore")
         // Now add the rest of them until we're done or it's below threshold
         // doing this via tail recursion
         val (score, pos) =
           conditionalAddSentinel(sentinels,
             candidate, sidx, threshold, senscore)
-
-        debug(s"final: cand=$candidate, score=$score (t=$threshold), $pos of ${sentinels.size}")
         if (pos == sentinels.size && score > threshold) {
           hackedAcc += ScoredDocument(candidate, score)
           if (threshold != hackedAcc.head.score) {
@@ -95,7 +86,6 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
 
       // Grab next candidate
       candidate = getMinCandidate(drivers)
-      debug(s"next candidate: $candidate")
     }
 
     // All done - return

@@ -76,7 +76,6 @@ abstract class SimplePreloadingProcessor
       if (drivers.exists(_.matches(candidate))) {
         iterators.foreach(_.moveTo(candidate))
         val score = allSentinels.map(_.feat.eval).sum
-        debug(s"preload: $candidate, $score")
         acc += ScoredDocument(candidate, score)
       }
       drivers.foreach(_.movePast(candidate))

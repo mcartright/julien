@@ -51,10 +51,8 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
       if (pivotPos == -1 || sortedSentinels(pivotPos).iter.isDone) {
         // invariants not maintained - time to stop
         running = false
-        debug("stopping")
       } else {
         val pivot = sortedSentinels(pivotPos).iter.at
-        debug(s"pivot = $pivot, lastScored = $lastScored")
         if (pivot <= lastScored) {
           // The pivot is old news. Move the pivot iterator past it
           // and try again
@@ -66,9 +64,9 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
           iterators.foreach(_.moveTo(pivot))
           val score = sortedSentinels.map(_.feat.eval).sum
           // Pass muster, put it in the queue and update the threshold
-          debug(s"adding ($pivot, $score)")
           hackedAcc += ScoredDocument(pivot, score)
           threshold = hackedAcc.head.score * factor
+          lastScored = pivot
         } else {
           // Iterators in line before the pivot iterator are not lined
           // up yet - pick one and move it to the pivot.
@@ -85,17 +83,18 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
 
   // Assumption: limit is NOT negative infinity. We assume this b/c the method
   // is not called in the above code until after warming up the queue.
-  def findPivot(s: Array[Sentinel], min: Double, limit: Double): Int = {
-    // Small recursive function here
-    @tailrec
-    def sumif(s: Array[Sentinel], i: Int, sum: Double, lim: Double): Int = {
-      if (i >= s.length) -1
-      else if (sum > lim) i
-      else if (s(i).iter.isDone) sumif(s, i+1, sum, lim)
-      else sumif(s, i+1, sum+s(i).feat.upperBound, lim)
+  @tailrec
+  final def findPivot(
+    s: Array[Sentinel],
+    sum: Double,
+    limit: Double,
+    i: Int = 0): Int = {
+    if (i >= s.length) return -1
+    else {
+      val newSum = if (s(i).iter.isDone) sum else sum + s(i).feat.upperBound
+      if (newSum > limit) i
+      else findPivot(s, newSum, limit, i+1)
     }
-    // aaaand go.
-    sumif(s, 0, min, limit)
   }
 
   @tailrec
@@ -104,13 +103,17 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
     lim: Int,
     limDoc: Int,
     idx: Int = 0,
+    midx: Int = 0,
     m: Long = Long.MaxValue): Int = {
-    if (idx >= lim) idx // need (best min, pos)
+    if (idx >= lim) midx // need (best min, pos)
     else if (s(idx).iter.at >= limDoc)
-      advancingSentinel(s, lim, limDoc, idx+1, m)
+      advancingSentinel(s, lim, limDoc, idx+1, midx, m)
     else {
-      val newMin = min(m, s(idx).iter.totalEntries)
-      advancingSentinel(s, lim, limDoc, idx+1, newMin)
+      val testMin = s(idx).iter.totalEntries
+      if (testMin < m)
+        advancingSentinel(s, lim, limDoc, idx+1, idx, testMin)
+      else
+        advancingSentinel(s, lim, limDoc, idx+1, midx, m)
     }
   }
 

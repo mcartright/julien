@@ -78,20 +78,12 @@ class SimpleProcessor extends QueryProcessor {
     // Need to fix this
     val scorers : List[FeatureOp] = _models
 
-    val scoreMap =
-      scala.collection.mutable.HashMap[FeatureOp, Tuple3[Int,Double,Int]]()
-
     // Go
     while (drivers.exists(_.isDone == false)) {
       val candidate = drivers.filterNot(_.isDone).map(_.at).min
       iterators.foreach(_.moveTo(candidate))
       if (drivers.exists(_.matches(candidate))) {
         // Time to score
-        for (f <- scorers.head.children) {
-          val tc = f.grab[Term].head
-          if (!scoreMap.contains(f)) scoreMap(f) = (tc.at, f.eval, tc.count)
-          else if (scoreMap(f)._2 < f.eval) scoreMap(f) = (tc.at, f.eval, tc.count)
-        }
         val score = scorers.map(_.eval).sum
         // How do we instantiate an object without knowing what it is, and
         // knowing what it needs? One method in the QueryProcessor?
@@ -102,9 +94,6 @@ class SimpleProcessor extends QueryProcessor {
         hackedAcc += ScoredDocument(candidate, score)
       }
       drivers.foreach(_.movePast(candidate))
-    }
-    scoreMap.foreach { case (feat, result) =>
-        println(s"ACTUAL: $feat => $result")
     }
     acc.result
   }

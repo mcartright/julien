@@ -6,6 +6,7 @@ import org.scalatest.matchers.ShouldMatchers._
 import java.io.File
 import julien.galago.tupleflow.{Utility,Parameters}
 import java.util.logging.{Level,Logger}
+import scala.util.Random
 
 trait SimpleProcessorBehavior { this: FlatSpec =>
   def index: Index
@@ -22,14 +23,18 @@ trait SimpleProcessorBehavior { this: FlatSpec =>
     pFactory: => QueryProcessor) {
     it should "have the same results as the SimpleProcessor" in {
       // Make a random 5-word query.
-      val randomTerms = givenQuery match {
+      val qterms = givenQuery match {
         case Some(terms) => terms
-        case None => scala.util.Random.shuffle(vocabulary).take(5)
+        case None => Random.shuffle(vocabulary).take(5)
       }
-      val terms = randomTerms.mkString(";")
+      val terms = qterms.mkString(";")
 
       val l = IndexLengths()
-      val query = Combine(randomTerms.map(t => BM25(Term(t), l)))
+      val (query, scorerName) = Random.nextInt(3) match {
+        case 0 => (Combine(qterms.map(t => BM25(Term(t), l))), "BM25")
+        case 1 => (Combine(qterms.map(t => JelinekMercer(Term(t), l))), "JM")
+        case 2 => (Combine(qterms.map(t => Dirichlet(Term(t), l))), "Dir")
+      }
 
       // Do the simple run
       val sp = ref
@@ -44,12 +49,8 @@ trait SimpleProcessorBehavior { this: FlatSpec =>
       val altResults = alt.run(DefaultAccumulator[ScoredDocument](3))
 
       // And compare
-      withClue(s"query=$terms") {
+      withClue(s"query=$terms,scorer=$scorerName") {
         simpleResults.size should equal (altResults.size)
-      }
-
-      for ((base, exp) <- simpleResults.zip(altResults)) {
-        println(s"expected: $base\treceived: $exp")
       }
 
       for ((result, idx) <- simpleResults.zipWithIndex) {
@@ -62,14 +63,18 @@ trait SimpleProcessorBehavior { this: FlatSpec =>
 
     it should "return the same results when the accumulator is not full" in {
       // Make a random 5-word query.
-      val randomTerms = givenQuery match {
+      val qterms = givenQuery match {
         case Some(terms) => terms
-        case None => scala.util.Random.shuffle(vocabulary).take(5)
+        case None => Random.shuffle(vocabulary).take(5)
       }
-      val terms = randomTerms.mkString(";")
+      val terms = qterms.mkString(";")
 
       val l = IndexLengths()
-      val query = Combine(randomTerms.map(t => BM25(Term(t), l)))
+      val (query, scorerName) = Random.nextInt(3) match {
+        case 0 => (Combine(qterms.map(t => BM25(Term(t), l))), "BM25")
+        case 1 => (Combine(qterms.map(t => JelinekMercer(Term(t), l))), "JM")
+        case 2 => (Combine(qterms.map(t => Dirichlet(Term(t), l))), "Dir")
+      }
 
       // Do the simple run
       val sp = ref
@@ -84,7 +89,7 @@ trait SimpleProcessorBehavior { this: FlatSpec =>
       val altResults = alt.run(DefaultAccumulator[ScoredDocument](10000))
 
       // And compare
-      withClue(s"query=$terms") {
+      withClue(s"query=$terms,scorer=$scorerName") {
         simpleResults.size should equal (altResults.size)
       }
       for ((result, idx) <- simpleResults.zipWithIndex) {
