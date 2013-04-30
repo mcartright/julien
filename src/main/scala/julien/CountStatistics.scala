@@ -8,5 +8,6 @@ case class CountStatistics(
   var numDocs: Long = 0L,
   var collLength: Long = 0L,
   var docFreq: Long = 0L,
-  var max: Int = 0
+  var max: Int = 0,
+  var longestDoc: Int = 0
 )

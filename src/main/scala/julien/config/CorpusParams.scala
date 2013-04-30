@@ -3,8 +3,8 @@ package config
 
 case class CorpusParams(
   blockSize: Int = 512,
-  mergerClass: String = "org.lemurproject.galago.core.index.merge.CorpusMerger",
-  readerClass: String = "org.lemurproject.galago.core.index.merge.CorpusReader",
+  mergerClass: String = "julien.galago.core.index.merge.CorpusMerger",
+  readerClass: String = "julien.galago.core.index.merge.CorpusReader",
   writerClass: String =
-    "org.lemurproject.galago.core.index.merge.CorpusFolderWriter"
+    "julien.galago.core.index.merge.CorpusFolderWriter"
 ) extends StandardParameters

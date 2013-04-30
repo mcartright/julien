@@ -2,9 +2,9 @@ package julien
 package access
 
 import scala.collection.LinearSeq
-import org.lemurproject.galago.core.index.DataIterator
-import org.lemurproject.galago.core.index.corpus.CorpusReader
-import org.lemurproject.galago.core.index.corpus.CorpusReader._
+import julien.galago.core.index.DataIterator
+import julien.galago.core.index.corpus.CorpusReader
+import julien.galago.core.index.corpus.CorpusReader._
 import scala.collection.JavaConversions._
 import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable.{Builder,ListBuffer}

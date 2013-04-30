@@ -3,7 +3,7 @@ package access
 
 import org.scalatest._
 import org.scalamock.scalatest.MockFactory
-import org.lemurproject.galago.core.{index => lemur}
+import julien.galago.core.{index => lemur}
 import lemur.{Index => GIndex}
 import lemur.LengthsReader.LengthsIterator
 import lemur.AggregateReader.CollectionStatistics

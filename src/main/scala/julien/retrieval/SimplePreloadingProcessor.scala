@@ -3,6 +3,7 @@ package retrieval
 
 import scala.annotation.tailrec
 import julien._
+import scala.math._
 
 abstract class SimplePreloadingProcessor
     extends SimpleProcessor {
@@ -14,7 +15,7 @@ abstract class SimplePreloadingProcessor
     */
     def finishScoring[T <: ScoredObject[T]](
       allSentinels: Seq[Sentinel],
-      unfinished: Seq[Sentinel],
+      iterators: Set[GIterator],
       acc: Accumulator[T]): List[T]
 
   override def run[T <: ScoredObject[T]](acc: Accumulator[T] =
@@ -29,13 +30,12 @@ abstract class SimplePreloadingProcessor
       Sentinel(feat, it, feat.upperBound-feat.lowerBound)
     }
 
-    val activeSentinels = preLoadAccumulator(
-      sentinels,
-      sentinels.filterNot(_.iter.isDone),
-      hackedAcc)
+    val iterators = _models.flatMap(_.iHooks).map(_.underlying).toSet
+    var drivers = iterators.filterNot(_.hasAllCandidates)
+    preLoadAccumulator(sentinels, drivers, iterators, hackedAcc)
 
-    if (activeSentinels.isEmpty) return acc.result
-    else finishScoring(sentinels, activeSentinels, acc)
+    if (drivers.isEmpty) return acc.result
+    else finishScoring(sentinels, iterators, acc)
   }
 
   // For encapsulation - note we assume 1-to-1
@@ -54,35 +54,37 @@ abstract class SimplePreloadingProcessor
   // have already been filtered out.
   @tailrec
   final def getMinCandidate(
-    sents: Seq[Sentinel],
-    min: Int = Int.MaxValue): Int = {
-    if (sents.isEmpty) return min
-    else getMinCandidate(sents.tail,
-      scala.math.min(min, sents.head.iter.currentCandidate))
+    drivers: Set[GIterator],
+    m: Int = Int.MaxValue): Int = {
+    if (drivers.isEmpty) return m
+    else getMinCandidate(drivers.tail, min(m, drivers.head.currentCandidate))
   }
 
   @tailrec
   final def preLoadAccumulator(
     allSentinels: Seq[Sentinel],
-    sents: Seq[Sentinel],
-    acc: Accumulator[ScoredDocument]): Seq[Sentinel] = {
+    drivers: Set[GIterator],
+    iterators: Set[GIterator],
+    acc: Accumulator[ScoredDocument]): Unit = {
     // base case
-    if (acc.atCapacity || sents.isEmpty) {
-      sents
+    if (acc.atCapacity || drivers.isEmpty) {
+      return
     } else {
       // otherwise throw a new candidate in there
-      val candidate = getMinCandidate(sents)
-      if (sents.exists(_.iter.hasMatch(candidate))) {
-        sents.foreach(_.iter.syncTo(candidate))
+      val candidate = getMinCandidate(drivers)
+      if (drivers.exists(_.hasMatch(candidate))) {
+        iterators.foreach(_.syncTo(candidate))
         val score = allSentinels.map(_.feat.eval).sum
+        debug(s"preload: ($candidate, $score)")
         acc += ScoredDocument(candidate, score)
       }
-      sents.foreach(_.iter.movePast(candidate))
+      drivers.foreach(_.movePast(candidate))
       // Remove finished iterators from the remaining list at the next
       // call - saves checking later
       preLoadAccumulator(
         allSentinels,
-        sents.filterNot(_.iter.isDone),
+        drivers.filterNot(_.isDone),
+        iterators,
         acc)
     }
   }

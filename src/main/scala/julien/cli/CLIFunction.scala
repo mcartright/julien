@@ -1,6 +1,6 @@
 package julien
 
-import org.lemurproject.galago.tupleflow.Parameters
+import julien.galago.tupleflow.Parameters
 import java.io.PrintStream
 
 /** Behavior needed for a valid CLI-interfaced class. */

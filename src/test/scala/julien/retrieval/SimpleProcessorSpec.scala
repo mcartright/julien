@@ -4,7 +4,7 @@ package retrieval
 import org.scalatest._
 import org.scalatest.matchers.ShouldMatchers._
 import java.io.File
-import org.lemurproject.galago.tupleflow.{Utility,Parameters}
+import julien.galago.tupleflow.{Utility,Parameters}
 import java.util.logging.{Level,Logger}
 
 trait SimpleProcessorBehavior { this: FlatSpec =>
@@ -29,7 +29,7 @@ trait SimpleProcessorBehavior { this: FlatSpec =>
       val terms = randomTerms.mkString(";")
 
       val l = IndexLengths()
-      val query = Combine(randomTerms.map(t => Dirichlet(Term(t), l)))
+      val query = Combine(randomTerms.map(t => BM25(Term(t), l)))
 
       // Do the simple run
       val sp = ref
@@ -37,14 +37,21 @@ trait SimpleProcessorBehavior { this: FlatSpec =>
       sp add query
       val simpleResults = sp.run(DefaultAccumulator[ScoredDocument](3))
 
-      // Now do maxscore run
+      // Now do alternate run
       val alt = pFactory
       alt add index
       alt add query
       val altResults = alt.run(DefaultAccumulator[ScoredDocument](3))
 
       // And compare
-      simpleResults.size should equal (altResults.size)
+      withClue(s"query=$terms") {
+        simpleResults.size should equal (altResults.size)
+      }
+
+      for ((base, exp) <- simpleResults.zip(altResults)) {
+        println(s"expected: $base\treceived: $exp")
+      }
+
       for ((result, idx) <- simpleResults.zipWithIndex) {
         withClue(s"@$idx, $result != ${altResults(idx)}, query=$terms") {
           altResults(idx).docid should equal (result.docid)
@@ -62,7 +69,7 @@ trait SimpleProcessorBehavior { this: FlatSpec =>
       val terms = randomTerms.mkString(";")
 
       val l = IndexLengths()
-      val query = Combine(randomTerms.map(t => Dirichlet(Term(t), l)))
+      val query = Combine(randomTerms.map(t => BM25(Term(t), l)))
 
       // Do the simple run
       val sp = ref
@@ -77,7 +84,9 @@ trait SimpleProcessorBehavior { this: FlatSpec =>
       val altResults = alt.run(DefaultAccumulator[ScoredDocument](10000))
 
       // And compare
-      simpleResults.size should equal (altResults.size)
+      withClue(s"query=$terms") {
+        simpleResults.size should equal (altResults.size)
+      }
       for ((result, idx) <- simpleResults.zipWithIndex) {
         withClue(s"@$idx, $result != ${altResults(idx)}, query=$terms") {
           altResults(idx).docid should equal (result.docid)
@@ -263,9 +272,11 @@ class SimpleProcessorSpec
   "The MaxcoreProcessor" should behave like aSimpleProcessor(maxProc)
   it should behave like anAccumulatorProcessor(simpleProc, maxProc)
 
+/*
   "The WeakANDProcessor" should behave like aSimpleProcessor(wandProc)
   it should behave like anAccumulatorProcessor(simpleProc, wandProc)
 
   "Maxscore and WeakAND" should
   behave like anAccumulatorProcessor(maxProc, wandProc)
+ */
 }

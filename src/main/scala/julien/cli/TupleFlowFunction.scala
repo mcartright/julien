@@ -1,11 +1,11 @@
 package julien
 
 import java.io.PrintStream;
-import org.lemurproject.galago.tupleflow.Parameters;
-import org.lemurproject.galago.tupleflow.Utility;
-import org.lemurproject.galago.tupleflow.execution.ErrorStore;
-import org.lemurproject.galago.tupleflow.execution.Job;
-import org.lemurproject.galago.tupleflow.execution.JobExecutor;
+import julien.galago.tupleflow.Parameters;
+import julien.galago.tupleflow.Utility;
+import julien.galago.tupleflow.execution.ErrorStore;
+import julien.galago.tupleflow.execution.Job;
+import julien.galago.tupleflow.execution.JobExecutor;
 
 trait TupleFlowFunction extends CLIFunction {
   def runTupleFlowJob(job: Job, p: Parameters, out: PrintStream) : Boolean = {

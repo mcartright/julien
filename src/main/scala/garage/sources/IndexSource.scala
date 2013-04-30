@@ -1,11 +1,11 @@
 package garage
 package sources
 
-import org.lemurproject.galago.core.index._
-import org.lemurproject.galago.core.index.AggregateReader._
-import org.lemurproject.galago.core.util.ExtentArray
-import org.lemurproject.galago.core.parse._
-import org.lemurproject.galago.tupleflow.{Parameters,Utility,Source}
+import julien.galago.core.index._
+import julien.galago.core.index.AggregateReader._
+import julien.galago.core.util.ExtentArray
+import julien.galago.core.parse._
+import julien.galago.tupleflow.{Parameters,Utility,Source}
 import scala.collection.JavaConversions._
 
 

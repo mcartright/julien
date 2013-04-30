@@ -1,7 +1,7 @@
 package julien
 package access
 
-import org.lemurproject.galago.core.index.ScoreIterator
+import julien.galago.core.index.ScoreIterator
 
 class ScorePosting protected (var docid: Docid, var score: Double)
     extends Posting[ScorePosting]

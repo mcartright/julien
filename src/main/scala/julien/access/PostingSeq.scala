@@ -1,8 +1,8 @@
 package julien
 package access
 
-import org.lemurproject.galago.core.index.ExtentIterator
-import org.lemurproject.galago.tupleflow.Utility
+import julien.galago.core.index.ExtentIterator
+import julien.galago.tupleflow.Utility
 import scala.collection.{LinearSeq}
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.List

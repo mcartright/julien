@@ -29,20 +29,17 @@ object WeakANDProcessor {
 class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
   override def finishScoring[T <: ScoredObject[T]](
     allSentinels: Seq[Sentinel],
-    unfinished: Seq[Sentinel],
+    iterators: Set[GIterator],
     acc: Accumulator[T] = DefaultAccumulator[ScoredDocument]()
   ): List[T] = {
     val hackedAcc = acc.asInstanceOf[DefaultAccumulator[ScoredDocument]]
-    val sentinels = allSentinels.toArray
-    // direct access to the underlying iterators
-    val iterators = _models.flatMap(_.iHooks.map(_.underlying)).toSet
 
     // This is the WeakAND strategy - before scoring fully, we decide whether
     // this document has the potential to make it into the final list. If so,
     // it's fully scored.
 
     // Start with a full sort - the only one needed
-    var sortedSentinels = sentinels.sorted(SentinelOrdering)
+    var sortedSentinels = allSentinels.toArray.sorted(SentinelOrdering)
     val scoreMinimum = sortedSentinels.map(_.feat.lowerBound).sum
 
     var running = true
@@ -53,8 +50,10 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
       if (pivotPos == -1 || sortedSentinels(pivotPos).iter.isDone) {
         // invariants not maintained - time to stop
         running = false
+        debug("stopping")
       } else {
         val pivot = sortedSentinels(pivotPos).iter.currentCandidate
+        debug(s"pivot = $pivot, lastScored = $lastScored")
         if (pivot <= lastScored) {
           // The pivot is old news. Move the pivot iterator past it
           // and try again
@@ -65,11 +64,10 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
           // All iterators up to the pivot iterator are lined up. Score.
           iterators.foreach(_.syncTo(pivot))
           val score = sortedSentinels.map(_.feat.eval).sum
-          if (score > threshold) {
-            // Pass muster, put it in the queue and update the threshold
-            hackedAcc += ScoredDocument(pivot, score)
-            threshold = hackedAcc.head.score * factor
-          }
+          // Pass muster, put it in the queue and update the threshold
+          debug(s"adding ($pivot, $score)")
+          hackedAcc += ScoredDocument(pivot, score)
+          threshold = hackedAcc.head.score * factor
         } else {
           // Iterators in line before the pivot iterator are not lined
           // up yet - pick one and move it to the pivot.

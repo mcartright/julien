@@ -41,8 +41,8 @@ class JelinekMercer(
     score(maxtf, maxtf)
   }
 
-  // Crappy estimate. What's better?
   override lazy val lowerBound: Double =
+    //score(0, statsrc.statistics.longestDoc)
     score(0, JelinekMercer.totallyMadeUpValue)
 
   def eval: Double = score(op.count, lengths.length)

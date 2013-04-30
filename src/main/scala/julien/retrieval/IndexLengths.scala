@@ -1,7 +1,7 @@
 package julien
 package retrieval
 
-import org.lemurproject.galago.core.index.LengthsReader._
+import julien.galago.core.index.LengthsReader._
 
 object IndexLengths {
   def apply() = new IndexLengths(None)
@@ -15,4 +15,5 @@ class IndexLengths private (field: Option[String])
     s"lengths:" + (if (isAttached) index.toString else "")
   def getIterator(i: Index): LengthsIterator = i.lengthsIterator(field)
   def length: Int = it.get.getCurrentLength
+  def current: Int = it.get.currentCandidate
 }

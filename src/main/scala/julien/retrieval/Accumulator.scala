@@ -15,7 +15,20 @@ trait Accumulator[T <: ScoredObject[T]]
     extends LinearSeq[T]
     with Builder[T, List[T]] {
 
-  // Need overriding
+  /** This operation is generally unsupported, as it can be difficult
+    * to reach a particular index when the accumulator is of unknown
+    * size.
+    */
+  final override def update(idx: Int, elem: T): Unit =
+    throw new UnsupportedOperationException(s"Ha! You wish.")
+
+  /** True if this accumulator has a definite size.
+    * Default implementation is false. Override in subclasses.
+    */
   def hasLimit: Boolean = false
+
+  /** True if the number of elements in the accumulator is equal
+    * to the limit, if one exists. Default implementation is false.
+    */
   def atCapacity: Boolean = false
 }

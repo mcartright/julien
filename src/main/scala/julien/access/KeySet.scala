@@ -1,8 +1,8 @@
 package julien
 package access
 
-import org.lemurproject.galago.core.index.KeyIterator
-import org.lemurproject.galago.tupleflow.Utility
+import julien.galago.core.index.KeyIterator
+import julien.galago.tupleflow.Utility
 import scala.collection.SortedSet
 import scala.collection.generic.SortedSetFactory
 

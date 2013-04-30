@@ -1,9 +1,9 @@
 package garage
 package sources
 
-import org.lemurproject.galago.core.util.ExtentArray
-import org.lemurproject.galago.core.util.ExtentArrayIterator
-import org.lemurproject.galago.core.parse.Document
+import julien.galago.core.util.ExtentArray
+import julien.galago.core.util.ExtentArrayIterator
+import julien.galago.core.parse.Document
 
 sealed trait DataSource
 

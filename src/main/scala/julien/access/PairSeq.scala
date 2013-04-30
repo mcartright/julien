@@ -2,8 +2,8 @@ package julien
 package access
 
 import scala.collection.LinearSeq
-import org.lemurproject.galago.core.index.KeyIterator
-import org.lemurproject.galago.tupleflow.Utility
+import julien.galago.core.index.KeyIterator
+import julien.galago.tupleflow.Utility
 
 // We only inherit from LinearSeq here, because LinearSeqLike indicates
 // that the PairSeq class should be the result of a transformation

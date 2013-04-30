@@ -2,8 +2,8 @@ package julien
 package retrieval
 
 import julien._
-import org.lemurproject.galago.tupleflow.Utility
-import org.lemurproject.galago
+import julien.galago.tupleflow.Utility
+import julien.galago
 
 object SimpleProcessor {
   def apply() = new SimpleProcessor()
@@ -71,16 +71,20 @@ class SimpleProcessor extends QueryProcessor {
     // extract iterators
     val index = _indexes.head
     val model = _models.head
-    val iterators: Set[GIterator] =
-      model.iHooks.map(_.underlying).toSet.filterNot(_.hasAllCandidates)
+    val iterators: Set[GIterator] = _models.
+      flatMap(_.iHooks).
+      map(_.underlying).
+      toSet
+    val drivers: Set[GIterator] = iterators.filterNot(_.hasAllCandidates)
+
     // Need to fix this
-    val scorers : List[FeatureOp] = List(model)
+    val scorers : List[FeatureOp] = _models
 
     // Go
-    while (iterators.exists(_.isDone == false)) {
-      val candidate = iterators.filterNot(_.isDone).map(_.currentCandidate).min
+    while (drivers.exists(_.isDone == false)) {
+      val candidate = drivers.filterNot(_.isDone).map(_.currentCandidate).min
       iterators.foreach(_.syncTo(candidate))
-      if (iterators.exists(_.hasMatch(candidate))) {
+      if (drivers.exists(_.hasMatch(candidate))) {
         // Time to score
         val score = scorers.map(_.eval).sum
         // How do we instantiate an object without knowing what it is, and
@@ -91,7 +95,7 @@ class SimpleProcessor extends QueryProcessor {
         val hackedAcc = acc.asInstanceOf[Accumulator[ScoredDocument]]
         hackedAcc += ScoredDocument(candidate, score)
       }
-      iterators.foreach(_.movePast(candidate))
+      drivers.foreach(_.movePast(candidate))
     }
     acc.result
   }

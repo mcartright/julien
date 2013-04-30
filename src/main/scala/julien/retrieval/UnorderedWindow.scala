@@ -1,7 +1,7 @@
 package julien
 package retrieval
 
-import org.lemurproject.galago.core.util._
+import julien.galago.core.util._
 
 object UnorderedWindow {
   def apply(w: Int, t: PositionStatsView*) = new UnorderedWindow(w, t)

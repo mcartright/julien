@@ -1,4 +1,4 @@
-package org.lemurproject.galago.tupleflow.types;
+package julien.galago.tupleflow.types;
 
 type TupleflowBytes {
     bytes value;

@@ -30,55 +30,69 @@ object MaxscoreProcessor {
 class MaxscoreProcessor extends SimplePreloadingProcessor {
   override def finishScoring[T <: ScoredObject[T]](
     allSentinels: Seq[Sentinel],
-    activeSentinels: Seq[Sentinel],
+    iterators: Set[GIterator],
     acc: Accumulator[T] = DefaultAccumulator[ScoredDocument]()
   ): List[T] = {
     val hackedAcc = acc.asInstanceOf[DefaultAccumulator[ScoredDocument]]
-    var unfinished = activeSentinels
+
     // Build the sentinel list - sort is on idf
     val sentinels = allSentinels.sortBy(_.iter.totalEntries)
+
+    sentinels.foreach(s => debug(s.toString))
 
     // establish upper bound of all features - every document starts at
     // this value and is progressively lowered to the true score
     val startingScore = sentinels.map(_.feat.upperBound).sum
-    // direct access to the underlying iterators
-    val iterators = _models.flatMap(m => m.iHooks.map(_.underlying)).toSet
 
     // Now start looking for cutoffs
     var threshold = hackedAcc.head.score
     var sidx = getSentinelIndex(sentinels, 0, threshold, startingScore)
 
-    // HACK - would like this to be cleaner
+    debug(s"startingScore: $startingScore, threshold: $threshold, sidx=$sidx")
+
+    // HACK - need to make this a "other" set
     val lengths = iterators.filter(_.isInstanceOf[LI]).head
 
     // Scala does not natively support a "break" construct, so let's avoid it.
     // We simply need to set the candidate once before entering the while
     // loop, then check at the end of the loop
-    var candidate = getMinCandidate(unfinished)
+    var selected = sentinels.take(sidx)
+    var drivers = selected.map(_.iter).toSet.filterNot(_.isDone)
+    var candidate = getMinCandidate(drivers)
     while (candidate < Int.MaxValue) {
-      val drivers = sentinels.take(sidx)
-      if (drivers.exists(_.iter.hasMatch(candidate))) {
-        drivers.foreach(_.iter.syncTo(candidate))
+      if (drivers.exists(_.hasMatch(candidate))) {
+        drivers.foreach(_.syncTo(candidate))
         lengths.syncTo(candidate)
         // Sum the active sentinels
-        val senscore = drivers.map(_.feat.eval).sum
-
+        val senscore = selected.foldLeft(startingScore) { (score, sent) =>
+          val r = score + (sent.feat.eval - sent.feat.upperBound)
+          debug(s"$score - (${sent.feat.upperBound}) + (${sent.feat.eval}) = $r")
+          r
+        }
+        debug(s"partial: cand=$candidate, score=$senscore")
         // Now add the rest of them until we're done or it's below threshold
         // doing this via tail recursion
         val (score, pos) =
-          conditionalAddSentinel(sentinels, sidx, threshold, senscore)
+          conditionalAddSentinel(sentinels,
+            candidate, sidx, threshold, senscore)
 
+        debug(s"final: cand=$candidate, score=$score (t=$threshold), $pos of ${sentinels.size}")
         if (pos == sentinels.size && score > threshold) {
           hackedAcc += ScoredDocument(candidate, score)
-          threshold = hackedAcc.head.score
-          sidx = getSentinelIndex(sentinels, 0, threshold, startingScore)
+          if (threshold != hackedAcc.head.score) {
+            threshold = hackedAcc.head.score
+            sidx = getSentinelIndex(sentinels, 0, threshold, startingScore)
+            selected = sentinels.take(sidx)
+            drivers = selected.map(_.iter).toSet
+          }
         }
       }
-      unfinished.foreach(_.iter.movePast(candidate))
+      drivers.foreach(_.movePast(candidate))
+      drivers = drivers.filterNot(_.isDone)
 
       // Grab next candidate
-      unfinished = unfinished.filterNot(_.iter.isDone)
-      candidate = getMinCandidate(unfinished)
+      candidate = getMinCandidate(drivers)
+      debug(s"next candidate: $candidate")
     }
 
     // All done - return
@@ -89,6 +103,7 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
   @tailrec
   private def conditionalAddSentinel(
     sents: Seq[Sentinel],
+    candidate: Int,
     idx: Int,
     threshold: Double,
     oldScore: Double): Tuple2[Double, Int] =
@@ -96,10 +111,13 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
     // or we dropped below the threshold
     if (idx == sents.size || oldScore < threshold)
       (oldScore, idx)
-    else
+    else {
       // Add one more sentinel to the total
-      conditionalAddSentinel(sents, idx+1, threshold,
-        oldScore + sents(idx).feat.eval - sents(idx).dec)
+      sents(idx).iter.syncTo(candidate)
+      val r = oldScore + (sents(idx).feat.eval - sents(idx).feat.upperBound)
+      debug(s"$oldScore - (${sents(idx).feat.upperBound}) + (${sents(idx).feat.eval}) = $r")
+      conditionalAddSentinel(sents, candidate, idx+1, threshold, r)
+    }
 
   @tailrec
   private def getSentinelIndex(
@@ -109,6 +127,8 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
     currentScore: Double): Int =
     if (idx == sents.size || currentScore < threshold)
       return idx
-    else
+    else {
+      debug(s"SETTING (sidx=$idx, t=$threshold, change=$currentScore - ${sents(idx).dec} = ${currentScore - sents(idx).dec}")
       getSentinelIndex(sents, idx+1, threshold, currentScore - sents(idx).dec)
+    }
 }

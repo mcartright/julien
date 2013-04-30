@@ -1,7 +1,7 @@
 package julien
 package retrieval
 
-import org.lemurproject.galago.core.index.ExtentIterator
+import julien.galago.core.index.ExtentIterator
 
 object Term {
   def apply(s: String) = new Term(s, None)
@@ -39,12 +39,17 @@ final class Term private (val t: String, val field: Option[String])
       lengthsIterator(field).
       asInstanceOf[ARCA].
       getStatistics
+
     CountStatistics(
       ns.nodeFrequency,
       cs.documentCount,
       cs.collectionLength,
       ns.nodeDocumentCount,
-      ns.maximumCount.toInt
+      ns.maximumCount.toInt,
+      attachedIndex.collectionStats.maxLength.toInt
     )
   }
+
+  /** Diagnostic for determining the current location of this term. */
+  def current: Int = it.get.currentCandidate
 }

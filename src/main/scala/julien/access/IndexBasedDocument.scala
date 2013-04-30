@@ -1,7 +1,7 @@
 package julien
 package access
 
-import org.lemurproject.galago.core.index.DataIterator
+import julien.galago.core.index.DataIterator
 import scala.collection.JavaConversions._
 
 class IndexBasedDocument extends Document {

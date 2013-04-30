@@ -3,7 +3,7 @@ package julien
 package cli
 
 // Aliasing for shorthand
-import org.lemurproject.galago.{core => gcore, tupleflow => gt}
+import julien.galago.{core => gcore, tupleflow => gt}
 
 import java.io.{File, PrintStream}
 import gcore.index.corpus._

@@ -24,8 +24,8 @@ object DefaultAccumulator {
   * a simple template.
   */
 class DefaultAccumulator[T <: ScoredObject[T]] private(
-  private[this] val q: PriorityQueue[T], val limit: Int)
-    extends Accumulator[T] {
+  private[this] val q: PriorityQueue[T], val limit: Int
+) extends Accumulator[T] {
   override val hasLimit: Boolean = true
   override def atCapacity: Boolean = q.size >= limit
 
@@ -51,6 +51,5 @@ class DefaultAccumulator[T <: ScoredObject[T]] private(
   override def tail: DefaultAccumulator[T] = DefaultAccumulator(q.tail)
   override def length: Int = q.length
   override def apply(idx: Int): T = q(idx)
-  override def update(idx: Int, elem: T): Unit =
-    throw new UnsupportedOperationException(s"Ha! You wish.")
+
 }

@@ -1,9 +1,9 @@
 package garage
 package sources
 
-import org.lemurproject.galago.core.util.{ExtentArray,ExtentArrayIterator}
-import org.lemurproject.galago.tupleflow.Parameters
-import org.lemurproject.galago.core.index._
+import julien.galago.core.util.{ExtentArray,ExtentArrayIterator}
+import julien.galago.tupleflow.Parameters
+import julien.galago.core.index._
 import julien._
 
 object IteratorSource {

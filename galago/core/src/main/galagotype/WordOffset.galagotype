@@ -1,4 +1,4 @@
-package org.lemurproject.galago.core.types;
+package julien.galago.core.types;
 
 type WordOffset {
     bytes word;

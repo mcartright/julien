@@ -45,11 +45,11 @@ class Dirichlet(
     score(maxtf, maxtf)
   }
 
-  // this is a filthy estimation - want something better
-  // problem is that it's the longest document *not* seen by
-  // the underlying view.
-  override lazy val lowerBound: Double =
+  override lazy val lowerBound: Double = {
+    // Not sure which one is less accurate, actually...
+    //score(0, statsrc.statistics.longestDoc)
     score(0, Dirichlet.totallyMadeUpValue)
+  }
 
   def eval: Double = score(op.count, lengths.length)
   def score(c: Int, l: Int): Double = {

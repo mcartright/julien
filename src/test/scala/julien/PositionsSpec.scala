@@ -1,7 +1,7 @@
 package julien
 
 import org.scalatest._
-import org.lemurproject.galago.core.util.ExtentArray
+import julien.galago.core.util.ExtentArray
 
 trait PositionsBehaviors { this: FlatSpec =>
   def emptyPositions(emptyP: => Positions) {

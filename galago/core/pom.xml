@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.lemurproject</groupId>
+    <groupId>julien</groupId>
     <artifactId>galago</artifactId>
-    <version>3.3-JULIEN</version>
+    <version>3.3</version>
   </parent>
-  <groupId>org.lemurproject.galago</groupId>
+  <groupId>julien.galago</groupId>
   <artifactId>core</artifactId>
   <packaging>jar</packaging>
-  <version>3.3-JULIEN</version>
+  <version>3.3</version>
   <name>core</name>
   <url>http://lemurproject.org/galago/php</url>
   <description>Galago is a toolkit for experimenting with search engines and text processing.</description>
@@ -30,7 +30,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.7</version>
         <configuration>
-          <excludePackageNames>org.lemurproject.galago.core.types</excludePackageNames>
+          <excludePackageNames>julien.galago.core.types</excludePackageNames>
         </configuration>
       </plugin>
       <plugin>
@@ -204,7 +204,7 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.lemurproject.galago</groupId>
+        <groupId>julien.galago</groupId>
         <artifactId>tupleflow-typebuilder</artifactId>
         <version>${project.version}</version>
         <executions>
