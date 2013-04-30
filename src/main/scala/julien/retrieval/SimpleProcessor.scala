@@ -84,6 +84,7 @@ class SimpleProcessor extends QueryProcessor {
       iterators.foreach(_.moveTo(candidate))
       if (drivers.exists(_.matches(candidate))) {
         // Time to score
+   //     println("scoring candidate: " + candidate + " " + index.name(candidate))
         val score = scorers.map(_.eval).sum
         // How do we instantiate an object without knowing what it is, and
         // knowing what it needs? One method in the QueryProcessor?
