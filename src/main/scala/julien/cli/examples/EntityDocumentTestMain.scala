@@ -8,18 +8,16 @@ import retrieval._
 import retrieval.Utils._
 
 /**
-* User: jdalton
-* Date: 4/24/13
-*/
+ * User: jdalton
+ * Date: 4/24/13
+ */
 object EntityDocumentTestMain extends App {
 
   // load index into memory
-  var index : Index = null
+  var index: Index = null
 
-  val memIndex =
-    Index.memory("/usr/dan/users4/jdalton/code/julien/src/test/resources/wiki-trectext-5.dat")
-  val diskIndex =
-    Index.disk("/usr/dan/users4/jdalton/code/julien/data/test-index")
+  val memIndex = Index.memory("/usr/dan/users4/jdalton/code/julien/src/test/resources/wiki-trectext-5.dat")
+  //val diskIndex = Index.disk("/usr/dan/users4/jdalton/code/julien/data/test-index")
 
   index = memIndex
 
@@ -29,26 +27,28 @@ object EntityDocumentTestMain extends App {
     keys.nextKey()
     println(keys.getKey + " " + keys.getKeyString)
   }
-//  val docLens = lengths.getIterator(Utility."document")
+  //  val docLens = lengths.getIterator(Utility."document")
   println("docs: " + memIndex.numDocuments + " cf:" + memIndex.collectionLength)
 
   val query = args(0).split(" ").map(Term(_))
   val modelFeatures = List.newBuilder[FeatureOp]
 
   val sdm =
-     Combine(List[FeatureOp](
-        Combine(children = query.map(a => Dirichlet(a,IndexLengths())),
-          weight = 0.8),
-        Combine(children = query.sliding(2,1).map { p =>
+    Combine(List[FeatureOp](
+      Combine(children = query.map(a => Dirichlet(a, IndexLengths())),
+        weight = 0.8),
+      Combine(children = query.sliding(2, 1).map {
+        p =>
           Dirichlet(OrderedWindow(1, p: _*), IndexLengths())
-        }.toSeq,
-          weight = 0.15),
-        Combine(query.sliding(2,1).map { p =>
+      }.toSeq,
+        weight = 0.15),
+      Combine(query.sliding(2, 1).map {
+        p =>
           Dirichlet(UnorderedWindow(8, p: _*), IndexLengths())
-        }.toSeq,
-          weight = 0.05)
-      ))
-   modelFeatures += sdm
+      }.toSeq,
+        weight = 0.05)
+    ))
+  modelFeatures += sdm
 
   // Make a processor to run it
   val processor = SimpleProcessor()

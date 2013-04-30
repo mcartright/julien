@@ -23,7 +23,12 @@ object Combine {
     combiner: Combiner) = new Combine(children, weight, combiner)
 
   val summer: Combiner = (sops: Seq[FeatureOp]) => {
-    sops.foldLeft(0.0) { (score, op) => score + op.eval }
+    sops.foldLeft(0.0) { (score, op) => {
+
+      val weightedScore = (op.weight * op.eval)
+      debug("COMBINE: " + op.toString + " " + score + " " + weightedScore)
+      score + weightedScore
+    } }
   }
 }
 
