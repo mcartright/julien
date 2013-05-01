@@ -1126,7 +1126,6 @@ public class JobExecutor {
   public static boolean runLocally(Job job, ErrorStore store, Parameters p) throws IOException,
           InterruptedException, ExecutionException, Exception {
       Logger logger = Logger.getLogger(JobExecutor.class.toString());
-      logger.setLevel(Level.INFO);
 
     // Extraction from parameters can go here now
     String tempPath = p.get("galagoJobDir", "");

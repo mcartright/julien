@@ -1,11 +1,11 @@
 /*
  *  BSD License (http://lemurproject.org/galago-license)
  */
-package julien.galago.core.index.mem;
+package julien.galago.core.index.dynamic;
 
 import java.io.IOException;
 
-import julien.galago.core.index.IndexPartReader;
+import julien.galago.core.index.Index;
 import julien.galago.core.index.Iterator;
 import julien.galago.core.parse.Document;
 
@@ -14,7 +14,7 @@ import julien.galago.core.parse.Document;
  *
  * @author sjh
  */
-public interface MemoryIndexPart extends IndexPartReader {
+public interface MemoryIndexPart extends Index.IndexPartReader {
   /*
    * flush data to a disk index part
    */

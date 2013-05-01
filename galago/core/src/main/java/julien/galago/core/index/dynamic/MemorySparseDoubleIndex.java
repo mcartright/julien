@@ -1,20 +1,16 @@
 // BSD License (http://lemurproject.org/galago-license)
-package julien.galago.core.index.mem;
+package julien.galago.core.index.dynamic;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Map;
 import java.util.TreeMap;
 
-import julien.galago.core.index.AggregateReader;
 import julien.galago.core.index.CompressedByteBuffer;
-import julien.galago.core.index.CountIterator;
 import julien.galago.core.index.Iterator;
 import julien.galago.core.index.KeyIterator;
-import julien.galago.core.index.AggregateReader.NodeAggregateIterator;
-import julien.galago.core.index.AggregateReader.NodeStatistics;
-import julien.galago.core.index.disk.CountIndexWriter;
+import julien.galago.core.index.ScoreIterator;
+import julien.galago.core.index.disk.SparseFloatListWriter;
 import julien.galago.core.parse.Document;
 import julien.galago.core.parse.stem.Stemmer;
 import julien.galago.tupleflow.FakeParameters;
@@ -31,7 +27,7 @@ import julien.galago.tupleflow.Utility.ByteArrComparator;
  * In-memory posting index
  *
  */
-public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.AggregateIndexPart {
+public class MemorySparseDoubleIndex implements MemoryIndexPart {
 
   // this could be a bit big -- but we need random access here
   // should use a trie (but java doesn't have one?)
@@ -39,12 +35,9 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
   protected Parameters parameters;
   protected long collectionDocumentCount = 0;
   protected long collectionPostingsCount = 0;
-  protected long vocabCount = 0;
-  protected long highestFrequency = 0;
-  protected long highestDocumentCount = 0;
   protected Stemmer stemmer = null;
 
-  public MemoryCountIndex(Parameters parameters) throws Exception {
+  public MemorySparseDoubleIndex(Parameters parameters) throws Exception {
     this.parameters = parameters;
 
     if (parameters.containsKey("stemmer")) {
@@ -56,37 +49,29 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
     collectionDocumentCount = parameters.get("statistics/documentCount", 0);
   }
 
-  // overridable function (for stemming etc) 
-  public Document preProcessDocument(Document doc) throws IOException {
-    return doc;
-  }
-
   @Override
   public void addDocument(Document doc) throws IOException {
-    // stemming may shorten document
-    doc = preProcessDocument(doc);
-
-    for (String term : doc.terms) {
-      String stem = stemAsRequired(term);
-      addPosting(Utility.fromString(stem), doc.identifier, 1);
-    }
-
-    collectionDocumentCount += 1;
-    collectionPostingsCount += doc.terms.size();
-    vocabCount = postings.size();
+    // do nothing
+    // - we have no way of extracting scores from documents at the moment
   }
 
   @Override
   public void addIteratorData(byte[] key, Iterator iterator) throws IOException {
-
     // if  we have not already cached this data
     if (!postings.containsKey(key)) {
-      PostingList postingList = new PostingList(key);
-      CountIterator mi = (CountIterator) iterator;
+      ScoreIterator mi = (ScoreIterator) iterator;
+
+      // note that dirichet should not have a static default score
+      //  -> this cache should not be used for dirichlet scores
+      double defaultScore = mi.score();
+      PostingList postingList = new PostingList(key, defaultScore);
+
       while (!mi.isDone()) {
         int document = mi.currentCandidate();
-        int count = mi.count();
-        postingList.add(document, count);
+        if (mi.hasMatch(document)) {
+          double score = mi.score();
+          postingList.add(document, score);
+        }
         mi.movePast(document);
       }
 
@@ -94,30 +79,13 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
       //  - we do not want to search partial data.
       postings.put(key, postingList);
 
-      this.highestDocumentCount = Math.max(highestDocumentCount, postingList.termDocumentCount);
-      this.highestFrequency = Math.max(highestFrequency, postingList.termPostingsCount);
+      mi.reset();
     }
-
-    vocabCount = postings.size();
   }
 
   @Override
   public void removeIteratorData(byte[] key) throws IOException {
     postings.remove(key);
-  }
-
-  protected void addPosting(byte[] byteWord, int document, int count) {
-    if (!postings.containsKey(byteWord)) {
-      PostingList postingList = new PostingList(byteWord);
-      postings.put(byteWord, postingList);
-    }
-
-    PostingList postingList = postings.get(byteWord);
-    postingList.add(document, count);
-
-    // this posting list has changed - check if the aggregate stats also need to change.
-    this.highestDocumentCount = Math.max(highestDocumentCount, postingList.termDocumentCount);
-    this.highestFrequency = Math.max(highestFrequency, postingList.termPostingsCount);
   }
 
   // Posting List Reader functions
@@ -128,13 +96,13 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
 
   @Override
   public Iterator getIterator(byte[] key) throws IOException {
-    return getTermCounts(key);
+    return getNodeScores(key);
   }
 
-  private CountsIterator getTermCounts(byte[] term) throws IOException {
-    PostingList postingList = postings.get(term);
+  protected ScoresIterator getNodeScores(byte[] key) throws IOException {
+    PostingList postingList = postings.get(key);
     if (postingList != null) {
-      return new CountsIterator(postingList);
+      return new ScoresIterator(postingList);
     }
     return null;
   }
@@ -152,11 +120,13 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
 
   @Override
   public long getDocumentCount() {
+    // doesn't work/make sense
     return collectionDocumentCount;
   }
 
   @Override
   public long getCollectionLength() {
+    // doesn't work/make sense
     return collectionPostingsCount;
   }
 
@@ -169,16 +139,19 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
   public void flushToDisk(String path) throws IOException {
     Parameters p = getManifest();
     p.set("filename", path);
-    CountIndexWriter writer = new CountIndexWriter(new FakeParameters(p));
+    p.set("statistics/documentCount", this.getDocumentCount());
+    p.set("statistics/collectionLength", this.getCollectionLength());
+    p.set("statistics/vocabCount", this.getKeyCount());
+    SparseFloatListWriter writer = new SparseFloatListWriter(new FakeParameters(p));
 
     KIterator kiterator = new KIterator();
-    CountsIterator viterator;
+    ScoresIterator viterator;
     while (!kiterator.isDone()) {
-      viterator = (CountsIterator) kiterator.getValueIterator();
+      viterator = (ScoresIterator) kiterator.getValueIterator();
       writer.processWord(kiterator.getKey());
       while (!viterator.isDone()) {
-        writer.processDocument(viterator.currentCandidate());
-        writer.processTuple(viterator.count());
+        writer.processNumber(viterator.currentCandidate());
+        writer.processTuple(viterator.score());
         viterator.movePast(viterator.currentCandidate());
       }
       kiterator.nextKey();
@@ -186,66 +159,35 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
     writer.close();
   }
 
-  @Override
-  public AggregateReader.IndexPartStatistics getStatistics() {
-    AggregateReader.IndexPartStatistics is = new AggregateReader.IndexPartStatistics();
-    is.partName = "MemoryCountIndex";
-    is.collectionLength = this.collectionPostingsCount;
-    is.vocabCount = this.vocabCount;
-    is.highestDocumentCount = this.highestDocumentCount;
-    is.highestFrequency = this.highestFrequency;
-    return is;
-  }
-
-  // private functions
-  private String stemAsRequired(String term) {
-    if (stemmer != null) {
-      return stemmer.stem(term);
-    }
-    return term;
-  }
-
   // sub classes:
   public class PostingList {
 
     byte[] key;
     CompressedByteBuffer documents_cbb = new CompressedByteBuffer();
-    CompressedByteBuffer counts_cbb = new CompressedByteBuffer();
-    //IntArray documents = new IntArray();
-    //IntArray termFreqCounts = new IntArray();
-    //IntArray termPositions = new IntArray();
-    int termDocumentCount = 0;
+    CompressedByteBuffer scores_cbb = new CompressedByteBuffer();
     int termPostingsCount = 0;
     int lastDocument = 0;
-    int lastCount = 0;
-    int maximumPostingsCount = 0;
+    double maxScore = Double.MIN_VALUE;
+    double minScore = Double.MAX_VALUE;
+    double defaultScore;
 
-    public PostingList(byte[] key) {
+    public PostingList(byte[] key, double defaultScore) {
       this.key = key;
+      this.defaultScore = defaultScore;
     }
 
-    public void add(int document, int count) {
-      if (termDocumentCount == 0) {
-        // first instance of term
-        lastDocument = document;
-        lastCount = count;
-        termDocumentCount += 1;
-        documents_cbb.add(document);
-      } else if (lastDocument == document) {
-        // additional instance of term in document
-        lastCount += count;
-      } else {
-        // new document
-        assert lastDocument == 0 || document > lastDocument;
-        documents_cbb.add(document - lastDocument);
-        lastDocument = document;
-        counts_cbb.add(lastCount);
-        lastCount = count;
-        termDocumentCount += 1;
-      }
-      termPostingsCount += count;
-      // keep track of the document with the highest frequency of 'term'
-      maximumPostingsCount = Math.max(lastCount, maximumPostingsCount);
+    public void add(int document, double score) {
+      assert lastDocument == 0 || document > lastDocument : "Can not add documents in non-increasing order.";
+
+      documents_cbb.add(document - lastDocument);
+      lastDocument = document;
+
+      maxScore = Math.max(maxScore, score);
+      minScore = Math.min(minScore, score);
+
+      scores_cbb.addDouble(score);
+
+      termPostingsCount += 1;
     }
   }
   // iterator allows for query processing and for streaming posting list data
@@ -304,16 +246,10 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
     @Override
     public String getValueString() throws IOException {
       long count = -1;
-      CountsIterator it = new CountsIterator(postings.get(currKey));
-      count = it.count();
+      ScoresIterator it = new ScoresIterator(postings.get(currKey));
       StringBuilder sb = new StringBuilder();
       sb.append(Utility.toString(getKey())).append(",");
-      sb.append("list of size: ");
-      if (count > 0) {
-        sb.append(count);
-      } else {
-        sb.append("Unknown");
-      }
+      sb.append("score:").append(it.score());
       return sb.toString();
     }
 
@@ -339,25 +275,24 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
     @Override
     public Iterator getValueIterator() throws IOException {
       if (currKey != null) {
-        return new CountsIterator(postings.get(currKey));
+        return new ScoresIterator(postings.get(currKey));
       } else {
         return null;
       }
     }
   }
 
-  public class CountsIterator implements NodeAggregateIterator, CountIterator {
+  public class ScoresIterator implements ScoreIterator {
 
     PostingList postings;
     VByteInput documents_reader;
-    VByteInput counts_reader;
+    VByteInput scores_reader;
     int iteratedDocs;
     int currDocument;
-    int currCount;
+    double currScore;
     boolean done;
-    Map<String, Object> modifiers;
 
-    private CountsIterator(PostingList postings) throws IOException {
+    private ScoresIterator(PostingList postings) throws IOException {
       this.postings = postings;
       reset();
     }
@@ -367,25 +302,30 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
       documents_reader = new VByteInput(
               new DataInputStream(
               new ByteArrayInputStream(postings.documents_cbb.getBytes())));
-      counts_reader = new VByteInput(
+      scores_reader = new VByteInput(
               new DataInputStream(
-              new ByteArrayInputStream(postings.counts_cbb.getBytes())));
+              new ByteArrayInputStream(postings.scores_cbb.getBytes())));
 
       iteratedDocs = 0;
       currDocument = 0;
-      currCount = 0;
+      currScore = 0;
 
       read();
     }
 
     @Override
-    public int count() {
-      return currCount;
+    public double score() {
+      return currScore;
     }
 
     @Override
-    public int maximumCount() {
-      return Integer.MAX_VALUE;
+    public double maximumScore() {
+      return postings.maxScore;
+    }
+
+    @Override
+    public double minimumScore() {
+      return postings.minScore;
     }
 
     @Override
@@ -399,11 +339,6 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
     }
 
     @Override
-    public byte[] key() {
-      return Utility.fromString("MemCI");
-    }
-
-    @Override
     public boolean hasMatch(int identifier) {
       return (!isDone() && identifier == currDocument);
     }
@@ -414,15 +349,12 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
     }
 
     private void read() throws IOException {
-      if (iteratedDocs >= postings.termDocumentCount) {
+      if (iteratedDocs >= postings.termPostingsCount) {
         done = true;
         return;
-      } else if (iteratedDocs == postings.termDocumentCount - 1) {
-        currDocument = postings.lastDocument;
-        currCount = postings.lastCount;
       } else {
         currDocument += documents_reader.readInt();
-        currCount = counts_reader.readInt();
+        currScore = scores_reader.readDouble();
       }
 
       iteratedDocs++;
@@ -439,6 +371,7 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
 
     @Override
     public void movePast(int identifier) throws IOException {
+
       while (!isDone() && (currDocument <= identifier)) {
         read();
       }
@@ -452,24 +385,14 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
       builder.append(",");
       builder.append(currDocument);
       builder.append(",");
-      builder.append(currCount);
+      builder.append(currScore);
 
       return builder.toString();
     }
 
     @Override
     public long totalEntries() {
-      return postings.termDocumentCount;
-    }
-
-    @Override
-    public NodeStatistics getStatistics() {
-      NodeStatistics stats = new NodeStatistics();
-      stats.node = Utility.toString(postings.key);
-      stats.nodeFrequency = postings.termPostingsCount;
-      stats.nodeDocumentCount = postings.termDocumentCount;
-      stats.maximumCount = postings.maximumPostingsCount;
-      return stats;
+      return postings.termPostingsCount;
     }
 
     @Override
@@ -484,6 +407,21 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
         return 0;
       }
       return currentCandidate() - other.currentCandidate();
+    }
+
+    @Override
+    public byte[] key() {
+      return postings.key;
+    }
+
+    @Override
+    public void setMaximumScore(double newMax) {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void setMinimumScore(double newMin) {
+      throw new UnsupportedOperationException("Not supported yet.");
     }
   }
 }

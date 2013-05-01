@@ -1,7 +1,7 @@
 package julien
 
 import java.io.{PrintStream,File}
-import julien.galago.core.index.IndexPartReader;
+import julien.galago.core.index.Index.IndexPartReader;
 import julien.galago.core.index.KeyIterator;
 import julien.galago.core.index.disk.DiskIndex;
 import julien.galago.tupleflow.Parameters;
@@ -23,7 +23,7 @@ index      path of index *file* to dump. NOT a directory.
 """
 
   def run(p: Parameters, out: PrintStream) : Unit = {
-    val reader = DiskIndex.openIndexPart(p.getString("index"))
+    val reader = DiskIndex.openIndexReader(p.getString("index"))
     if (reader.getManifest().get("emptyIndexFile", false)) {
       out.println("Empty Index File.")
       return

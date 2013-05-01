@@ -34,7 +34,7 @@ public class ExtractIndexDocumentNumbers extends StandardStep<Document, Document
 
   public ExtractIndexDocumentNumbers(TupleFlowParameters parameters) throws IOException {
     String namesPath = parameters.getJSON().getString("indexPath") + File.separator + "names.reverse";
-    namesIterator = ((DiskNameReverseReader) DiskIndex.openIndexPart(namesPath)).keys();
+    namesIterator = ((DiskNameReverseReader) DiskIndex.openIndexReader(namesPath)).keys();
   }
 
   @Override

@@ -1,5 +1,5 @@
 // BSD License (http://lemurproject.org/galago-license)
-package julien.galago.core.index.mem;
+package julien.galago.core.index.dynamic;
 
 import java.io.IOException;
 import java.util.ArrayList;

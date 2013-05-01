@@ -10,12 +10,11 @@ import scala.collection.JavaConversions._
 
 trait QuickIndexBuilder {
   val tmp5Input: File = Utility.createTemporary
-  val tmp5Index: File = Utility.createTemporaryDirectory("tmpindex")
+  val tmp5Index: File = Utility.createTemporaryDirectory
 
   def copy5: Unit = {
     val istream = getClass.getResourceAsStream("/wiki-trectext-5.dat")
     assert (istream != null)
-    debug(s"Copying to ${tmp5Input.getAbsolutePath}")
     Utility.copyStreamToFile(istream, tmp5Input)
   }
 
@@ -67,7 +66,7 @@ trait QuickIndexBuilder {
 
   val tmpSampInput: File =
     new File(Utility.createTemporary.getAbsolutePath + ".gz")
-  val tmpSampIndex: File = Utility.createTemporaryDirectory("tmpindex")
+  val tmpSampIndex: File = Utility.createTemporaryDirectory
 
   def deleteSampleDisk: Unit = {
     if (tmpSampInput.exists) tmpSampInput.delete()

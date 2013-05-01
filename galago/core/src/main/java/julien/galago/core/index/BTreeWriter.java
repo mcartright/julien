@@ -3,11 +3,7 @@ package julien.galago.core.index;
 
 import java.io.IOException;
 
-import julien.galago.core.types.KeyValuePair;
-import julien.galago.tupleflow.IncompatibleProcessorException;
 import julien.galago.tupleflow.Parameters;
-import julien.galago.tupleflow.Source;
-import julien.galago.tupleflow.Step;
 
 
 /**

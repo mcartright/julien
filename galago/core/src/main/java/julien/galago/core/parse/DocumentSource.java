@@ -79,7 +79,7 @@ public class DocumentSource implements ExNihiloSource<DocumentSplit> {
 
   private void initialize() {
     inputPolicy = parameters.get("inputPolicy", "require");
-    logger = Logger.getLogger("DOCSOURCE");
+    logger = Logger.getLogger(getClass().getName());
     externalFileTypes = new HashSet<String>();
     forceFileType = parameters.get("filetype", (String) null);
     if (parameters.containsKey("externalParsers")) {
@@ -114,7 +114,7 @@ public class DocumentSource implements ExNihiloSource<DocumentSplit> {
 
   /// PRIVATE FUNCTIONS ///
   private void processDirectory(File root) throws IOException {
-    System.out.println("Processing directory: " + root);
+    logger.info("Processing directory: " + root);
     File[] subs = root.listFiles();
     int count = 0;
     while (subs == null && count < 100) {
@@ -122,7 +122,7 @@ public class DocumentSource implements ExNihiloSource<DocumentSplit> {
         Thread.sleep(1000);
       } catch (Exception e) {
       }
-      System.out.println("sleeping. subs is null. Wuh?");
+      logger.info("sleeping. subs is null. Wuh?");
       count++;
       subs = root.listFiles();
     }
@@ -139,7 +139,7 @@ public class DocumentSource implements ExNihiloSource<DocumentSplit> {
         }
       }
     } else {
-      System.out.println("subs is still null... ");
+      logger.info("subs is still null... ");
       throw new IllegalStateException("subs is null");
     }
   }
@@ -329,9 +329,9 @@ public class DocumentSource implements ExNihiloSource<DocumentSplit> {
       }
       br.close();
       if (fileType != null) {
-        System.out.println(file.getAbsolutePath() + " detected as " + fileType);
+        logger.info(file.getAbsolutePath() + " detected as " + fileType);
       } else {
-        System.out.println("Unable to determine file type of " + file.getAbsolutePath());
+        logger.info("Unable to determine file type of " + file.getAbsolutePath());
       }
       return fileType;
     } catch (IOException ioe) {

@@ -4,12 +4,13 @@
  */
 package julien.galago.core.parse;
 
+
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-import julien.galago.core.index.IndexPartReader;
+import julien.galago.core.index.Index;
 import julien.galago.core.index.KeyIterator;
-import julien.galago.core.index.disk.DiskIndex;
 import julien.galago.core.index.disk.PositionIndexReader;
 import julien.galago.core.types.Adjacency;
 import julien.galago.core.types.KeyValuePair;
@@ -43,7 +44,8 @@ public class DistanceCalculator extends StandardStep<KeyValuePair, Adjacency> {
     String indexLocation = parameters.getJSON().getString("directory");
     String partName = parameters.getJSON().getString("part");
     isSymmetric = parameters.getJSON().get("symmetric", true);
-    IndexPartReader partReader = new PositionIndexReader(DiskIndex.getPartPath(indexLocation, partName));
+    Index.IndexPartReader partReader = 
+            new PositionIndexReader(new File(indexLocation, partName).getPath());
     counter = parameters.getCounter("pairs calculated");
     iterator = partReader.keys();
     String method = parameters.getJSON().get("method", "levenshtein");

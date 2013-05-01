@@ -7,7 +7,7 @@ import java.io.IOException;
  *
  * @author irmarc
  */
-public interface LengthsReader extends IndexPartReader {
+public interface LengthsReader extends Index.IndexPartReader {
 
   public int getLength(int document) throws IOException;
 

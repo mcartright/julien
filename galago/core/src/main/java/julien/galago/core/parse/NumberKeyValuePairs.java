@@ -34,7 +34,7 @@ public class NumberKeyValuePairs extends StandardStep<KeyValuePair, NumberKeyVal
 
   public NumberKeyValuePairs(TupleFlowParameters parameters) throws IOException {
     String namesPath = parameters.getJSON().getString("indexPath") + File.separator + "names.reverse";
-    namesIterator = ((DiskNameReverseReader) DiskIndex.openIndexPart(namesPath)).keys();
+    namesIterator = ((DiskNameReverseReader) DiskIndex.openIndexReader(namesPath)).keys();
     numbered = parameters.getCounter("Numbered Items");
   }
 

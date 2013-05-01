@@ -15,9 +15,7 @@ import java.util.List;
 import julien.galago.core.index.BTreeWriter;
 import julien.galago.core.index.IndexElement;
 import julien.galago.tupleflow.Counter;
-import julien.galago.tupleflow.IncompatibleProcessorException;
 import julien.galago.tupleflow.Parameters;
-import julien.galago.tupleflow.Step;
 import julien.galago.tupleflow.TupleFlowParameters;
 import julien.galago.tupleflow.Utility;
 

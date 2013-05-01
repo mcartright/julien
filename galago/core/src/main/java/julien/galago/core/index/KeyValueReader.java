@@ -17,7 +17,7 @@ import julien.galago.tupleflow.Utility;
  *
  * @author irmarc
  */
-public abstract class KeyValueReader implements IndexPartReader {
+public abstract class KeyValueReader implements Index.IndexPartReader {
 
   protected BTreeReader reader;
 

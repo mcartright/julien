@@ -4,8 +4,9 @@ package julien.galago.core.index.disk;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,7 +16,6 @@ import java.util.logging.Logger;
 import julien.galago.core.index.BTreeFactory;
 import julien.galago.core.index.BTreeReader;
 import julien.galago.core.index.Index;
-import julien.galago.core.index.IndexPartReader;
 import julien.galago.core.index.Iterator;
 import julien.galago.core.index.LengthsReader;
 import julien.galago.core.index.NamesReader;
@@ -24,13 +24,12 @@ import julien.galago.core.index.AggregateReader.AggregateIndexPart;
 import julien.galago.core.index.AggregateReader.CollectionAggregateIterator;
 import julien.galago.core.index.AggregateReader.CollectionStatistics;
 import julien.galago.core.index.AggregateReader.IndexPartStatistics;
+import julien.galago.core.index.LengthsReader;
 import julien.galago.core.index.LengthsReader.LengthsIterator;
 import julien.galago.core.index.corpus.CorpusReader;
-import julien.galago.core.index.corpus.SplitBTreeReader;
 import julien.galago.core.parse.Document;
 import julien.galago.tupleflow.Parameters;
 import julien.galago.tupleflow.Utility;
-
 
 /**
  * This is the main class for a disk based index structure
@@ -46,31 +45,11 @@ import julien.galago.tupleflow.Utility;
  */
 public class DiskIndex implements Index {
 
+  protected static final String manifestName = "buildManifest.json";
   protected File location;
-  protected Parameters manifest = new Parameters();
-  protected LengthsReader lengthsReader = null;
-  protected NamesReader namesReader = null;
-  protected Map<String, IndexPartReader> parts =
-      new HashMap<String, IndexPartReader>();
-
-  // useful to assemble an index from odd pieces
-  public DiskIndex(Collection<String> indexParts) throws IOException {
-    location = null;
-
-    for (String indexPart : indexParts) {
-      File part = new File(indexPart);
-      IndexComponentReader component =
-	  openIndexComponent(part.getAbsolutePath());
-      initializeComponent(part.getName(), component);
-    }
-    // Initialize these now b/c they're so common
-    if (parts.containsKey("lengths")) {
-      lengthsReader = (DiskLengthsReader) parts.get("lengths");
-    }
-    if (parts.containsKey("names")) {
-      namesReader = (DiskNameReader) parts.get("names");
-    }
-  }
+  protected Parameters manifest;
+  protected Set<String> partNames;
+  protected Map<String, IndexPartReader> loadedParts;
 
   public DiskIndex(String indexPath) throws IOException {
     // Make sure it's a valid location
@@ -79,51 +58,54 @@ public class DiskIndex implements Index {
       throw new IOException(String.format("%s is not a directory.", indexPath));
     }
 
-    // Load all parts
-    openDiskParts("", location);
+    // Just find the parts, and point to them. Open stuff up later.
+    partNames = new HashSet<String>(Arrays.asList(location.list()));
+    if (!partNames.contains(manifestName)) {
+      throw new IOException(String.format("Did not find part file %s. Dying!",
+              manifestName));
+    }
 
-    // Initialize these now b/c they're so common
-    if (parts.containsKey("lengths")) {
-      lengthsReader = (DiskLengthsReader) parts.get("lengths");
-    }
-    if (parts.containsKey("names")) {
-      namesReader = (DiskNameReader) parts.get("names");
-    }
+    // Load the manifest - the others are a bit bigger, so be lazy with them
+    String manifestPath = new File(location, manifestName).getAbsolutePath();
+    Logger.getLogger(getClass().getName()).info(String.format("Opening manifest: %s", manifestPath));
+    //manifest = Parameters.parse(new File(location, manifestName));
+    manifest = new Parameters();
+    partNames.remove(manifestName);
+
+    // Set up other structures
+    loadedParts = new HashMap<String, IndexPartReader>();
   }
 
-  /**
-   * recursively open index parts + infer if the file/folder is a part or a
-   * modifier
-   *
-   * prefix should be empty string or a path ending with a slash
-   */
-  private void openDiskParts(String name, File directory) throws IOException {
-    // check if the directory is a split index folder: (e.g. corpus)
-    if (SplitBTreeReader.isBTree(directory)) {
-      IndexComponentReader component = openIndexComponent(directory.getAbsolutePath());
-      if (component != null) {
-        initializeComponent(name, component);
-      }
-      return;
-    }
-
-    // otherwise the directory might contain stand-alone index files
-    for (File part : directory.listFiles()) {
-      String partName = (name.length() == 0) ? part.getName() : name + "/" + part.getName();
-      if (part.isDirectory()) {
-        openDiskParts(partName, part);
-      } else {
-        IndexComponentReader component = openIndexComponent(part.getAbsolutePath());
-        if (component != null) {
-          initializeComponent(partName, component);
-        }
-      }
-    }
+  protected BTreeReader getBTree(String path) throws IOException {
+    BTreeReader reader = BTreeFactory.getBTreeReader(path);
+    return reader;
   }
 
-  private void initializeComponent(String name, IndexComponentReader component) {
-    if (IndexPartReader.class.isAssignableFrom(component.getClass())) {
-      parts.put(name, (IndexPartReader) component);
+  protected <T extends Index.IndexPartReader> T getPart(String partname)
+          throws IOException {
+    if (!loadedParts.containsKey(partname)) {
+      if (!partNames.contains(partname)) {
+        throw new IOException(String.format("Did not find part file %s. Dying!",
+                partname));
+      }
+
+      // try to load it
+      String fullPath = location.getAbsolutePath() + File.separator + partname;
+      BTreeReader reader = getBTree(fullPath);
+      if (reader == null) {
+        throw new RuntimeException("Unable to load BTree: " + fullPath);
+      }
+      IndexPartReader ipr = openIndexReader(reader);
+      if (ipr == null) {
+        throw new RuntimeException("Unable to create part reader:" + fullPath);
+      }
+      loadedParts.put(partname, ipr);
+    }
+
+    try {
+      return ((T) loadedParts.get(partname));
+    } catch (ClassCastException cce) {
+      throw new IllegalArgumentException("Cannot cast" + partname, cce);
     }
   }
 
@@ -131,17 +113,9 @@ public class DiskIndex implements Index {
     return location;
   }
 
-  public static String getPartPath(String index, String part) {
-    return (index + File.separator + part);
-  }
-
   @Override
   public IndexPartReader getIndexPart(String part) throws IOException {
-    if (parts.containsKey(part)) {
-      return parts.get(part);
-    } else {
-      return null;
-    }
+    return this.<Index.IndexPartReader>getPart(part);
   }
 
   /**
@@ -152,12 +126,12 @@ public class DiskIndex implements Index {
    */
   @Override
   public boolean containsPart(String partName) {
-    return parts.containsKey(partName);
+    return partNames.contains(partName);
   }
 
   @Override
   public boolean containsIdentifier(int document) throws IOException {
-    NamesReader.NamesIterator ni = this.getNamesIterator();
+    NamesReader.NamesIterator ni = getNamesIterator();
     ni.syncTo(document);
     return ni.hasMatch(document);
   }
@@ -165,7 +139,7 @@ public class DiskIndex implements Index {
   @Override
   public Iterator getIterator(byte[] key, Parameters p) throws IOException {
     Iterator result = null;
-    IndexPartReader part = parts.get(p.getString("part"));
+    IndexPartReader part = getIndexPart(p.getString("part"));
     if (part != null) {
       result = part.getIterator(key);
       if (result == null) {
@@ -178,7 +152,8 @@ public class DiskIndex implements Index {
   @Override
   public CollectionStatistics getCollectionStatistics(String field) {
     try {
-      return ((CollectionAggregateIterator) lengthsReader.getIterator(Utility.fromString(field))).getStatistics();
+      LengthsReader l = this.<LengthsReader>getPart("lengths");
+      return ((CollectionAggregateIterator) l.getIterator(Utility.fromString(field))).getStatistics();
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
     }
@@ -186,46 +161,45 @@ public class DiskIndex implements Index {
 
   @Override
   public IndexPartStatistics getIndexPartStatistics(String part) {
-    if (parts.containsKey(part)) {
-      IndexPartReader p = parts.get(part);
+    try {
+      IndexPartReader p = this.<IndexPartReader>getPart(part);
       if (AggregateIndexPart.class.isInstance(p)) {
         return ((AggregateIndexPart) p).getStatistics();
       }
       throw new IllegalArgumentException("Index part, " + part + ", does not store aggregated statistics.");
+    } catch (IOException ioe) {
+      throw new RuntimeException(ioe);
     }
-    throw new IllegalArgumentException("Index part, " + part + ", could not be found in index, " + this.location.getAbsolutePath());
   }
 
   @Override
   public void close() throws IOException {
-    for (IndexPartReader part : parts.values()) {
+    for (IndexPartReader part : loadedParts.values()) {
       part.close();
     }
-    parts.clear();
-    lengthsReader.close();
-    namesReader.close();
+    loadedParts.clear();
   }
 
   @Override
   public int getLength(int document) throws IOException {
-    return lengthsReader.getLength(document);
+    return this.<LengthsReader>getPart("lengths").getLength(document);
   }
 
   @Override
   public String getName(int document) throws IOException {
-    return namesReader.getDocumentName(document);
+    return this.<NamesReader>getPart("names").getDocumentName(document);
   }
 
   @Override
   public int getIdentifier(String document) throws IOException {
-    return ((NamesReader) parts.get("names.reverse")).getDocumentIdentifier(document);
+    return this.<NamesReader>getPart("names.reverse").getDocumentIdentifier(document);
   }
 
   @Override
   public Document getItem(String name, Parameters p) throws IOException {
-    if (parts.containsKey("corpus")) {
+    if (partNames.contains("corpus")) {
       try {
-        CorpusReader corpus = (CorpusReader) parts.get("corpus");
+        CorpusReader corpus = this.<CorpusReader>getPart("corpus");
         int docId = getIdentifier(name);
         return corpus.getDocument(docId, p);
       } catch (Exception e) {
@@ -251,29 +225,40 @@ public class DiskIndex implements Index {
 
   @Override
   public LengthsIterator getLengthsIterator() throws IOException {
-    return lengthsReader.getLengthsIterator();
+    return this.<LengthsReader>getPart("lengths").getLengthsIterator();
   }
 
   @Override
   public NamesReader.NamesIterator getNamesIterator() throws IOException {
-    return namesReader.getNamesIterator();
+    return this.<NamesReader>getPart("names").getNamesIterator();
   }
 
   @Override
   public Parameters getManifest() {
-    return manifest.clone();
+    return manifest;
   }
 
   @Override
   public Set<String> getPartNames() {
-    return parts.keySet();
+    return partNames;
   }
 
-
-  /* static functions for opening index component readers */
-  public static IndexComponentReader openIndexComponent(String path) throws IOException {
+  /**
+   * Workhorse method for actually loading an IndexPartReader.
+   * 
+   * @param path The full path to the part to open.
+   * @return If successful, the opened part.
+   * @throws IOException 
+   */
+  public static IndexPartReader openIndexReader(String path)
+          throws IOException {
     BTreeReader reader = BTreeFactory.getBTreeReader(path);
+    return openIndexReader(reader);
+  }
 
+  public static IndexPartReader openIndexReader(BTreeReader reader)
+          throws IOException {
+    String path = reader.getManifest().get("filename", "unknown");
     // if it's not an index: return null
     if (reader == null) {
       return null;
@@ -286,7 +271,7 @@ public class DiskIndex implements Index {
               + "contents of the file)");
     }
 
-    String className = reader.getManifest().get("readerClass", (String) null);
+    String className = reader.getManifest().getString("readerClass");
     Class readerClass;
     try {
       readerClass = Class.forName(className);
@@ -295,8 +280,9 @@ public class DiskIndex implements Index {
               + "in " + path + ", could not be found.");
     }
 
-    if (!IndexComponentReader.class.isAssignableFrom(readerClass)) {
-      throw new IOException(className + " is not a IndexComponentReader subclass.");
+    if (!IndexPartReader.class.isAssignableFrom(readerClass)) {
+      throw new IOException("Somehow " + className
+              + " is not an Index.IndexPartReader subclass.");
     }
 
     Constructor c;
@@ -310,21 +296,13 @@ public class DiskIndex implements Index {
               + "this code has access to (SecurityException)");
     }
 
-    IndexComponentReader componentReader;
+    IndexPartReader componentReader;
     try {
-      componentReader = (IndexComponentReader) c.newInstance(reader);
+      componentReader = (IndexPartReader) c.newInstance(reader);
     } catch (Exception ex) {
-      throw new IOException("Caught an exception while instantiating "
+      throw new IOException("Caught a generic exception while instantiating "
               + "a StructuredIndexPartReader: ", ex);
     }
     return componentReader;
-  }
-
-  public static IndexPartReader openIndexPart(String path) throws IOException {
-    IndexComponentReader componentReader = openIndexComponent(path);
-    if (!IndexPartReader.class.isAssignableFrom(componentReader.getClass())) {
-      throw new IOException(componentReader.getClass().getName() + " is not a IndexPartReader subclass.");
-    }
-    return (IndexPartReader) componentReader;
   }
 }

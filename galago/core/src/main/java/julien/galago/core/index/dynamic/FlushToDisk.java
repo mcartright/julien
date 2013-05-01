@@ -1,5 +1,5 @@
 // BSD License (http://lemurproject.org/galago-license)
-package julien.galago.core.index.mem;
+package julien.galago.core.index.dynamic;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,14 +12,14 @@ import julien.galago.tupleflow.Utility;
 public class FlushToDisk {
 
   private Logger logger = Logger.getLogger(FlushToDisk.class.toString());
-  private MemoryIndex index;
+  private DynamicIndex index;
   private String outputFolder;
 
-  public void flushMemoryIndex(MemoryIndex index, String folder) throws IOException {
+  public void flushMemoryIndex(DynamicIndex index, String folder) throws IOException {
     flushMemoryIndex(index, folder, true);
   }
 
-  public void flushMemoryIndex(MemoryIndex index, String folder, boolean threaded) throws IOException {
+  public void flushMemoryIndex(DynamicIndex index, String folder, boolean threaded) throws IOException {
     this.index = index;
     this.outputFolder = folder;
 

@@ -186,7 +186,8 @@ object BuildIndex extends TupleFlowFunction {
       for (err <- errorLog) {
         Console.err.println(err)
       }
-      return null
+      throw new RuntimeException("Unable to execute job: " +
+        errorLog.mkString(";"))
     }
   }
 

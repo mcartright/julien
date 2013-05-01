@@ -10,7 +10,6 @@ import julien.galago.core.index.CompressedByteBuffer;
 import julien.galago.core.index.CompressedRawByteBuffer;
 import julien.galago.core.index.IndexElement;
 import julien.galago.core.index.KeyListReader;
-import julien.galago.core.index.mem.MemoryPositionalIndex;
 import julien.galago.core.types.NumberWordPosition;
 import julien.galago.tupleflow.InputClass;
 import julien.galago.tupleflow.Parameters;
@@ -72,7 +71,6 @@ public class PositionIndexWriter implements
     actualParams = parameters.getJSON();
     actualParams.set("writerClass", getClass().getName());
     actualParams.set("readerClass", PositionIndexReader.class.getName());
-    actualParams.set("memoryClass", MemoryPositionalIndex.class.getName());
     actualParams.set("defaultOperator", "counts");
 
     writer = new DiskBTreeWriter(parameters);

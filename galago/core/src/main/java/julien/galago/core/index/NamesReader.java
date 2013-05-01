@@ -7,7 +7,7 @@ import java.io.IOException;
  *
  * @author irmarc
  */
-public interface NamesReader extends IndexPartReader {
+public interface NamesReader extends Index.IndexPartReader {
 
   public String getDocumentName(int document) throws IOException;
 

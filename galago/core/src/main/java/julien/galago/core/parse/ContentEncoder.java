@@ -19,7 +19,6 @@ import julien.galago.tupleflow.TupleFlowParameters;
 import julien.galago.tupleflow.Utility;
 import julien.galago.tupleflow.execution.Verified;
 
-import org.xerial.snappy.SnappyInputStream;
 import org.xerial.snappy.SnappyOutputStream;
 
 /**

@@ -1,14 +1,20 @@
 package julien
 package access
 
+import java.io.{ByteArrayOutputStream, File, PrintStream}
+import java.util.logging.{Level,Logger}
+import julien.cli.BuildIndex
 import julien.galago.core.index.disk.DiskIndex
+import julien.galago.core.index.dynamic.DynamicIndex
 import julien.galago.core.index.corpus.CorpusReader
-import julien.galago.core.index.mem.MemoryIndex
+import julien.galago.core.index.MemoryIndex
+import julien.galago.core.index.Index.IndexPartReader
 import julien.galago.core.index.{Index=> _, _}
 import julien.galago.core.index.AggregateReader._
 import julien.galago.core.util.ExtentArray
 import julien.galago.core.parse.{Document => _, _}
 import julien.galago.tupleflow.{Parameters,Utility,Source}
+import julien.galago.tupleflow.execution.JobExecutor
 import scala.collection.JavaConversions._
 import julien._
 
@@ -30,6 +36,30 @@ object Index {
     input: String,
     defaultPart: String = "all",
     parameters: Parameters = Parameters.empty): Index = {
+    val tmp: File = Utility.createTemporaryDirectory("memory")
+    parameters.set("inputPath", List(input))
+    parameters.set("indexPath", tmp.getAbsolutePath)
+    Logger.getLogger("").setLevel(Level.OFF)
+    Logger.getLogger(classOf[JobExecutor].toString).setLevel(Level.OFF)
+    val receiver = new PrintStream(new ByteArrayOutputStream)
+    BuildIndex.run(parameters, receiver)
+    receiver.close
+
+    // Open, stuff into a memory index
+    val memoryIndex = new MemoryIndex(tmp.getAbsolutePath)
+
+    // Can delete underlying segments because the memory index eagerly
+    // loaded
+    tmp.delete()
+
+    // Return using the memory index
+    return new Index(input, memoryIndex, defaultPart)
+  }
+
+  def dynamic(
+    input: String,
+    defaultPart: String = "all",
+    parameters: Parameters = Parameters.empty): Index = {
     val parserParams = parameters.get("parser", Parameters.empty)
     val tokenizerParams = parameters.get("tokenizer", Parameters.empty)
 
@@ -38,17 +68,17 @@ object Index {
     val docsource = new DocumentSource(List(input), parameters)
 
     // Establish the pipeline
-    val memoryIndex = docsource.asInstanceOf[Source[_]].
+    val dynamicIndex = docsource.asInstanceOf[Source[_]].
       setProcessor(new ParserCounter(parserParams)).asInstanceOf[Source[_]].
       setProcessor(new SplitOffsetter()).asInstanceOf[Source[_]].
       setProcessor(new ParserSelector(parserParams)).asInstanceOf[Source[_]].
       setProcessor(new TagTokenizer(tokenizerParams)).asInstanceOf[Source[_]].
-      setProcessor(new MemoryIndex()).asInstanceOf[MemoryIndex]
+      setProcessor(new DynamicIndex()).asInstanceOf[DynamicIndex]
 
     // Run it
     docsource.run()
-    // Return it
-    return new Index(input, memoryIndex, defaultPart)
+    // load it
+    return new Index(input, dynamicIndex, defaultPart)
   }
 }
 

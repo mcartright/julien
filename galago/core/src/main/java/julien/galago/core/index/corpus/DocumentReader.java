@@ -3,7 +3,7 @@ package julien.galago.core.index.corpus;
 
 import java.io.IOException;
 
-import julien.galago.core.index.IndexPartReader;
+import julien.galago.core.index.Index;
 import julien.galago.core.index.KeyIterator;
 import julien.galago.core.parse.Document;
 import julien.galago.tupleflow.Parameters;
@@ -15,7 +15,7 @@ import julien.galago.tupleflow.Parameters;
  *
  * @author sjh
  */
-public interface DocumentReader extends IndexPartReader {
+public interface DocumentReader extends Index.IndexPartReader {
 
   public abstract Document getDocument(byte[] key, Parameters p) throws IOException;
 

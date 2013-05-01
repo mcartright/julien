@@ -1,5 +1,5 @@
 // BSD License (http://lemurproject.org/galago-license)
-package julien.galago.core.index.mem;
+package julien.galago.core.index.dynamic;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -9,9 +9,7 @@ import java.util.Set;
 import java.util.Map;
 
 import julien.galago.core.index.AggregateReader;
-import julien.galago.core.index.DynamicIndex;
 import julien.galago.core.index.Index;
-import julien.galago.core.index.IndexPartReader;
 import julien.galago.core.index.Iterator;
 import julien.galago.core.index.NamesReader;
 import julien.galago.core.index.NullExtentIterator;
@@ -24,6 +22,7 @@ import julien.galago.core.parse.Document;
 import julien.galago.core.parse.stem.Porter2Stemmer;
 import julien.galago.tupleflow.InputClass;
 import julien.galago.tupleflow.Parameters;
+import julien.galago.tupleflow.Processor;
 import julien.galago.tupleflow.TupleFlowParameters;
 import julien.galago.tupleflow.Utility;
 import julien.galago.tupleflow.execution.Verified;
@@ -37,7 +36,7 @@ import julien.galago.tupleflow.execution.Verified;
  */
 @Verified
 @InputClass(className = "julien.galago.core.parse.Document")
-public class MemoryIndex implements DynamicIndex, Index {
+public class DynamicIndex implements Index, Processor<Document> {
 
   public boolean stemming, nonstemming, makecorpus, dirty;
   protected int documentNumberOffset, documentCount;
@@ -47,19 +46,19 @@ public class MemoryIndex implements DynamicIndex, Index {
   HashMap<String, String> defaultIndexOperators = new HashMap<String, String>();
   HashSet<String> knownIndexOperators = new HashSet<String>();
 
-  public MemoryIndex(Parameters p) throws Exception {
+  public DynamicIndex(Parameters p) throws Exception {
     manifest = p;
     initialize();
   }
 
-  public MemoryIndex() throws Exception {
+  public DynamicIndex() throws Exception {
     manifest = new Parameters();
     manifest.set("stemming", false);
     manifest.set("makecorpus", true);
     initialize();
   }
 
-  public MemoryIndex(TupleFlowParameters parameters) throws Exception {
+  public DynamicIndex(TupleFlowParameters parameters) throws Exception {
     manifest = parameters.getJSON();
     initialize();
   }
@@ -122,7 +121,7 @@ public class MemoryIndex implements DynamicIndex, Index {
    *public boolean hasChanged() {
    *  return dirty;
    *}
-   */
+   
   public String getDefaultPart() {
     if (manifest.isString("defaultPart")) {
       String part = manifest.getString("defaultPart");
@@ -141,6 +140,7 @@ public class MemoryIndex implements DynamicIndex, Index {
     // otherwise - anything will do.
     return parts.keySet().iterator().next();
   }
+  */
 
   /**
    * Tests to see if a named index part exists.
