@@ -171,6 +171,7 @@ trait SimpleProcessorBehavior extends QuickIndexBuilder { this: FlatSpec =>
       intercept[AssertionError] {
         val result = proc.run(DefaultAccumulator[ScoredDocument]())
       }
+      deleteWiki5Memory
     }
 
     it should "automatically attach hooks if only 1 index is provided" in {

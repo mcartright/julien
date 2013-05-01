@@ -67,7 +67,6 @@ public class DiskIndex implements Index {
 
     // Load the manifest - the others are a bit bigger, so be lazy with them
     String manifestPath = new File(location, manifestName).getAbsolutePath();
-    Logger.getLogger(getClass().getName()).info(String.format("Opening manifest: %s", manifestPath));
     //manifest = Parameters.parse(new File(location, manifestName));
     manifest = new Parameters();
     partNames.remove(manifestName);

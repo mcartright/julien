@@ -52,6 +52,10 @@ Required parameters:
     // Make a processor to run it
     val processor = SimpleProcessor()
 
+    // Use this to add a line-printing debugger - still experimental
+    //processor.debugger =
+    //  Some(julien.retrieval.LinePrintingDebugger().printState _)
+
     // Attach the query model to the index
     sdm.hooks.foreach(_.attach(index))
 

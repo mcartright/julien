@@ -21,8 +21,13 @@ object SimpleProcessor {
   * If any of these assumptions are not met, then a different
   * [[julien.retrieval.QueryProcessor QueryProcessor]] should be used.
   */
-class SimpleProcessor extends QueryProcessor {
+class SimpleProcessor
+    extends QueryProcessor {
   type GHook = IteratedHook[_ <: GIterator]
+  type DebugHook =
+    (ScoredDocument, Seq[FeatureOp], Index, QueryProcessor) => Unit
+
+  var debugger: Option[DebugHook] = None
 
   override def validated: Boolean = {
     val looseCheck = super.validated
@@ -80,19 +85,22 @@ class SimpleProcessor extends QueryProcessor {
 
     // Go
     while (drivers.exists(_.isDone == false)) {
-      val candidate = drivers.filterNot(_.isDone).map(_.at).min
+      val candidate = drivers.foldLeft(Int.MaxValue) { (best, drv) =>
+        if (drv.isDone) best else scala.math.min(drv.at, best)
+      }
       iterators.foreach(_.moveTo(candidate))
       if (drivers.exists(_.matches(candidate))) {
         // Time to score
-   //     println("scoring candidate: " + candidate + " " + index.name(candidate))
-        val score = scorers.map(_.eval).sum
+        val score = scorers.foldLeft(0.0) { (t, s) => t + s.eval }
         // How do we instantiate an object without knowing what it is, and
         // knowing what it needs? One method in the QueryProcessor?
 
         // For now, put a nasty hack in to make it work.
         // SAFETY OFF
         val hackedAcc = acc.asInstanceOf[Accumulator[ScoredDocument]]
-        hackedAcc += ScoredDocument(candidate, score)
+        val sd = ScoredDocument(candidate, score)
+        hackedAcc += sd
+        if (debugger.isDefined) debugger.get(sd, scorers, index, this)
       }
       drivers.foreach(_.movePast(candidate))
     }

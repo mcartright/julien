@@ -18,10 +18,11 @@ case class ScoredDocument(val docid: Docid, var score: Double)
     extends ScoredObject[ScoredDocument] {
 
   /** Compares two ScoredDocuments by score, breaks ties w/ Docid. */
-  def compare(that: ScoredDocument): Int = {
-    val r = that.score compare this.score
-    if (r != 0) r else this.docid.underlying compare that.docid.underlying
-  }
+  def compare(that: ScoredDocument): Int =
+    if (that.score < this.score) return -1
+    else if (that.score > this.score) return 1
+    else (this.docid.underlying - that.docid.underlying)
+
   def equals(that: ScoredDocument): Boolean =
     this.docid == that.docid && this.score == that.score
   def +=(scoreToAdd: Double): Unit = score += scoreToAdd

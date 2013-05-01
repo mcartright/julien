@@ -50,7 +50,7 @@ object Index {
 
     // Can delete underlying segments because the memory index eagerly
     // loaded
-    tmp.delete()
+    Utility.deleteDirectory(tmp)
 
     // Return using the memory index
     return new Index(input, memoryIndex, defaultPart)
