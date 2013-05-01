@@ -26,7 +26,7 @@ object Combine {
     sops.foldLeft(0.0) { (score, op) => {
 
       val weightedScore = (op.weight * op.eval)
-      debug("COMBINE: " + op.toString + " " + score + " " + weightedScore)
+      //debug("COMBINE: " + op.toString + " " + score + " " + weightedScore)
       score + weightedScore
     } }
   }

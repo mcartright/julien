@@ -10,10 +10,10 @@ import java.util.logging.{Level,Logger}
 import org.scalatest._
 import julien.cli.BuildIndex
 
-class MemoryIndexSpec extends FlatSpec with BeforeAndAfterAll {
-  val tmpForInput: File =
-    new File(Utility.createTemporary.getAbsolutePath)
-  val tmpForIndex: File = Utility.createTemporaryDirectory("tmpindex")
+class MemoryIndexSpec
+    extends FlatSpec
+    with BeforeAndAfterAll
+    with QuickIndexBuilder {
   // Our indexes
   var diskIndex: Index = null
   var memoryIndex: Index = null
@@ -21,48 +21,14 @@ class MemoryIndexSpec extends FlatSpec with BeforeAndAfterAll {
   // Extract our source docs, write to an index, run the tests over the
   // read-only structure, then clean up.
   override def beforeAll() {
-    // Turn off logging so the tests aren't diluted.
-    Logger.getLogger("").setLevel(Level.OFF)
-    Logger.getLogger(classOf[JobExecutor].toString).setLevel(Level.OFF)
-
-    // Extract resource - small 5 doc collection for correctness testing
-    val istream = getClass.getResourceAsStream("/wiki-trectext-5.dat")
-    assert (istream != null)
-    Utility.copyStreamToFile(istream, tmpForInput)
-
-    // Set some parameters
-    val params = new Parameters
-    params.set("inputPath", tmpForInput.getAbsolutePath)
-    params.set("indexPath", tmpForIndex.getAbsolutePath)
-    params.set("deleteJobDir", true)
-    params.set("mode", "local")
-    val parser = new Parameters
-    params.set("parser", parser)
-    params.set("corpus", true)
-    val corpus = new Parameters
-    val corpusFile =
-      new File(tmpForIndex.getAbsolutePath, "corpus")
-    corpusFile.mkdir
-    corpus.set("filename", corpusFile.getAbsolutePath)
-    params.set("corpusParameters", corpus)
-
-    // Sort of a "/dev/null"
-    val receiver = new PrintStream(new ByteArrayOutputStream)
-    BuildIndex.run(params, receiver)
-    receiver.close
-    diskIndex = Index.disk(tmpForIndex.getAbsolutePath)
-
-    // Make the memory index too
-    memoryIndex = Index.memory(tmpForInput.getAbsolutePath)
+    diskIndex = makeWiki5Disk
+    memoryIndex = makeWiki5Memory
   }
 
   override def afterAll() {
-
     diskIndex.close
-    tmpForInput.delete()
-    Utility.deleteDirectory(tmpForIndex)
-
-    memoryIndex.close
+    deleteWiki5Memory
+    deleteWiki5Disk
   }
 
   // Start tests

@@ -7,11 +7,10 @@ import java.io.File
 import julien.galago.tupleflow.{Utility,Parameters}
 import java.util.logging.{Level,Logger}
 import scala.util.Random
+import julien.access.QuickIndexBuilder
 
-trait SimpleProcessorBehavior { this: FlatSpec =>
+trait SimpleProcessorBehavior extends QuickIndexBuilder { this: FlatSpec =>
   def index: Index
-  def tmpForInput: File
-  def indexParams: Parameters
   def vocabulary: Seq[String]
   val epsilon: Double = 1.0E-10
   def config: Map[String, Any]
@@ -164,7 +163,7 @@ trait SimpleProcessorBehavior { this: FlatSpec =>
       proc add index
 
       // Let's just open another one
-      val index2 = Index.memory(tmpForInput.getAbsolutePath, "all", indexParams)
+      val index2 = makeWiki5Memory
       proc add index2
 
       // And try to execute it
@@ -193,10 +192,7 @@ class SimpleProcessorSpec
     extends FlatSpec
     with BeforeAndAfterAll
     with SimpleProcessorBehavior {
-  val tmpForInput: File =
-    new File(Utility.createTemporary.getAbsolutePath + ".gz")
   var index: Index = null
-  val indexParams = new Parameters()
   val vocabulary = collection.mutable.ListBuffer[String]()
 
   // Extracts the configuration map to use in the test. These are set
@@ -209,18 +205,7 @@ class SimpleProcessorSpec
   }
 
   override def beforeAll() {
-    Logger.getLogger("").setLevel(Level.OFF)
-
-    // Extract resource - small 5 doc collection for correctness testing
-    val istream = getClass.getResourceAsStream("/wikisample.gz")
-    assert (istream != null)
-    Utility.copyStreamToFile(istream, tmpForInput)
-    val parserParams = new Parameters()
-    parserParams.set("filetype", "wikiwex")
-    indexParams.set("parser", parserParams)
-    indexParams.set("filetype", "wikiwex")
-    index = Index.memory(tmpForInput.getAbsolutePath, "all", indexParams)
-
+    index = makeSampleMemory
     // let's get that vocab out too
     val vIter = index.vocabulary().iterator
     while (vIter.hasNext) { vocabulary += vIter.next }
@@ -228,7 +213,8 @@ class SimpleProcessorSpec
 
   override def afterAll() {
     index.close
-    tmpForInput.delete()
+    deleteSampleMemory
+    deleteWiki5Memory
   }
 
   // These are to create factory functions to pass into
