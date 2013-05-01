@@ -57,8 +57,6 @@ class FieldsSpec
 
   "An index backed by a DiskIndex" should behave like aFieldIndex(didx)
 
-  /*
   "An index backed by a MemoryIndex" should
   behave like aFieldIndex(midx)
-   */
 }
