@@ -28,9 +28,9 @@ class UnorderedWindowSpec extends FlatSpec with MockFactory {
     val p2 = Positions(pos2)
     val p3 = Positions(pos3)
 
-    mock1.expects('positions)().returning(p1) never()
-    mock2.expects('positions)().returning(p2) never()
-    mock3.expects('positions)().returning(p3) never()
+    mock1.expects('positions)().returning(p1) noMoreThanTwice()
+    mock2.expects('positions)().returning(p2) noMoreThanTwice()
+    mock3.expects('positions)().returning(p3) noMoreThanTwice()
 
     val thrown = intercept[AssertionError] {
       val uw = UnorderedWindow(1, mock1, mock2, mock3)

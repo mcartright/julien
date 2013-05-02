@@ -2,7 +2,6 @@ package julien
 package cli
 package examples
 
-import scala.collection.mutable.PriorityQueue
 import scala.collection.JavaConversions._
 import julien.galago.tupleflow.Parameters
 
