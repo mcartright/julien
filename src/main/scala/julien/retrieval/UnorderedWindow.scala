@@ -8,6 +8,7 @@ object UnorderedWindow {
   def apply(w: Int, t: PositionStatsView*) = new UnorderedWindow(w, t)
 }
 
+// width = -1 means that the whole document is considered a match
 class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     extends MultiTermView(terms) {
   assume(terms.size > 1 && width >= terms.size,
@@ -26,11 +27,20 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     }.toArray
     while (iterators.forall(_.hasNext == true)) {
       // Find bounds
+      
       //val currentPositions = iterators.map(_.head)
       //val minPos = currentPositions.min
       //val maxPos = currentPositions.max
-      val minPos = min(iterators, 0)
-      val maxPos = max(iterators, 0)
+      val (minPos, maxPos) = {
+        var min = Int.MaxValue
+        var max = Int.MinValue
+        iterators.foreach(iter => {
+          val cur = iter.head
+          if(cur < min) min = cur
+          if(cur > max) max = cur
+        })
+        (min, max)
+      }
 
       // see if it fits
       if (maxPos - minPos < width || width == -1) hits += minPos
@@ -52,29 +62,6 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
       if (it.head == pos) it.next
       movePast(its, idx+1, pos)
     }
-
-  @tailrec
-  private def min(
-    its: Array[BufferedIterator[Int]],
-    idx: Int,
-    m: Int = Int.MaxValue): Int = {
-    if (idx == its.length) return m else {
-      val newM = if (its(idx).head < m) its(idx).head else m
-      min(its, idx+1, newM)
-    }
-  }
-
-  @tailrec
-  private def max(
-    its: Array[BufferedIterator[Int]],
-    idx: Int,
-    m: Int = Int.MinValue): Int = {
-    if (idx == its.length) return m else {
-      val testM = its(idx).head
-      val newM = if (testM > m) testM else m
-      max(its, idx+1, newM)
-    }
-  }
 
   override def isDense: Boolean = terms.forall(_.isDense)
   override def size: Int = statistics.docFreq.toInt

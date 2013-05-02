@@ -58,12 +58,14 @@ Required parameters:
     // Attach the query model to the index
     sdm.hooks.foreach(_.attach(index))
 
-    // Add the model to the processor
-    processor.add(sdm)
+    time ("process SDM") {
+      // Add the model to the processor
+      processor.add(sdm)
 
-    // run it and get results
-    val results = processor.run()
+      // run it and get results
+      val results = processor.run()
 
-    printResults(results, index, out)
+      //printResults(results, index, out)
+    }
   }
 }

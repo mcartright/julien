@@ -36,18 +36,28 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
       }
       if (iterators.exists(!_.hasNext)) return hits.result
 
-      // Now see if we have a valid match
-      val matched = iterators.sliding(2, 1).map {
-        P =>
-        // Map pairs of iterators to booleans. All true = have match
-          P(1).head - P(0).head <= width
-      }.reduceLeft((A, B) => A && B)
+      // Now see if we have a valid match; forall short circuits
+      val matched = allInWidth(iterators, width)
       if (matched) {
-        hits += iterators.head.head
+        hits += iterators(0).head
       }
       iterators(0).next
     }
     hits.result
+  }
+
+  def allInWidth(iterators: Seq[BufferedIterator[Int]], width: Int): Boolean = {
+    var idx = 0
+    while(idx < iterators.size-1) {
+      val left = iterators(idx)
+      val right = iterators(idx+1)
+
+      if(right.head - left.head <= width) {
+        // good
+        idx += 1
+      } else return false
+    }
+    true
   }
 
   override def isDense: Boolean = terms.forall(_.isDense)
