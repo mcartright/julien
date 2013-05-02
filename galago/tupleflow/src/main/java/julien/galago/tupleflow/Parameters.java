@@ -86,8 +86,10 @@ public class Parameters implements Serializable {
       return jp;
     }
 
-    private Parameters parseParameters(Parameters container) throws IOException {
-      // Need to move past the opening '{' and find the next meaningful character
+    private Parameters parseParameters(Parameters container)
+	throws IOException {
+      // Need to move past the opening '{' and find the next meaningful
+      // character
       delimiter = (char) reader.read();
       skipWhitespace();
       String key;
@@ -142,6 +144,7 @@ public class Parameters implements Serializable {
     private List parseList() throws IOException {
       // Have to move past the opening '['
       delimiter = (char) reader.read();
+      skipWhitespace();
       ArrayList container = new ArrayList();
       while (delimiter != ']') {
         skipWhitespace();
@@ -175,12 +178,12 @@ public class Parameters implements Serializable {
 
     // Need to parse to a general delimiter:
     // " leads a string
-    // - or [0-9] leads a string
+    // - or [0-9] leads a numeric
     // { leads a map
     // [ leads an array
     // t leads true
     // f leads false
-    // n leads null (do we allow nulls? I guess to make is full JSON...)
+    // n leads null (do we allow nulls? I guess to make it full JSON...)
     private Object parseValue() throws IOException {
       // Decide on character
       switch (delimiter) {

@@ -2,6 +2,8 @@
 package julien.galago.core.index.disk;
 
 import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -30,6 +32,7 @@ import julien.galago.core.index.corpus.CorpusReader;
 import julien.galago.core.parse.Document;
 import julien.galago.tupleflow.Parameters;
 import julien.galago.tupleflow.Utility;
+
 
 /**
  * This is the main class for a disk based index structure
@@ -67,8 +70,7 @@ public class DiskIndex implements Index {
 
     // Load the manifest - the others are a bit bigger, so be lazy with them
     String manifestPath = new File(location, manifestName).getAbsolutePath();
-    //manifest = Parameters.parse(new File(location, manifestName));
-    manifest = new Parameters();
+    manifest = Parameters.parse(new File(location, manifestName));
     partNames.remove(manifestName);
 
     // Set up other structures
@@ -244,10 +246,10 @@ public class DiskIndex implements Index {
 
   /**
    * Workhorse method for actually loading an IndexPartReader.
-   * 
+   *
    * @param path The full path to the part to open.
    * @return If successful, the opened part.
-   * @throws IOException 
+   * @throws IOException
    */
   public static IndexPartReader openIndexReader(String path)
           throws IOException {
