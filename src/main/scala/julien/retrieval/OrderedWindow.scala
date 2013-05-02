@@ -27,36 +27,48 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
       t =>
         t.positions.iterator.buffered
     }
-    while (iterators.forall(_.hasNext)) {
-      // Make sure an iterator is after its preceding one
-      iterators.reduceLeft {
-        (i1, i2) =>
-          while (i2.hasNext && i2.head < i1.head) i2.next
-          i2
+    
+    while (iterators(0).hasNext) {
+      // if while advancing, we don't find a hit:
+      if(!advance(iterators, width)) {
+        return hits.result
       }
-      if (iterators.exists(!_.hasNext)) return hits.result
 
-      // Now see if we have a valid match; forall short circuits
-      val matched = allInWidth(iterators, width)
-      if (matched) {
-        hits += iterators(0).head
-      }
+      // found a hit, keep going
+      hits += iterators(0).head
       iterators(0).next
     }
     hits.result
   }
 
-  def allInWidth(iterators: Seq[BufferedIterator[Int]], width: Int): Boolean = {
+  // returns true if a result has been found
+  def advance(iterators: Seq[BufferedIterator[Int]], width: Int): Boolean = {
     var idx = 0
     while(idx < iterators.size-1) {
       val left = iterators(idx)
       val right = iterators(idx+1)
 
-      if(right.head - left.head <= width) {
-        // good
+      // make sure each iterator occurs in order
+      while(right.hasNext && right.head < left.head) {
+        right.next
+      }
+      
+      // ran out of an iterator; return results immediately
+      if(!right.hasNext)
+        return false
+
+      // if this iterator violates the window, restart loop
+      // note that width == -1 signifies no window constraint
+      if(width != -1 && (right.head - left.head > width)) {
+        iterators(0).next
+        if(!iterators(0).hasNext)
+          return false
+        idx = 0
+      } else {
         idx += 1
-      } else return false
+      }
     }
+    // found a hit that satisfies all our conditions
     true
   }
 
