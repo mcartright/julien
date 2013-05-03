@@ -23,21 +23,21 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
       terms.head.statistics.collLength - adjustment
   }
 
-  override def positions: Seq[Int] = {
-    val hits = new ArrayBuffer[Int]()
-    val iterators: Seq[ExtentArray] = terms.map {t => t.positions}
+  override def positions: ExtentArray = {
+//    val hits = new ArrayBuffer[Int]()
+//    val iterators: Seq[ExtentArray] = terms.map {t => t.positions}
     
-    while (iterators(0).hasNext) {
-      // if while advancing, we don't find a hit:
-      if(!advance(iterators, width)) {
-        return hits
-      }
-
-      // found a hit, keep going
-      hits += iterators(0).head
-      iterators(0).next
-    }
-    hits.result
+//    while (iterators(0).hasNext) {
+//      // if while advancing, we don't find a hit:
+//      if(!advance(iterators, width)) {
+//        return hits
+//      }
+//
+//      // found a hit, keep going
+//      hits += iterators(0).head
+//      iterators(0).next
+//    }
+    ExtentArray.empty
   }
 
   // returns true if a result has been found
