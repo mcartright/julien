@@ -2,6 +2,7 @@ package julien
 package retrieval
 
 import julien.galago.core.index.ExtentIterator
+import julien.galago.core.util.ExtentArray
 
 object Term {
   def apply(s: String) = new Term(s, None)
@@ -31,7 +32,7 @@ final class Term private (val t: String, val field: Option[String])
   def count: Int = if (matched) underlying.count else 0
 
   /** Returns the current positions of the underlying iterator. */
-  def positions: Positions = Positions(underlying.extents())
+  def positions: ExtentArray = underlying.extents()
 
   lazy val statistics: CountStatistics = {
     val ns = it.get.asInstanceOf[ARNA].getStatistics

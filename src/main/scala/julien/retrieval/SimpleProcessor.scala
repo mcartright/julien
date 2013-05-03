@@ -76,9 +76,8 @@ class SimpleProcessor
     // extract iterators
     val index = _indexes.head
     val model = _models.head
-    val iterators: Set[GHook] = _models.
-      flatMap(_.iHooks).toSet
-    val drivers: Set[GHook] = iterators.filterNot(_.isDense)
+    val iterators: Array[GHook] = _models.flatMap(_.iHooks).toArray
+    val drivers: Array[GHook] = iterators.filterNot(_.isDense).toArray
 
     // Need to fix this
     val scorers : List[FeatureOp] = _models
@@ -88,7 +87,13 @@ class SimpleProcessor
       val candidate = drivers.foldLeft(Int.MaxValue) { (best, drv) =>
         if (drv.isDone) best else scala.math.min(drv.at, best)
       }
-      iterators.foreach(_.moveTo(candidate))
+
+      var i = 0
+      while (i < iterators.length) {
+        iterators(i).moveTo(candidate)
+        i+=1
+      }
+
       if (drivers.exists(_.matches(candidate))) {
         // Time to score
         val score = scorers.foldLeft(0.0) { (t, s) => t + s.eval }
@@ -102,7 +107,12 @@ class SimpleProcessor
         hackedAcc += sd
         if (debugger.isDefined) debugger.get(sd, scorers, index, this)
       }
-      drivers.foreach(_.movePast(candidate))
+
+      var j = 0
+      while (j < drivers.size) {
+        drivers(j).movePast(candidate)
+        j+=1
+      }
     }
     acc.result
   }

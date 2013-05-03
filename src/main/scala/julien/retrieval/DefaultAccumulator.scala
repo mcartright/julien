@@ -4,7 +4,7 @@ package retrieval
 import scala.collection.mutable.PriorityQueue
 
 object DefaultAccumulator {
-  val defaultSize: Int = 100
+  val defaultSize: Int = 1000
 
   def apply[T <: ScoredObject[T]](size: Int): DefaultAccumulator[T] =
     new DefaultAccumulator[T](new PriorityQueue[T](), size)
@@ -31,8 +31,20 @@ class DefaultAccumulator[T <: ScoredObject[T]] private(
 
   override def clear: Unit = q.clear
   override def +=(elem: T): this.type = {
-    q += elem
-    if (q.size > limit) q.dequeue
+
+//    q += elem
+//    if (q.size > limit) q.dequeue
+//    this
+
+    if (q.size >= limit) {
+      if (elem.score > q.head.score) {
+        q.dequeue
+        q += elem
+      }
+    } else {
+      q += elem
+    }
+
     this
   }
 

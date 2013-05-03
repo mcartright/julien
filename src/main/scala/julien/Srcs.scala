@@ -1,5 +1,7 @@
 package julien
 
+import galago.core.util.ExtentArray
+
 /** A trait that indicates [[CountStatistics]] can be provided. */
 trait StatisticsSrc { def statistics: CountStatistics }
 
@@ -13,7 +15,7 @@ trait CountSrc { def count: Int }
 trait LengthsSrc { def length: Int }
 
 /** A trait that indicates [[Positions]] can be provided. */
-trait PositionSrc { def positions: Positions }
+trait PositionSrc { def positions: ExtentArray }
 
 /** A trait that indicates a generic type T can be provided. */
 trait DataSrc[T] { def data: T }

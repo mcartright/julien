@@ -3,53 +3,55 @@ package retrieval
 
 object CombineNorm {
   def apply(children: Seq[FeatureOp]) =
-    new CombineNorm(children, () => 1.0, summer)
+    new CombineNorm(children, () => 1.0)
 
   def apply(children: Seq[FeatureOp], weight: Double) =
-    new CombineNorm(children, () => weight, summer)
-
-  def apply(children: Seq[FeatureOp], weight: Double, combiner: Combiner) =
-    new CombineNorm(children, () => weight, combiner)
+    new CombineNorm(children, () => weight)
 
   def apply(children: Seq[FeatureOp], weight: () => Double) =
-    new CombineNorm(children, weight, summer)
-
-  def apply(children: Seq[FeatureOp], combiner: Combiner) =
-    new CombineNorm(children, () => 1.0, combiner)
-
-  def apply(
-    children: Seq[FeatureOp],
-    weight: () => Double,
-    combiner: Combiner) = new CombineNorm(children, weight, combiner)
-
-//  val weightSum : Double = (sops: Seq[FeatureOp]) => {
-//    sops.foldLeft(0.0) { (score, op) => { score + op.weight} }
-//  }
-
-  val summer: Combiner = (sops: Seq[FeatureOp]) => {
-
-    val weightSum = sops.foldLeft(0.0) { (score, op) => score + op.weight }
-
-    sops.foldLeft(0.0) { (score, op) => {
-      val normWeight = (op.weight / weightSum)
-      val evaluatedScore = normWeight * op.eval
-
-     // debug("COMBINE: " + op.toString + " cur:" + score + " raw:" + op.eval + " normWeight: " + normWeight + " evalScore:" + evaluatedScore )
-      score + evaluatedScore
-    } }
-  }
+    new CombineNorm(children, weight)
 }
 
-class CombineNorm private(
-                       val ops: Seq[FeatureOp],
-                       w: () => Double,
-                       var combiner: Combiner)
+class CombineNorm private(val ops: Seq[FeatureOp],
+                          w: () => Double)
   extends FunctionWeightedFeature {
   this.weight = w
   lazy val children: Seq[Operator] = ops
   def views: Set[ViewOp] =
     ops.foldLeft(Set[ViewOp]()) { (s, op) => s ++ op.views }
-  def eval : Double = combiner(ops)
+  def eval : Double = combine()
+
+  val weightSum : Double = {
+
+    var i = 0
+    var sum = 0.0
+    while (i < ops.size) {
+      val op = ops(i)
+      sum += op.weight
+      i+=1
+    }
+    sum
+    //    @tailrec def scoreNormalizeHelper(sops:Seq[FeatureOp], score:Double) : Double = {
+    //      sops match {
+    //        case Nil => score
+    //        case w =>  scoreNormalizeHelper(sops.tail, score + ops.head.weight)
+    //      }
+    //    }
+    // scoreNormalizeHelper(ops, 0.0)
+  }
+
+  def combine() : Double = {
+
+    var i = 0
+    var score = 0.0
+    while (i < ops.size) {
+      val op = ops(i)
+      score += op.eval / weightSum
+      i+=1
+    }
+    score
+  }
+
 }
 
 
