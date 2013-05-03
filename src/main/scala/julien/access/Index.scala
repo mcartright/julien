@@ -202,13 +202,13 @@ class Index private(
   }
 
 
-  def positions(key: String, targetId: String): Positions = {
+  def positions(key: String, targetId: String): ExtentArray = {
     val it =
       underlying.getIterator(key, Parameters.empty).asInstanceOf[ExtentIterator]
-    if (it.isInstanceOf[NullExtentIterator]) return Positions.empty
+    if (it.isInstanceOf[NullExtentIterator]) return ExtentArray.empty
     val docid = underlying.getIdentifier(targetId)
     it.syncTo(docid)
-    if (it.hasMatch(docid)) Positions(it.extents) else Positions.empty
+    if (it.hasMatch(docid)) it.extents else ExtentArray.empty
   }
 
   /** Returns a view of the set of keys of a given index part.

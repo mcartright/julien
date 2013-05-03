@@ -3,6 +3,8 @@ package retrieval
 
 import scala.annotation.tailrec
 import julien.galago.core.util._
+import collection.mutable
+import collection.mutable.ArrayBuffer
 
 object UnorderedWindow {
   def apply(w: Int, t: PositionStatsView*) = new UnorderedWindow(w, t)
@@ -20,11 +22,9 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     statistics.collLength = terms.head.statistics.collLength
   }
 
-  override def positions:  Positions = {
-    val hits = Positions.newBuilder
-    val iterators: Array[BufferedIterator[Int]] = terms.map { t =>
-      t.positions.iterator.buffered
-    }.toArray
+  override def positions:  Array[Int] = {
+    val hits = ArrayBuffer[Int]()
+    val iterators: Array[ExtentArray] = terms.map {t => t.positions}.toArray
     while (iterators.forall(_.hasNext == true)) {
       // Find bounds
       
@@ -49,7 +49,11 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
       //for (it <- iterators; if (it.head == minPos)) it.next
       movePast(iterators, 0, minPos)
     }
-    hits.result
+    hits.toArray
+  }
+
+  def hasNext(e: ExtentArray) {
+
   }
 
   @tailrec

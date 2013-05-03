@@ -12,15 +12,15 @@ import java.util.Arrays;
 public class ExtentArray {
   public static final ExtentArray empty = new ExtentArray();
 
-  int[] _begins;
-  int[] _ends;
-  int _position;
-  int document;
+  public int[] begins;
+  public int[] ends;
+  public int position;
+  public int document;
 
   public ExtentArray(int capacity) {
-    _begins = new int[capacity];
-    _ends = null; // lazy load these
-    _position = 0;
+    begins = new int[capacity];
+    ends = null; // lazy load these
+    position = 0;
     document = -1; // not valid yet
   }
 
@@ -29,8 +29,8 @@ public class ExtentArray {
   }
 
   private void makeRoom() {
-    _begins = Arrays.copyOf(_begins, _begins.length * 2);
-    if (_ends != null) _ends = Arrays.copyOf(_ends, _ends.length * 2);
+    begins = Arrays.copyOf(begins, begins.length * 2);
+    if (ends != null) ends = Arrays.copyOf(ends, ends.length * 2);
   }
 
   public void setDocument(int d) {
@@ -42,47 +42,47 @@ public class ExtentArray {
   }
 
   public int capacity() {
-    return _begins.length;
+    return begins.length;
   }
 
   public void add(int begin) {
-    if (_position == _begins.length) {
+    if (position == begins.length) {
       makeRoom();
     }
 
-    _begins[_position] = begin;
-    _position += 1;
+    begins[position] = begin;
+    position += 1;
   }
 
   public void add(int begin, int end) {
-    if (_position == _begins.length) {
+    if (position == begins.length) {
       makeRoom();
     }
 
-    _begins[_position] = begin;
-    if (_ends == null && _position == 0) _ends = new int[_begins.length];
-    _ends[_position] = end;
-    _position += 1;
+    begins[position] = begin;
+    if (ends == null && position == 0) ends = new int[begins.length];
+    ends[position] = end;
+    position += 1;
   }
 
   public int begin(int index) {
-    return _begins[index];
+    return begins[index];
   }
 
   public int end(int index) {
-    if (_ends == null) return _begins[index]+1;
-    return _ends[index];
+    if (ends == null) return begins[index]+1;
+    return ends[index];
   }
 
   public int size() {
-    return _position;
+    return position;
   }
 
   public void reset() {
-    _position = 0;
+    position = 0;
   }
 
   public String toString(){
-    return String.format("ExtentArray:doc=%d:count=%d", document, _position);
+    return String.format("ExtentArray:doc=%d:count=%d", document, position);
   }
 }
