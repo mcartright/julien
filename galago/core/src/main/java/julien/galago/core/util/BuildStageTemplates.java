@@ -23,7 +23,6 @@ import julien.galago.tupleflow.execution.ConnectionPointType;
 import julien.galago.tupleflow.execution.InputStep;
 import julien.galago.tupleflow.execution.OutputStep;
 import julien.galago.tupleflow.execution.Stage;
-import julien.galago.tupleflow.execution.StageConnectionPoint;
 import julien.galago.tupleflow.execution.Step;
 
 
@@ -46,8 +45,7 @@ public class BuildStageTemplates {
   public static Stage getGenericWriteStage(String stageName, File destination, String inputPipeName,
           Class<? extends julien.galago.tupleflow.Step> writer, Order dataOrder, Parameters p) throws IOException {
     Stage stage = new Stage(stageName);
-    stage.add(new StageConnectionPoint(ConnectionPointType.Input,
-            inputPipeName, dataOrder));
+    stage.addInput(inputPipeName, dataOrder);
     p.set("filename", destination.getCanonicalPath());
     stage.add(new InputStep(inputPipeName));
     stage.add(new Step(writer, p));
@@ -59,8 +57,7 @@ public class BuildStageTemplates {
     Stage stage = new Stage(stageName);
     assert(inputs.length == orders.length);
     for (int i = 0; i < inputs.length; i++) {
-      stage.add(new StageConnectionPoint(ConnectionPointType.Input,
-            inputs[i], orders[i]));
+      stage.addInput(inputs[i], orders[i]);
     }
     p.set("filename", destination.getCanonicalPath());
     stage.add(new InputStep(inputs[0]));
@@ -92,7 +89,6 @@ public class BuildStageTemplates {
   }
 
   public static Stage getWriteLengthsStage(String stageName, File destination, String inputPipeName, Parameters p) throws IOException {
-    p.set("blockSize", 512);
     return getGenericWriteStage(stageName, destination, inputPipeName,
             DiskLengthsWriter.class, new FieldLengthData.FieldDocumentOrder(), p);
   }
@@ -105,7 +101,6 @@ public class BuildStageTemplates {
   }
 
   public static Stage getWriteNamesStage(String stageName, File destination, String inputPipeName, Parameters p) throws IOException {
-    p.set("blockSize", 512);
     return getGenericWriteStage(stageName, destination, inputPipeName,
             DiskNameWriter.class, new NumberedDocumentData.NumberOrder(), p);
   }
@@ -115,7 +110,6 @@ public class BuildStageTemplates {
   }
 
   public static Stage getWriteNamesRevStage(String stageName, File destination, String inputPipeName, Parameters p) throws IOException {
-    p.set("blockSize", 512);
     return getGenericWriteStage(stageName, destination, inputPipeName,
             DiskNameReverseWriter.class, new NumberedDocumentData.IdentifierOrder(), p);
   }

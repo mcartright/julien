@@ -7,17 +7,18 @@ import julien.galago.{core => gcore, tupleflow => gt}
 
 import java.io.{File, PrintStream}
 import gcore.index.corpus._
-import gcore.index.disk.{DiskNameReader,PositionFieldIndexWriter}
-import gcore.index.disk.{PositionIndexWriter,PositionContentWriter}
-import gcore.util.BuildStageTemplates._
+import gcore.index.disk._
 import gcore.parse._
 import gcore.types._
-import gt.{Order,Utility}
-import gt.execution.ConnectionAssignmentType
-import gt.execution.{Job,InputStep,MultiStep,OutputStep, Stage, Step}
 
-import scala.collection.mutable.{ListBuffer,HashSet}
-import scala.collection.JavaConversions._
+import julien.galago.tupleflow.Utility
+
+import collection.mutable.{ListBuffer,HashSet}
+import collection.JavaConversions._
+
+import julien.flow._
+import Recipe._
+
 
 /**
   * Refactored from Galago's BuildIndex
@@ -27,244 +28,167 @@ import scala.collection.JavaConversions._
 object BuildIndex extends TupleFlowFunction {
   val slash = File.separator
 
-  def getOffsetSplitStage: Stage = {
-    return new Stage("offsetting").
-      addInput("countedSplits", new DocumentSplit.FileNameOrder).
-      addOutput("offsetSplits", new DocumentSplit.FileNameOrder).
-      add(new InputStep("countedSplits")).
-      add(new Step(classOf[SplitOffsetter])).
-      add(new OutputStep("offsetSplits"))
-  }
-
-  def getCountDocumentsStage: Stage = {
-    return new Stage("countDocuments").
-      addInput("splits", new DocumentSplit.FileNameOrder()).
-      addOutput("countedSplits", new DocumentSplit.FileNameOrder()).
-      add(new InputStep("splits")).
-      add(new Step(classOf[ParserCounter])).
-      add(new OutputStep("countedSplits"))
-  }
-
-  def getParsePostingsStage(bp : Parameters) : Stage = {
-    val stage = new Stage("parsePostings").
-      addInput("offsetSplits", new DocumentSplit.FileNameOrder()).
-      addOutput("fieldLengthData", new FieldLengthData.FieldDocumentOrder()).
-      addOutput("numberedDocumentDataNumbers",
-        new NumberedDocumentData.NumberOrder()).
-      addOutput("numberedDocumentDataNames",
-        new NumberedDocumentData.IdentifierOrder()).
-      addOutput("numberedPostings",
-        new NumberWordPosition.WordDocumentPositionOrder()).
-      addOutput("numberedExtentPostings",
-        new FieldNumberWordPosition.FieldWordDocumentPositionOrder()).
-      addOutput("encoded-fields",
-        new NumberedField.FieldNameNumberOrder()).
-      addOutput("storeKeys",
-        new KeyValuePair.KeyOrder())
-
-    // Steps
-    stage.add(new InputStep("offsetSplits")).
-      add(getParserStep(bp)).
-      add(getTokenizerStep(bp))
-    val processingFork = new MultiStep()
-
-    // these forks are always executed
-    processingFork.
-      addGroup("fieldLengths",
-	getExtractionSteps("fieldLengthData",
-	  classOf[FieldLengthExtractor],
-	  new FieldLengthData.FieldDocumentOrder())).
-      addGroup("numberedDocumentData",
-	getExtractionSteps("numberedDocumentDataNumbers",
-	  classOf[NumberedDocumentDataExtractor],
-	  new NumberedDocumentData.NumberOrder())).
-      addGroup("numberedDocumentDataNames",
-	getExtractionSteps("numberedDocumentDataNames",
-	  classOf[NumberedDocumentDataExtractor],
-	  new NumberedDocumentData.IdentifierOrder())).
-      addGroup("store").
-      addToGroup("store",
-        new Step(classOf[CorpusFolderWriter], bp.getMap("storeParams"))).
-      addToGroup("store", Utility.getSorter(new KeyValuePair.KeyOrder())).
-      addToGroup("store", new OutputStep("storeKeys")).
-      addGroup("postings",
-        getExtractionSteps("numberedPostings",
-	  classOf[NumberedPostingsPositionExtractor],
-	  new NumberWordPosition.WordDocumentPositionOrder())).
-      addGroup("fieldIndex",
-	getExtractionSteps("numberedExtentPostings",
-	  classOf[NumberedExtentPostingsExtractor],
-	  new FieldNumberWordPosition.FieldWordDocumentPositionOrder()))
-    // one fork path for each field recorded
-    processingFork.addGroup("encode-fields",
-      getExtractionSteps("encoded-fields",
-        classOf[ContentEncoder],
-        bp.getMap("tokenizer"),
-        new NumberedField.FieldNameNumberOrder()))
-
-    return stage.add(processingFork)
-  }
-
-  def getWritePostingsStage(
-    bp: Parameters,
-    stageName: String,
-    inputName: String,
-    inputOrder: Order[_],
-    indexName: String,
-    indexWriter: Class[_]) : Stage = {
-    val p = new Parameters()
-    p.set("filename", bp.getString("indexPath") + slash + indexName)
-    p.set("skipping", bp.get("skipping", true))
-    p.set("skipDistance", bp.get("skipDistance", 500L))
-    return new Stage(stageName).addInput(inputName, inputOrder).
-      add(new InputStep(inputName)).
-      add(new Step(indexWriter, p))
-  }
-
-  def getParallelIndexKeyWriterStage(
-    name: String,
-    input: String,
-    indexParameters: Parameters) : Stage = {
-    return new Stage(name).addInput(input, new KeyValuePair.KeyOrder()).
-      add(new InputStep(input)).
-      add(new Step(classOf[SplitBTreeKeyWriter], indexParameters))
-  }
-
-  def checkBuildIndexParameters(globalParameters: Parameters) : Parameters = {
-    val errorLog = ListBuffer[String]()
+  // check parameters
+  def checkBuildIndexParameters(gblParms: Parameters) : Parameters = {
+    val errorLog = new StringBuilder
 
     // inputPath may be a string, or a list of strings -- required
-    if (!globalParameters.containsKey("inputPath")) {
-      errorLog.add("Parameter 'inputPath' is required " +
-        "as a string or list of strings.")
+    if (!gblParms.containsKey("inputPath")) {
+      errorLog ++= "Parameter 'inputPath' is required as a string or list of strings.\n"
     } else {
-      val absolutePaths = globalParameters.getAsList("inputPath").map { s =>
-        new File(s.asInstanceOf[String]).getAbsolutePath
-      }
-      globalParameters.remove("inputPath")
-      globalParameters.set("inputPath", absolutePaths)
     }
 
     // indexPath may be a string
-    if (!globalParameters.containsKey("indexPath")) {
-      errorLog.add("Parameter 'indexPath' is required. It should be a string.")
+    if (!gblParms.containsKey("indexPath")) {
+      errorLog ++= "Parameter 'indexPath' is required. It should be a string.\n"
     } else {
-      val indexPath = globalParameters.getString("indexPath")
-      globalParameters.set("indexPath", (new File(indexPath).getAbsolutePath()))
+      val indexPath = gblParms.getString("indexPath")
+      gblParms.set("indexPath", (new File(indexPath).getCanonicalPath()))
     }
 
     // Make a separate map for corpus stuff
     val storeP = new Parameters
-    storeP.set("blockSize", globalParameters.get("corpusBlockSize", 512));
+    storeP.set("blockSize", gblParms.get("corpusBlockSize", 512));
     storeP.set("filename",
-      s"${globalParameters.getString("indexPath")}${slash}corpus");
-    globalParameters.set("storeParams", storeP);
+      s"${gblParms.getString("indexPath")}${slash}corpus");
+    gblParms.set("storeParams", storeP);
 
     // tokenizer/fields must be a list of strings [optional parameter]
     // defaults
     var fieldNames : Set[String] = Set.empty
     val tokenizerParams = new Parameters()
-    if (globalParameters.containsKey("tokenizer")) {
-      if (!globalParameters.isMap("tokenizer")) {
-        errorLog.add("Parameter 'tokenizer' must be a map.\n")
+    if (gblParms.containsKey("tokenizer")) {
+      if (!gblParms.isMap("tokenizer")) {
+        errorLog ++= "Parameter 'tokenizer' must be a map.\n"
       } else {
-        val tokenizerParams = globalParameters.getMap("tokenizer")
+        val tokenizerParams = gblParms.getMap("tokenizer")
         fieldNames = tokenizerParams.
           getAsList("fields").
           asInstanceOf[java.util.List[String]].
           toSet
       }
     } else {
-      globalParameters.set("tokenizer", tokenizerParams)
+      gblParms.set("tokenizer", tokenizerParams)
     }
     tokenizerParams.set("fields", fieldNames)
     tokenizerParams.set("formats", new Parameters())
 
+    if(gblParms.containsKey("parser") && !gblParms.isMap("parser")) {
+      errorLog ++= "parser ought to be a map!"
+      gblParms.remove("parser")
+    }
+    // handle not-present
+    gblParms.set("parser", gblParms.get("parser", new Parameters))
+
     if (errorLog.isEmpty()) {
-      return globalParameters
+      return gblParms
     } else {
-      for (err <- errorLog) {
-        Console.err.println(err)
-      }
-      throw new RuntimeException("Unable to execute job: " +
-        errorLog.mkString(";"))
+      Console.err.println(errorLog)
+      throw new RuntimeException("Unable to execute job: " +errorLog)
     }
   }
 
-  def getIndexJob(bp: Parameters) : Job = {
-    val indexPath = new File(bp.getString("indexPath")).getAbsolutePath()
-    // ensure the index folder exists
-    val buildManifest = new File(indexPath, "buildManifest.json")
-    Utility.makeParentDirectories(buildManifest)
-    Utility.copyStringToFile(bp.toPrettyString(), buildManifest)
+  def getSplitParms(bp: Parameters): Parameters = {
+    val splitParms = bp.getMap("parser").clone()
+    if(bp.isString("filetype")) {
+      splitParms.set("filetype", bp.getString("filetype"))
+    }
+    
+    // filter input paths into files and directories
+    val inputPaths = bp.getAsList("inputPath").asInstanceOf[java.util.List[String]].toSet
+    var files = new ListBuffer[String]
+    var directories = new ListBuffer[String]
 
-    // common steps + connections
-    val splitParameters = bp.get("parser", new Parameters()).clone()
-    if (bp.isMap("parser")) {
-      splitParameters.set("parser", bp.getMap("parser"))
+    inputPaths.foreach(path => {
+      val fp = new File(path)
+      if(fp.isFile) { files += fp.getCanonicalPath }
+      else if(fp.isDirectory) { directories += fp.getCanonicalPath }
+      else {
+        Console.err.println("Cannot find input path: "+path)
+        ???
+      }
+    })
+    splitParms.set("filename", files)
+    splitParms.set("directory", directories)
+    
+    splitParms
+  }
+
+  def constructJob(bp: Parameters): Job = {
+    writeBuildManifest(bp)
+
+    // build up stages
+    val splitInput = new FlowStage(FlowLinearStep(Seq(
+        FlowStep(classOf[DocumentSource], getSplitParms(bp)),
+        FlowStep(new DocumentSplit.FileNameOrder())
+    )), gensym("DocumentSource"))
+
+    val countDocs = FlowStage(classOf[ParserCounter])
+    val offsetDocs = FlowStage(classOf[SplitOffsetter])
+    
+    // build up output of fork stage first
+    val writeNames = FlowStage(classOf[DiskNameWriter], indexFileParms(bp, "names"))
+    val writeNamesRev = FlowStage(classOf[DiskNameReverseWriter], indexFileParms(bp, "names.reverse"))
+    val writeLengths = FlowStage(classOf[DiskLengthsWriter], indexFileParms(bp, "lengths"))
+    // PositionFieldIndexWriter uses this name as a prefix to calculate names
+    val writeExtentPostings = FlowStage(classOf[PositionFieldIndexWriter], indexFileParms(bp, ""))
+
+    val writeContent = if(bp.get("content", true)) {
+      Some(FlowStage(classOf[PositionContentWriter],indexFileParms(bp, "content")))
+    } else None
+
+    val writeCorpus = if(bp.get("corpus", true)) {
+      Some(FlowStage(classOf[SplitBTreeKeyWriter], bp.getMap("storeParams")))
+    } else None
+
+    val writePostings = if(bp.get("nonStemmedPostings", true)) {
+      Some(FlowStage(classOf[PositionIndexWriter], indexFileParms(bp, "all.postings")))
+    } else None
+
+    // build up complicated fork stage
+    val parseDocs = {
+      val leadup = Seq(
+        FlowStep(classOf[ParserSelector], bp.getMap("parser")),
+        FlowStep(classOf[TagTokenizer], bp.getMap("tokenizer"))
+      )
+
+      val branches = Seq(
+        extractor(classOf[FieldLengthExtractor], Some(writeLengths)),
+        extractor(classOf[NumberedDocumentDataExtractor], Some(writeNames)),
+        extractor(classOf[NumberedDocumentDataExtractor], Some(writeNamesRev)),
+        extractor(classOf[NumberedExtentPostingsExtractor], Some(writeExtentPostings)),
+
+        //--- optional bits:
+        extractor(classOf[NumberedPostingsPositionExtractor], writePostings),
+        extractor(classOf[ContentEncoder], writeContent, bp.getMap("tokenizer")),
+
+        // enforce custom sort on CorpusFolderWriter;
+        // it doesn't need a sort but is faster with one
+        extractor(classOf[CorpusFolderWriter], writeCorpus, bp.getMap("storeParams"), Some(new KeyValuePair.KeyOrder()))
+
+      ).flatten // remove anything that wasn't included in the build
+      
+      new FlowStage(FlowLinearStep(leadup ++ Seq(FlowMultiStep(branches))), gensym("ParseDocs"))
     }
 
-    if (bp.isString("filetype")) {
-      splitParameters.set("filetype", bp.getString("filetype"))
-    }
-    val job = new Job()
-    job.add(
-      getSplitStage(
-        bp.getAsList("inputPath").asInstanceOf[java.util.List[String]],
-        classOf[DocumentSource],
-        new DocumentSplit.FileNameOrder(),
-        splitParameters)).
-      add(getCountDocumentsStage).
-      each("inputSplit", "countDocuments").
-      add(getOffsetSplitStage).
-      combined("countDocuments", "offsetting").
-      add(getParsePostingsStage(bp)).
-      each("offsetting", "parsePostings").
-      add(getWritePostingsStage(
-        bp,
-        "writeContent",
-        "encoded-fields",
-        new NumberedField.FieldNameNumberOrder,
-        "content",
-        classOf[PositionContentWriter])).
-      combined("parsePostings", "writeContent").
-      add(getParallelIndexKeyWriterStage(
-        "writeStoreKeys",
-        "storeKeys",
-        bp.getMap("storeParams"))).
-      combined("parsePostings", "writeStoreKeys").
-      add(getWriteNamesStage(
-        "writeNames",
-        new File(indexPath, "names"),
-        "numberedDocumentDataNumbers")).
-      combined("parsePostings", "writeNames").
-      add(getWriteNamesRevStage(
-        "writeNamesRev",
-        new File(indexPath, "names.reverse"),
-        "numberedDocumentDataNames")).
-      combined("parsePostings", "writeNamesRev").
-      add(getWriteLengthsStage(
-        "writeLengths",
-        new File(indexPath, "lengths"),
-        "fieldLengthData")).
-      combined("parsePostings", "writeLengths").
-      add(getWritePostingsStage(bp,
-        "writePostings",
-        "numberedPostings",
-        new NumberWordPosition.WordDocumentPositionOrder(),
-        "all.postings",
-        classOf[PositionIndexWriter])).
-      combined("parsePostings", "writePostings").
-      add(getWritePostingsStage(
-        bp,
-        "writeExtentPostings",
-        "numberedExtentPostings",
-        new FieldNumberWordPosition.FieldWordDocumentPositionOrder(),
-        "",
-        classOf[PositionFieldIndexWriter])).
-      combined("parsePostings", "writeExtentPostings")
+    // DSL for when we don't want to create nodes explicitly
+    // splitTo = each
+    // joinTo = combined
+    splitInput splitTo countDocs
+    countDocs joinTo offsetDocs
+    offsetDocs splitTo parseDocs
 
-    return job
+    // the rest of the stages will be joined automagically by sharing nodes
+    // build up our set of stages
+    val inputStages: Set[FlowStage] = Set(splitInput, countDocs, offsetDocs, parseDocs)
+    val mustWriteStages: Set[FlowStage] = Set(writeNames, writeNamesRev, writeLengths, writeExtentPostings)
+    val mightWriteStages: Set[FlowStage] = Set(writeCorpus, writeContent, writePostings).flatten
+
+    val graph = inputStages ++ 
+                mustWriteStages ++
+                mightWriteStages
+    
+    JobGen.createAndVerify(graph)
   }
 
   val name : String = "build"
@@ -275,6 +199,7 @@ object BuildIndex extends TupleFlowFunction {
       case e: Exception =>
         false
     }
+  
   def help : String = """
   Builds a Galago StructuredIndex with TupleFlow, using one thread
   for each CPU core on your computer.  While some debugging output
@@ -283,11 +208,11 @@ object BuildIndex extends TupleFlowFunction {
   that will direct you to the status page.
 
 Required Parameters:
-<input>:  Can be either a file or directory, and as many can be
+<inputPath>:  Can be either a file or directory, and as many can be
           specified as you like.  Galago can read html, xml, txt,
           arc (Heritrix), warc, trectext, trecweb and store files.
           Files may be gzip compressed (.gz|.bz).
-<index>:  The directory path of the index to produce.
+<indexPath>:  The directory path of the index to produce.
 
 Algorithm Flags:
   --tokenizer/fields+{field-name}:
@@ -296,14 +221,18 @@ Algorithm Flags:
 """
 
   def run(p: Parameters, out: PrintStream) : Unit = {
-    val checked = checkBuildIndexParameters(p)
-    val job = getIndexJob(checked)
-    runTupleFlowJob(job, checked, out)
-    out.println("Done Indexing.")
+    val bp = checkBuildIndexParameters(p)
 
+    val job = constructJob(bp)
+    runTupleFlowJob(job, bp, out)
+    out.println("Done Indexing!")
+    
     // sanity check - get the number of documents out of ./names
-    val names = new DiskNameReader(p.getString("indexPath") + slash + "names")
+    val names = new DiskNameReader(new File(bp.getString("indexPath"), "names").getCanonicalPath)
     out.println("Documents Indexed: " + names.getManifest.getLong("keyCount"))
+
+    // sometimes local threaded hangs, so force exit here
+    sys.exit(0);
   }
 }
 
