@@ -5,7 +5,7 @@ class AvgPrecision(n: String) extends QueryEvaluator(n) {
   def eval[T <: ScoredObject[T]](
     result: QueryResult[T],
     judgment: QueryJudgment,
-    strictlyEval: Boolean = true): Double = {
+    strictlyEval: Boolean): Double = {
     if (judgment.numRel == 0)
       if (strictlyEval)
         throw new Exception(s"No relevant docs for query ${result.name}")
@@ -16,7 +16,7 @@ class AvgPrecision(n: String) extends QueryEvaluator(n) {
     // Have some relevant - can "properly" evaluate
     for (idx <- result.indices) {
       val so = result(idx)
-      if (judgment(so).isRelevant) {
+      if (judgment.isRelevant(so.name)) {
         relCount += 1.0
         sumPrec += relCount / (idx+1)
       }

@@ -54,7 +54,13 @@ class DefaultAccumulator[T <: ScoredObject[T]] private(
   override def result(): List[T] = {
     val b = scala.collection.mutable.ListBuffer[T]()
     // building it back-to-front (i.e. a series of prepends)
-    while (!q.isEmpty) q.dequeue +=: b
+    var rank = q.size
+    while (!q.isEmpty) {
+      val so = q.dequeue
+      so.rank = rank
+      so +=: b
+      rank -= 1
+    }
     b.result
   }
 

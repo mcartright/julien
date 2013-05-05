@@ -1,10 +1,8 @@
-package julien.cli.examples
+package julien
+package eval
 
-
-import org.lemurproject.galago.tupleflow.Parameters
+import julien.galago.tupleflow.Parameters
 import scala.collection.JavaConversions._
-import julien.eval.aggregate._;
-import julien.retrieval.ScoredObject
 import collection.mutable.HashMap
 import collection.mutable.ListBuffer
 import java.io._
@@ -14,40 +12,35 @@ import java.io._
  * Date: 4/30/13
  */
 object Evaluator {
-  type SObj <: ScoredObject[SObj]
+  type DoubleList = ListBuffer[Double]
+  type Judgment = Tuple2[String, Double]
 
-  // Can we infer this from the trec result files? Does it need to be static?
   val metrics = Array("num_ret", "num_rel", "num_rel_ret", "map", /*"gmap",*/
     "R-prec", "bpref", "recip_rank", "ndcg", "ndcg5", "ndcg10", "ndcg20", "ERR",
     "ERR10", "ERR20", "P1", "P5", "P10", "P15", "P20", "P30", "P50", "P100",
     "P200", "P500", "P1000");
   val evalFormat = "%2$-16s%1$3s %3$6.5f"
 
-  def evaluate(qrelFile: String, resultMap: Map[String, Seq[SObj]]):
-      (Seq[(String, Double)], Map[String, ListBuffer[Double]]) = {
-    val newResults = resultMap.map(r => r._1 -> r._2.toArray[SObj])
-    val qsr = new QuerySetResults(newResults);
-    val qrels = new QuerySetJudgments(qrelFile, true, true)
-    val evalParams = new Parameters()
+  def evaluate[T <: ScoredObject[T]](
+    qrelFile: String,
+    resultMap: Map[String, Seq[T]]
+  ): (Seq[Judgment], Map[String, DoubleList]) = {
+    val newResults = resultMap.map{ case (n, sos) => (n, QueryResult(n, sos)) }
+    val qsr = QueryResultSet(newResults)
+    val qrels = QueryJudgmentSet(qrelFile, true)
+    val evaluators = metrics.map( m => QueryEvaluator(m))
+    val queryByQueryResults = HashMap[String, DoubleList]()
+    val summaryResults = ListBuffer[Judgment]()
 
-    val evaluators = for (metric <- metrics) yield {
-      QuerySetEvaluatorFactory.instance(metric, evalParams)
+    for (query <- qsr.keys; evaluator <- evaluators) {
+      val evalScore = evaluator.eval(qsr(query), qrels(query))
+      queryByQueryResults.
+        getOrElseUpdate(evaluator.metric, ListBuffer()) += evalScore
     }
 
-    val queryByQueryResults = new HashMap[String, ListBuffer[Double]]
-    val summaryResults = new ListBuffer[(String, Double)]
-
-    for (query <- qsr.getQueryIterator()) {
-      for (evaluator <- evaluators) {
-        val evalScore = evaluator.evaluate(qsr.get(query), qrels.get(query))
-        queryByQueryResults.
-          getOrElseUpdate(evaluator.getMetric(), ListBuffer()) += evalScore
-      }
-    }
-
-    evaluators.map(evaluator => {
-      val summaryScore = evaluator.evaluate(qsr, qrels)
-      summaryResults += ((evaluator.getMetric(), summaryScore))
+    evaluators.foreach(evaluator => {
+      val summaryScore = evaluator.eval(qsr, qrels)
+      summaryResults += ((evaluator.metric, summaryScore))
     })
     (summaryResults.toSeq, queryByQueryResults.toMap)
   }

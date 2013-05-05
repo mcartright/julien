@@ -14,7 +14,11 @@ package retrieval
   * implementations should define their own update methods,
   * if needed.
   */
-case class ScoredDocument(val docid: Docid, var score: Double)
+case class ScoredDocument(
+  val docid: Docid,
+  var score: Double,
+  var name: String = "unknown",
+  var rank: Int=0)
     extends ScoredObject[ScoredDocument] {
 
   /** Compares two ScoredDocuments by score, breaks ties w/ Docid. */

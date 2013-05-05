@@ -23,42 +23,41 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   }
 
   override def positions:  ExtentArray = {
-//    val hits = ArrayBuffer[Int]()
-//    val iterators: Array[ExtentArray] = terms.map {t => t.positions}.toArray
-//    while (iterators.forall(_.hasNext == true)) {
-//      // Find bounds
-//
-//      //val currentPositions = iterators.map(_.head)
-//      //val minPos = currentPositions.min
-//      //val maxPos = currentPositions.max
-//      val (minPos, maxPos) = {
-//        var min = Int.MaxValue
-//        var max = Int.MinValue
-//        iterators.foreach(iter => {
-//          val cur = iter.head
-//          if(cur < min) min = cur
-//          if(cur > max) max = cur
-//        })
-//        (min, max)
-//      }
-//
-//      // see if it fits
-//      if (maxPos - minPos < width || width == -1) hits += minPos
-//
-//      // move all lower bound iterators foward
-//      //for (it <- iterators; if (it.head == minPos)) it.next
-//      movePast(iterators, 0, minPos)
-//    }
-    ExtentArray.empty
-  }
+    val hits = new ExtentArray()
+    val iterators: Array[Positions] = terms.map {t =>
+      Positions(t.positions)
+    }.toArray
 
-  def hasNext(e: ExtentArray) {
+    while (iterators.forall(_.hasNext == true)) {
+      // Find bounds
 
+      //val currentPositions = iterators.map(_.head)
+      //val minPos = currentPositions.min
+      //val maxPos = currentPositions.max
+      val (minPos, maxPos) = {
+        var min = Int.MaxValue
+        var max = Int.MinValue
+        iterators.foreach(iter => {
+          val cur = iter.head
+          if(cur < min) min = cur
+          if(cur > max) max = cur
+        })
+        (min, max)
+      }
+
+      // see if it fits
+      if (maxPos - minPos < width || width == -1) hits.add(minPos)
+
+      // move all lower bound iterators foward
+      for (it <- iterators; if (it.head == minPos)) it.next
+      movePast(iterators, 0, minPos)
+    }
+    hits
   }
 
   @tailrec
   private def movePast(
-    its: Array[BufferedIterator[Int]],
+    its: Array[Positions],
     idx :Int,
     pos: Int): Unit =
     if (idx == its.length) return else {

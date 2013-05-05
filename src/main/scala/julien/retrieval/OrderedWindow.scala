@@ -11,6 +11,7 @@ object OrderedWindow {
 
 class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   extends MultiTermView(terms) {
+  assume(width > 0, s"OrderedWindow needs a positive width. Got $width")
   // update the statistics object w/ our notion of "collection length"
   // We *could* say it's dependent on the size of the gram and width, but
   // that's a lot of work and no one else does it, so here's our lazy way out.
@@ -24,24 +25,24 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   }
 
   override def positions: ExtentArray = {
-//    val hits = new ArrayBuffer[Int]()
-//    val iterators: Seq[ExtentArray] = terms.map {t => t.positions}
-    
-//    while (iterators(0).hasNext) {
-//      // if while advancing, we don't find a hit:
-//      if(!advance(iterators, width)) {
-//        return hits
-//      }
-//
-//      // found a hit, keep going
-//      hits += iterators(0).head
-//      iterators(0).next
-//    }
-    ExtentArray.empty
+    val hits = new ExtentArray()
+    val iterators: Seq[Positions] = terms.map(t => Positions(t.positions))
+
+    while (iterators(0).hasNext) {
+      // if while advancing, we don't find a hit:
+      if(!advance(iterators)) {
+        return hits
+      }
+
+      // found a hit, keep going
+      hits.add(iterators(0).head)
+      iterators(0).next
+    }
+    hits
   }
 
   // returns true if a result has been found
-  def advance(iterators: Seq[BufferedIterator[Int]], width: Int): Boolean = {
+  def advance(iterators: Seq[Positions]): Boolean = {
     var idx = 0
     while(idx < iterators.size-1) {
       val left = iterators(idx)
@@ -51,14 +52,13 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
       while(right.hasNext && right.head < left.head) {
         right.next
       }
-      
+
       // ran out of an iterator; return results immediately
       if(!right.hasNext)
         return false
 
       // if this iterator violates the window, restart loop
-      // note that width == -1 signifies no window constraint
-      if(width != -1 && (right.head - left.head > width)) {
+      if(right.head - left.head > width) {
         iterators(0).next
         if(!iterators(0).hasNext)
           return false
@@ -72,6 +72,5 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   }
 
   override def isDense: Boolean = terms.forall(_.isDense)
-
   override def size: Int = statistics.docFreq.toInt
 }

@@ -83,16 +83,16 @@ Required parameters:
     val logSumExp = max + scala.math.log(initialResults.map { v =>
       scala.math.exp(v.score - max)
     }.sum)
-    initialResults = initialResults.map { sd =>
-      ScoredDocument(sd.docid, scala.math.exp(sd.score - logSumExp))
-    }
+    val initialFactors = initialResults.map { sd =>
+      (sd.docid, scala.math.exp(sd.score - logSumExp))
+    }.toMap
 
     // get the actual documents, and count the grams
     val tokenizer = new TagTokenizer()
     val dummy = new Parameters()
     // load and tokenize docs if needed
     val docs = index.
-      documents(initialResults.map(_.docid)).
+      documents(initialFactors.keySet.toSeq).
       map { d =>
         if (!d.hasTermVector)
           Document(tokenizer.tokenize(d.content))
@@ -113,17 +113,17 @@ Required parameters:
       .filterNot(t => """\d+""".r == t) // and are NOT all digits
 
     // Apparently we need lengths too. Makes (docid -> length) map
-    val doclengths = initialResults.map { doc =>
-      (doc.docid, index.length(doc.docid))
+    val doclengths = initialFactors.keys.map { docid =>
+      (docid, index.length(docid))
     }.toMap
 
     // Time to score the terms
     val grams = terms.map { T =>
       // map to score-per-doc then sum
-      val score = initialResults.map { SD =>
+      val score = initialFactors.map { case (docid, score) =>
         val tf =
-          hists(SD.docid).getOrElse(T, 0).toDouble / doclengths(SD.docid)
-        (SD.score * tf)
+          hists(docid).getOrElse(T, 0).toDouble / doclengths(docid)
+        (score * tf)
       }.sum
       Gram(T, score)
     }

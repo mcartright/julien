@@ -2,22 +2,29 @@ package julien
 package eval
 
 import gnu.trove.map.hash.TObjectIntHashMap
+import scala.collection.Iterable
 
-class QueryJudgment(val queryName: String) {
-  private var numRel = 0
-  private var numNonrel = 0
+case class Judgment(var name: String, var label: Int)
+
+class QueryJudgment(val queryName: String) extends Iterable[Judgment] {
+  private var _numRel = 0
+  private var _numNonRel = 0
   private var numUnknown = 0
   val judgments = new TObjectIntHashMap[String]()
 
   def +=(docName: String, label: Int): this.type = {
     assume(!judgments.containsKey(docName), s"Got $docName already.")
-    judgments.out(docName, label)
-    // TODO : Don't really like this
-    if (label > 0) numRel += 1 else (label <= 0) numNonrel += 1
+    judgments.put(docName, label)
+    // TODO : Not sure I like this binarization
+    if (label > 0)
+      _numRel += 1
+    else
+      _numNonRel += 1
+    this
   }
 
-  def numRelevant: Int = numRel
-  def numNonRelevant: Int = numNonRel
+  def numRel(): Int = _numRel
+  def numNonRel(): Int = _numNonRel
   def isJudged(name: String): Boolean = judgments.containsKey(name)
   def isNonRelevant(name: String): Boolean = !isRelevant(name)
   def contains(name: String): Boolean = judgments.containsKey(name)
@@ -33,8 +40,8 @@ class QueryJudgment(val queryName: String) {
     if (judgments.containsKey(name)) judgments.get(name) else default
 
   def keys: Array[String] = judgments.keys.asInstanceOf[Array[String]]
-  def values: Array[Iny] = judgments.values
-  def size: Int = judgments.size
+  def values: Array[Int] = judgments.values
+  override def size: Int = judgments.size
   def iterator: Iterator[Judgment] = new Iterator[Judgment] {
     val j = Judgment("", 0)
     var idx = 0
@@ -47,5 +54,4 @@ class QueryJudgment(val queryName: String) {
       j
     }
   }
-  case class Judgment(var name: String, var label: Int)
 }

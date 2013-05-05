@@ -193,7 +193,7 @@ class Index private(
   def postings(key:String): PostingSeq[PositionsPosting] =
     new PostingSeq(iterator(key), this)
   def documents: DocumentSeq = DocumentSeq(this)
-  def documents(docids: List[Docid]): List[Document] = {
+  def documents(docids: Seq[Docid]): List[Document] = {
     val sortedNames = docids.sorted.map(underlying.getName(_))
     val gdocs: scala.collection.mutable.Map[String, GDoc] =
       underlying.getItems(sortedNames, Parameters.empty)

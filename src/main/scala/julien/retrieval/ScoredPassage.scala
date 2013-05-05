@@ -8,8 +8,13 @@ package retrieval
    *
    * Natural ordering is assumed to be by score.
    */
-case class ScoredPassage(val docid: Docid, var score: Double,
-  val begin: Int, val end: Int) extends ScoredObject[ScoredPassage] {
+case class ScoredPassage(
+  val docid: Docid,
+  var score: Double,
+  val begin: Int,
+  val end: Int,
+  var name: String  = "unknown",
+  var rank: Int = 0) extends ScoredObject[ScoredPassage] {
   assume(begin < end, s"Can't have a scored passage with bad indices.")
 
   /** Compares passages by score. */

@@ -1,11 +1,18 @@
 package julien
 package eval
 
-abstract class QueryEvaluator(val name: String) {
+object QueryEvaluator {
+  def apply(name: String): QueryEvaluator = {
+    // TODO: NEED TO IMPLEMENT
+    null
+  }
+}
+
+abstract class QueryEvaluator(val metric: String) {
   def eval[T <: ScoredObject[T]](
     result: QueryResult[T],
     judgment: QueryJudgment,
-    strictlyEval: Boolean): Double
+    strictlyEval: Boolean = true): Double
 
   // TODO
   // Need a natural reducer for this - how to provide?
