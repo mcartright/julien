@@ -137,7 +137,6 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
     private int currentDocument;
     private int currentCount;
     private ExtentArray extentArray;
-    private final ExtentArray emptyExtentArray;
     // to support resets
     protected long startPosition, endPosition;
     // to support skipping
@@ -164,7 +163,6 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
     public TermExtentIterator(BTreeReader.BTreeIterator iterator) throws IOException {
       super(iterator.getKey());
       extentArray = new ExtentArray();
-      emptyExtentArray = new ExtentArray();
       reset(iterator);
     }
 

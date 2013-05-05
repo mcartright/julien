@@ -19,7 +19,6 @@ import julien.galago.core.index.disk.PositionIndexWriter;
 import julien.galago.core.parse.Document;
 import julien.galago.core.parse.stem.Stemmer;
 import julien.galago.core.util.ExtentArray;
-import julien.galago.core.util.ExtentArrayIterator;
 import julien.galago.tupleflow.FakeParameters;
 import julien.galago.tupleflow.Parameters;
 import julien.galago.tupleflow.Utility;
@@ -84,10 +83,9 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
     ExtentIterator mi = (ExtentIterator) iterator;
     while (!mi.isDone()) {
       int document = mi.currentCandidate();
-      ExtentArrayIterator ei = new ExtentArrayIterator(mi.extents());
-      while (!ei.isDone()) {
-        postingList.add(document, ei.currentBegin());
-        ei.next();
+      ExtentArray ea = mi.extents();
+      for (int i = 0; i < ea.size(); i++) {
+	postingList.add(document, ea.begin(i));
       }
       mi.movePast(document);
     }

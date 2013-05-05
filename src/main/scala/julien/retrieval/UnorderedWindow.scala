@@ -31,9 +31,12 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     while (iterators.forall(_.hasNext == true)) {
       // Find bounds
 
-      //val currentPositions = iterators.map(_.head)
-      //val minPos = currentPositions.min
-      //val maxPos = currentPositions.max
+      // Used to be the code directly below:
+      //  val currentPositions = iterators.map(_.head)
+      //  val minPos = currentPositions.min
+      //  val maxPos = currentPositions.max
+      //
+      // But was refactored into the following faster code:
       val (minPos, maxPos) = {
         var min = Int.MaxValue
         var max = Int.MinValue
