@@ -294,7 +294,7 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
       builder.append(",");
       builder.append(currentDocument);
       ExtentArray e = extents();
-      for (int i = 0; i < e.size(); ++i) {
+      for (int i = 0; i < e.position; ++i) {
         builder.append(",");
         builder.append(e.begin(i));
       }

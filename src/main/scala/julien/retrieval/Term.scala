@@ -35,7 +35,7 @@ final class Term private (val t: String, val field: Option[String])
   def positions: ExtentArray = underlying.extents()
 
   lazy val statistics: CountStatistics = {
-    val ns = it.get.asInstanceOf[ARNA].getStatistics
+    val ns = underlying.asInstanceOf[ARNA].getStatistics
     val cs = attachedIndex.
       lengthsIterator(field).
       asInstanceOf[ARCA].

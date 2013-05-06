@@ -84,7 +84,7 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
     while (!mi.isDone()) {
       int document = mi.currentCandidate();
       ExtentArray ea = mi.extents();
-      for (int i = 0; i < ea.size(); i++) {
+      for (int i = 0; i < ea.position; i++) {
 	postingList.add(document, ea.begin(i));
       }
       mi.movePast(document);
@@ -185,7 +185,7 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
       while (!viterator.isDone()) {
         writer.processDocument(viterator.currentCandidate());
         extents = viterator.extents();
-        for (int i = 0; i < extents.size(); i++) {
+        for (int i = 0; i < extents.position; i++) {
           writer.processPosition(extents.begin(i));
           writer.processTuple();
         }
@@ -482,7 +482,7 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
       builder.append(Utility.toString(postings.key));
       builder.append(",");
       builder.append(currDocument);
-      for (int i = 0; i < extents.size(); ++i) {
+      for (int i = 0; i < extents.position; ++i) {
         builder.append(",");
         builder.append(extents.begin(i));
       }

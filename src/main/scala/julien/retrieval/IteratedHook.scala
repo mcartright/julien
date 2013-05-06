@@ -10,7 +10,7 @@ trait IteratedHook[I <: GIterator]
     with ChildlessOp
     with IndexHook {
   /** The iterator attached to this hook. */
-  protected[this] var it: Option[I] = None
+  var underlying: I = _
 
   /** Iterator getter. */
   protected def getIterator(i: Index): I
@@ -20,27 +20,26 @@ trait IteratedHook[I <: GIterator]
     */
   override def attach(i: Index) {
     super.attach(i)
-    it = Some(getIterator(i))
+    underlying = getIterator(i)
   }
 
   /** Returns the underlying iterator. If it is not defined,
     *  an assertion fail is thrown. So, attach this hook before
     *  using it. Doy.
     */
-  def underlying: I = {
-    assume(it.isDefined,
-      s"Tried to use iterator of ${toString} before attaching")
-    it.get
-  }
+//  def underlying: I = {
+//   // assume(it.isDefined, s"Tried to use iterator of ${toString} before attaching")
+//    it
+//  }
 
   /** We have an iterator, so we can determine if its dense (has an entry
     * for every retrieval item in the collection).
     */
-  override def isDense: Boolean = it.get.hasAllCandidates
+  override def isDense: Boolean = underlying.hasAllCandidates
 
   /** The estimated number of entries in this view.
     */
-  override def size: Int = it.get.totalEntries.toInt
+  override def size: Int = underlying.totalEntries.toInt
 
 
   /** This should be refactored into a DenseIterator */
