@@ -103,7 +103,7 @@ public class SimpleTermExtentReader {
         if (currentCount > inlineMinimum) {
            positions.readInt(); // we are being proactive
         }
-        currentPositions.setDocument(currentDocument);
+       // currentPositions.setDocument(currentDocument);
         int position = 0;
         for (int i = 0; i < currentCount; i++) {
           position += positions.readInt();
