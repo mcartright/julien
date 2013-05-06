@@ -1,7 +1,7 @@
 package julien
 package retrieval
 
-import scala.collection.mutable.TreeSet
+import scala.collection.mutable.ArrayBuffer
 import galago.core.util.ExtentArray
 
 object Synonym {
@@ -10,23 +10,23 @@ object Synonym {
 
 class Synonym(terms: Seq[Term])
     extends MultiTermView(terms) {
+
+
   // Being lazy with the estimation of this number
-  override def updateStatistics = {
+  override def updateStatistics(docid: Docid) = {
     statistics.collLength = terms.head.attachedIndex.collectionLength
   }
 
   override def positions: ExtentArray = {
-    // Assumption: a position is a one-to-one with a word, so the set union of
-    // the position vectors of all involved terms is equal to the multiset union
-    //
-    // Based on that, a TreeSet is a sorted set implementation to hold results.
-    // Boom.
-//    val hits = TreeSet[Int]()
-//    for (it <- terms.map(t => t.underlying.extents.begins)) {
-//      hits ++= it
-//    }
-//    hits.toArray
-    ExtentArray.empty
+    val arrays = terms.map(_.underlying.extents)
+    val b = ArrayBuffer[Int]()
+    for (a <- arrays) {
+      while (a.hasNext) b += a.next
+    }
+
+    val hits = new ExtentArray()
+    for (p <- b.sorted) hits.add(p)
+    hits
   }
 
   override def isDense: Boolean = terms.forall(_.isDense)

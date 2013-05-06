@@ -16,8 +16,8 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   assume(terms.size > 1 && width >= terms.size,
     s"Window size must be >1 and at least as big as the number of iterators")
 
-  override def updateStatistics = {
-    super.updateStatistics
+  override def updateStatistics(docid: Docid) = {
+    super.updateStatistics(docid)
   // Again, being lazy about this number
     statistics.collLength = terms.head.statistics.collLength
   }

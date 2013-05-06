@@ -14,7 +14,7 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
   // Start with no knowledge
   val statistics = CountStatistics()
 
-  def updateStatistics = {
+  def updateStatistics(docid: Docid) = {
     assume(verified, s"Tried to use multi-term view from different indexes.")
     val c = count
     statistics.collFreq += c

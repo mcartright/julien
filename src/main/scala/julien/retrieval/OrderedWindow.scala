@@ -18,8 +18,8 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   // val adjustment = t.size * statistics.numDocs
   val adjustment = 0
 
-  override def updateStatistics = {
-    super.updateStatistics
+  override def updateStatistics(docid: Docid) = {
+    super.updateStatistics(docid)
     statistics.collLength =
       terms.head.statistics.collLength - adjustment
   }

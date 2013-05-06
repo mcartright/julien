@@ -12,7 +12,7 @@ trait IteratedHook[I <: GIterator]
   /** The iterator attached to this hook. */
   protected[this] var it: Option[I] = None
 
-  /** Iterator getter. */
+  /** Iterator getter. This is for internal use only. */
   protected def getIterator(i: Index): I
 
   /** Overriden to add functionality to additionally attach
@@ -24,8 +24,8 @@ trait IteratedHook[I <: GIterator]
   }
 
   /** Returns the underlying iterator. If it is not defined,
-    *  an assertion fail is thrown. So, attach this hook before
-    *  using it. Doy.
+    * an assertion fail is thrown. So, attach this hook before
+    * using it. Doy.
     */
   def underlying: I = {
     assume(it.isDefined,

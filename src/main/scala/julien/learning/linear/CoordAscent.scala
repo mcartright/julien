@@ -1,5 +1,6 @@
 package julien
 package learning
+package linear
 
 import scala.math._
 

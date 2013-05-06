@@ -55,7 +55,9 @@ class SimpleProcessor
         val candidate = active.map(_.at).min
         iterators.foreach(_.moveTo(candidate))
         if (iterators.exists(_.matches(candidate))) {
-          unprepped.foreach(_.asInstanceOf[NeedsPreparing].updateStatistics)
+          for (p <- unprepped) {
+            p.asInstanceOf[NeedsPreparing].updateStatistics(Docid(candidate))
+          }
         }
         active.foreach(_.movePast(candidate))
       }

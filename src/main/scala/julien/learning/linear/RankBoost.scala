@@ -1,6 +1,6 @@
 package julien
 package learning
-package boosting
+package linear
 
 import scala.collection.mutable.{ListBuffer,ArrayBuffer}
 import scala.math._
@@ -10,7 +10,7 @@ class RankBoost(samples: List[RankList], features: Array[Int])
   def clone: Ranker = RankBoost()
   val name: String = "RankBoost"
 
-  val wRankers = ListBuffer[RBWeakRanker]()
+  val wRankers = ListBuffer[WeakRanker]()
   val rWeight = ListBuffer[Double]()
   val correctSamples = samples.map(_.getCorrectRanking)
   val sweight = Array.ofDim[Double](samples.size)(rl.size)(rl.size)
@@ -80,7 +80,7 @@ class RankBoost(samples: List[RankList], features: Array[Int])
     }
   }
 
-  def learnWeakRanker(): RBWeakRanker {
+  def learnWeakRanker(): WeakRanker {
     for (i <- 0 until features.length) {
       val sSortedIndex = sortedSamples(i)
       val idx = tSortedIndex(i)
@@ -104,7 +104,7 @@ class RankBoost(samples: List[RankList], features: Array[Int])
     }
     if (bestFid == -1) return null
     R_t = Z_t * maxR
-    return new RBWeakRanker(bestFid, bestThreshold)
+    return new WeakRanker(bestFid, bestThreshold)
   }
 
   def eval(p: DataPoint): Double =
@@ -160,5 +160,9 @@ class RankBoost(samples: List[RankList], features: Array[Int])
     }
 
     // TODO: Should probably return the trained ranker here
+  }
+
+  class WeakRanker(val fid: Int, val threshold: Double) {
+    def score(p: DataPoint): Int = if (p(fid) > threshold) 1 else 0
   }
 }
