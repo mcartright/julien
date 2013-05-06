@@ -125,7 +125,7 @@ object JobGen {
   def createAndVerify(graph: Set[FlowStage]): Job = {
     val job = create(graph)
     val store = new ErrorStore
-    //Verification.verify(job, store)
+    Verification.verify(job, store)
     if(store.hasStatements) {
       Console.err.println(store)
       ???

@@ -230,9 +230,6 @@ Algorithm Flags:
     // sanity check - get the number of documents out of ./names
     val names = new DiskNameReader(new File(bp.getString("indexPath"), "names").getCanonicalPath)
     out.println("Documents Indexed: " + names.getManifest.getLong("keyCount"))
-
-    // sometimes local threaded hangs, so force exit here
-    sys.exit(0);
   }
 }
 
