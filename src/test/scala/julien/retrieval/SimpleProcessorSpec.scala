@@ -67,7 +67,7 @@ trait SimpleProcessorBehavior extends QuickIndexBuilder { this: FlatSpec =>
 
       for ((result, idx) <- simpleResults.zipWithIndex) {
         withClue(s"@$idx, $result != ${altResults(idx)}, $genericClue") {
-          altResults(idx).docid should equal (result.docid)
+          altResults(idx).id should equal (result.id)
           altResults(idx).score should be (result.score plusOrMinus epsilon)
         }
       }
@@ -97,7 +97,7 @@ trait SimpleProcessorBehavior extends QuickIndexBuilder { this: FlatSpec =>
       }
       for ((result, idx) <- simpleResults.zipWithIndex) {
         withClue(s"@$idx, $result != ${altResults(idx)}, $genericClue") {
-          altResults(idx).docid should equal (result.docid)
+          altResults(idx).id should equal (result.id)
           altResults(idx).score should be (result.score plusOrMinus epsilon)
         }
       }
@@ -249,7 +249,7 @@ class SimpleProcessorSpec
         val total = iterators.foldLeft(0) { (sum , iter) =>
           if (iter.hasMatch(min)) sum + iter.count else sum
         }
-        val candidate = ScoredDocument(Docid(min), total.toDouble)
+        val candidate = ScoredDocument(InternalId(min), total.toDouble)
         counts += candidate
       }
       iterators.foreach(_.movePast(min))
@@ -259,7 +259,7 @@ class SimpleProcessorSpec
     // Now compare
     for ((result, idx) <- sorted.zipWithIndex) {
       withClue(s"@$idx, $result != ${results(idx)}") {
-        result.docid should equal (results(idx).docid)
+        result.id should equal (results(idx).id)
         results(idx).score should be (result.score plusOrMinus epsilon)
       }
     }

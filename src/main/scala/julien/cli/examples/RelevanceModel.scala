@@ -84,7 +84,7 @@ Required parameters:
       scala.math.exp(v.score - max)
     }.sum)
     val initialFactors = initialResults.map { sd =>
-      (sd.docid, scala.math.exp(sd.score - logSumExp))
+      (sd.id, scala.math.exp(sd.score - logSumExp))
     }.toMap
 
     // get the actual documents, and count the grams

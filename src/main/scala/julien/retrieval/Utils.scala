@@ -19,7 +19,7 @@ object Utils {
     index: Index,
     out: PrintStream = Console.out) : Unit = {
     for ((sd, idx) <- results.zipWithIndex) {
-      val name = index.name(sd.docid)
+      val name = index.name(sd.id)
       out.println(f"test $name ${sd.score}%10.8f ${idx+1} julien")
     }
   }

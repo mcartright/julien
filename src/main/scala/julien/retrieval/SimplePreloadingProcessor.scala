@@ -33,7 +33,7 @@ abstract class SimplePreloadingProcessor
 
   override def run[T <: ScoredObject[T]](acc: Accumulator[T] =
     DefaultAccumulator[ScoredDocument]()): List[T] = {
-    assume(validated, s"Unable to validate given model/index combination")
+//    assume(validated, s"Unable to validate given model/index combination")
     prepare()
 
     val hackedAcc = acc.asInstanceOf[DefaultAccumulator[ScoredDocument]]

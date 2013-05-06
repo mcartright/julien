@@ -26,11 +26,11 @@ package object julien {
     * Good use of a value class - when you want an AnyVal, but you want to
     * actually *remove* some of the functionality of the AnyVal.
     */
-  implicit class Docid(val underlying: Int) extends AnyVal
-  implicit object DocidOrder extends Ordering[Docid] {
-    def compare(a: Docid, b: Docid) = a.underlying compare b.underlying
+  implicit class InternalId(val underlying: Int) extends AnyVal
+  implicit object InternalIdOrder extends Ordering[InternalId] {
+    def compare(a: InternalId, b: InternalId) = a.underlying compare b.underlying
   }
-  implicit def docid2int(d: Docid): Int = d.underlying
+  implicit def InternalId2int(d: InternalId): Int = d.underlying
 
   import scala.util.matching.Regex
   /** Implicit extension to the Regex class (done via composition)

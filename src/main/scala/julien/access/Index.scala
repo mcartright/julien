@@ -127,7 +127,7 @@ class Index private(
   def numDocuments: Long = collectionStats.documentCount
   def vocabularySize: Long = postingsStats.vocabCount
 
-  def length(d: Docid): Int = underlying.getLength(d)
+  def length(d: InternalId): Int = underlying.getLength(d)
   def length(targetId: String): Int =
     underlying.getLength(underlying.getIdentifier(targetId))
 
@@ -193,7 +193,7 @@ class Index private(
   def postings(key:String): PostingSeq[PositionsPosting] =
     new PostingSeq(iterator(key), this)
   def documents: DocumentSeq = DocumentSeq(this)
-  def documents(docids: Seq[Docid]): List[Document] = {
+  def documents(docids: Seq[InternalId]): List[Document] = {
     val sortedNames = docids.sorted.map(underlying.getName(_))
     val gdocs: scala.collection.mutable.Map[String, GDoc] =
       underlying.getItems(sortedNames, Parameters.empty)
@@ -216,16 +216,16 @@ class Index private(
    */
   def vocabulary(field: String = currentDefault): KeySet =
     KeySet(underlying.getIndexPart(getLabel(field)).keys _)
-  def name(docid: Docid) : String = underlying.getName(docid)
-  def identifier(name: String): Docid =
-    new Docid(underlying.getIdentifier(name))
+  def name(docid: InternalId) : String = underlying.getName(docid)
+  def identifier(name: String): InternalId =
+    new InternalId(underlying.getIdentifier(name))
   def names: PairSeq[String] =
     new PairSeq[String](underlying.getIndexPart("names").keys,
     (k: KeyIterator) => Utility.toString(k.getValueBytes) : String )
   def count(key: String, targetId: String): Int = positions(key, targetId).size
   def collectionCount(key: String): Long = getKeyStatistics(key).nodeFrequency
   def docFreq(key: String): Long = getKeyStatistics(key).nodeDocumentCount
-  def document(docid: Docid): Document =
+  def document(docid: InternalId): Document =
     IndexBasedDocument(underlying.getItem(underlying.getName(docid.underlying),
       Parameters.empty), this)
   def document(targetId: String): Document =

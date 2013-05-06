@@ -6,7 +6,7 @@ package access
   * over these given a ViewOp.
   */
 trait Posting[T <: Posting[T]] {
-  def docid: Docid
+  def docid: InternalId
   def copy: T
 }
 

@@ -1,25 +1,28 @@
+
+/**
+ * User: jdalton
+ * Date: 5/3/13
+ */
 package julien
 package retrieval
 
-import julien._
-
-object SimpleProcessor {
+object LowLevelProcessor {
   def apply() = new SimpleProcessor()
 }
 
 /** The simplest form of query processor. This processor assumes the following:
   *
   * - Only 1 index is provided for execution.
-  * - None of the `View` opeators have a [[julien.retrieval.Slicer S l i c e r]]
-  * attached.
+  * - None of the `View` opeators have a [[julien.retrieval.Slicer Slicer]]
+  *   attached.
   * - Currently, `SimpleProcessor` only recognizes
-  * [[julien.retrieval.IteratedHook I t e r a t e d H o o k I t e r a t e d H o o k s]]. This may
-  * change in the future.
+  *  [[julien.retrieval.IteratedHook IteratedHook IteratedHooks]]. This may
+  *  change in the future.
   *
   * If any of these assumptions are not met, then a different
-  * [[julien.retrieval.QueryProcessor Q u e r y P r o c e s s o r]] should be used.
+  * [[julien.retrieval.QueryProcessor QueryProcessor]] should be used.
   */
-class SimpleProcessor
+class LowLevelProcessor
   extends QueryProcessor {
   type GHook = IteratedHook[_ <: GIterator]
   type DebugHook =
@@ -65,8 +68,7 @@ class SimpleProcessor
     for (h <- hooks) h.underlying.reset
   }
 
-  def run[T <: ScoredObject[T]](acc: Accumulator[T] =
-                                DefaultAccumulator[ScoredDocument]): List[T] = {
+  def run[T <: ScoredObject[T]](acc: Accumulator[T] = ArrayAccumulator(indexes.head.numDocuments.toInt)): List[T] = {
     // Make sure we can do the next stuff easily
     assume(validated, s"Unable to validate given model/index combination")
     prepare()
@@ -78,7 +80,7 @@ class SimpleProcessor
     val drivers: Array[GHook] = iterators.filterNot(_.isDense).toArray
 
     // Need to fix this
-    val scorers: List[FeatureOp] = _models
+    val scorers : List[FeatureOp] = _models
 
     // Go
     while (!isDone(drivers)) {
@@ -92,22 +94,19 @@ class SimpleProcessor
       //        }
       //      }
 
-      val candidate = drivers.foldLeft(Int.MaxValue) {
-        (best, drv) =>
-          if (drv.isDone) best else scala.math.min(drv.at, best)
+      val candidate = drivers.foldLeft(Int.MaxValue) { (best, drv) =>
+        if (drv.isDone) best else scala.math.min(drv.at, best)
       }
 
       var i = 0
       while (i < iterators.length) {
         iterators(i).moveTo(candidate)
-        i += 1
+        i+=1
       }
 
       if (matches(drivers, candidate)) {
         // Time to score
-        val score = scorers.foldLeft(0.0) {
-          (t, s) => t + s.eval
-        }
+        val score = scorers.foldLeft(0.0) { (t, s) => t + s.eval }
         // How do we instantiate an object without knowing what it is, and
         // knowing what it needs? One method in the QueryProcessor?
 
@@ -122,32 +121,32 @@ class SimpleProcessor
       var j = 0
       while (j < drivers.length) {
         drivers(j).movePast(candidate)
-        j += 1
+        j+=1
       }
     }
     acc.result
   }
 
-  final def isDone(drivers: Array[GHook]): Boolean = {
+  final def isDone(drivers: Array[GHook]) : Boolean = {
     var j = 0
     while (j < drivers.length) {
       val curDone = drivers(j).isDone
       if (curDone == false) {
         return false
       }
-      j += 1
+      j+=1
     }
     return true
   }
 
-  final def matches(drivers: Array[GHook], candidate: Int): Boolean = {
+  final def matches(drivers: Array[GHook], candidate:Int) : Boolean = {
     var j = 0
     while (j < drivers.length) {
       val matches = drivers(j).matches(candidate)
       if (matches == true) {
         return true
       }
-      j += 1
+      j+=1
     }
     return false
   }
