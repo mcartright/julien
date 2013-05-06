@@ -9,7 +9,7 @@ package retrieval
    * Natural ordering is assumed to be by score.
    */
 case class ScoredPassage(
-  val docid: Docid,
+  val id: InternalId,
   var score: Double,
   val begin: Int,
   val end: Int,
@@ -21,12 +21,12 @@ case class ScoredPassage(
   def compare(that: ScoredPassage): Int =
     if (that.score < this.score) return -1
     else if (that.score > this.score) return 1
-    else (this.docid.underlying - that.docid.underlying)
+    else (this.id.underlying - that.id.underlying)
 
   override def compareTo(that: ScoredPassage): Int =
     if (that.score < this.score) return -1
     else if (that.score > this.score) return 1
-    else (this.docid.underlying - that.docid.underlying)
+    else (this.id.underlying - that.id.underlying)
 
   def +=(scoreToAdd: Double): Unit = score += scoreToAdd
   def -=(scoreToSubtract: Double): Unit = score -= scoreToSubtract

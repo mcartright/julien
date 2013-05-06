@@ -4,6 +4,7 @@ package examples
 
 import julien.retrieval._
 import julien.retrieval.Utils._
+import julien.eval.QueryResult
 
 import scala.collection.mutable.{ListBuffer,PriorityQueue,HashMap,LinkedHashMap}
 import julien.galago.core.parse.{Tag,TagTokenizer}
@@ -72,7 +73,10 @@ Required parameters:
     printResults(results, index, out)
   }
 
-  def extractGrams(initial: List[ScoredDocument], index: Index): List[Gram] = {
+  def extractGrams(
+    initial: QueryResult[ScoredDocument],
+    index: Index
+  ): List[Gram] = {
     val fbDocs = 10  // make proper variable later
 
     // take fbDocs
@@ -84,7 +88,7 @@ Required parameters:
       scala.math.exp(v.score - max)
     }.sum)
     val initialFactors = initialResults.map { sd =>
-      (sd.docid, scala.math.exp(sd.score - logSumExp))
+      (sd.id, scala.math.exp(sd.score - logSumExp))
     }.toMap
 
     // get the actual documents, and count the grams

@@ -2,6 +2,7 @@ package julien
 package retrieval
 
 import scala.annotation.tailrec
+import julien.eval.QueryResult
 import julien._
 import scala.math._
 
@@ -32,7 +33,7 @@ abstract class SimplePreloadingProcessor
       acc: Accumulator[T]): List[T]
 
   override def run[T <: ScoredObject[T]](acc: Accumulator[T] =
-    DefaultAccumulator[ScoredDocument]()): List[T] = {
+    DefaultAccumulator[ScoredDocument]()): QueryResult[T] = {
     assume(validated, s"Unable to validate given model/index combination")
     prepare()
 
@@ -47,9 +48,11 @@ abstract class SimplePreloadingProcessor
     var drivers = iterators.filter(_.isSparse)
     preLoadAccumulator(sentinels, drivers, iterators, hackedAcc)
 
-    if (drivers.isEmpty) {
-      return acc.result
-    } else finishScoring(sentinels, iterators, acc)
+    val raw = if (drivers.isEmpty)
+      acc.result
+    else
+      finishScoring(sentinels, iterators, acc)
+    return QueryResult("unknown", raw)
   }
 
   // We don't do a finished check here - assume the finished iterators

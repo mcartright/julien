@@ -16,3 +16,10 @@ class IndexLengths private (field: Option[String])
   def getIterator(i: Index): LengthsIterator = i.lengthsIterator(field)
   def length: Int = it.get.getCurrentLength
 }
+
+class ArrayLengths private(field: Option[String], val lengths : LengthsArray) extends ViewOp with LengthsView with ChildlessOp {
+  def isDense: Boolean = true
+
+  def length: Int = lengths.get
+
+}

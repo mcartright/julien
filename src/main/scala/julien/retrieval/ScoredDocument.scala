@@ -16,7 +16,7 @@ package retrieval
   * if needed.
   */
 case class ScoredDocument(
-  val docid: Docid,
+  val id: InternalId,
   var score: Double,
   var name: String = "unknown",
   var rank: Int = 0)
@@ -26,10 +26,10 @@ case class ScoredDocument(
   def compare(that: ScoredDocument): Int =
     if (that.score < this.score) return -1
     else if (that.score > this.score) return 1
-    else (this.docid.underlying - that.docid.underlying)
+    else (this.id.underlying - that.id.underlying)
 
   def equals(that: ScoredDocument): Boolean =
-    this.docid == that.docid && this.score == that.score
+    this.id == that.id && this.score == that.score
   def +=(scoreToAdd: Double): Unit = score += scoreToAdd
   def -=(scoreToSubtract: Double): Unit = score -= scoreToSubtract
 }

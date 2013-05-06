@@ -13,7 +13,7 @@ class Synonym(terms: Seq[Term])
 
 
   // Being lazy with the estimation of this number
-  override def updateStatistics(docid: Docid) = {
+  override def updateStatistics(docid: InternalId) = {
     statistics.collLength = terms.head.attachedIndex.collectionLength
   }
 

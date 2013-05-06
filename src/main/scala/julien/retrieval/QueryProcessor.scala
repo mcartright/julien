@@ -1,19 +1,33 @@
 package julien
 package retrieval
 
+import julien.eval.{QueryResult, QueryResultSet}
+
 /** Generic definition of a query processor. */
 trait QueryProcessor {
   protected var _indexes = Set[Index]()
-  protected var _models = List[FeatureOp]()
+  protected var _models = Seq[FeatureOp]()
   def add(i: Index) { _indexes = _indexes + i }
   def add(f: FeatureOp*) { _models = f ++: _models }
   def indexes: Set[Index] = _indexes
-  def models: List[FeatureOp] = _models
+  def models: Seq[FeatureOp] = _models
 
   // The things that need implementing in subclasses
   // makes sure that all views are ready to provide info upwards
   def prepare: Unit
-  def run[T <: ScoredObject[T]](acc: Accumulator[T]): List[T]
+  def run[T <: ScoredObject[T]](acc: Accumulator[T]): QueryResult[T]
+  def runBatch[T <: ScoredObject[T]](
+    queries: List[String],
+    prep: QueryPreparer,
+    acc: Accumulator[T]): QueryResultSet[T] = {
+    val results = Map.newBuilder[String, QueryResult[T]]
+    for (q <- queries) {
+      _models = prep(q)
+      val result = run(acc)
+      results += (q -> result)
+    }
+    return QueryResultSet(results.result)
+  }
 
   def clear: Unit = {
     _indexes = Set[Index]()

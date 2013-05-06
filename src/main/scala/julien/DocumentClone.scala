@@ -5,7 +5,7 @@ import scala.collection.JavaConversions._
 object DocumentClone {
   def apply(gd: GDoc): Document =
     new DocumentClone(
-      Docid(gd.identifier),
+      InternalId(gd.identifier),
       gd.name,
       gd.terms.size,
       gd.text,
@@ -26,7 +26,7 @@ object DocumentClone {
   * an existing connection to an underlying [[Index]].
   */
 class DocumentClone(
-  val identifier: Docid,
+  val identifier: InternalId,
   val name: String,
   val length: Int,
   val content: String,

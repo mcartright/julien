@@ -1,27 +1,17 @@
 package julien
 package retrieval
 
-import scala.collection.mutable.{LinearSeq, Builder}
+import scala.collection.mutable.{Iterable, Builder}
 
 /** This trait defines what an accumulator needs to behave like.
   * Basically, it's some sort of Buffer (we should be able to mutate it),
-  * but it's also a sequence of some kind. For now I'm going to call it
-  * a LinearSeq (fast head/tail, but not indexed access), because the
-  * standard use case is a PriorityQueue (another LinearSeq). This trait
-  * also extends Builder, which additionally defines a 'result' method
-  * which means you're done adding to the accumulator.
+  * but it's also iterable - meaning yu can iterate over the contents of the
+  * accumulator. Iteration order is assumed to be stable (i.e. the contents
+  * of the accumulator are somehow ordered).
   */
 trait Accumulator[T <: ScoredObject[T]]
-    extends LinearSeq[T]
+    extends Iterable[T]
     with Builder[T, List[T]] {
-
-  /** This operation is generally unsupported, as it can be difficult
-    * to reach a particular index when the accumulator is of unknown
-    * size.
-    */
-  final override def update(idx: Int, elem: T): Unit =
-    throw new UnsupportedOperationException(s"Ha! You wish.")
-
   /** True if this accumulator has a definite size.
     * Default implementation is false. Override in subclasses.
     */

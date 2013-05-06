@@ -32,12 +32,11 @@ class PercentWorseAccumulator[T <: ScoredObject[T]] private(
     b.result
   }
 
+  override def iterator: Iterator[T] = elements.iterator
   override def isEmpty: Boolean = elements.isEmpty
   override def head: T = elements.head
   override def tail: PercentWorseAccumulator[T] =
     new PercentWorseAccumulator(elements.tail, pct)
-  override def length: Int = elements.size
-  override def apply(idx: Int): T = elements.slice(idx, idx).head
 
   private def pruneIfNeeded() {
     val max = elements.lastKey.score

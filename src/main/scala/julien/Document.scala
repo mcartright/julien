@@ -6,7 +6,7 @@ package julien
   * behavior.
   */
 trait Document extends LengthsSrc {
-  def identifier: Docid
+  def identifier: InternalId
   def name: String
   def length: Int
   def content: String

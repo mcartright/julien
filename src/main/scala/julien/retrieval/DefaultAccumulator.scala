@@ -60,9 +60,8 @@ class DefaultAccumulator[T <: ScoredObject[T]] private(
     b.result
   }
 
+  override def iterator: Iterator[T] = q.iterator
   override def isEmpty: Boolean = q.isEmpty
   override def head: T = q.head
   override def tail: DefaultAccumulator[T] = DefaultAccumulator(q.tail)
-  override def length: Int = q.size
-  override def apply(idx: Int): T = q(idx)
 }
