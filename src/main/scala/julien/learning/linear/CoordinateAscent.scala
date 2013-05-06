@@ -51,7 +51,9 @@ class CoordinateAscent(
     }
   }
 
-  def optimizeFeature(f: FeatureOp, startConfig: Configuration): Configuration {
+  def optimizeFeature(
+    f: FeatureOp,
+    startConfig: Configuration): Configuration = {
     var currentBest = startConfig
     val fIdx = features.indexOf(f)
     while (true) {

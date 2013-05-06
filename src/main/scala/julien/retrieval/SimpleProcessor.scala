@@ -119,7 +119,7 @@ class SimpleProcessor
         j += 1
       }
     }
-    QueryResult("unknown", acc.result)
+    QueryResult(acc.result)
   }
 
   final def isDone(drivers: Array[GHook]): Boolean = {

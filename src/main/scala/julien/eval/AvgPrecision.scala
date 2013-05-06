@@ -8,7 +8,7 @@ class AvgPrecision(n: String) extends QueryEvaluator(n) {
     strictlyEval: Boolean): Double = {
     if (judgment.numRel == 0)
       if (strictlyEval)
-        throw new Exception(s"No relevant docs for query ${result.name}")
+        throw new Exception(s"No relevant docs for query")
       else return 0.0
 
     var sumPrec = 0.0

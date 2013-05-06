@@ -52,7 +52,7 @@ abstract class SimplePreloadingProcessor
       acc.result
     else
       finishScoring(sentinels, iterators, acc)
-    return QueryResult("unknown", raw)
+    return QueryResult(raw)
   }
 
   // We don't do a finished check here - assume the finished iterators

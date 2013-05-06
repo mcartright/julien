@@ -13,7 +13,7 @@ class BinaryPreference(n: String) extends QueryEvaluator(n) {
     val totalRel = judgment.numRel
     if (totalRel == 0)
       if (strictlyEval)
-        throw new Exception(s"No relevant docs for query ${result.name}")
+        throw new Exception(s"No relevant docs for query")
       else return 0
 
     val nonRelCount =
