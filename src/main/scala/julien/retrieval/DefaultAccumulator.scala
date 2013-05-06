@@ -1,6 +1,7 @@
 package julien
 package retrieval
 
+//import java.util.PriorityQueue
 import scala.collection.mutable.PriorityQueue
 
 object DefaultAccumulator {
@@ -32,19 +33,18 @@ class DefaultAccumulator[T <: ScoredObject[T]] private(
   override def clear: Unit = q.clear
   override def +=(elem: T): this.type = {
 
-//    q += elem
-//    if (q.size > limit) q.dequeue
-//    this
-
     if (q.size >= limit) {
+      // if (elem.score > q.peek.score) {
       if (elem.score > q.head.score) {
+        //q.poll
+        //q add elem
         q.dequeue
         q += elem
       }
     } else {
+      //q add elem
       q += elem
     }
-
     this
   }
 
@@ -56,7 +56,7 @@ class DefaultAccumulator[T <: ScoredObject[T]] private(
     // building it back-to-front (i.e. a series of prepends)
     var rank = q.size
     while (!q.isEmpty) {
-      val so = q.dequeue
+      val so = q.dequeue // q.poll
       so.rank = rank
       so +=: b
       rank -= 1
@@ -65,9 +65,18 @@ class DefaultAccumulator[T <: ScoredObject[T]] private(
   }
 
   override def isEmpty: Boolean = q.isEmpty
-  override def head: T = q.head
-  override def tail: DefaultAccumulator[T] = DefaultAccumulator(q.tail)
-  override def length: Int = q.length
-  override def apply(idx: Int): T = q(idx)
-
+  override def head: T = q.head // q.peek
+  override def tail: DefaultAccumulator[T] = {
+    DefaultAccumulator(q.tail)
+    // val other = new PriorityQueue(q)
+    // other.poll // drop the head
+    // DefaultAccumulator(other)
+  }
+  override def length: Int = q.size
+  override def apply(idx: Int): T = {
+    q(idx)
+    // val it = q.iterator()
+    // for (i <- 0 until idx) it.next
+    // it.next
+  }
 }

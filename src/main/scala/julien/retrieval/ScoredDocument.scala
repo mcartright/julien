@@ -18,11 +18,16 @@ case class ScoredDocument(
   val docid: Docid,
   var score: Double,
   var name: String = "unknown",
-  var rank: Int=0)
+  var rank: Int = 0)
     extends ScoredObject[ScoredDocument] {
 
   /** Compares two ScoredDocuments by score, breaks ties w/ Docid. */
   def compare(that: ScoredDocument): Int =
+    if (that.score < this.score) return -1
+    else if (that.score > this.score) return 1
+    else (this.docid.underlying - that.docid.underlying)
+
+  override def compareTo(that: ScoredDocument): Int =
     if (that.score < this.score) return -1
     else if (that.score > this.score) return 1
     else (this.docid.underlying - that.docid.underlying)

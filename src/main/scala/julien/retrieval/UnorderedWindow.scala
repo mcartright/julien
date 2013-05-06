@@ -24,9 +24,7 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
 
   override def positions:  ExtentArray = {
     val hits = new ExtentArray()
-    val iterators: Array[Positions] = terms.map {t =>
-      Positions(t.positions)
-    }.toArray
+    val iterators: Array[ExtentArray] = terms.map(_.positions).toArray
 
     while (iterators.forall(_.hasNext == true)) {
       // Find bounds
@@ -49,7 +47,7 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
       }
 
       // see if it fits
-      if (maxPos - minPos < width || width == -1) hits.add(minPos)
+      if (maxPos - minPos < width || width == -1) hits.add(minPos, maxPos)
 
       // move all lower bound iterators foward
       for (it <- iterators; if (it.head == minPos)) it.next
@@ -60,7 +58,7 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
 
   @tailrec
   private def movePast(
-    its: Array[Positions],
+    its: Array[ExtentArray],
     idx :Int,
     pos: Int): Unit =
     if (idx == its.length) return else {

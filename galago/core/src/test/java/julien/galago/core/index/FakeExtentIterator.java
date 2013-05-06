@@ -52,7 +52,6 @@ public class FakeExtentIterator implements ExtentIterator {
   public ExtentArray extents() {
     ExtentArray array = new ExtentArray();
     int[] datum = data[index];
-    array.setDocument(datum[0]);
     for (int i = 1; i < datum.length; i++) {
       array.add(datum[i]);
     }

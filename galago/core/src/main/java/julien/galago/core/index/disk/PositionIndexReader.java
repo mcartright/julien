@@ -263,7 +263,7 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
       currentCount = counts.readInt();
 
       // Prep the extents
-      extentArray.reset();
+      extentArray.clear();
       extentsLoaded = false;
       if (currentCount > inlineMinimum) {
         extentsByteSize = positions.readInt();
@@ -277,7 +277,6 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
     // load that needs to be done when moving forward one in the posting list.
     private void loadExtents() throws IOException {
       if (!extentsLoaded) {
-        extentArray.setDocument(currentDocument);
         int position = 0;
         for (int i = 0; i < currentCount; i++) {
           position += positions.readInt();
@@ -316,7 +315,7 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
     public void reset() throws IOException {
       currentDocument = 0;
       currentCount = 0;
-      extentArray.reset();
+      extentArray.clear();
       initialize();
     }
 

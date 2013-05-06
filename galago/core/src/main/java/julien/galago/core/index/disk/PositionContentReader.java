@@ -111,7 +111,6 @@ public class PositionContentReader extends KeyListReader {
     private int currentCount;
     private ExtentArray extentArray;
     private ArrayList<List<String>> entryList;
-    private final ExtentArray emptyExtentArray;
     // to support resets
     protected long startPosition, endPosition;
     // Supports lazy-loading of positions and content
@@ -126,7 +125,6 @@ public class PositionContentReader extends KeyListReader {
       super(iterator.getKey());
       extentArray = new ExtentArray();
       entryList = new ArrayList<List<String>>();
-      emptyExtentArray = new ExtentArray();
       reset(iterator);
     }
 
@@ -205,7 +203,7 @@ public class PositionContentReader extends KeyListReader {
       currentCount = documents.readInt();
 
       // Prep the extents
-      extentArray.reset();
+      extentArray.clear();
       positionsLoaded = false;
       entryList.clear();
       entriesLoaded = false;
@@ -223,7 +221,6 @@ public class PositionContentReader extends KeyListReader {
     // load that needs to be done when moving forward one in the posting list.
     private void loadPositions() throws IOException {
       if (!positionsLoaded) {
-        extentArray.setDocument(currentDocument);
         int position = 0;
         for (int i = 0; i < currentCount; ++i) {
           position += positions.readInt();
@@ -281,7 +278,7 @@ public class PositionContentReader extends KeyListReader {
     public void reset() throws IOException {
       currentDocument = 0;
       currentCount = 0;
-      extentArray.reset();
+      extentArray.clear();
       entryList.clear();
       initialize();
     }

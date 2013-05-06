@@ -434,8 +434,7 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
     }
 
     public void loadExtents() throws IOException {
-      extents.reset();
-      extents.setDocument(currDocument);
+      extents.clear();
       int position = 0;
       for (int i = 0; i < currCount; i++) {
         position += positions_reader.readInt();

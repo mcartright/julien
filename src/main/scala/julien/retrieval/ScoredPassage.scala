@@ -18,7 +18,16 @@ case class ScoredPassage(
   assume(begin < end, s"Can't have a scored passage with bad indices.")
 
   /** Compares passages by score. */
-  def compare(that: ScoredPassage): Int = this.score compare that.score
+  def compare(that: ScoredPassage): Int =
+    if (that.score < this.score) return -1
+    else if (that.score > this.score) return 1
+    else (this.docid.underlying - that.docid.underlying)
+
+  override def compareTo(that: ScoredPassage): Int =
+    if (that.score < this.score) return -1
+    else if (that.score > this.score) return 1
+    else (this.docid.underlying - that.docid.underlying)
+
   def +=(scoreToAdd: Double): Unit = score += scoreToAdd
   def -=(scoreToSubtract: Double): Unit = score -= scoreToSubtract
 }

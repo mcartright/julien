@@ -4,24 +4,30 @@ package julien.galago.core.util;
 import java.util.Arrays;
 
 /**
- * (9/30/2011) - Refactored to remove useless boxing of the extent data.
- * Saves a ton on object allocation and overall space utilization.
+ * An array that holds the spans of a particular index key.
+ * In most cases, this is just a list of positions (i.e.
+ * term positions). However this class is capable of holding
+ * spans of (begin, end) - so proper spans are possible.
+ *
+ * Also iterator behavior has been incorporated into this class.
+ * Primarily, the methods 'hasNext', 'next', 'reset', and
+ * 'end' (with no parameters) implement this behavior.
  *
  * @author irmarc
  */
 public class ExtentArray {
   public static final ExtentArray empty = new ExtentArray();
 
-  public int[] begins;
-  public int[] ends;
-  public int position;
-  public int document;
+  private int[] begins;
+  private int[] ends;
+  private int position;
+  private int iterationPosition;
+
 
   public ExtentArray(int capacity) {
     begins = new int[capacity];
     ends = null; // lazy load these
-    position = 0;
-    document = -1; // not valid yet
+    iterationPosition = position = 0;
   }
 
   public ExtentArray() {
@@ -31,14 +37,6 @@ public class ExtentArray {
   private void makeRoom() {
     begins = Arrays.copyOf(begins, begins.length * 2);
     if (ends != null) ends = Arrays.copyOf(ends, ends.length * 2);
-  }
-
-  public void setDocument(int d) {
-    document = d;
-  }
-
-  public int getDocument() {
-    return document;
   }
 
   public int capacity() {
@@ -78,11 +76,35 @@ public class ExtentArray {
     return position;
   }
 
-  public void reset() {
+  public void clear() {
     position = 0;
   }
 
   public String toString(){
-    return String.format("ExtentArray:doc=%d:count=%d", document, position);
+    return String.format("ExtentArray:count=%d", position);
+  }
+
+  // ITERATOR ITERATOR ITERATOR ITERATOR ITERATOR
+  public boolean hasNext() {
+      return iterationPosition < position-1;
+  }
+
+  public int next() {
+    int toReturn = begins[iterationPosition];
+    iterationPosition++;
+    return toReturn;
+  }
+
+  public int head() {
+    return begins[iterationPosition];
+  }
+
+  public int end() {
+    if (ends == null) return begins[iterationPosition]+1;
+    else return ends[iterationPosition];
+  }
+
+  public void reset() {
+    iterationPosition = 0;
   }
 }

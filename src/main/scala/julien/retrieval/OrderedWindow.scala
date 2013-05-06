@@ -26,7 +26,7 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
 
   override def positions: ExtentArray = {
     val hits = new ExtentArray()
-    val iterators: Seq[Positions] = terms.map(t => Positions(t.positions))
+    val iterators: Seq[ExtentArray] = terms.map(_.positions)
 
     while (iterators(0).hasNext) {
       // if while advancing, we don't find a hit:
@@ -42,7 +42,7 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   }
 
   // returns true if a result has been found
-  def advance(iterators: Seq[Positions]): Boolean = {
+  def advance(iterators: Seq[ExtentArray]): Boolean = {
     var idx = 0
     while(idx < iterators.size-1) {
       val left = iterators(idx)
