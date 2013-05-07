@@ -32,8 +32,9 @@ abstract class SimplePreloadingProcessor
       iterators: Set[GHook],
       acc: Accumulator[T]): List[T]
 
-  override def run[T <: ScoredObject[T]](acc: Accumulator[T] =
-    DefaultAccumulator[ScoredDocument]()): QueryResult[T] = {
+  override def run[T <: ScoredObject[T]](
+    acc: Accumulator[T] = DefaultAccumulator[ScoredDocument]()
+  ): QueryResult[T] = {
     assume(validated, s"Unable to validate given model/index combination")
     prepare()
 

@@ -69,8 +69,9 @@ class SimpleProcessor
     for (h <- hooks) h.underlying.reset
   }
 
-  def run[T <: ScoredObject[T]](acc: Accumulator[T] =
-    DefaultAccumulator[ScoredDocument]): QueryResult[T] = {
+  def run[T <: ScoredObject[T]](
+    acc: Accumulator[T] = DefaultAccumulator[ScoredDocument]()
+  ): QueryResult[T] = {
     // Make sure we can do the next stuff easily
     assume(validated, s"Unable to validate given model/index combination")
     prepare()

@@ -2,151 +2,91 @@ package julien
 package learning
 package linear
 
+import scala.collection.mutable.ListBuffer
 import scala.math._
-import scala.collection.mutable.HashSet
-
+import julien.retrieval._
+import julien.eval._
 
 object AdaRank {
   val nIter = 500
   val tolerance = 0.002
   val trainWithEnqueue = true
   val maxSelCount = 5
+
+  // Just for wrapping
+  implicit
+  def swf2seq(f: ScalarWeightedFeature): Seq[ScalarWeightedFeature] = Seq(f)
 }
 
-case class Sample(rl: RankList, weight: Double)
-
-class AdaRank(samples: List[RankList], features: Array[Int])
-    extends Ranker(samples, features) {
+class AdaRank(
+  queries: Map[String, String],
+  preparer: QueryPreparer,
+  judgments: QueryJudgmentSet,
+  evaluator: QueryEvaluator,
+  index: Index,
+  f: Seq[FeatureOp]
+) {
   import AdaRank._
-  def eval(p: DataPoint): Double = rankers.map(r => r.weight * p(r.fid)).sum
-  def clone: Ranker = AdaRank()
-  def name: String = "AdaRank"
+  case class WeightedQuery(val qid: String, var weight: Double = 1.0)
 
-  // init
-  val usedFeatures = HashSet[Int]()
-  val wsamples = samples.map(rl => Sample(rl, 1.0f/samples.size))
-  val backupSampleWeight = Array.ofDim[Double](wsamples.size)
-  var lastTrainedScore = -1.0
+  assume(f.forall(_.isInstanceOf[ScalarWeightedFeature]),
+    s"AdaRank needs scalar-weighted features.")
+  val processor = SimpleProcessor()
+  val weightedQueries = queries.keys.map(qid => WeightedQuery(qid))
+  var trainedFeatures = ListBuffer[ScalarWeightedFeature]()
 
-  def learnWeakRanker: WeakRanker = {
-    val availableFeatures =
-      features.
-        filter(i => fQueue.contains(i)).
-        filter(i => usedFeatures.contains(i))
-    val rankers = availableFeatures.map(i => WeakRanker(i))
-    val candidates = rankers.map { r =>
-      val score = wsamples.foldLeft(0.0) { (total, samp) =>
-        val dp = scorer.score(r.rank(samp.rl) * samp.weight)
-        total + dp
-      }
-      (score, r)
+  def train: Unit = {
+    var iter = 0
+    var trainableFeatures = ListBuffer[ScalarWeightedFeature]() ++=
+    f.map(_.asInstanceOf[ScalarWeightedFeature])
+    while (iter < nIter && !trainableFeatures.isEmpty) {
+      val wr = selectWeakRanker(trainableFeatures)
+      val wrScores = weightedQueries.map(wq => scoreQuery(wq, wr))
+      val num = weightedQueries.view.zip(wrScores).map { case (wq, ws) =>
+          wq.weight * (1 + ws)
+      }.sum
+      val denom = weightedQueries.view.zip(wrScores).map { case (wq, ws) =>
+          wq.weight * (1 - ws)
+      }.sum
+      wr.weight = 0.5 * log(num / denom)  // alpha_t
+
+      // Move it to "trained" status.
+      trainedFeatures += wr
+      trainableFeatures -= wr
+
+      updateQueryWeights
+      iter += 1
     }
-    return candidates.maxBy(_._1)._2
   }
 
-  def updateBestModelOnValidation() {
-    bestModelRankers.clear
-    bestModelRankers.addAll(rankers)
+  private def scoreQuery(wq: WeightedQuery, feats: Seq[ScalarWeightedFeature]): Double = {
+    processor.clear
+    processor.add(feats: _*)
+    processor add index
+    evaluator.eval(processor.run(), judgments(wq.qid))
   }
 
-  def learn() {
-    if (!trainWithEnqueue) learn(1, false)
-    else {
-      var t = learn(1, true)
-      // TODO: Don't get this...
-      for (i <- (0 to featureQueue.size).reverse) {
-        featureQueue.remove(i)
-        t = learn(t, false) // TODO: Seriously, what the hell is this?
-      }
+  private def updateQueryWeights: Unit = {
+    // Score each query against the current ensemble - ignoring weights
+    val rawQueryScores =
+      weightedQueries.map(wq => scoreQuery(wq, trainedFeatures))
+    // exponentiate, gather the sum, and assign a normalized weight
+    // worse scores get more weight due to the negative exponent
+    val expQueryScores = rawQueryScores.map(s => exp(-s))
+    val total = expQueryScores.sum
+    for ((eqs, wq) <- expQueryScores.zip(weightedQueries)) {
+      wq.weight = eqs / total
     }
-
-    if (validationSamples != null && !bestModelRankers.isEmpty) {
-      rankers.clear
-      rankers.addAll(bestModelRankers)
-    }
-
-    // TODO: This should probably return a "trained" ranker...
   }
 
-  def learn(startIter: Int, withEnqueue: Boolean): Int = {
-    for (t <- startIter to nIter) {
-      val bestWR = learnWeakRanker()
+  private def selectWeakRanker(
+    available: Seq[ScalarWeightedFeature]
+  ): ScalarWeightedFeature = {
+    // TODO: for each available feature, run it against
+    // the set of queries - multiply its score by the query
+    // weight, and pick the one with the best overall score
 
-      if (bestWR == null) return t // can this happen?
-
-      if (withEnqueue) {
-        if (bestWR.fid == lastFeature) {
-          featureQueue.add(lastFeature)
-          rankers = rankers.init
-          backupSampleWeight.copyToArray(sweight)
-          bestScoreOnValidationData = 0.0
-          lastTrainedScore = backupTrainScore
-          // TODO: was a continue here. Not supported in scala. Need to fix.
-        } else {
-          lastFeature = bestWR.fid
-          sweight.copyToArray(backupSampleWeight)
-          backupTrainScore = lastTrainedScore
-        }
-      }
-
-      var tmps = wsamples.map(ws => scorer.score(bestWR.rank(ws.rl)))
-      val num = tmps.zipWithIndex.map((t, idx) => wsamples(idx).weight * t).sum
-      val denom =
-        tmps.zipWithIndex.map((t, idx) => wsamples(idx).weight * t).sum
-      rankers += bestWR
-      val alpha_t = 0.5 * ln(num/denom)
-      rankers.last.weight = alpha_t
-      tmps = wsamples.map(s => scorer.score(rank(s.rl)))
-      val total = tmps.map(t => exp(-alpha_t * t)).sum
-      val trainedScore = tmps.sum / wsamples.size
-      val delta = trainedScore + tolerance - lastTrainedScore
-      if (!withEnqueue) {
-        if (trainedScore != lastTrainedScore) {
-          performanceChanged = true
-          lastFeatureConsecutiveCount = 0
-          usedFeatures.clear
-        } else {
-          performanceChanged = false
-          if (lastFeature == bestWR.fid) {
-            lastFeatureConsecutiveCount += 1
-            if (lastFeatureConsecutiveCount == maxSelCount) {
-              lastFeatureConsecutiveCount = 0
-              usedFeatures.add(lastFeature)
-            }
-          } else {
-            lastFeatureConsecutiveCount = 0
-            usedFeatures.clear
-          }
-        }
-        lastFeature = bestWR.fid
-      }
-      if (t % 1 == 0 && validationSamples != null) {
-        val scoreOnValidation = scorer.score(rank(validationSamples))
-        if (scoreOnValidation > bestScoreOnValidationData) {
-          bestScoreOnValidationData = scoreOnValidation
-          updateBestModelOnValidation()
-        }
-      }
-
-      if (delta <= 0) {
-        rankers = rankers.init
-        // TODO: Had a break here. Need to fix.
-      }
-
-      lastTrainedScore = trainedScore
-      for (ws <- wsamples)
-        ws.weight *= exp(-alpha_t * scorer.score(rank(ws.rl)))/total
-    }
-    return t
-  }
-
-  class WeakRanker(val fid: Int, var weight: Double = 1.0) {
-    def rank(rl: RankList): RankList = {
-      val scores = rl.points.map(p => p(fid))
-      val idx = Sorter.sort(scores, false)
-      new RankList(rl, idx)
-    }
-
-    def rank(rls: List[RankList]): List[RankList] = rls.map(rl => rank(rl))
+    // TODO: remove this with a real implementation
+    available.head
   }
 }

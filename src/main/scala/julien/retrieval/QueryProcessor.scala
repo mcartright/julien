@@ -17,14 +17,14 @@ trait QueryProcessor {
   def prepare: Unit
   def run[T <: ScoredObject[T]](acc: Accumulator[T]): QueryResult[T]
   def runBatch[T <: ScoredObject[T]](
-    queries: List[String],
+    queries: Map[String, String],
     prep: QueryPreparer,
     acc: Accumulator[T]): QueryResultSet[T] = {
     val results = Map.newBuilder[String, QueryResult[T]]
-    for (q <- queries) {
+    for ((qid, q) <- queries) {
       _models = prep(q)
       val result = run(acc)
-      results += (q -> result)
+      results += (qid -> result)
     }
     return QueryResultSet(results.result)
   }

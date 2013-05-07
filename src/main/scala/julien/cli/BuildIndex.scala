@@ -93,7 +93,7 @@ object BuildIndex extends TupleFlowFunction {
     if(bp.isString("filetype")) {
       splitParms.set("filetype", bp.getString("filetype"))
     }
-    
+
     // filter input paths into files and directories
     val inputPaths = bp.getAsList("inputPath").asInstanceOf[java.util.List[String]].toSet
     var files = new ListBuffer[String]
@@ -110,7 +110,7 @@ object BuildIndex extends TupleFlowFunction {
     })
     splitParms.set("filename", files)
     splitParms.set("directory", directories)
-    
+
     splitParms
   }
 
@@ -125,7 +125,7 @@ object BuildIndex extends TupleFlowFunction {
 
     val countDocs = FlowStage(classOf[ParserCounter])
     val offsetDocs = FlowStage(classOf[SplitOffsetter])
-    
+
     // build up output of fork stage first
     val writeNames = FlowStage(classOf[DiskNameWriter], indexFileParms(bp, "names"))
     val writeNamesRev = FlowStage(classOf[DiskNameReverseWriter], indexFileParms(bp, "names.reverse"))
@@ -167,7 +167,7 @@ object BuildIndex extends TupleFlowFunction {
         extractor(classOf[CorpusFolderWriter], writeCorpus, bp.getMap("storeParams"), Some(new KeyValuePair.KeyOrder()))
 
       ).flatten // remove anything that wasn't included in the build
-      
+
       new FlowStage(FlowLinearStep(leadup ++ Seq(FlowMultiStep(branches))), gensym("ParseDocs"))
     }
 
@@ -184,10 +184,10 @@ object BuildIndex extends TupleFlowFunction {
     val mustWriteStages: Set[FlowStage] = Set(writeNames, writeNamesRev, writeLengths, writeExtentPostings)
     val mightWriteStages: Set[FlowStage] = Set(writeCorpus, writeContent, writePostings).flatten
 
-    val graph = inputStages ++ 
+    val graph = inputStages ++
                 mustWriteStages ++
                 mightWriteStages
-    
+
     JobGen.createAndVerify(graph)
   }
 
@@ -199,7 +199,7 @@ object BuildIndex extends TupleFlowFunction {
       case e: Exception =>
         false
     }
-  
+
   def help : String = """
   Builds a Galago StructuredIndex with TupleFlow, using one thread
   for each CPU core on your computer.  While some debugging output
@@ -226,7 +226,7 @@ Algorithm Flags:
     val job = constructJob(bp)
     runTupleFlowJob(job, bp, out)
     out.println("Done Indexing!")
-    
+
     // sanity check - get the number of documents out of ./names
     val names = new DiskNameReader(new File(bp.getString("indexPath"), "names").getCanonicalPath)
     out.println("Documents Indexed: " + names.getManifest.getLong("keyCount"))

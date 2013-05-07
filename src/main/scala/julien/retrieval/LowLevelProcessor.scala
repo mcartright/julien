@@ -74,8 +74,8 @@ class LowLevelProcessor
   }
 
   def run[T <: ScoredObject[T]](
-    acc: Accumulator[T] =
-      ArrayAccumulator(indexes.head.numDocuments.toInt)): QueryResult[T] = {
+    acc: Accumulator[T] = ArrayAccumulator(indexes.head.numDocuments.toInt)
+  ): QueryResult[T] = {
     // Make sure we can do the next stuff easily
     assume(validated, s"Unable to validate given model/index combination")
     prepare()
