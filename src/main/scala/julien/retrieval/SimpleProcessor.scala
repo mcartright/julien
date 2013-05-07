@@ -22,10 +22,6 @@ object SimpleProcessor {
   */
 class SimpleProcessor
   extends QueryProcessor {
-  type GHook = IteratedHook[_ <: GIterator]
-  type DebugHook =
-  (ScoredDocument, Seq[FeatureOp], Index, QueryProcessor) => Unit
-
   var debugger: Option[DebugHook] = None
 
   override def validated: Boolean = {
@@ -148,10 +144,10 @@ class SimpleProcessor
         //          (t, s) => t + s.eval
         //        }
         var score = 0.0
-        var s=0
-        while (s < scorers.length) {
-          score = score +  scorers(s).eval
-          s += 1
+        var i=0
+        while (i < scorers.length) {
+          score += scorers(i).eval
+          i += 1
         }
 
         // How do we instantiate an object without knowing what it is, and
@@ -174,27 +170,27 @@ class SimpleProcessor
     QueryResult(acc.result)
   }
 
-  @inline private final def isDone(drivers: Array[GHook]): Boolean = {
-    var j = 0
-    while (j < drivers.length) {
-      val curDone = drivers(j).isDone
-      if (curDone == false) {
-        return false
-      }
-      j += 1
-    }
-    return true
-  }
-
-  @inline private final def matches(drivers: Array[GHook], candidate: Int): Boolean = {
-    var j = 0
-    while (j < drivers.length) {
-      val matches = drivers(j).matches(candidate)
-      if (matches == true) {
-        return true
-      }
-      j += 1
-    }
-    return false
-  }
+//  @inline final def isDone(drivers: Array[GHook]): Boolean = {
+//    var j = 0
+//    while (j < drivers.length) {
+//      val curDone = drivers(j).isDone
+//      if (curDone == false) {
+//        return false
+//      }
+//      j += 1
+//    }
+//    return true
+//  }
+//
+//  @inline final def matches(drivers: Array[GHook], candidate: Int): Boolean = {
+//    var j = 0
+//    while (j < drivers.length) {
+//      val matches = drivers(j).matches(candidate)
+//      if (matches == true) {
+//        return true
+//      }
+//      j += 1
+//    }
+//    return false
+//  }
 }

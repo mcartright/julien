@@ -29,8 +29,8 @@ object WeakANDProcessor {
   */
 class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
   override def finishScoring[T <: ScoredObject[T]](
-    allSentinels: Seq[Sentinel],
-    iterators: Set[GHook],
+    allSentinels: Array[Sentinel],
+    iterators: Array[GHook],
     acc: Accumulator[T] = DefaultAccumulator[ScoredDocument]()
   ): List[T] = {
     val hackedAcc = acc.asInstanceOf[DefaultAccumulator[ScoredDocument]]
@@ -40,7 +40,7 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
     // it's fully scored.
 
     // Start with a full sort - the only one needed
-    var sortedSentinels = allSentinels.toArray.sorted(SentinelOrdering)
+    var sortedSentinels = allSentinels.sorted(SentinelOrdering)
     val scoreMinimum = sortedSentinels.map(_.feat.lowerBound).sum
 
     var running = true
@@ -60,9 +60,26 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
           sortedSentinels(advancing).iter.movePast(pivot)
           shuffleDown(sortedSentinels, advancing)
         } else if (sortedSentinels.head.iter.at == pivot) {
+          // Two gross but tight/fast loops in here
+
           // All iterators up to the pivot iterator are lined up. Score.
-          iterators.foreach(_.moveTo(pivot))
-          val score = sortedSentinels.map(_.feat.eval).sum
+          var i = 0
+          while (i < iterators.length) {
+            iterators(i).moveTo(pivot)
+            i += 1
+          }
+
+          // Slow but pretty
+          // val score = sortedSentinels.map(_.feat.eval).sum
+          // vs. fast but blah
+          i = 0
+          var score = 0.0
+          while (i < sortedSentinels.length) {
+            score += sortedSentinels(i).feat.eval
+            i += 1
+          }
+
+
           // Pass muster, put it in the queue and update the threshold
           hackedAcc += ScoredDocument(pivot, score)
           threshold = hackedAcc.head.score * factor

@@ -72,10 +72,9 @@ ${selectedFn.help}
   }
 
   // Would like to find these via reflection, but...not that easy right now.
-  // TODO: Via reflection. Might need jarfile inspection.
   def findFunctions : Seq[CLIFunction] =
     // List of PO-functions
-    List[CLIFunction](BuildIndex, DumpKeys, DocCount) ++
-  // List of examples.
-  List[Example](BagOfWords, RelevanceModel, SequentialDependenceModel)
+    List[CLIFunction](BuildIndex, DumpKeys, DocCount,
+      // List of Examples
+      BagOfWords, RelevanceModel, SequentialDependenceModel)
 }

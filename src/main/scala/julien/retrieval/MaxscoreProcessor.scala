@@ -29,8 +29,8 @@ object MaxscoreProcessor {
   */
 class MaxscoreProcessor extends SimplePreloadingProcessor {
   override def finishScoring[T <: ScoredObject[T]](
-    allSentinels: Seq[Sentinel],
-    iterators: Set[GHook],
+    allSentinels: Array[Sentinel],
+    iterators: Array[GHook],
     acc: Accumulator[T] = DefaultAccumulator[ScoredDocument]()
   ): List[T] = {
     val hackedAcc = acc.asInstanceOf[DefaultAccumulator[ScoredDocument]]
@@ -53,9 +53,7 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
     // We simply need to set the candidate once before entering the while
     // loop, then check at the end of the loop
     var selected = sentinels.take(sidx)
-    var drivers = selected.map(_.iter).toSet.filterNot(_.isDone)
-    val driverPos = drivers.map(_.at).mkString(",")
-    val allPos = sentinels.map(_.iter.at).mkString(",")
+    var drivers = selected.map(_.iter).filterNot(_.isDone)
     var candidate = getMinCandidate(drivers)
     while (candidate < Int.MaxValue) {
       if (drivers.exists(_.matches(candidate))) {
@@ -77,7 +75,7 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
             threshold = hackedAcc.head.score
             sidx = getSentinelIndex(sentinels, 0, threshold, startingScore)
             selected = sentinels.take(sidx)
-            drivers = selected.map(_.iter).toSet
+            drivers = selected.map(_.iter)
           }
         }
       }

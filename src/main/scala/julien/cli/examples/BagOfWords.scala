@@ -35,7 +35,7 @@ Required parameters:
     val index : Index = Index.disk(params.getString("index"))
 
     // Make a processor to run it
-    val processor = SimpleProcessor()
+    val processor = MaxscoreProcessor()
 
     // Attach the query model to the index
     ql.hooks.foreach(_.attach(index))
