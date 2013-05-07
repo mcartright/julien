@@ -17,7 +17,12 @@ class IndexLengths private (field: Option[String])
   def length: Int = underlying.getCurrentLength
 }
 
-class ArrayLengths private(field: Option[String], val lengths : LengthsArray) extends ViewOp with LengthsView with ChildlessOp {
+class ArrayLengths private(
+  field: Option[String],
+  val lengths : LengthsArray)
+    extends ViewOp
+    with LengthsView
+    with ChildlessOp {
   def isDense: Boolean = true
 
   def length: Int = lengths.get

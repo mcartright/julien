@@ -115,7 +115,6 @@ class Index private(
     currentDefault = newDefault
   }
 
-  private val lengthsIterator = underlying.getLengthsIterator
   val collectionStats =
     underlying.getCollectionStatistics(currentDefault)
   private val postingsStats =
@@ -222,7 +221,8 @@ class Index private(
   def names: PairSeq[String] =
     new PairSeq[String](underlying.getIndexPart("names").keys,
     (k: KeyIterator) => Utility.toString(k.getValueBytes) : String )
-  def count(key: String, targetId: String): Int = positions(key, targetId).position
+  def count(key: String, targetId: String): Int =
+    positions(key, targetId).position
   def collectionCount(key: String): Long = getKeyStatistics(key).nodeFrequency
   def docFreq(key: String): Long = getKeyStatistics(key).nodeDocumentCount
   def document(docid: InternalId): Document =
@@ -230,7 +230,6 @@ class Index private(
       Parameters.empty), this)
   def document(targetId: String): Document =
     IndexBasedDocument(underlying.getItem(targetId, Parameters.empty), this)
-
   def terms(targetId: String): List[String] = {
     val doc = underlying.getItem(targetId, Parameters.empty)
     doc.terms.toList
