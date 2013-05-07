@@ -26,10 +26,6 @@ object LowLevelProcessor {
   */
 class LowLevelProcessor
   extends QueryProcessor {
-  type GHook = IteratedHook[_ <: GIterator]
-  type DebugHook =
-  (ScoredDocument, Seq[FeatureOp], Index, QueryProcessor) => Unit
-
   var debugger: Option[DebugHook] = None
 
   override def validated: Boolean = {
@@ -132,29 +128,5 @@ class LowLevelProcessor
       }
     }
     QueryResult(acc.result)
-  }
-
-  final def isDone(drivers: Array[GHook]) : Boolean = {
-    var j = 0
-    while (j < drivers.length) {
-      val curDone = drivers(j).isDone
-      if (curDone == false) {
-        return false
-      }
-      j+=1
-    }
-    return true
-  }
-
-  final def matches(drivers: Array[GHook], candidate:Int) : Boolean = {
-    var j = 0
-    while (j < drivers.length) {
-      val matches = drivers(j).matches(candidate)
-      if (matches == true) {
-        return true
-      }
-      j+=1
-    }
-    return false
   }
 }

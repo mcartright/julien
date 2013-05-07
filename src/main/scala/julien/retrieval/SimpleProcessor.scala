@@ -22,9 +22,6 @@ object SimpleProcessor {
   */
 class SimpleProcessor
   extends QueryProcessor {
-  type GHook = IteratedHook[_ <: GIterator]
-  type DebugHook =
-  (ScoredDocument, Seq[FeatureOp], Index, QueryProcessor) => Unit
 
   var debugger: Option[DebugHook] = None
 
@@ -83,7 +80,7 @@ class SimpleProcessor
     val drivers: Array[GHook] = iterators.filterNot(_.isDense).toArray
 
     // Need to fix this
-    val scorers: Seq[FeatureOp] = _models
+    val scorers: Array[FeatureOp] = _models.toArray
 
     // Go
     while (!isDone(drivers)) {
@@ -99,9 +96,12 @@ class SimpleProcessor
       }
 
       if (matches(drivers, candidate)) {
-        // Time to score
-        val score = scorers.foldLeft(0.0) {
-          (t, s) => t + s.eval
+        // Time to score...using a gross loop
+        i = 0
+        var score = 0.0
+        while (i < scorers.length) {
+          score += scorers(i).eval
+          i += 1
         }
         // How do we instantiate an object without knowing what it is, and
         // knowing what it needs? One method in the QueryProcessor?
@@ -121,29 +121,5 @@ class SimpleProcessor
       }
     }
     QueryResult(acc.result)
-  }
-
-  final def isDone(drivers: Array[GHook]): Boolean = {
-    var j = 0
-    while (j < drivers.length) {
-      val curDone = drivers(j).isDone
-      if (curDone == false) {
-        return false
-      }
-      j += 1
-    }
-    return true
-  }
-
-  final def matches(drivers: Array[GHook], candidate: Int): Boolean = {
-    var j = 0
-    while (j < drivers.length) {
-      val matches = drivers(j).matches(candidate)
-      if (matches == true) {
-        return true
-      }
-      j += 1
-    }
-    return false
   }
 }

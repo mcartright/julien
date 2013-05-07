@@ -5,6 +5,10 @@ import julien.eval.{QueryResult, QueryResultSet}
 
 /** Generic definition of a query processor. */
 trait QueryProcessor {
+  type DebugHook =
+  (ScoredDocument, Seq[FeatureOp], Index, QueryProcessor) => Unit
+  type GHook = IteratedHook[_ <: GIterator]
+
   protected var _indexes = Set[Index]()
   protected var _models = Seq[FeatureOp]()
   def add(i: Index) { _indexes = _indexes + i }
@@ -62,4 +66,28 @@ trait QueryProcessor {
   def isBounded(op: FeatureOp): Boolean =
     op.upperBound < Double.PositiveInfinity &&
   op.lowerBound > Double.NegativeInfinity
+
+  final def isDone(drivers: Array[GHook]): Boolean = {
+    var j = 0
+    while (j < drivers.length) {
+      val curDone = drivers(j).isDone
+      if (curDone == false) {
+        return false
+      }
+      j += 1
+    }
+    return true
+  }
+
+  final def matches(drivers: Array[GHook], candidate: Int): Boolean = {
+    var j = 0
+    while (j < drivers.length) {
+      val matches = drivers(j).matches(candidate)
+      if (matches == true) {
+        return true
+      }
+      j += 1
+    }
+    return false
+  }
 }

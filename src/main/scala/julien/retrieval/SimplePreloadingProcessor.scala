@@ -28,8 +28,8 @@ abstract class SimplePreloadingProcessor
     * at this point.
     */
   def finishScoring[T <: ScoredObject[T]](
-    allSentinels: Seq[Sentinel],
-    iterators: Set[GHook],
+    allSentinels: Array[Sentinel],
+    iterators: Array[GHook],
     acc: Accumulator[T]): List[T]
 
   override def run[T <: ScoredObject[T]](
@@ -43,10 +43,10 @@ abstract class SimplePreloadingProcessor
     val sentinels = _models.map { feat =>
       val it = feat.iHooks.filter(_.isSparse).head
       Sentinel(feat, it, feat.upperBound-feat.lowerBound)
-    }
+    }.toArray
 
-    val iterators = _models.flatMap(_.iHooks).toSet
-    var drivers = iterators.filter(_.isSparse).toList
+    val iterators = _models.flatMap(_.iHooks).distinct.toArray
+    var drivers = iterators.filter(_.isSparse).toArray
     preLoadAccumulator(sentinels, drivers, iterators, hackedAcc)
 
     val raw = if (drivers.isEmpty)
@@ -60,30 +60,44 @@ abstract class SimplePreloadingProcessor
   // have already been filtered out.
   @tailrec
   final def getMinCandidate(
-    drivers: Seq[GHook],
+    drivers: Array[GHook],
+    idx: Int = 0,
     m: Int = Int.MaxValue): Int = {
-    if (drivers.isEmpty) return m
-    else getMinCandidate(drivers.tail, min(m, drivers.head.at))
+    if (idx == drivers.length) return m
+    else getMinCandidate(drivers, idx+1, min(m, drivers(idx).at))
   }
 
   @tailrec
   final def preLoadAccumulator(
-    allSentinels: Seq[Sentinel],
-    drivers: Seq[GHook],
-    iterators: Set[GHook],
+    allSentinels: Array[Sentinel],
+    drivers: Array[GHook],
+    iterators: Array[GHook],
     acc: Accumulator[ScoredDocument]): Unit = {
     // base case
     if (acc.atCapacity || drivers.isEmpty) {
       return
     } else {
+      var i = 0
       // otherwise throw a new candidate in there
       val candidate = getMinCandidate(drivers)
-      if (drivers.exists(_.matches(candidate))) {
-        iterators.foreach(_.moveTo(candidate))
-        val score = allSentinels.map(_.feat.eval).sum
+      if (matches(drivers, candidate)) {
+        while (i < iterators.length) {
+          iterators(i).moveTo(candidate)
+          i += 1
+        }
+
+        // Another crappy fast loop
+        i = 0
+        var score = 0.0
+        while (i < allSentinels.length) {
+          score += allSentinels(i).feat.eval
+          i += 1
+        }
         acc += ScoredDocument(candidate, score)
       }
+
       drivers.foreach(_.movePast(candidate))
+
       // Remove finished iterators from the remaining list at the next
       // call - saves checking later
       preLoadAccumulator(
