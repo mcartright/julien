@@ -12,7 +12,7 @@ class QueryJudgment(val queryName: String) extends Iterable[Judgment] {
   private var numUnknown = 0
   val judgments = new TObjectIntHashMap[String]()
 
-  def +=(docName: String, label: Int): this.type = {
+  def put(docName: String, label: Int): this.type = {
     assume(!judgments.containsKey(docName), s"Got $docName already.")
     judgments.put(docName, label)
     // TODO : Not sure I like this binarization
