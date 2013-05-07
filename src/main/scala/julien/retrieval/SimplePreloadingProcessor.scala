@@ -27,10 +27,10 @@ abstract class SimplePreloadingProcessor
     * [[julien.retrieval.WeakANDProcessor WeakAND]] algorithms both kick in
     * at this point.
     */
-    def finishScoring[T <: ScoredObject[T]](
-      allSentinels: Seq[Sentinel],
-      iterators: Set[GHook],
-      acc: Accumulator[T]): List[T]
+  def finishScoring[T <: ScoredObject[T]](
+    allSentinels: Seq[Sentinel],
+    iterators: Set[GHook],
+    acc: Accumulator[T]): List[T]
 
   override def run[T <: ScoredObject[T]](
     acc: Accumulator[T] = DefaultAccumulator[ScoredDocument]()
@@ -46,7 +46,7 @@ abstract class SimplePreloadingProcessor
     }
 
     val iterators = _models.flatMap(_.iHooks).toSet
-    var drivers = iterators.filter(_.isSparse)
+    var drivers = iterators.filter(_.isSparse).toList
     preLoadAccumulator(sentinels, drivers, iterators, hackedAcc)
 
     val raw = if (drivers.isEmpty)
@@ -60,7 +60,7 @@ abstract class SimplePreloadingProcessor
   // have already been filtered out.
   @tailrec
   final def getMinCandidate(
-    drivers: Set[GHook],
+    drivers: Seq[GHook],
     m: Int = Int.MaxValue): Int = {
     if (drivers.isEmpty) return m
     else getMinCandidate(drivers.tail, min(m, drivers.head.at))
@@ -69,7 +69,7 @@ abstract class SimplePreloadingProcessor
   @tailrec
   final def preLoadAccumulator(
     allSentinels: Seq[Sentinel],
-    drivers: Set[GHook],
+    drivers: Seq[GHook],
     iterators: Set[GHook],
     acc: Accumulator[ScoredDocument]): Unit = {
     // base case

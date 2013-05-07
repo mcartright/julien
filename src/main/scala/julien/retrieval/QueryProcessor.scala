@@ -55,7 +55,6 @@ trait QueryProcessor {
 
       assume(hooks.forall(_.isAttached),
         "Unable to implicitly attach all hooks to models.")
-
     }
     return true
   }
