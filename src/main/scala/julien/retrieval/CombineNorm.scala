@@ -17,6 +17,7 @@ class CombineNorm private(val ops: Seq[FeatureOp],
   extends FunctionWeightedFeature {
   this.weight = w
   lazy val children: Seq[Operator] = ops
+  lazy val localChildren : Array[FeatureOp] = ops.toArray
   def views: Set[ViewOp] =
     ops.foldLeft(Set[ViewOp]()) { (s, op) => s ++ op.views }
   def eval : Double = combine()
@@ -47,7 +48,7 @@ class CombineNorm private(val ops: Seq[FeatureOp],
     var i = 0
     var score = 0.0
     while (i < childrenSize) {
-      score += ops(i).eval
+      score += localChildren(i).eval
       i+=1
     }
     score / weightSum

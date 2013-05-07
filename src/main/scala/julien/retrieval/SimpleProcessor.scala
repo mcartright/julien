@@ -46,20 +46,40 @@ class SimpleProcessor
     if (unprepped.size > 0) {
       // We now need to get the iterators of the unprepped nodes, zip down them
       // and update statistics until done, then reset.
-      val iterators: Set[GHook] =
-        unprepped.flatMap(_.iHooks).toSet.filterNot(_.isDense)
+      val iterators: Array[GHook] = unprepped.flatMap(_.iHooks).toSet.filterNot(_.isDense).toArray
 
-      while (iterators.exists(!_.isDone)) {
+
+      while (!isDone(iterators)) {
         val active = iterators.filterNot(_.isDone)
-        val candidate = active.map(_.at).min
-        iterators.foreach(_.moveTo(candidate))
-        if (iterators.exists(_.matches(candidate))) {
+
+        //val candidate = active.map(_.at).min
+        var k=0
+        var candidate = Int.MaxValue
+        while (k < active.length) {
+          val curVal = active(k).at
+          if ( curVal < candidate) {
+            candidate = curVal
+          }
+          k += 1
+        }
+
+        var i = 0
+        while (i < active.length) {
+          active(i).moveTo(candidate)
+          i += 1
+        }
+
+        if (matches(active,candidate)) {
           for (p <- unprepped) {
-            p.asInstanceOf[NeedsPreparing].
-              updateStatistics(InternalId(candidate))
+            p.asInstanceOf[NeedsPreparing].updateStatistics(InternalId(candidate))
           }
         }
-        active.foreach(_.movePast(candidate))
+
+        var j = 0
+        while (j < active.length) {
+          active(j).movePast(candidate)
+          j += 1
+        }
       }
       unprepped.foreach(_.asInstanceOf[NeedsPreparing].prepared)
     }
@@ -87,10 +107,32 @@ class SimpleProcessor
 
     // Go
     while (!isDone(drivers)) {
-      val candidate = drivers.foldLeft(Int.MaxValue) {
-        (best, drv) =>
-          if (drv.isDone) best else scala.math.min(drv.at, best)
+
+      var k=0
+      var candidate = Int.MaxValue
+      while (k < drivers.length) {
+
+        val drv = drivers(k)
+        if (!drv.isDone) {
+        if ( drv.at < candidate) {
+          candidate = drv.at
+        }
+        }
+        k += 1
       }
+
+//      val candidate = drivers.foldLeft(Int.MaxValue) {
+//        (best, drv) =>
+//          if (drv.isDone) best else
+//          {
+//            // scala.min(drv.at,best)
+//            if (drv.at < best) {
+//              drv.at
+//            } else {
+//              best
+//            }
+//          }
+//      }
 
       var i = 0
       while (i < iterators.length) {
@@ -100,9 +142,18 @@ class SimpleProcessor
 
       if (matches(drivers, candidate)) {
         // Time to score
-        val score = scorers.foldLeft(0.0) {
-          (t, s) => t + s.eval
+
+
+        //        val score = scorers.foldLeft(0.0) {
+        //          (t, s) => t + s.eval
+        //        }
+        var score = 0.0
+        var s=0
+        while (s < scorers.length) {
+          score = score +  scorers(s).eval
+          s += 1
         }
+
         // How do we instantiate an object without knowing what it is, and
         // knowing what it needs? One method in the QueryProcessor?
 
@@ -123,7 +174,7 @@ class SimpleProcessor
     QueryResult(acc.result)
   }
 
-  final def isDone(drivers: Array[GHook]): Boolean = {
+  @inline private final def isDone(drivers: Array[GHook]): Boolean = {
     var j = 0
     while (j < drivers.length) {
       val curDone = drivers(j).isDone
@@ -135,7 +186,7 @@ class SimpleProcessor
     return true
   }
 
-  final def matches(drivers: Array[GHook], candidate: Int): Boolean = {
+  @inline private final def matches(drivers: Array[GHook], candidate: Int): Boolean = {
     var j = 0
     while (j < drivers.length) {
       val matches = drivers(j).matches(candidate)

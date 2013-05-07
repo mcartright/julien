@@ -6,31 +6,36 @@ object Dirichlet {
   val totallyMadeUpValue = 600
 
   def apply(op: PositionStatsView, l: LengthsView) = {
-    new Dirichlet(op, l, op, defMu)
+    new Dirichlet(op, l, op, defMu, () => 1.0)
   }
 
   def apply(op: PositionStatsView, l: LengthsView, mu: Double) = {
-    new Dirichlet(op, l, op, mu)
+    new Dirichlet(op, l, op, mu, () => 1.0)
+  }
+
+  def apply(op: PositionStatsView, l: LengthsView, mu: Double, weight: Double) = {
+    new Dirichlet(op, l, op, mu, () => weight)
   }
 
   def apply(c: CountView, l: LengthsView, s: StatisticsView) =
-    new Dirichlet(c, l, s, defMu)
+    new Dirichlet(c, l, s, defMu, () => 1.0)
 
   def apply(
              op: CountView,
              l: LengthsView,
              s: StatisticsView,
-             mu: Double): Dirichlet = new Dirichlet(op, l, s, mu)
+             mu: Double): Dirichlet = new Dirichlet(op, l, s, mu, () => 1.0)
 }
 
 class Dirichlet(
                  val op: CountView,
                  val lengths: LengthsView,
                  val statsrc: StatisticsView,
-                 val mu: Double)
+                 val mu: Double,
+                 w: () => Double)
   extends ScalarWeightedFeature {
   require(mu > 0, s"Mu must be positive. Received $mu")
-
+  this.weight = w.apply()
   lazy val children: Seq[Operator] = Set[Operator](op, lengths, statsrc).toList
   lazy val views: Set[ViewOp] = Set[ViewOp](op, lengths, statsrc)
   // Runs when asked for the first time, and runs only once

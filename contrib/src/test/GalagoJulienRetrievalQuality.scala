@@ -2,7 +2,7 @@ package julien.cli.examples
 
 import julien.retrieval._
 import julien.access.Index
-import scala.collection.mutable.HashMap
+import collection.mutable.{ArrayBuffer, HashMap}
 import org.lemurproject.galago.core.retrieval
 import retrieval.processing.RankedDocumentModel
 import julien.eval.Evaluator
@@ -29,7 +29,7 @@ object GalagoJulienRetrievalQuality extends App {
   val galagoResults = runGalagoQueries(queries)
   // verifyRanks(queries, julResults, galagoResults)
  //  verifyEval("./data/qrels/robust04.qrels", galagoResults)
-   verifyEval("./data/qrels/robust04.qrels", julResults)
+ //  verifyEval("./data/qrels/robust04.qrels", julResults)
 
 
   def verifyEval(qrelFile: String, results: Map[String, Seq[ScoredDocument]]) {
@@ -104,22 +104,16 @@ object GalagoJulienRetrievalQuality extends App {
           ql
         } else {
 
+          val unigramWeight = 0.87264
+          val odWeight = 0.07906
+          val udWeight = 0.04829
 
-          val sdm =
-            CombineNorm(List[FeatureOp](
-              CombineNorm(children = query.map(a => Dirichlet(a, IndexLengths(), mu)),
-                weight = 0.87264),
-              CombineNorm(children = query.sliding(2, 1).map {
-                p =>
-                  Dirichlet(OrderedWindow(1, p: _*), IndexLengths(), mu)
-              }.toSeq,
-                weight = 0.07906),
-              CombineNorm(query.sliding(2, 1).map {
-                p =>
-                  Dirichlet(UnorderedWindow(8, p: _*), IndexLengths(), mu)
-              }.toSeq,
-                weight = 0.04829)
-            ))
+          val children = new ArrayBuffer[FeatureOp]()
+          children ++= query.map(a => Dirichlet(a, IndexLengths(), mu,  weight = (unigramWeight / query.length)))
+          children ++= query.sliding(2, 1).map {p => Dirichlet(OrderedWindow(1, p: _*), IndexLengths(), mu, weight = (odWeight / (query.length-1)))}.toSeq
+          children ++= query.sliding(2, 1).map {p => Dirichlet(UnorderedWindow(8, p: _*), IndexLengths(), mu, weight = (udWeight / (query.length-1)))}.toSeq
+
+          val sdm = CombineNorm(children)
           sdm
         }
 
