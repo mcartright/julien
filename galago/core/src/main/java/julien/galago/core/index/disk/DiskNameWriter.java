@@ -43,6 +43,9 @@ public class DiskNameWriter implements Processor<NumberedDocumentData> {
     Parameters p = parameters.getJSON();
     p.set("writerClass", DiskNameWriter.class.getName());
     p.set("readerClass", DiskNameReader.class.getName());
+    if(!p.containsKey("blockSize")) {
+      p.set("blockSize", 512);
+    }
 
     writer = new DiskBTreeWriter(filename, p);
   }

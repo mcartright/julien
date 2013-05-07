@@ -69,11 +69,20 @@ public class MultiStep extends Step implements Iterable<String> {
      * The name is inferred using the first and last steps in the 
      * inner pipeline. Due to stage construction constraints, this is
      * guaranteed to be unique.
+     *
+     * names and names.reverse in particular generate equivalent group names
      */
     public MultiStep addGroup(List<Step> steps) {
-	String groupName = steps.get(0).toString() + "-" +
-	    steps.get(steps.size()-1).toString();
-	return addGroup(groupName, steps);
+      String groupName = steps.get(0).toString() + "-" +
+        steps.get(steps.size()-1).toString();
+      if(groups.containsKey(groupName)) {
+        int i=1;
+        while(groups.containsKey(groupName+i)) {
+          i+=1;
+        }
+        groupName = groupName+i;
+      }
+      return addGroup(groupName, steps);
     }
 
     /**
