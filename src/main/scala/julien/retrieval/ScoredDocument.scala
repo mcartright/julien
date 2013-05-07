@@ -5,7 +5,8 @@ package retrieval
   * Holds the id of the document and the score.
   *
   * The "natural" ordering of this class is assumed to
-  * be by score. Use an Ordering typed to this class
+  * be by score, where a higher score is equivalent to earlier
+  * in the order. Use an Ordering typed to this class
   * for different ordering behavior.
   *
   * As this class only contains a simple score, the
@@ -23,11 +24,6 @@ case class ScoredDocument(
 
   /** Compares two ScoredDocuments by score, breaks ties w/ Docid. */
   def compare(that: ScoredDocument): Int =
-    if (that.score < this.score) return -1
-    else if (that.score > this.score) return 1
-    else (this.id.underlying - that.id.underlying)
-
-  override def compareTo(that: ScoredDocument): Int =
     if (that.score < this.score) return -1
     else if (that.score > this.score) return 1
     else (this.id.underlying - that.id.underlying)

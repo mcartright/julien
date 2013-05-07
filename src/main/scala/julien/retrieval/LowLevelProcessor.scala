@@ -6,6 +6,8 @@
 package julien
 package retrieval
 
+import julien.eval.QueryResult
+
 object LowLevelProcessor {
   def apply() = new SimpleProcessor()
 }
@@ -56,7 +58,10 @@ class LowLevelProcessor
         val candidate = active.map(_.at).min
         iterators.foreach(_.moveTo(candidate))
         if (iterators.exists(_.matches(candidate))) {
-          unprepped.foreach(_.asInstanceOf[NeedsPreparing].updateStatistics)
+          unprepped.foreach(
+            _.asInstanceOf[NeedsPreparing].
+              updateStatistics(InternalId(candidate))
+          )
         }
         active.foreach(_.movePast(candidate))
       }
@@ -68,7 +73,9 @@ class LowLevelProcessor
     for (h <- hooks) h.underlying.reset
   }
 
-  def run[T <: ScoredObject[T]](acc: Accumulator[T] = ArrayAccumulator(indexes.head.numDocuments.toInt)): List[T] = {
+  def run[T <: ScoredObject[T]](
+    acc: Accumulator[T] = ArrayAccumulator(indexes.head.numDocuments.toInt)
+  ): QueryResult[T] = {
     // Make sure we can do the next stuff easily
     assume(validated, s"Unable to validate given model/index combination")
     prepare()
@@ -80,7 +87,7 @@ class LowLevelProcessor
     val drivers: Array[GHook] = iterators.filterNot(_.isDense).toArray
 
     // Need to fix this
-    val scorers : List[FeatureOp] = _models
+    val scorers : Seq[FeatureOp] = _models
 
     // Go
     while (!isDone(drivers)) {
@@ -124,7 +131,7 @@ class LowLevelProcessor
         j+=1
       }
     }
-    acc.result
+    QueryResult(acc.result)
   }
 
   final def isDone(drivers: Array[GHook]) : Boolean = {

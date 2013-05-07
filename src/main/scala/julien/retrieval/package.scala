@@ -13,6 +13,7 @@ import scala.reflect.runtime.universe._
 
 package object retrieval {
   type Combiner = (Seq[FeatureOp]) => Double
+  type QueryPreparer = (String) => Seq[FeatureOp]
 
   // Bring in local references to some of the access structures
   type Index = julien.access.Index

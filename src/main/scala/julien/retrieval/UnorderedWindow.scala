@@ -31,8 +31,8 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   // how big??
   val hits =  new ExtentArray(10000)
 
-  override def updateStatistics = {
-    super.updateStatistics
+  override def updateStatistics(docid: InternalId) = {
+    super.updateStatistics(docid)
   // Again, being lazy about this number
     statistics.collLength = terms.head.statistics.collLength
   }

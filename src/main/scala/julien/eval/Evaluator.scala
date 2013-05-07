@@ -25,7 +25,7 @@ object Evaluator {
     qrelFile: String,
     resultMap: Map[String, Seq[T]]
   ): (Seq[Judgment], Map[String, DoubleList]) = {
-    val newResults = resultMap.map{ case (n, sos) => (n, QueryResult(n, sos)) }
+    val newResults = resultMap.map{ case (n, sos) => (n, QueryResult(sos)) }
     val qsr = QueryResultSet(newResults)
     val qrels = QueryJudgmentSet(qrelFile, true)
     val evaluators = metrics.map( m => QueryEvaluator(m))

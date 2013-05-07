@@ -32,8 +32,8 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   val hits =  new ExtentArray(10000)
 
 
-  override def updateStatistics = {
-    super.updateStatistics
+  override def updateStatistics(docid: InternalId) = {
+    super.updateStatistics(docid)
     statistics.collLength =
       terms.head.statistics.collLength - adjustment
   }

@@ -88,7 +88,7 @@ class Index private(
   private[this] var currentDefault: String) {
   // Make sure the default isn't a crock
   assume(underlying.containsPart(s"$currentDefault.postings"),
-    s"$currentDefault is not a part in this index")
+    s"$currentDefault is not a part in this index ($toString)")
 
   override def toString: String = {
     val b = new StringBuilder()
@@ -111,7 +111,7 @@ class Index private(
     */
   def defaultPart_=(newDefault: String): Unit = {
     assume(underlying.containsPart(s"$newDefault.postings"),
-      s"$newDefault is not a part in this index")
+      s"$newDefault is not a part in this index ($toString)")
     currentDefault = newDefault
   }
 
@@ -264,7 +264,7 @@ class Index private(
   private def getLabel(field: String): String = {
     val label = s"$field.postings"
     assume (underlying.containsPart(label),
-      s"$label is not a part in this index")
+      s"$label is not a part in this index ($toString)")
     label
   }
 }

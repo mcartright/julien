@@ -8,6 +8,7 @@ import julien.galago.tupleflow.{Utility,Parameters}
 import java.util.logging.{Level,Logger}
 import scala.util.Random
 import julien.access.QuickIndexBuilder
+import julien.eval.QueryResult
 
 trait SimpleProcessorBehavior extends QuickIndexBuilder { this: FlatSpec =>
   def index: Index
@@ -236,7 +237,7 @@ class SimpleProcessorSpec
     sp add query
     sp add index
     val acc = DefaultAccumulator[ScoredDocument](size = 1000)
-    val results: List[ScoredDocument] = sp.run(acc)
+    val results: QueryResult[ScoredDocument] = sp.run(acc)
 
     // Now let's do this by hand, and compare results
 

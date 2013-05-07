@@ -2,9 +2,22 @@ package julien
 package eval
 
 import scala.collection.SeqProxy
+import scala.math._
+import scala.util.Random
 
 // Let's see if this works... if so, should probably mixin IterableProxyLike
-case class QueryResult[T <: ScoredObject[T]](val name: String, result: Seq[T])
+case class QueryResult[T <: ScoredObject[T]](result: Seq[T])
 extends SeqProxy[T] {
   def self = result
+
+  def sample(sampleRate: Double): QueryResult[T] = {
+    assume(sampleRate > 0.0 && sampleRate <= 1.0,
+      s" Can't sample with a rate of $sampleRate")
+
+    if (sampleRate == 1.0) return QueryResult(result)
+    else {
+      val newSize = round(result.size * sampleRate).toInt
+      QueryResult(Random.shuffle(result).take(newSize))
+    }
+  }
 }

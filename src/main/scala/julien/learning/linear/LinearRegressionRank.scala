@@ -1,5 +1,6 @@
 package julien
 package learning
+package linear
 
 class LinearRegressionRank(samples: List[RankList], features: Array[Int])
     extends Ranker(samples, features) {

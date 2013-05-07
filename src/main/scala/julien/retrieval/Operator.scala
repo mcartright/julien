@@ -142,7 +142,7 @@ trait FeatureView extends ViewOp with FeatureOp with ChildlessOp
   * I will probably add more traits to cover the different cases.
   */
 trait NeedsPreparing {
-  def updateStatistics: Unit
+  def updateStatistics(docid: InternalId): Unit
   protected var amIReady: Boolean = false
   def isPrepared: Boolean = amIReady
   def prepared: Unit = amIReady = true

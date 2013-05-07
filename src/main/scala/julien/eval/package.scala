@@ -1,9 +1,10 @@
 package julien
 
 import scala.math._
+import scala.collection.immutable.TreeMap
 
 package object eval {
-
+  type QuerySetEvaluation = TreeMap[String, Double]
   import julien.ScoredObject
 
   // These are carried over from the 'aggregate' package of Galago's eval

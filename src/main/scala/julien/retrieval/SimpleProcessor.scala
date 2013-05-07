@@ -2,6 +2,7 @@ package julien
 package retrieval
 
 import julien._
+import julien.eval.QueryResult
 
 object SimpleProcessor {
   def apply() = new SimpleProcessor()
@@ -10,14 +11,14 @@ object SimpleProcessor {
 /** The simplest form of query processor. This processor assumes the following:
   *
   * - Only 1 index is provided for execution.
-  * - None of the `View` opeators have a [[julien.retrieval.Slicer S l i c e r]]
+  * - None of the `View` opeators have a [[julien.retrieval.Slicer Slicer]]
   * attached.
   * - Currently, `SimpleProcessor` only recognizes
-  * [[julien.retrieval.IteratedHook I t e r a t e d H o o k I t e r a t e d H o o k s]]. This may
+  * [[julien.retrieval.IteratedHook IteratedHooks]]. This may
   * change in the future.
   *
   * If any of these assumptions are not met, then a different
-  * [[julien.retrieval.QueryProcessor Q u e r y P r o c e s s o r]] should be used.
+  * [[julien.retrieval.QueryProcessor QueryProcessor]] should be used.
   */
 class SimpleProcessor
   extends QueryProcessor {
@@ -53,7 +54,10 @@ class SimpleProcessor
         val candidate = active.map(_.at).min
         iterators.foreach(_.moveTo(candidate))
         if (iterators.exists(_.matches(candidate))) {
-          unprepped.foreach(_.asInstanceOf[NeedsPreparing].updateStatistics)
+          for (p <- unprepped) {
+            p.asInstanceOf[NeedsPreparing].
+              updateStatistics(InternalId(candidate))
+          }
         }
         active.foreach(_.movePast(candidate))
       }
@@ -65,8 +69,9 @@ class SimpleProcessor
     for (h <- hooks) h.underlying.reset
   }
 
-  def run[T <: ScoredObject[T]](acc: Accumulator[T] =
-                                DefaultAccumulator[ScoredDocument]): List[T] = {
+  def run[T <: ScoredObject[T]](
+    acc: Accumulator[T] = DefaultAccumulator[ScoredDocument]()
+  ): QueryResult[T] = {
     // Make sure we can do the next stuff easily
     assume(validated, s"Unable to validate given model/index combination")
     prepare()
@@ -78,20 +83,10 @@ class SimpleProcessor
     val drivers: Array[GHook] = iterators.filterNot(_.isDense).toArray
 
     // Need to fix this
-    val scorers: List[FeatureOp] = _models
+    val scorers: Seq[FeatureOp] = _models
 
     // Go
     while (!isDone(drivers)) {
-
-      //      var k = 0
-      //      val best = Int.MaxValue
-      //      while (k < drivers.length) {
-      //        val curDone = drivers(k).isDone
-      //        if (curDone) {
-      //          best
-      //        }
-      //      }
-
       val candidate = drivers.foldLeft(Int.MaxValue) {
         (best, drv) =>
           if (drv.isDone) best else scala.math.min(drv.at, best)
@@ -125,7 +120,7 @@ class SimpleProcessor
         j += 1
       }
     }
-    acc.result
+    QueryResult(acc.result)
   }
 
   final def isDone(drivers: Array[GHook]): Boolean = {

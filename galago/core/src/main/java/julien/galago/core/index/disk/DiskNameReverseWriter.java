@@ -41,6 +41,9 @@ public class DiskNameReverseWriter implements Processor<NumberedDocumentData> {
     Parameters p = parameters.getJSON();
     p.set("writerClass", DiskNameReverseWriter.class.getName());
     p.set("readerClass", DiskNameReverseReader.class.getName());
+    if(!p.containsKey("blockSize")) {
+      p.set("blockSize", 512);
+    }
 
     writer = new DiskBTreeWriter(filename, p);
   }

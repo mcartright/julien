@@ -5,6 +5,7 @@ import scala.collection.mutable.PriorityQueue
 import scala.collection.JavaConversions._
 import julien._
 import julien.access._
+import julien.eval.QueryResult
 
 import java.io.PrintStream
 
@@ -15,12 +16,12 @@ object Utils {
   // TODO: Remove this, make the ScoredDocuments into a collection type.
 
   def printResults(
-    results: List[ScoredDocument],
+    results: QueryResult[ScoredDocument],
     index: Index,
     out: PrintStream = Console.out) : Unit = {
-    for ((sd, idx) <- results.zipWithIndex) {
+    for (sd <- results) {
       val name = index.name(sd.id)
-      out.println(f"test $name ${sd.score}%10.8f ${idx+1} julien")
+      out.println(f"test $name ${sd.score}%10.8f ${sd.rank} julien")
     }
   }
 }
