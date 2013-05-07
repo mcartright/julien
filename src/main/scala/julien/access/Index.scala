@@ -222,7 +222,7 @@ class Index private(
   def names: PairSeq[String] =
     new PairSeq[String](underlying.getIndexPart("names").keys,
     (k: KeyIterator) => Utility.toString(k.getValueBytes) : String )
-  def count(key: String, targetId: String): Int = positions(key, targetId).size
+  def count(key: String, targetId: String): Int = positions(key, targetId).position
   def collectionCount(key: String): Long = getKeyStatistics(key).nodeFrequency
   def docFreq(key: String): Long = getKeyStatistics(key).nodeDocumentCount
   def document(docid: InternalId): Document =

@@ -13,8 +13,23 @@ object UnorderedWindow {
 // width = -1 means that the whole document is considered a match
 class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     extends MultiTermView(terms) {
-  assume(terms.size > 1 && width >= terms.size,
-    s"Window size must be >1 and at least as big as the number of iterators")
+    assume(terms.size > 1 && width >= terms.size, s"Window size must be >1 and at least as big as the number of iterators")
+
+  // this is lazy because it needs to be attached to a data source aka "hooked up"
+  // before underlying data source can be accessed.
+  lazy val iterators: Array[ExtentArray] = {
+    val itBuffer = Array.newBuilder[ExtentArray]
+    var t = 0
+    val numTerms =  terms.size
+    while (t < numTerms) {
+      itBuffer += terms(t).positions
+      t += 1
+    }
+    itBuffer.result()
+  }
+
+  // how big??
+  val hits =  new ExtentArray(10000)
 
   override def updateStatistics(docid: InternalId) = {
     super.updateStatistics(docid)
@@ -23,49 +38,83 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   }
 
   override def positions:  ExtentArray = {
-    val hits = new ExtentArray()
-    val iterators: Array[ExtentArray] = terms.map(_.positions).toArray
 
-    while (iterators.forall(_.hasNext == true)) {
-      // Find bounds
-
-      // Used to be the code directly below:
-      //  val currentPositions = iterators.map(_.head)
-      //  val minPos = currentPositions.min
-      //  val maxPos = currentPositions.max
-      //
+    var break = false
+    while (allHaveNext(iterators) && !break) {
       // But was refactored into the following faster code:
-      val (minPos, maxPos) = {
-        var min = Int.MaxValue
-        var max = Int.MinValue
-        iterators.foreach(iter => {
-          val cur = iter.head
-          if(cur < min) min = cur
-          if(cur > max) max = cur
-        })
-        (min, max)
+     // val (minPos, maxPos, minIdx) = updateMinMaxPos(iterators)
+
+      var minIdx = -1
+      var min = Int.MaxValue
+      var max = 0
+      var j = 0
+      while (j < iterators.length) {
+        val cur = iterators(j).head()
+        if (cur < min) {
+          min = cur
+          minIdx = j
+        }
+        if (cur > max) {
+          max = cur
+        }
+        j += 1
       }
 
       // see if it fits
-      if (maxPos - minPos < width || width == -1) hits.add(minPos, maxPos)
+      if (max - min < width || width == -1) hits.add(min, max)
 
       // move all lower bound iterators foward
-      for (it <- iterators; if (it.head == minPos)) it.next
-      movePast(iterators, 0, minPos)
+     // moveMinForward(iterators, minPos)
+      if (iterators(minIdx).hasNext) {
+        iterators(minIdx).next()
+      } else {
+        break = true
+      }
     }
     hits
   }
 
-  @tailrec
-  private def movePast(
-    its: Array[ExtentArray],
-    idx :Int,
-    pos: Int): Unit =
-    if (idx == its.length) return else {
-      val it = its(idx)
-      if (it.head == pos) it.next
-      movePast(its, idx+1, pos)
+  private final def moveMinForward(iterators: Array[ExtentArray], minPos : Int): Unit = {
+    var j = 0
+    while (j < iterators.length) {
+      val cur = iterators(j).head
+      if (cur == minPos) {
+        iterators(j).next()
+      }
+      j += 1
     }
+  }
+
+  private final def allHaveNext(iterators: Array[ExtentArray]): Boolean = {
+    var j = 0
+    while (j < iterators.length) {
+      val hasNext = iterators(j).hasNext
+      if (hasNext == false) {
+        return false
+      }
+      j += 1
+    }
+    return true
+  }
+
+  private final def updateMinMaxPos(iterators: Array[ExtentArray]) = {
+    var minIdx = -1
+    var min = Int.MaxValue
+    var max = 0
+    var j = 0
+    while (j < iterators.length) {
+      val cur = iterators(j).head()
+      if (cur < min) {
+        min = cur
+        minIdx = j
+      }
+      if (cur > max) {
+        max = cur
+      }
+      j += 1
+    }
+    (min, max, minIdx)
+  }
 
   override def isDense: Boolean = terms.forall(_.isDense)
   override def size: Int = statistics.docFreq.toInt

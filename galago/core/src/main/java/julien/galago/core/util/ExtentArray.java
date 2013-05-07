@@ -20,7 +20,7 @@ public class ExtentArray {
 
   private int[] begins;
   private int[] ends;
-  private int position;
+  public int position;
   private int iterationPosition;
 
 
@@ -70,10 +70,6 @@ public class ExtentArray {
   public int end(int index) {
     if (ends == null) return begins[index]+1;
     return ends[index];
-  }
-
-  public int size() {
-    return position;
   }
 
   public void clear() {

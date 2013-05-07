@@ -9,7 +9,7 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
     hooks.forall { t => t.attachedIndex == hooks.head.attachedIndex }
 
   def children: Seq[Operator] = terms
-  def count: Int = this.positions.size
+  def count: Int = this.positions.position
 
   // Start with no knowledge
   val statistics = CountStatistics()
@@ -22,4 +22,5 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
     statistics.max = scala.math.min(statistics.max, c)
     statistics.numDocs = terms.head.statistics.numDocs
   }
+
 }

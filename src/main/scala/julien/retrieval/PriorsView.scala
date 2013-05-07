@@ -14,6 +14,6 @@ class PriorsView
   }
 
   lazy val views: Set[ViewOp] = Set[ViewOp](this)
-  def eval: Double = it.get.score
-  def score: Double = it.get.score
+  def eval: Double = underlying.score
+  def score: Double = underlying.score
 }

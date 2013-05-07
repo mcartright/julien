@@ -18,6 +18,20 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   // val adjustment = t.size * statistics.numDocs
   val adjustment = 0
 
+  lazy val iterators: Array[ExtentArray] = {
+    val itBuffer = Array.newBuilder[ExtentArray]
+    var t = 0
+    val numTerms =  terms.size
+    while (t < numTerms) {
+      itBuffer += terms(t).positions
+      t += 1
+    }
+    itBuffer.result()
+  }
+
+  val hits =  new ExtentArray(10000)
+
+
   override def updateStatistics(docid: InternalId) = {
     super.updateStatistics(docid)
     statistics.collLength =
@@ -25,8 +39,6 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   }
 
   override def positions: ExtentArray = {
-    val hits = new ExtentArray()
-    val iterators: Seq[ExtentArray] = terms.map(_.positions)
 
     while (iterators(0).hasNext) {
       // if while advancing, we don't find a hit:
