@@ -82,11 +82,14 @@ class AdaRank(
   private def selectWeakRanker(
     available: Seq[ScalarWeightedFeature]
   ): ScalarWeightedFeature = {
-    // TODO: for each available feature, run it against
-    // the set of queries - multiply its score by the query
-    // weight, and pick the one with the best overall score
+    val weightedScoresPerRanker = available.map { feat =>
+      val weightedQueryScores = weightedQueries.map { wq =>
+        wq.weight * scoreQuery(wq, feat)
+      }
+      weightedQueryScores.sum
+    }
+    val bestIdx = weightedScoresPerRanker.view.zipWithIndex.maxBy(_._1)._2
 
-    // TODO: remove this with a real implementation
-    available.head
+    return available(bestIdx)
   }
 }
