@@ -49,7 +49,7 @@ Required parameters:
     val index : Index = Index.disk(params.getString("index"))
 
     // Make a processor to run it
-    val processor = SimpleProcessor()
+    val processor = MaxscoreProcessor()
 
     // Use this to add a line-printing debugger - still experimental
     //processor.debugger =

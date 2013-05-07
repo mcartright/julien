@@ -185,7 +185,10 @@
         <artifactId>maven-idea-plugin</artifactId>
         <configuration>
           <exclude>garage/**/*.scala</exclude>
-          <exclude>**/learning/**/*.scala</exclude>
+          <exclude>**/learning/trees/**/*.scala</exclude>
+          <exclude>**/learning/neuralnet/*.scala</exclude>
+          <exclude>**/learning/linear/RankBoost.scala</exclude>
+          <exclude>**/learning/linear/LinearRegressionRank.scala</exclude>
         </configuration>
         <version>2.2</version>
       </plugin>
