@@ -29,6 +29,9 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     itBuffer.result()
   }
 
+  val hits =  new ExtentArray(10000)
+
+
   override def updateStatistics = {
     super.updateStatistics
     statistics.collLength =
@@ -36,7 +39,6 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   }
 
   override def positions: ExtentArray = {
-    val hits = new ExtentArray()
 
     while (iterators(0).hasNext) {
       // if while advancing, we don't find a hit:

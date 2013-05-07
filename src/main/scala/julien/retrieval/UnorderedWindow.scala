@@ -28,6 +28,9 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     itBuffer.result()
   }
 
+  // how big??
+  val hits =  new ExtentArray(10000)
+
   override def updateStatistics = {
     super.updateStatistics
   // Again, being lazy about this number
@@ -35,7 +38,6 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   }
 
   override def positions:  ExtentArray = {
-    val hits = new ExtentArray()
 
     var break = false
     while (allHaveNext(iterators) && !break) {
