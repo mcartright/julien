@@ -271,6 +271,10 @@ public class MemoryDocumentLengths implements MemoryIndexPart, LengthsReader {
       return "Length data can not be output as a string.";
     }
 
+    public long getValueLength() throws IOException {
+	throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     @Override
     public byte[] getValueBytes() throws IOException {
       return null;
@@ -421,6 +425,11 @@ public class MemoryDocumentLengths implements MemoryIndexPart, LengthsReader {
       cs.minLength = this.fieldLengths.minLength;
       cs.avgLength = (double) this.fieldLengths.collectionLength / (double) this.fieldLengths.nonZeroDocumentCount;
       return cs;
+    }
+
+    @Override
+    public long sizeInBytes() throws IOException {
+      throw new UnsupportedOperationException("Not supported yet.");
     }
   }
 }

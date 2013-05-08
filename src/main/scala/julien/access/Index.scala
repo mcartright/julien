@@ -125,7 +125,7 @@ class Index private(
   def collectionLength: Long = collectionStats.collectionLength
   def numDocuments: Long = collectionStats.documentCount
   def vocabularySize: Long = postingsStats.vocabCount
-
+  def partSize(s: String): Long = underlying.indexPartSize(s)
   def length(d: InternalId): Int = underlying.getLength(d)
   def length(targetId: String): Int =
     underlying.getLength(underlying.getIdentifier(targetId))
@@ -136,7 +136,6 @@ class Index private(
       asInstanceOf[CorpusReader].
       getIterator(Index.dummyBytes).
       asInstanceOf[DataIterator[GDoc]]
-
 
   /** Provided because the underlying interface provides it. However it's a
     * breach in the abstraction, and should go away in the future.

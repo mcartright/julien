@@ -56,7 +56,7 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
     collectionDocumentCount = parameters.get("statistics/documentCount", 0);
   }
 
-  // overridable function (for stemming etc) 
+  // overridable function (for stemming etc)
   public Document preProcessDocument(Document doc) throws IOException {
     return doc;
   }
@@ -317,6 +317,10 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
       return sb.toString();
     }
 
+    public long getValueLength() {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     @Override
     public byte[] getValueBytes() throws IOException {
       throw new UnsupportedOperationException("Not supported yet.");
@@ -484,6 +488,11 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
         return 0;
       }
       return currentCandidate() - other.currentCandidate();
+    }
+
+    @Override
+    public long sizeInBytes() throws IOException {
+      throw new UnsupportedOperationException("Not supported yet.");
     }
   }
 }

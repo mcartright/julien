@@ -67,7 +67,7 @@ trait QueryProcessor {
     op.upperBound < Double.PositiveInfinity &&
   op.lowerBound > Double.NegativeInfinity
 
-  final def isDone(drivers: Array[GHook]): Boolean = {
+  final def isDone(drivers: Array[Movable]): Boolean = {
     var j = 0
     while (j < drivers.length) {
       val curDone = drivers(j).isDone
@@ -79,7 +79,7 @@ trait QueryProcessor {
     return true
   }
 
-  final def matches(drivers: Array[GHook], candidate: Int): Boolean = {
+  final def matches(drivers: Array[Movable], candidate: Int): Boolean = {
     var j = 0
     while (j < drivers.length) {
       val matches = drivers(j).matches(candidate)

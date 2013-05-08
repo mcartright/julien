@@ -10,7 +10,7 @@ abstract class SimplePreloadingProcessor
     extends SimpleProcessor {
   // For encapsulation - note we assume 1-to-1
   // of features to non-lengths iterators
-  case class Sentinel(feat: FeatureOp, iter: GHook, dec: Double)
+  case class Sentinel(feat: FeatureOp, iter: Movable, dec: Double)
 
   // Also want an ordering on the Sentinels based on current location
   object SentinelOrdering extends Ordering[Sentinel] {
@@ -29,7 +29,7 @@ abstract class SimplePreloadingProcessor
     */
   def finishScoring[T <: ScoredObject[T]](
     allSentinels: Array[Sentinel],
-    iterators: Array[GHook],
+    iterators: Array[Movable],
     acc: Accumulator[T]): List[T]
 
   override def run[T <: ScoredObject[T]](
@@ -41,11 +41,11 @@ abstract class SimplePreloadingProcessor
     val hackedAcc = acc.asInstanceOf[DefaultAccumulator[ScoredDocument]]
     // Build the sentinel list
     val sentinels = _models.map { feat =>
-      val it = feat.iHooks.filter(_.isSparse).head
+      val it = feat.movers.filter(_.isSparse).head
       Sentinel(feat, it, feat.upperBound-feat.lowerBound)
     }.toArray
 
-    val iterators = _models.flatMap(_.iHooks).distinct.toArray
+    val iterators = _models.flatMap(_.movers).distinct.toArray
     var drivers = iterators.filter(_.isSparse).toArray
     preLoadAccumulator(sentinels, drivers, iterators, hackedAcc)
 
@@ -60,7 +60,7 @@ abstract class SimplePreloadingProcessor
   // have already been filtered out.
   @tailrec
   final def getMinCandidate(
-    drivers: Array[GHook],
+    drivers: Array[Movable],
     idx: Int = 0,
     m: Int = Int.MaxValue): Int = {
     if (idx == drivers.length) return m
@@ -70,8 +70,8 @@ abstract class SimplePreloadingProcessor
   @tailrec
   final def preLoadAccumulator(
     allSentinels: Array[Sentinel],
-    drivers: Array[GHook],
-    iterators: Array[GHook],
+    drivers: Array[Movable],
+    iterators: Array[Movable],
     acc: Accumulator[ScoredDocument]): Unit = {
     // base case
     if (acc.atCapacity || drivers.isEmpty) {
@@ -124,7 +124,7 @@ abstract class SimplePreloadingProcessor
       result = result && combiner.children.forall { child =>
         child.isInstanceOf[FeatureOp] &&
         isBounded(child) &&
-        child.iHooks.filter(_.isSparse).size == 1 // make sure it's 1-to-1
+        child.movers.filter(_.isSparse).size == 1 // make sure it's 1-to-1
       }
     }
     return result

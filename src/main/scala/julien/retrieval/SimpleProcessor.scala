@@ -42,8 +42,8 @@ class SimpleProcessor
     if (unprepped.size > 0) {
       // We now need to get the iterators of the unprepped nodes, zip down them
       // and update statistics until done, then reset.
-      val iterators: Array[GHook] = unprepped.flatMap(_.iHooks).toSet.filterNot(_.isDense).toArray
-
+      val iterators: Array[Movable] =
+        unprepped.flatMap(_.movers).toSet.filterNot(_.isDense).toArray
 
       while (!isDone(iterators)) {
         val active = iterators.filterNot(_.isDone)
@@ -53,7 +53,7 @@ class SimpleProcessor
         var candidate = Int.MaxValue
         while (k < active.length) {
           val curVal = active(k).at
-          if ( curVal < candidate) {
+          if (curVal < candidate) {
             candidate = curVal
           }
           k += 1
@@ -65,9 +65,10 @@ class SimpleProcessor
           i += 1
         }
 
-        if (matches(active,candidate)) {
+        if (matches(active, candidate)) {
           for (p <- unprepped) {
-            p.asInstanceOf[NeedsPreparing].updateStatistics(InternalId(candidate))
+            p.asInstanceOf[NeedsPreparing].
+              updateStatistics(InternalId(candidate))
           }
         }
 
@@ -81,8 +82,8 @@ class SimpleProcessor
     }
 
     // Do this regardless in case any iterators are recycled.
-    val hooks = models.flatMap(_.iHooks).toSet
-    for (h <- hooks) h.underlying.reset
+    val movers = models.flatMap(_.movers).toSet
+    movers.foreach(_.reset)
   }
 
   def run[T <: ScoredObject[T]](
@@ -95,40 +96,24 @@ class SimpleProcessor
     // extract iterators
     val index = _indexes.head
     val model = _models.head
-    val iterators: Array[GHook] = _models.flatMap(_.iHooks).toArray
-    val drivers: Array[GHook] = iterators.filterNot(_.isDense).toArray
+    val iterators: Array[Movable] = _models.flatMap(_.movers).distinct.toArray
+    val drivers: Array[Movable] = iterators.filterNot(_.isDense).toArray
 
     // Need to fix this
     val scorers: Seq[FeatureOp] = _models
 
     // Go
     while (!isDone(drivers)) {
-
       var k=0
       var candidate = Int.MaxValue
       while (k < drivers.length) {
 
         val drv = drivers(k)
         if (!drv.isDone) {
-        if ( drv.at < candidate) {
-          candidate = drv.at
-        }
+          if (drv.at < candidate) candidate = drv.at
         }
         k += 1
       }
-
-//      val candidate = drivers.foldLeft(Int.MaxValue) {
-//        (best, drv) =>
-//          if (drv.isDone) best else
-//          {
-//            // scala.min(drv.at,best)
-//            if (drv.at < best) {
-//              drv.at
-//            } else {
-//              best
-//            }
-//          }
-//      }
 
       var i = 0
       while (i < iterators.length) {
@@ -169,28 +154,4 @@ class SimpleProcessor
     }
     QueryResult(acc.result)
   }
-
-//  @inline final def isDone(drivers: Array[GHook]): Boolean = {
-//    var j = 0
-//    while (j < drivers.length) {
-//      val curDone = drivers(j).isDone
-//      if (curDone == false) {
-//        return false
-//      }
-//      j += 1
-//    }
-//    return true
-//  }
-//
-//  @inline final def matches(drivers: Array[GHook], candidate: Int): Boolean = {
-//    var j = 0
-//    while (j < drivers.length) {
-//      val matches = drivers(j).matches(candidate)
-//      if (matches == true) {
-//        return true
-//      }
-//      j += 1
-//    }
-//    return false
-//  }
 }

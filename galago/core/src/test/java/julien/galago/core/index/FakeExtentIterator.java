@@ -118,4 +118,9 @@ public class FakeExtentIterator implements ExtentIterator {
   public byte[] key() {
     return Utility.fromString("FAKE");
   }
+
+  @Override
+  public long sizeInBytes() throws IOException {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
 }

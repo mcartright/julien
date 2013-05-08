@@ -30,7 +30,7 @@ object WeakANDProcessor {
 class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
   override def finishScoring[T <: ScoredObject[T]](
     allSentinels: Array[Sentinel],
-    iterators: Array[GHook],
+    iterators: Array[Movable],
     acc: Accumulator[T] = DefaultAccumulator[ScoredDocument]()
   ): List[T] = {
     val hackedAcc = acc.asInstanceOf[DefaultAccumulator[ScoredDocument]]
@@ -78,7 +78,6 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
             score += sortedSentinels(i).feat.eval
             i += 1
           }
-
 
           // Pass muster, put it in the queue and update the threshold
           hackedAcc += ScoredDocument(pivot, score)
@@ -129,7 +128,7 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
     else if (s(idx).iter.at >= limDoc)
       advancingSentinel(s, lim, limDoc, idx+1, midx, m)
     else {
-      val testMin = s(idx).iter.totalEntries
+      val testMin = s(idx).iter.size
       if (testMin < m)
         advancingSentinel(s, lim, limDoc, idx+1, idx, testMin)
       else

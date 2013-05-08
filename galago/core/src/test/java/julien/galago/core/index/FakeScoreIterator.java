@@ -3,8 +3,6 @@ package julien.galago.core.index;
 
 import java.io.IOException;
 
-import julien.galago.core.index.Iterator;
-import julien.galago.core.index.ScoreIterator;
 
 
 /**
@@ -128,6 +126,11 @@ public class FakeScoreIterator implements ScoreIterator {
 
   @Override
   public byte[] key() {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  @Override
+  public long sizeInBytes() throws IOException {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 }

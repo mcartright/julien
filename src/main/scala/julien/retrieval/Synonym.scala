@@ -28,7 +28,4 @@ class Synonym(terms: Seq[Term])
     for (p <- b.sorted) hits.add(p)
     hits
   }
-
-  override def isDense: Boolean = terms.forall(_.isDense)
-  override def size: Int = statistics.docFreq.toInt
 }

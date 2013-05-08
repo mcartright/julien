@@ -1,6 +1,8 @@
 // BSD License (http://lemurproject.org/galago-license)
 package julien.galago.core.index.disk;
 
+import gnu.trove.map.hash.TObjectLongHashMap;
+
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -33,7 +35,6 @@ import julien.galago.core.parse.Document;
 import julien.galago.tupleflow.Parameters;
 import julien.galago.tupleflow.Utility;
 
-
 /**
  * This is the main class for a disk based index structure
  *
@@ -53,6 +54,7 @@ public class DiskIndex implements Index {
   protected Parameters manifest;
   protected Set<String> partNames;
   protected Map<String, IndexPartReader> loadedParts;
+  protected TObjectLongHashMap<String> sizes;
 
   public DiskIndex(String indexPath) throws IOException {
     // Make sure it's a valid location
@@ -75,6 +77,7 @@ public class DiskIndex implements Index {
 
     // Set up other structures
     loadedParts = new HashMap<String, IndexPartReader>();
+    sizes = new TObjectLongHashMap<String>();
   }
 
   protected BTreeReader getBTree(String path) throws IOException {
@@ -90,8 +93,15 @@ public class DiskIndex implements Index {
                 partname));
       }
 
-      // try to load it
+      // try to load it - first create full name.
       String fullPath = location.getAbsolutePath() + File.separator + partname;
+
+      // Quickly add the length if needed
+      if (!sizes.containsKey(partname)) {
+	File f = new File(fullPath);
+	sizes.put(partname, f.length());
+      }
+
       BTreeReader reader = getBTree(fullPath);
       if (reader == null) {
         throw new RuntimeException("Unable to load BTree: " + fullPath);
@@ -108,6 +118,23 @@ public class DiskIndex implements Index {
     } catch (ClassCastException cce) {
       throw new IllegalArgumentException("Cannot cast" + partname, cce);
     }
+  }
+
+  public long indexPartSize(String partname) throws IOException {
+    if (!sizes.containsKey(partname)) {
+      if (!partNames.contains(partname)) {
+	throw new IOException(String.format("Did not find part file %s. Dying!",
+					    partname));
+      }
+
+      // add the size
+      String fullPath = location.getAbsolutePath() + File.separator + partname;
+      File f = new File(fullPath);
+      sizes.put(partname, f.length());
+    }
+
+    // and return it
+    return sizes.get(partname);
   }
 
   public File getIndexLocation() {

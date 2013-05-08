@@ -230,6 +230,10 @@ public class MemoryDocumentNames implements MemoryIndexPart, NamesReader {
       return Utility.fromString(this.getCurrentName());
     }
 
+    public long getValueLength() {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     public DataStream getValueStream() throws IOException {
       throw new UnsupportedOperationException("Not supported yet.");
     }

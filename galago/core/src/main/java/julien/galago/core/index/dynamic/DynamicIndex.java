@@ -117,30 +117,9 @@ public class DynamicIndex implements Index, Processor<Document> {
     documentCount++;
   }
 
-  /* this Isn't required at the moment
-   *public boolean hasChanged() {
-   *  return dirty;
-   *}
-   
-  public String getDefaultPart() {
-    if (manifest.isString("defaultPart")) {
-      String part = manifest.getString("defaultPart");
-      if (parts.containsKey(part)) {
-        return part;
-      }
-    }
-
-    // otherwise, try to default
-    if (parts.containsKey("all.postings.porter")) {
-      return "all.postings.porter";
-    }
-    if (parts.containsKey("postings")) {
-      return "all.postings";
-    }
-    // otherwise - anything will do.
-    return parts.keySet().iterator().next();
+  public long indexPartSize(String partname) {
+    return 0L;
   }
-  */
 
   /**
    * Tests to see if a named index part exists.

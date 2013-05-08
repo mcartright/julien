@@ -134,6 +134,7 @@ public class DiskLengthsReader extends KeyListReader implements LengthsReader {
 
     @Override
     public void reset(BTreeIterator it) throws IOException {
+      super.reset(it);
       this.streamBuffer = it.getValueStream();
 
       // collect stats

@@ -37,6 +37,8 @@ Required parameters:
 """
 
   def run(params: Parameters, out: PrintStream): Unit = {
+    implicit val index : Index = Index.disk(params.getString("index"))
+
     val queryTerms = params.getString("query").split(" ")
     val fields = params.getList("fields").asInstanceOf[List[String]]
 
@@ -115,7 +117,6 @@ Required parameters:
 
     // Execute it
     val model = modelFeatures.result
-    val index : Index = Index.disk(params.getString("index"))
     val processor = SimpleProcessor()
     val hooks = model.flatMap(m => m.iHooks).toSet
     hooks.foreach(_.attach(index))

@@ -84,6 +84,11 @@ public abstract class KeyValueReader implements Index.IndexPartReader {
     }
 
     @Override
+    public long getValueLength() throws IOException {
+      return iterator.getValueLength();
+    }
+
+    @Override
     public byte[] getValueBytes() throws IOException{
       return iterator.getValueBytes();
     }

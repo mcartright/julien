@@ -6,7 +6,6 @@ package julien.galago.core.index;
 
 import java.io.IOException;
 
-import julien.galago.core.index.Iterator;
 import julien.galago.core.index.LengthsReader.LengthsIterator;
 
 
@@ -95,6 +94,11 @@ public class FakeLengthIterator implements LengthsIterator {
 
   @Override
   public byte[] key() {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  @Override
+  public long sizeInBytes() throws IOException {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 }

@@ -9,4 +9,9 @@ trait SparseIterator[I <: GIterator] extends IteratedHook[I] {
     underlying.syncTo(id)
     matched = underlying.hasMatch(id)
   }
+
+  override def movePast(id: Int) {
+    underlying.movePast(id)
+    matched = underlying.hasMatch(id)
+  }
 }
