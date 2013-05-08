@@ -50,9 +50,7 @@ object IndexLengths {
       buffer += l.getCurrentLength
       i += 1
     }
-    val r = buffer.result
-    println(s"totalEntries: ${l.totalEntries} length: ${r.length}")
-    r
+    buffer.result
   }
 }
 

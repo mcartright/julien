@@ -12,11 +12,6 @@ object OrderedWindow {
 class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   extends MultiTermView(terms) {
   assume(width > 0, s"OrderedWindow needs a positive width. Got $width")
-  // update the statistics object w/ our notion of "collection length"
-  // We *could* say it's dependent on the size of the gram and width, but
-  // that's a lot of work and no one else does it, so here's our lazy way out.
-  // val adjustment = t.size * statistics.numDocs
-  val adjustment = 0
 
   lazy val iterators: Array[ExtentArray] = {
     val itBuffer = Array.newBuilder[ExtentArray]
@@ -29,17 +24,8 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     itBuffer.result()
   }
 
-  val hits =  new ExtentArray(10000)
-
-
-  override def updateStatistics(docid: InternalId) = {
-    super.updateStatistics(docid)
-    statistics.collLength =
-      terms.head.statistics.collLength - adjustment
-  }
-
   override def positions: ExtentArray = {
-
+    hits.clear
     while (iterators(0).hasNext) {
       // if while advancing, we don't find a hit:
       if(!advance(iterators)) {

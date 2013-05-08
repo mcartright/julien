@@ -9,8 +9,7 @@ object Synonym {
 }
 
 class Synonym(terms: Seq[Term])
-    extends MultiTermView(terms) {
-
+    extends IntersectedTermView(terms) {
 
   // Being lazy with the estimation of this number
   override def updateStatistics(docid: InternalId) = {

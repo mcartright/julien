@@ -29,16 +29,8 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     itBuffer.result()
   }
 
-  // how big??
-  val hits =  new ExtentArray(10000)
-
-  override def updateStatistics(docid: InternalId) = {
-    super.updateStatistics(docid)
-  // Again, being lazy about this number
-    statistics.collLength = terms.head.statistics.collLength
-  }
-
   override def positions:  ExtentArray = {
+    hits.clear
     var break = false
     while (allHaveNext(iterators) && !break) {
       // But was refactored into the following faster code:
@@ -74,7 +66,7 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     hits
   }
 
-  private final def moveMinForward(iterators: Array[ExtentArray], minPos : Int): Unit = {
+  private def moveMinForward(iterators: Array[ExtentArray], minPos : Int): Unit = {
     var j = 0
     while (j < iterators.length) {
       val cur = iterators(j).head
@@ -85,7 +77,7 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     }
   }
 
-  private final def allHaveNext(iterators: Array[ExtentArray]): Boolean = {
+  private def allHaveNext(iterators: Array[ExtentArray]): Boolean = {
     var j = 0
     while (j < iterators.length) {
       val hasNext = iterators(j).hasNext
@@ -97,7 +89,7 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     return true
   }
 
-  private final def updateMinMaxPos(iterators: Array[ExtentArray]) = {
+  private def updateMinMaxPos(iterators: Array[ExtentArray]) = {
     var minIdx = -1
     var min = Int.MaxValue
     var max = 0
