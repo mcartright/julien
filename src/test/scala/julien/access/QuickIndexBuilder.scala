@@ -96,7 +96,7 @@ trait QuickIndexBuilder {
     params.set("deleteJobDir", true)
     params.set("mode", "local")
     val parser = new Parameters
-    parser.set("filetype", "wikiwex")
+    parser.set("filetype", "wex")
     params.set("parser", parser)
     val tokenizer = new Parameters
     tokenizer.set("fields",
@@ -122,7 +122,7 @@ trait QuickIndexBuilder {
   def makeSampleMemory: Index = {
     copySample
     val parserParams = new Parameters()
-    parserParams.set("filetype", "wikiwex")
+    parserParams.set("filetype", "wex")
     val tokenizerParams = new Parameters()
     tokenizerParams.set("fields",
       List("title", "title-exact", "fbname",
@@ -133,7 +133,7 @@ trait QuickIndexBuilder {
     val indexParams = new Parameters()
     indexParams.set("parser", parserParams)
     indexParams.set("tokenizer", tokenizerParams)
-    indexParams.set("filetype", "wikiwex")
+    indexParams.set("filetype", "wex")
     Index.memory(tmpSampInput.getAbsolutePath, "all", indexParams)
   }
 }

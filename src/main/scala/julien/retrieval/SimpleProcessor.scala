@@ -50,7 +50,7 @@ class SimpleProcessor
       while (!isDone(iterators)) {
     //    val active = iterators.filterNot(_.isDone)
 
-        val activeBuf = Array.newBuilder[GHook]
+        val activeBuf = Array.newBuilder[Movable]
         var l=0
         while (l < iterators.length) {
           val curItr = iterators(l)

@@ -82,7 +82,7 @@ object GalagoJulienRetrievalQuality extends App {
   }
 
   def runJulienQueries(queries: Seq[String]) = {
-    val index = Index.memoryFromDisk("/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-jul-11")
+    implicit val index = Index.memoryFromDisk("/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-jul-11")
 
    // val index = Index.disk("/usr/dan/users4/jdalton/code/julien/data/test-index-julien")
 

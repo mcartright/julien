@@ -54,7 +54,7 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   }
 
   // returns true if a result has been found
-  def advance(iterators: Seq[ExtentArray]): Boolean = {
+  def advance(iterators: Array[ExtentArray]): Boolean = {
     var idx = 0
     while(idx < iterators.size-1) {
       val left = iterators(idx)
