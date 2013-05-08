@@ -259,6 +259,7 @@ public class CountIndexReader extends KeyListReader implements AggregateIndexPar
 
     @Override
     public void reset(BTreeReader.BTreeIterator i) throws IOException {
+      super.reset(i);
       iterator = i;
       startPosition = iterator.getValueStart();
       endPosition = iterator.getValueEnd();

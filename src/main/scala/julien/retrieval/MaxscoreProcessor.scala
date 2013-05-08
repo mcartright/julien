@@ -30,13 +30,13 @@ object MaxscoreProcessor {
 class MaxscoreProcessor extends SimplePreloadingProcessor {
   override def finishScoring[T <: ScoredObject[T]](
     allSentinels: Array[Sentinel],
-    iterators: Array[GHook],
+    iterators: Array[Movable],
     acc: Accumulator[T] = DefaultAccumulator[ScoredDocument]()
   ): List[T] = {
     val hackedAcc = acc.asInstanceOf[DefaultAccumulator[ScoredDocument]]
 
     // Build the sentinel list - sort is on idf
-    val sentinels = allSentinels.sortBy(_.iter.totalEntries)
+    val sentinels = allSentinels.sortBy(_.iter.size)
 
     // establish upper bound of all features - every document starts at
     // this value and is progressively lowered to the true score
@@ -46,7 +46,7 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
     var threshold = hackedAcc.head.score
     var sidx = getSentinelIndex(sentinels, 0, threshold, startingScore)
 
-    // HACK - need to make this a "other" set
+    // Has to sit outside the sentinels...because, for now.
     val lengths = iterators.filter(_.isInstanceOf[IndexLengths]).head
 
     // Scala does not natively support a "break" construct, so let's avoid it.
@@ -57,7 +57,9 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
     var candidate = getMinCandidate(drivers)
     while (candidate < Int.MaxValue) {
       if (drivers.exists(_.matches(candidate))) {
+        // line up lengths
         lengths.moveTo(candidate)
+
         // Sum the active sentinels
         val senscore = selected.foldLeft(startingScore) { (score, sent) =>
           sent.iter.moveTo(candidate)

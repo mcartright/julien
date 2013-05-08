@@ -32,12 +32,13 @@ Required parameters:
 
 
   def run(params: Parameters, out: PrintStream): Unit = {
+    // Open an index - the implicit is to have it auto set for anything
+    // that needs it.
+    implicit val index : Index = Index.disk(params.getString("index"))
+
     // Set up to perform the first run
     val query = params.getString("query").split(" ").map(Term(_))
     val ql = Combine(query.map(a => Dirichlet(a, IndexLengths())))
-
-    // Open an index
-    val index : Index = Index.disk(params.getString("index"))
 
     // Make a processor to run it
     val processor = SimpleProcessor()

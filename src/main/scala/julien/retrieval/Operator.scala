@@ -25,6 +25,8 @@ trait Operator extends Traversable[Operator] {
       toList
   }
 
+  def movers: Traversable[Movable] = grab[Movable]
+
   def iHooks: Traversable[IteratedHook[_ <: GIterator]] = this.
     filter(_.isInstanceOf[IteratedHook[_ <: GIterator]]).
     map(_.asInstanceOf[IteratedHook[_ <: GIterator]]).
@@ -65,12 +67,7 @@ object Operator {
 /** Views provide values to the Features, but this line is
   *  blurry.
   */
-trait ViewOp extends Operator {
-  def size: Int
-  def isDense: Boolean
-  def isSparse: Boolean = !isDense
-}
-
+trait ViewOp extends Operator
 trait BooleanView extends ViewOp with BoolSrc
 trait CountView extends ViewOp with CountSrc
 trait StatisticsView extends ViewOp with StatisticsSrc
@@ -129,24 +126,6 @@ trait FunctionWeightedFeature extends FeatureOp {
   * but that definition is quite loose.
   */
 trait FeatureView extends ViewOp with FeatureOp with ChildlessOp
-
-/** This is a marker trait that indicates the need for preparation
-  * prior to execution. A typical example is an OrderedWindow view
-  * needs to calculate some statistics before scoring takes place to
-  * ensure accurate scoring.
-  *
-  * After all updates to statistics are made, the operator is told
-  * that no more statistics are coming (via a call to 'prepared').
-  *
-  * If this needs generalization to different types of preparation,
-  * I will probably add more traits to cover the different cases.
-  */
-trait NeedsPreparing {
-  def updateStatistics(docid: InternalId): Unit
-  protected var amIReady: Boolean = false
-  def isPrepared: Boolean = amIReady
-  def prepared: Unit = amIReady = true
-}
 
 // Overloaded operators that do both -- these need work
 // case class Require[T](test: (_) => Boolean, op: Operator) extends FeatureOp

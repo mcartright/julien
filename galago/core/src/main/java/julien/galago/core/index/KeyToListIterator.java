@@ -14,9 +14,20 @@ import julien.galago.tupleflow.Utility;
 public abstract class KeyToListIterator implements Iterator {
 
   protected KeyIterator iterator;
+  protected long size;
 
   public KeyToListIterator(KeyIterator ki) {
     iterator = ki;
+    try {
+      size = ki.getValueLength();
+    } catch(Exception e) {
+      size = Long.MAX_VALUE;
+    }
+  }
+  
+  @Override
+  public long sizeInBytes() {
+    return size;
   }
 
   @Override

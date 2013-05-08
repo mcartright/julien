@@ -36,6 +36,7 @@ public interface KeyIterator extends Comparable<KeyIterator> {
   public String getKeyString() throws IOException;
 
   // Access to the key's value. (Not all may be implemented)
+  public long getValueLength() throws IOException;
   public byte[] getValueBytes() throws IOException;
   public String getValueString() throws IOException;
   public Iterator getValueIterator() throws IOException;

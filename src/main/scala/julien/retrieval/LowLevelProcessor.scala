@@ -46,8 +46,8 @@ class LowLevelProcessor
     if (unprepped.size > 0) {
       // We now need to get the iterators of the unprepped nodes, zip down them
       // and update statistics until done, then reset.
-      val iterators: Set[GHook] =
-        unprepped.flatMap(_.iHooks).toSet.filterNot(_.isDense)
+      val iterators: Set[Movable] =
+        unprepped.flatMap(_.movers).toSet.filterNot(_.isDense)
 
       while (iterators.exists(!_.isDone)) {
         val active = iterators.filterNot(_.isDone)
@@ -65,8 +65,8 @@ class LowLevelProcessor
     }
 
     // Do this regardless in case any iterators are recycled.
-    val hooks = models.flatMap(_.iHooks).toSet
-    for (h <- hooks) h.underlying.reset
+    val movers = models.flatMap(_.movers).toSet
+    movers.foreach(_.reset)
   }
 
   def run[T <: ScoredObject[T]](
@@ -79,8 +79,8 @@ class LowLevelProcessor
     // extract iterators
     val index = _indexes.head
     val model = _models.head
-    val iterators: Array[GHook] = _models.flatMap(_.iHooks).toArray
-    val drivers: Array[GHook] = iterators.filterNot(_.isDense).toArray
+    val iterators: Array[Movable] = _models.flatMap(_.movers).distinct.toArray
+    val drivers: Array[Movable] = iterators.filterNot(_.isDense).toArray
 
     // Need to fix this
     val scorers : Seq[FeatureOp] = _models

@@ -51,6 +51,8 @@ public interface Index {
 
   public IndexPartReader getIndexPart(String part) throws IOException;
 
+  public long indexPartSize(String part) throws IOException;
+
   public boolean containsIdentifier(int identifer) throws IOException;
 
   public boolean containsPart(String partName);

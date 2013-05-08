@@ -8,7 +8,8 @@ package retrieval
 trait IteratedHook[I <: GIterator]
     extends ViewOp
     with ChildlessOp
-    with IndexHook {
+    with IndexHook
+    with Movable {
   /** The iterator attached to this hook. */
   var underlying: I = _
 
@@ -23,30 +24,16 @@ trait IteratedHook[I <: GIterator]
     underlying = getIterator(i)
   }
 
-  /** Returns the underlying iterator. If it is not defined,
-    * an assertion fail is thrown. So, attach this hook before
-    * using it. Doy.
-    */
-//  def underlying: I = {
-//   // assume(it.isDefined, s"Tried to use iterator of ${toString} before attaching")
-//    it
-//  }
-
   /** We have an iterator, so we can determine if its dense (has an entry
     * for every retrieval item in the collection).
     */
   override def isDense: Boolean = underlying.hasAllCandidates
 
-  /** The estimated number of entries in this view.
-    */
+  /** The estimated number of entries in this view. */
   override def size: Int = underlying.totalEntries.toInt
-
-
-  /** This should be refactored into a DenseIterator */
-  def matches(id: Int): Boolean = true
-  @inline def isDone: Boolean = underlying.isDone
-  @inline def at: Int = underlying.currentCandidate
-  @inline def moveTo(id: Int) = underlying.syncTo(id)
-  @inline def movePast(id: Int) = underlying.movePast(id)
-  @inline def totalEntries: Long = underlying.totalEntries
+  def reset: Unit = underlying.reset
+  def isDone: Boolean = underlying.isDone
+  def at: Int = underlying.currentCandidate
+  def moveTo(id: Int) = underlying.syncTo(id)
+  def movePast(id: Int) = underlying.movePast(id)
 }

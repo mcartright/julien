@@ -253,6 +253,10 @@ public class MemorySparseDoubleIndex implements MemoryIndexPart {
       return sb.toString();
     }
 
+    public long getValueLength() {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     @Override
     public byte[] getValueBytes() throws IOException {
       throw new UnsupportedOperationException("Not supported yet.");
@@ -421,6 +425,11 @@ public class MemorySparseDoubleIndex implements MemoryIndexPart {
 
     @Override
     public void setMinimumScore(double newMin) {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public long sizeInBytes() throws IOException {
       throw new UnsupportedOperationException("Not supported yet.");
     }
   }

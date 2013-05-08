@@ -93,6 +93,7 @@ public class FieldIndexReader extends KeyListReader {
 
     @Override
     public void reset(BTreeReader.BTreeIterator i) throws IOException {
+      super.reset(i);
       iterator = i;
       key = iterator.getKey();
       startPosition = iterator.getValueStart();

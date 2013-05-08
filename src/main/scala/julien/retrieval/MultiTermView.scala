@@ -3,6 +3,7 @@ package retrieval
 
 abstract class MultiTermView(terms: Seq[PositionStatsView])
     extends PositionStatsView
+    with Bounded
     with NeedsPreparing {
   // Make sure we're not making a single view of multiple indexes - that's weird
   lazy val verified =
@@ -10,6 +11,15 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
 
   def children: Seq[Operator] = terms
   def count: Int = this.positions.position
+
+  override lazy val isDense: Boolean = {
+    val ops =
+      terms.filter(_.isInstanceOf[Operator]).map(_.asInstanceOf[Operator])
+    val movers = ops.flatMap(_.movers)
+    movers.exists(_.isDense)
+  }
+
+  override def size: Int = statistics.docFreq.toInt
 
   // Start with no knowledge
   val statistics = CountStatistics()

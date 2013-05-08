@@ -36,7 +36,7 @@ public class MemoryCorpus implements DocumentReader, MemoryIndexPart {
     docCount += 1;
     termCount += doc.terms.size();
 
-    // save a subset of the document 
+    // save a subset of the document
     // - to match the output of themake-corpus function.
     corpusData.put(Utility.fromInt(doc.identifier), doc);
   }
@@ -202,6 +202,10 @@ public class MemoryCorpus implements DocumentReader, MemoryIndexPart {
     @Override
     public Iterator getValueIterator() throws IOException {
       return new MemCorpusIterator(this);
+    }
+
+    public long getValueLength() throws IOException {
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override

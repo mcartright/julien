@@ -30,6 +30,9 @@ Required parameters:
 """
 
   def run(params: Parameters, out: PrintStream) {
+    // Open an index
+    implicit val index : Index = Index.disk(params.getString("index"))
+
     val query = params.getString("query").split(" ").map(Term(_))
     val sdm =
       Combine(List[FeatureOp](
@@ -44,9 +47,6 @@ Required parameters:
         }.toSeq,
           weight = 0.05)
       ))
-
-    // Open an index
-    val index : Index = Index.disk(params.getString("index"))
 
     // Make a processor to run it
     val processor = SimpleProcessor()

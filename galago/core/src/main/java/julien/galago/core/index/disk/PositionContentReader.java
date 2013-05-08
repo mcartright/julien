@@ -15,7 +15,6 @@ import julien.galago.core.index.AggregateReader.NodeAggregateIterator;
 import julien.galago.core.index.AggregateReader.NodeStatistics;
 import julien.galago.core.util.ExtentArray;
 import julien.galago.tupleflow.DataStream;
-import julien.galago.tupleflow.Parameters;
 import julien.galago.tupleflow.Utility;
 import julien.galago.tupleflow.VByteInput;
 
@@ -267,6 +266,7 @@ public class PositionContentReader extends KeyListReader {
 
     @Override
     public void reset(BTreeReader.BTreeIterator i) throws IOException {
+      super.reset(i);
       iterator = i;
       key = iterator.getKey();
       startPosition = iterator.getValueStart();

@@ -122,6 +122,7 @@ public class SparseFloatListReader extends KeyListReader {
 
     @Override
     public void reset(BTreeReader.BTreeIterator iterator) throws IOException {
+      super.reset(iterator);
       DataStream buffered = iterator.getValueStream();
       stream = new VByteInput(buffered);
       documentCount = stream.readInt();

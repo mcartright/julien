@@ -13,7 +13,8 @@ object UnorderedWindow {
 // width = -1 means that the whole document is considered a match
 class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     extends MultiTermView(terms) {
-    assume(terms.size > 1 && width >= terms.size, s"Window size must be >1 and at least as big as the number of iterators")
+    assume(terms.size > 1 && width >= terms.size,
+      s"Window size must be >1 and at least as big as the number of iterators")
 
   // this is lazy because it needs to be attached to a data source aka "hooked up"
   // before underlying data source can be accessed.
@@ -38,7 +39,6 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   }
 
   override def positions:  ExtentArray = {
-
     var break = false
     while (allHaveNext(iterators) && !break) {
       // But was refactored into the following faster code:
@@ -115,7 +115,4 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     }
     (min, max, minIdx)
   }
-
-  override def isDense: Boolean = terms.forall(_.isDense)
-  override def size: Int = statistics.docFreq.toInt
 }

@@ -28,12 +28,20 @@ public abstract class KeyListReader extends KeyValueReader {
     public static final int HAS_MAXTF = 0x02;
     public static final int HAS_INLINING = 0x04;
     protected byte[] key;
-
+    protected long size;
+      
     public ListIterator(byte[] key) {
       this.key = key;
     }
 
-    public abstract void reset(BTreeReader.BTreeIterator it) throws IOException;
+    @Override
+    public long sizeInBytes() {
+      return size;
+    }
+    
+    public void reset(BTreeReader.BTreeIterator it) throws IOException {
+      size = it.getValueLength();
+    }
 
     @Override
     public byte[] key() {

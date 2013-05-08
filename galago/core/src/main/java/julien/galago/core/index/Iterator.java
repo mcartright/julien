@@ -110,4 +110,6 @@ public interface Iterator extends Comparable<Iterator> {
    *  Useful for dump index/iterator functions
    */
   public String getEntry() throws IOException;
+  
+  public long sizeInBytes() throws IOException;
 }

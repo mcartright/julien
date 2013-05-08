@@ -28,11 +28,10 @@ Required parameters:
 """
 
   def run(params: Parameters, out: PrintStream): Unit = {
+    implicit val index : Index = Index.disk(params.getString("index"))
+
     val query = params.getString("query").split(" ").map(Term(_))
     val ql = Combine(query.map(a => Dirichlet(a, IndexLengths())))
-
-    // Open a small in-memory index
-    val index : Index = Index.disk(params.getString("index"))
 
     // Make a processor to run it
     val processor = MaxscoreProcessor()

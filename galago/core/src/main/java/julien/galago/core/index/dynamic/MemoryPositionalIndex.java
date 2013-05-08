@@ -317,6 +317,10 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
       return nextKey();
     }
 
+    public long getValueLength() {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     @Override
     public String getValueString() throws IOException {
       long count = -1;
@@ -528,6 +532,11 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
     public byte[] key() {
       return postings.key;
     }
+
+    @Override
+    public long sizeInBytes() throws IOException {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
   }
 
   public class CountsIterator implements NodeAggregateIterator, CountIterator {
@@ -672,6 +681,11 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
     @Override
     public byte[] key() {
       return postings.key;
+    }
+
+    @Override
+    public long sizeInBytes() throws IOException {
+      throw new UnsupportedOperationException("Not supported yet.");
     }
   }
 }

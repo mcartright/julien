@@ -105,4 +105,9 @@ public class NullExtentIterator
     stats.maximumCount = 0;
     return stats;
   }
+
+  @Override
+  public long sizeInBytes() throws IOException {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
 }

@@ -22,6 +22,7 @@ trait SimpleProcessorBehavior extends QuickIndexBuilder { this: FlatSpec =>
   }
 
   def getQuery(terms: List[String]): Tuple2[FeatureOp, String] = {
+    implicit val defaultIndex = index
     val models = List("BM25", "JM", "Dir")
     val chosen = if (config.contains("scorer"))
       config("scorer").asInstanceOf[String]
@@ -110,11 +111,8 @@ trait SimpleProcessorBehavior extends QuickIndexBuilder { this: FlatSpec =>
       expectResult(0) { pFactory.models.size }
     }
 
-    it should "start with no indexes" in {
-      expectResult(0) { pFactory.indexes.size }
-    }
-
     it should "accept feature operators" in {
+      implicit val implicitIndex = index
       val proc = pFactory
       val f1 = Dirichlet(Term("the"), IndexLengths())
       proc add f1
@@ -129,63 +127,11 @@ trait SimpleProcessorBehavior extends QuickIndexBuilder { this: FlatSpec =>
       expectResult(true) { models(f3) }
     }
 
-    it should "accept indexes" in {
-      val proc = pFactory
-      proc add index
-      expectResult(1) { proc.indexes.size }
-      expectResult(true) { proc.indexes.toSet(index) }
-    }
-
-    it should "accept the same index only once" in {
-      val proc = pFactory
-      proc add index
-      proc add index
-      expectResult(1) { proc.indexes.size }
-    }
-
     it should "complain if executed with no models" in {
       val proc = pFactory
-      proc add index
       intercept[AssertionError] {
         val results = proc.run(DefaultAccumulator[ScoredDocument]())
       }
-    }
-
-    it should "complain if executed with no indexes" in {
-      val proc = pFactory
-      proc add Dirichlet(Term("a"), IndexLengths())
-      intercept[AssertionError] {
-        proc.run(DefaultAccumulator[ScoredDocument]())
-      }
-    }
-
-    it should "complain if more than 1 index is provided" in {
-      val proc = pFactory
-      proc add index
-
-      // Let's just open another one
-      val index2 = makeWiki5Memory
-      proc add index2
-
-      // And try to execute it
-      proc add Dirichlet(Term("the"), IndexLengths())
-      intercept[AssertionError] {
-        val result = proc.run(DefaultAccumulator[ScoredDocument]())
-      }
-      deleteWiki5Memory
-    }
-
-    it should "automatically attach hooks if only 1 index is provided" in {
-      val proc = pFactory
-      val terms =
-        "little red riding hood went to the store".split(" ").map(Term(_))
-      val l = IndexLengths()
-      val ql = Combine(terms.map(t => Dirichlet(t, l)))
-      proc add ql
-      proc add index
-      expectResult(false) { ql.iHooks.exists(_.isAttached) }
-      expectResult(true) { proc.validated }
-      expectResult(true) { ql.iHooks.forall(_.isAttached) }
     }
   }
 }
@@ -232,7 +178,9 @@ class SimpleProcessorSpec
   it should "iterate over and score every candidate document (stupidly)" in {
     val queryTerms =
       List("arrangement", "baptist", "goethe", "liberal", "october")
-    val query = Combine(queryTerms.map(t => TermCount(t)))
+    val l = IndexLengths()(index)
+    val query = Combine(queryTerms.map(t => TF(Term(t), l)))
+    query.iHooks.foreach(_.attach(index))
     val sp = simpleProc
     sp add query
     sp add index
@@ -240,15 +188,19 @@ class SimpleProcessorSpec
     val results: QueryResult[ScoredDocument] = sp.run(acc)
 
     // Now let's do this by hand, and compare results
-
+    l.reset
     val counts = scala.collection.mutable.ListBuffer[ScoredDocument]()
     val iterators = queryTerms.map(t => index.iterator(t))
     while (iterators.exists(!_.isDone)) {
       val min = iterators.filterNot(_.isDone).map(_.currentCandidate).min
       iterators.foreach(_.syncTo(min))
+      l.moveTo(min)
       if (iterators.exists(_.hasMatch(min))) {
-        val total = iterators.foldLeft(0) { (sum , iter) =>
-          if (iter.hasMatch(min)) sum + iter.count else sum
+        val total = iterators.foldLeft(0.0) { (sum , iter) =>
+          if (iter.hasMatch(min))
+            sum + (iter.count.toDouble / l.length)
+          else
+            sum
         }
         val candidate = ScoredDocument(InternalId(min), total.toDouble)
         counts += candidate
@@ -273,8 +225,7 @@ class SimpleProcessorSpec
   "The WeakANDProcessor" should behave like aSimpleProcessor(wandProc)
   it should behave like anAccumulatorProcessor(simpleProc, wandProc)
 
-  /*
   "Maxscore and WeakAND" should
   behave like anAccumulatorProcessor(maxProc, wandProc)
- */
+
 }
