@@ -33,7 +33,7 @@ import org.xml.sax.InputSource;
 public class WikiWexParser extends DocumentStreamParser {
 
   BufferedReader reader;
-  /** Creates a new instance of TrecTextParser */
+  /** Creates a new instance of Wikipedia wex parser */
   public WikiWexParser(DocumentSplit split, Parameters p) throws IOException {
     super(split, p);
     this.reader = getBufferedReader(split);

@@ -3,6 +3,8 @@ package retrieval
 
 import julien._
 import julien.eval.QueryResult
+import collection.mutable
+import collection.mutable.ArrayBuffer
 
 object SimpleProcessor {
   def apply() = new SimpleProcessor()
@@ -46,12 +48,24 @@ class SimpleProcessor
 
 
       while (!isDone(iterators)) {
-        val active = iterators.filterNot(_.isDone)
+    //    val active = iterators.filterNot(_.isDone)
 
+        val activeBuf = Array.newBuilder[GHook]
+        var l=0
+        while (l < iterators.length) {
+          val curItr = iterators(l)
+          if (!curItr.isDone) {
+            activeBuf += curItr
+          }
+          l += 1
+        }
+        val active = activeBuf.result()
+
+        val numActive = active.length
         //val candidate = active.map(_.at).min
         var k=0
         var candidate = Int.MaxValue
-        while (k < active.length) {
+        while (k < numActive) {
           val curVal = active(k).at
           if ( curVal < candidate) {
             candidate = curVal
@@ -60,7 +74,7 @@ class SimpleProcessor
         }
 
         var i = 0
-        while (i < active.length) {
+        while (i < numActive) {
           active(i).moveTo(candidate)
           i += 1
         }
@@ -72,7 +86,7 @@ class SimpleProcessor
         }
 
         var j = 0
-        while (j < active.length) {
+        while (j < numActive) {
           active(j).movePast(candidate)
           j += 1
         }
@@ -99,7 +113,7 @@ class SimpleProcessor
     val drivers: Array[GHook] = iterators.filterNot(_.isDense).toArray
 
     // Need to fix this
-    val scorers: Seq[FeatureOp] = _models
+    val scorers: Array[FeatureOp] = _models.toArray
 
     // Go
     while (!isDone(drivers)) {
