@@ -44,19 +44,6 @@ public class ExtentArray {
         this(16);
     }
 
-    private static final boolean activePositionsEqual(int[] a, int a1Length, int[] a2, int a2Length) {
-        if (a == a2)
-            return true;
-        if (a == null || a2 == null)
-            return false;
-        if (a2Length != a1Length)
-            return false;
-        for (int i = 0; i < a1Length; i++)
-            if (a[i] != a2[i])
-                return false;
-        return true;
-    }
-
     private void makeRoom() {
         begins = Arrays.copyOf(begins, begins.length * 2);
         if (ends != null) ends = Arrays.copyOf(ends, ends.length * 2);
@@ -140,6 +127,23 @@ public class ExtentArray {
 
         if (!activePositionsEqual(begins, length, that.begins, that.length)) return false;
         if (!activePositionsEqual(ends, length, that.ends, that.length)) return false;
+        return true;
+    }
+
+    private static final boolean activePositionsEqual(int[] a,
+						      int a1Length,
+						      int[] a2,
+						      int a2Length)
+    {
+        if (a==a2)
+            return true;
+        if (a==null || a2==null)
+            return false;
+        if (a2Length != a1Length)
+            return false;
+        for (int i=0; i<a1Length; i++)
+            if (a[i] != a2[i])
+                return false;
         return true;
     }
 

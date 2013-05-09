@@ -32,3 +32,4 @@ object QueryJudgmentSet {
     queryJudgments
   }
 }
+
