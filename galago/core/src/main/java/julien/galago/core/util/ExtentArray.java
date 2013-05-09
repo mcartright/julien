@@ -116,16 +116,21 @@ public class ExtentArray {
 
         ExtentArray that = (ExtentArray) o;
 
-        if (length != that.length) return false;
-        int[] beginSubset = Arrays.copyOfRange(begins, 0, length);
-        int[] otherBegins =  Arrays.copyOfRange(that.begins, 0, that.length);
+        activePositionsEqual(begins, length, that.begins, that.length);
+        activePositionsEqual(ends, length, that.ends, that.length);
+        return true;
+    }
 
-        int[] endsSubset = Arrays.copyOfRange(ends, 0, length);
-        int[] endsBegins =  Arrays.copyOfRange(that.ends, 0, that.length);
-
-        if (!Arrays.equals(beginSubset, otherBegins)) return false;
-        if (!Arrays.equals(endsSubset, endsBegins)) return false;
-
+    boolean activePositionsEqual(int[] a, int a1Length, int[] a2, int a2Length) {
+        if (a==a2)
+            return true;
+        if (a==null || a2==null)
+            return false;
+        if (a2Length != a1Length)
+            return false;
+        for (int i=0; i<a1Length; i++)
+            if (a[i] != a2[i])
+                return false;
         return true;
     }
 
