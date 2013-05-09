@@ -22,8 +22,8 @@ import julien.galago.tupleflow.VByteInput;
 
 /**
  * Reads a simple positions-based index, where each inverted list in the index
- * contains both term count information and term position information. The term
- * counts data is stored separately from term position information for faster
+ * contains both term count information and term length information. The term
+ * counts data is stored separately from term length information for faster
  * query processing when no positions are needed.
  *
  * (12/16/2010, irmarc): In order to facilitate faster count-only processing,
@@ -294,7 +294,7 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
       builder.append(",");
       builder.append(currentDocument);
       ExtentArray e = extents();
-      for (int i = 0; i < e.position; ++i) {
+      for (int i = 0; i < e.length; ++i) {
         builder.append(",");
         builder.append(e.begin(i));
       }

@@ -18,7 +18,7 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
     if (loc != null && countCache.containsKey(loc.at)) {
       countCache.get(loc.at)
     } else {
-      this.positions.position
+      this.positions.length
     }
   }
 

@@ -167,7 +167,7 @@ public class PositionContentWriter
 
     /**
      * The length of the posting list. This is the sum of the docid, count, and
-     * position buffers plus the skip buffers (if they exist).
+     * length buffers plus the skip buffers (if they exist).
      *
      * @return
      */
@@ -229,7 +229,7 @@ public class PositionContentWriter
 
     /**
      * Add a new document id to the PositionsList. Assumes there will be at
-     * least one position added afterwards (otherwise why add the docid?).
+     * least one length added afterwards (otherwise why add the docid?).
      *
      * @param documentID
      * @throws IOException

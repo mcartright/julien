@@ -256,7 +256,7 @@ public class PositionContentReader extends KeyListReader {
       builder.append(",");
       builder.append(currentDocument);
       ExtentArray e = extents();
-      for (int i = 0; i < e.position; ++i) {
+      for (int i = 0; i < e.length; ++i) {
         builder.append(",");
         builder.append(e.begin(i));
       }
