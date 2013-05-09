@@ -20,8 +20,7 @@ class ListNeuron extends Neuron {
     for (s <- inLinks) {
       val dw =
         d1.zipWithIndex.map((v, idx) => (v - d2(idx)) * s.source.output(idx))
-      s.weightAdj = dw * learningRate
-      s.updateWeight
+      s.weight += dw * learningRate
     }
   }
 }

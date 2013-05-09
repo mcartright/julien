@@ -11,6 +11,7 @@ resolvers ++= Seq("Galago" at "http://ayr.cs.umass.edu/m2/repository",
 )
 
 libraryDependencies ++= Seq(
+  "org.apache.commons" % "commons-compress" % "1.0",
   "edu.umass.ciir" % "macros" % "0.1",
   "org.antlr" % "antlr4-runtime" % "4.0",
   "julien.galago" % "core" % "3.3",
@@ -23,7 +24,9 @@ excludeFilter in Compile := new SimpleFilter(s =>
 )
 
 scalacOptions in (Compile, doc) ++=
-	      Opts.doc.sourceUrl("https://github.com/CIIR/julien/tree/master/src/main/scala/€{FILE_PATH}.scala")
+		Opts.doc.sourceUrl("https://github.com/CIIR/julien/tree/master/src/main/scala/€{FILE_PATH}.scala") ++
+	       Opts.doc.title("Julien") ++
+	       Seq("-d", "/var/www/julien-docs/julien")
 
 doc in Compile <<= (doc in Compile) map { in =>
   Seq("bash","-c",""" for x in $(find target/scala-2.10/api/ -type f); do sed -i "s_/usr/ayr/tmp1/irmarc/projects/julien/src/main/scala/__" $x; done """).!

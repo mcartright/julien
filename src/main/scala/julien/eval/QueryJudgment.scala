@@ -2,6 +2,7 @@ package julien
 package eval
 
 import gnu.trove.map.hash.TObjectIntHashMap
+import gnu.trove.iterator.TObjectIntIterator
 import scala.collection.Iterable
 
 case class Judgment(var name: String, var label: Int)
@@ -54,4 +55,26 @@ class QueryJudgment(val queryName: String) extends Iterable[Judgment] {
       j
     }
   }
+
+  // Support for pairwise preference learning
+  lazy val numPrefPairs: Int = {
+    var sum = 0
+    val b = Array.newBuilder[Judgment]()
+    val it = judgments.iterator
+    while (it.hasNext) {
+      it.advance
+      b += Judgment(it.key, it.value)
+    }
+    val jlist = b.result
+    var sum = 0
+      for (
+        i < 0 until jlist.length-1;
+        j <- i+1 until jlist.length;
+        if b(i).label > b(j).label
+      ) sum += 1
+    sum
+  }
+
+  def isBetter(first: String, second: String): Boolean =
+    judgments.get(first) > judgments.get(second)
 }
