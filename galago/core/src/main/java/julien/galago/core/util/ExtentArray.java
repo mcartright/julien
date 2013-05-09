@@ -116,12 +116,12 @@ public class ExtentArray {
 
         ExtentArray that = (ExtentArray) o;
 
-        activePositionsEqual(begins, length, that.begins, that.length);
-        activePositionsEqual(ends, length, that.ends, that.length);
+        if (!activePositionsEqual(begins, length, that.begins, that.length)) return false;
+        if (! activePositionsEqual(ends, length, that.ends, that.length)) return false;
         return true;
     }
 
-    boolean activePositionsEqual(int[] a, int a1Length, int[] a2, int a2Length) {
+    private static final boolean activePositionsEqual(int[] a, int a1Length, int[] a2, int a2Length) {
         if (a==a2)
             return true;
         if (a==null || a2==null)
