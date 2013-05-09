@@ -67,7 +67,7 @@ public class ParserSelector extends StandardStep<DocumentSplit, Document> {
 	{"trecweb", TrecWebParser.class.getName()},
 	{"twitter", TwitterParser.class.getName()},
 	{"wiki", WikiParser.class.getName()},
-	{"wikiwex", WikiWexParser.class.getName()}
+	{"wex", WikiWexParser.class.getName()}
     };
 
   private HashMap<String, Class> fileTypeMap;

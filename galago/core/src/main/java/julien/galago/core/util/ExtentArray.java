@@ -30,6 +30,11 @@ public class ExtentArray {
     iterationPosition = position = 0;
   }
 
+  public ExtentArray(int[] begins) {
+      this.begins = begins;
+      position = begins.length;
+  }
+
   public ExtentArray() {
     this(16);
   }

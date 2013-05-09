@@ -23,13 +23,13 @@ object GalagoJulienRetrievalQuality extends App {
  //  Thread.sleep(10000)
   val myTestQueries = Array("1 wood construction")
 
-  val queries = tsvToJulienQuery()
+  val queries = myTestQueries //tsvToJulienQuery()
 
   val julResults = runJulienQueries(queries)
   val galagoResults = runGalagoQueries(queries)
-  // verifyRanks(queries, julResults, galagoResults)
- //  verifyEval("./data/qrels/robust04.qrels", galagoResults)
- //  verifyEval("./data/qrels/robust04.qrels", julResults)
+   verifyRanks(queries, julResults, galagoResults)
+  verifyEval("./data/qrels/robust04.qrels", galagoResults)
+  verifyEval("./data/qrels/robust04.qrels", julResults)
 
 
   def verifyEval(qrelFile: String, results: Map[String, Seq[ScoredDocument]]) {
@@ -82,16 +82,22 @@ object GalagoJulienRetrievalQuality extends App {
   }
 
   def runJulienQueries(queries: Seq[String]) = {
-    val index = Index.disk("/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-jul")
+    //implicit val index = Index.memoryFromDisk("/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-jul-11")
 
-   // val index = Index.disk("/usr/dan/users4/jdalton/code/julien/data/test-index-julien")
+    implicit val index = Index.disk("/usr/dan/users4/jdalton/code/julien/data/test-index-julien")
 
     val resultMap = HashMap[String, Seq[ScoredDocument]]()
 
     val mu = 1269
     println("start julien")
-    val start = System.currentTimeMillis()
+    var start = System.currentTimeMillis()
+
     for (i <- 1 to 1) {
+
+      if (i == 2) {
+        start = System.currentTimeMillis()
+      }
+
       for (line <- queries) {
 
         val query = line.split("\\s+").drop(1).map(Term(_))
@@ -135,10 +141,12 @@ object GalagoJulienRetrievalQuality extends App {
 
         // run it and get results
         val results = processor.run()
-//        val galagoResults = for (r <- results.zipWithIndex) yield {
-//          val name = index.name(r._1.asInstanceOf[julien.retrieval.ScoredDocument].docid)
-//          new retrieval.ScoredDocument(name, r._2 + 1, r._1.asInstanceOf[julien.retrieval.ScoredDocument].score)
-//        }
+        for ((r, idx) <- results.zipWithIndex) yield {
+          val doc = r.asInstanceOf[julien.retrieval.ScoredDocument]
+          val name = index.name(doc.id)
+          doc.name = name
+         // new retrieval.ScoredDocument(name, idx + 1, r._1.asInstanceOf[julien.retrieval.ScoredDocument].score)
+        }
         // printResults(results, index)
         resultMap += (line.split("\\s+")(0) -> results)
       }
@@ -157,10 +165,10 @@ object GalagoJulienRetrievalQuality extends App {
     p.set("uniw", 0.87264)
     p.set("odw", 0.07906)
     p.set("uww", 0.04829)
-   // p.set("index", "/usr/dan/users4/jdalton/code/julien/data/test-index-galago34")
-    p.set("index", "/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-g34")
+    p.set("index", "/usr/dan/users4/jdalton/code/julien/data/test-index-galago34")
+   // p.set("index", "/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-g34")
     p.set("requested", 1000)
- //   p.set("annotate", true)
+    p.set("annotate", true)
     p.set("stemming", false)
     p.set("deltaReady", false)
     // conceptIndexParams.set("print", true)
@@ -181,7 +189,7 @@ object GalagoJulienRetrievalQuality extends App {
         val transformed = text2ConceptRetrieval.transformQuery(root, p)
         // println(transformed.toPrettyString)
         val proc = new RankedDocumentModel(text2ConceptRetrieval)
-        var results = text2ConceptRetrieval.runQuery(transformed, p) //proc.execute(transformed, p)
+        var results = proc.execute(transformed, p) //text2ConceptRetrieval.runQuery(transformed, p) //
         if (results == null) {
           results = Array.empty[org.lemurproject.galago.core.retrieval.ScoredDocument]
         }
@@ -193,14 +201,14 @@ object GalagoJulienRetrievalQuality extends App {
 
         resultMap += (queryLine.split("\\s+")(0) -> julienResults)
 
-//              for (r <- results) {
-//                val name = text2ConceptRetrieval.getDocumentName(r.document)
-//                println("document: " + name)
-//                println(r.annotation.toString)
-//                r.documentName = name
-            //    println(f"test ${r.documentName} ${r.score}%10.8f ${r.rank} galago")
+              for (r <- results) {
+                val name = text2ConceptRetrieval.getDocumentName(r.document)
+                println("document: " + name)
+                println(r.annotation.toString)
+                r.documentName = name
+                println(f"test ${r.documentName} ${r.score}%10.8f ${r.rank} galago")
 
-            //  }
+              }
       }
     }
     val end = System.currentTimeMillis()

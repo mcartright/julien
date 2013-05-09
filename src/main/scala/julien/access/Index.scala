@@ -56,6 +56,12 @@ object Index {
     return new Index(input, memoryIndex, defaultPart)
   }
 
+  def memoryFromDisk(inputPath:String,  defaultPart: String = "all") : Index = {
+    val memoryIndex = new MemoryIndex(inputPath)
+    return new Index(inputPath, memoryIndex, defaultPart)
+  }
+
+
   def dynamic(
     input: String,
     defaultPart: String = "all",
