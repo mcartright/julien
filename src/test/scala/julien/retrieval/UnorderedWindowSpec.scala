@@ -5,6 +5,7 @@ import org.scalatest._
 import org.scalamock.scalatest.proxy.MockFactory
 import julien._
 
+import galago.core.util.ExtentArray
 class UnorderedWindowSpec extends FlatSpec with MockFactory {
 
   def fixture = new {
@@ -24,6 +25,14 @@ class UnorderedWindowSpec extends FlatSpec with MockFactory {
     val pos1 = Array(1,20)
     val pos2 = Array(21)
     val pos3 = Array(2, 19)
+
+    val p1 = new ExtentArray(pos1)
+    val p2 = new ExtentArray(pos2)
+    val p3 = new ExtentArray(pos3)
+
+    mock1.expects('positions)().returning(p1) noMoreThanTwice()
+    mock2.expects('positions)().returning(p2) noMoreThanTwice()
+    mock3.expects('positions)().returning(p3) noMoreThanTwice()
 
     val thrown = intercept[AssertionError] {
       val uw = UnorderedWindow(1, mock1, mock2, mock3)
@@ -45,6 +54,21 @@ class UnorderedWindowSpec extends FlatSpec with MockFactory {
     val pos2 = Array(21)
     val pos3 = Array(2, 19)
 
+    val p1 = new ExtentArray(pos1)
+    val p2 = new ExtentArray(pos2)
+    val p3 = new ExtentArray(pos3)
+
+    mock1.expects('positions)().returning(p1)
+    mock2.expects('positions)().returning(p2)
+    mock3.expects('positions)().returning(p3)
+
     val uw = UnorderedWindow(3, mock1, mock2, mock3)
+
+    val hits = new ExtentArray(Array(19))
+    expectResult(hits) {uw.positions}
+
+     val ow1 = OrderedWindow(1, mock1, mock2, mock3)
+
+      expectResult(hits) {ow1.positions}
   }
 }

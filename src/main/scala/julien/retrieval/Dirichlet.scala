@@ -66,8 +66,11 @@ class Dirichlet(
   def eval: Double = score(op.count, lengths.length)
 
   def score(c: Int, l: Int): Double = {
+    val num = (c + (mu * cf))
+    val den = (l + mu)
+    val rawScore = scala.math.log((c + (mu * cf)) / (l + mu))
     val score = localWeight * scala.math.log((c + (mu * cf)) / (l + mu))
-    //  debug(s"DIRICHLET  c: $c cf: $cf mu: $mu num: $num den: $den score: $score")
+    debug(s"DIRICHLET  c: $c cf: $cf mu: $mu num: $num den: $den raw: $rawScore weight: $weight final score: $score")
     score
   }
 }
