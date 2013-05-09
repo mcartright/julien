@@ -65,7 +65,8 @@ class UnorderedWindowSpec extends FlatSpec with MockFactory {
     val uw = UnorderedWindow(3, mock1, mock2, mock3)
 
     val hits = new ExtentArray(Array(19))
-    expectResult(hits) {uw.positions}
+    val got = uw.positions
+    expectResult(hits) { uw.positions }
 
      val ow1 = OrderedWindow(1, mock1, mock2, mock3)
 
