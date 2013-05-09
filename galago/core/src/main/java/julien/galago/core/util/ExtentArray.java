@@ -35,6 +35,12 @@ public class ExtentArray {
       length = begins.length;
   }
 
+    public ExtentArray(int[] begins, int[] ends) {
+        this.begins = begins;
+        this.ends = ends;
+        length = begins.length;
+    }
+
   public ExtentArray() {
     this(16);
   }
