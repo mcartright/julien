@@ -120,8 +120,11 @@ public class ExtentArray {
         int[] beginSubset = Arrays.copyOfRange(begins, 0, length);
         int[] otherBegins =  Arrays.copyOfRange(that.begins, 0, that.length);
 
+        int[] endsSubset = Arrays.copyOfRange(ends, 0, length);
+        int[] endsBegins =  Arrays.copyOfRange(that.ends, 0, that.length);
+
         if (!Arrays.equals(beginSubset, otherBegins)) return false;
-        if (!Arrays.equals(ends, that.ends)) return false;
+        if (!Arrays.equals(endsSubset, endsBegins)) return false;
 
         return true;
     }
