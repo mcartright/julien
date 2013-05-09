@@ -34,5 +34,5 @@ class QueryJudgmentSet(
 queryMap: Map[String, QueryJudgment]
 ) extends MapProxy[String, QueryJudgment] {
   def self = queryMap
-  def numPrefPairs: Int = queryMap.mapValues(_.numPrefPairs).sum
+  def numPrefPairs: Int = queryMap.values.map(_.numPrefPairs).sum
 }

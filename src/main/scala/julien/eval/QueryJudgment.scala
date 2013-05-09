@@ -58,8 +58,7 @@ class QueryJudgment(val queryName: String) extends Iterable[Judgment] {
 
   // Support for pairwise preference learning
   lazy val numPrefPairs: Int = {
-    var sum = 0
-    val b = Array.newBuilder[Judgment]()
+    val b = Array.newBuilder[Judgment]
     val it = judgments.iterator
     while (it.hasNext) {
       it.advance
@@ -68,9 +67,9 @@ class QueryJudgment(val queryName: String) extends Iterable[Judgment] {
     val jlist = b.result
     var sum = 0
       for (
-        i < 0 until jlist.length-1;
+        i <- 0 until jlist.length-1;
         j <- i+1 until jlist.length;
-        if b(i).label > b(j).label
+        if jlist(i).label > jlist(j).label
       ) sum += 1
     sum
   }
