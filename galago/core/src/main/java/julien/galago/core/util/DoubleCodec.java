@@ -123,7 +123,7 @@ public class DoubleCodec {
 	    mask <<= 8;
 	    mask |= (int) (0xFF & buffer[i]);
 	}
-	// Shift back to the right position
+	// Shift back to the right length
 	mask >>>= (lzc-(62-(8*(used-1))));
 	
 	// De-mask	

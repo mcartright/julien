@@ -203,7 +203,7 @@ public class PositionIndexWriter implements
       if (documents.length() > 0) {
         counts.add(positionCount);
 
-        // Now conditionally add in the skip marker and the array of position bytes
+        // Now conditionally add in the skip marker and the array of length bytes
         if (positionCount > MARKER_MINIMUM) {
           positions.add(positionBlock.length());
         }
@@ -242,7 +242,7 @@ public class PositionIndexWriter implements
 
     /**
      * The length of the posting list. This is the sum of the docid, count, and
-     * position buffers plus the skip buffers (if they exist).
+     * length buffers plus the skip buffers (if they exist).
      *
      * @return
      */
@@ -327,7 +327,7 @@ public class PositionIndexWriter implements
 
     /**
      * Add a new document id to the PositionsList. Assumes there will be at
-     * least one position added afterwards (otherwise why add the docid?).
+     * least one length added afterwards (otherwise why add the docid?).
      *
      * @param documentID
      * @throws IOException
@@ -337,7 +337,7 @@ public class PositionIndexWriter implements
       if (documents.length() > 0) {
         counts.add(positionCount);
 
-        // Now add in the skip marker and the array of position bytes
+        // Now add in the skip marker and the array of length bytes
         if (positionCount > MARKER_MINIMUM) {
           positions.add(positionBlock.length());
         }
@@ -360,7 +360,7 @@ public class PositionIndexWriter implements
     }
 
     /**
-     * Adds a single position for the latest document added in the
+     * Adds a single length for the latest document added in the
      * PositionsList.
      *
      * @param position

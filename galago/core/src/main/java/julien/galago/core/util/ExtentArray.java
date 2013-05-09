@@ -20,19 +20,19 @@ public class ExtentArray {
 
   private int[] begins;
   private int[] ends;
-  public int position;
-  private int iterationPosition;
+  public int length;
+  private int curPos;
 
 
   public ExtentArray(int capacity) {
     begins = new int[capacity];
     ends = null; // lazy load these
-    iterationPosition = position = 0;
+    curPos = length = 0;
   }
 
   public ExtentArray(int[] begins) {
       this.begins = begins;
-      position = begins.length;
+      length = begins.length;
   }
 
   public ExtentArray() {
@@ -49,23 +49,23 @@ public class ExtentArray {
   }
 
   public void add(int begin) {
-    if (position == begins.length) {
+    if (length == begins.length) {
       makeRoom();
     }
 
-    begins[position] = begin;
-    position += 1;
+    begins[length] = begin;
+    length += 1;
   }
 
   public void add(int begin, int end) {
-    if (position == begins.length) {
+    if (length == begins.length) {
       makeRoom();
     }
 
-    begins[position] = begin;
-    if (ends == null && position == 0) ends = new int[begins.length];
-    ends[position] = end;
-    position += 1;
+    begins[length] = begin;
+    if (ends == null && length == 0) ends = new int[begins.length];
+    ends[length] = end;
+    length += 1;
   }
 
   public int begin(int index) {
@@ -78,34 +78,59 @@ public class ExtentArray {
   }
 
   public void clear() {
-    position = 0;
+    length = 0;
   }
 
   public String toString(){
-    return String.format("ExtentArray:count=%d", position);
+    return String.format("ExtentArray:count=%d", length);
   }
 
   // ITERATOR ITERATOR ITERATOR ITERATOR ITERATOR
   public boolean hasNext() {
-      return iterationPosition < position-1;
+      return curPos < length;
   }
 
   public int next() {
-    int toReturn = begins[iterationPosition];
-    iterationPosition++;
+    int toReturn = begins[curPos];
+    curPos++;
     return toReturn;
   }
 
   public int head() {
-    return begins[iterationPosition];
+    return begins[curPos];
   }
 
   public int end() {
-    if (ends == null) return begins[iterationPosition]+1;
-    else return ends[iterationPosition];
+    if (ends == null) return begins[curPos]+1;
+    else return ends[curPos];
   }
 
   public void reset() {
-    iterationPosition = 0;
+    curPos = 0;
   }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ExtentArray that = (ExtentArray) o;
+
+        if (length != that.length) return false;
+        int[] beginSubset = Arrays.copyOfRange(begins, 0, length);
+        int[] otherBegins =  Arrays.copyOfRange(that.begins, 0, that.length);
+
+        if (!Arrays.equals(beginSubset, otherBegins)) return false;
+        if (!Arrays.equals(ends, that.ends)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = begins != null ? Arrays.hashCode(Arrays.copyOfRange(begins, 0, length)) : 0;
+        result = 31 * result + (ends != null ? Arrays.hashCode(Arrays.copyOfRange(ends, 0, length)) : 0);
+        result = 31 * result + length;
+        return result;
+    }
 }

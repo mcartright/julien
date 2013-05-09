@@ -247,7 +247,7 @@ public class DiskLengthsReader extends KeyListReader implements LengthsReader {
         this.currLength = 0;
         // check for range.
         if (firstDocument <= currDocument && currDocument <= lastDocument) {
-          // seek to the required position - hopefully this will hit cache
+          // seek to the required length - hopefully this will hit cache
           this.streamBuffer.seek(lengthsDataOffset + (4 * (this.currDocument - firstDocument)));
           try {
             this.currLength = this.streamBuffer.readInt();

@@ -10,8 +10,8 @@ import julien.galago.tupleflow.Utility;
 /**
  * This class represents a tag in a XML/HTML document.
  * 
- * A tag has a tagName, an optional set of attributes, a beginning position and an
- * end position.  The positions are in terms of tokens, so if begin = 5, that means
+ * A tag has a tagName, an optional set of attributes, a beginning length and an
+ * end length.  The positions are in terms of tokens, so if begin = 5, that means
  * the open tag is between token 5 and token 6.
  * 
  * @author trevor

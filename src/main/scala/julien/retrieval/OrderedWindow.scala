@@ -42,7 +42,7 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   // returns true if a result has been found
   def advance(iterators: Array[ExtentArray]): Boolean = {
     var idx = 0
-    while(idx < iterators.size-1) {
+    while(idx < iterators.length-1) {
       val left = iterators(idx)
       val right = iterators(idx+1)
 
@@ -52,8 +52,9 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
       }
 
       // ran out of an iterator; return results immediately
-      if(!right.hasNext)
+      if(!right.hasNext) {
         return false
+      }
 
       // if this iterator violates the window, restart loop
       if(right.head - left.head > width) {
