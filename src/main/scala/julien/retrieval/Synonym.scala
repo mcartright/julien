@@ -9,12 +9,7 @@ object Synonym {
 }
 
 class Synonym(terms: Seq[Term])
-    extends IntersectedTermView(terms) {
-
-  // Being lazy with the estimation of this number
-  override def updateStatistics(docid: InternalId) = {
-    statistics.collLength = terms.head.attachedIndex.collectionLength
-  }
+    extends MultiTermView(terms) {
 
   override def positions: ExtentArray = {
     val arrays = terms.map(_.underlying.extents)
