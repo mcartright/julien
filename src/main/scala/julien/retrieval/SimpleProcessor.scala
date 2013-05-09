@@ -74,7 +74,7 @@ class SimpleProcessor
         }
 
         var i = 0
-        while (i < numActive) {
+        while (i < active.length) {
           active(i).moveTo(candidate)
           i += 1
         }
@@ -129,6 +129,10 @@ class SimpleProcessor
         k += 1
       }
 
+//      val document = index.name(candidate)
+//      if (document equals "FT923-11593") {
+//        val test = "test"
+//      }
       var i = 0
       while (i < iterators.length) {
         iterators(i).moveTo(candidate)

@@ -1,12 +1,15 @@
 package julien
 package eval
 
-class AvgPrecision(n: String) extends QueryEvaluator(n) {
+class MeanAveragePrecision extends QueryEvaluator() {
+
+  //val name = "Average Precision"
+
   def eval[T <: ScoredObject[T]](
     result: QueryResult[T],
-    judgment: QueryJudgment,
+    judgment: QueryJudgments,
     strictlyEval: Boolean): Double = {
-    if (judgment.numRel == 0)
+    if (numRelevant(judgment) == 0)
       if (strictlyEval)
         throw new Exception(s"No relevant docs for query")
       else return 0.0
@@ -16,11 +19,13 @@ class AvgPrecision(n: String) extends QueryEvaluator(n) {
     // Have some relevant - can "properly" evaluate
     for (idx <- result.indices) {
       val so = result(idx)
-      if (judgment.isRelevant(so.name)) {
+      if (isRelevant(so.name, judgment)) {
         relCount += 1.0
         sumPrec += relCount / (idx+1)
       }
     }
-    sumPrec / judgment.numRel
+    sumPrec / numRelevant(judgment)
   }
+
+  val name: String = "Mean Average Precision"
 }

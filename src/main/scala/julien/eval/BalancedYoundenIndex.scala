@@ -1,16 +1,16 @@
 package julien
 package eval
 
-class BalancedYoundenIndex extends QueryEvaluator("BalancedYoundenIndex") {
+class BalancedYoundenIndex extends QueryEvaluator() {
   val threshold = 0.5
 
   def eval[T <: ScoredObject[T]](
     predictions: QueryResult[T],
-    actual: QueryJudgment,
+    actual: QueryJudgments,
     strictlyEval: Boolean
   ): Double = {
     val ps = predictions.map(_.name).toSet
-    val paired = actual.map { j => (j.label, (if (ps(j.name)) 1.0 else 0.0)) }
+    val paired = actual.map { case(k,j) => (j.label, (if (ps(j.name)) 1.0 else 0.0)) }
 
     // a pair is (target, prediction) - bin and count
     val (predictTrue, predictFalse) = paired.partition(_._2 > threshold)
@@ -20,4 +20,6 @@ class BalancedYoundenIndex extends QueryEvaluator("BalancedYoundenIndex") {
     val specificity = tn.size.toDouble / (tn.size + fp.size)
     return scala.math.min(sensitivity, specificity)
   }
+
+  val name: String = "Balanced Younden Index"
 }

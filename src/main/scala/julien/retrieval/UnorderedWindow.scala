@@ -24,6 +24,7 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     val numTerms =  terms.size
     while (t < numTerms) {
       itBuffer += terms(t).positions
+//      println(terms(t).positions.getBegins().mkString(" "))
       t += 1
     }
     itBuffer.result()
@@ -31,6 +32,7 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
 
   override def positions:  ExtentArray = {
     hits.clear
+    reset(iterators)
     var break = false
     while (allHaveNext(iterators) && !break) {
       // But was refactored into the following faster code:
@@ -64,6 +66,15 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
       }
     }
     hits
+  }
+
+  private def reset(iterators: Array[ExtentArray]): Unit = {
+    var j = 0
+    while (j < iterators.length) {
+      iterators(j).reset()
+   //   println(iterators(j).length  + " " + iterators(j).getBegins.mkString(" "))
+      j += 1
+    }
   }
 
   private def moveMinForward(iterators: Array[ExtentArray], minPos : Int): Unit = {

@@ -5,7 +5,7 @@ package retrieval
 import scala.collection.mutable.PriorityQueue
 
 object DefaultAccumulator {
-  val defaultSize: Int = 1000
+  val defaultSize: Int = 5
 
   def apply[T <: ScoredObject[T]](size: Int): DefaultAccumulator[T] =
     new DefaultAccumulator[T](new PriorityQueue[T](), size)

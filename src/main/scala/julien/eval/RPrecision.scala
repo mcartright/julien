@@ -1,17 +1,18 @@
 package julien
 package eval
 
-class RPrecision(n: String) extends QueryEvaluator(n) {
-  def this(i: Int) = this(s"RPrec@$i")
+class RPrecision() extends QueryEvaluator() {
 
   def eval[T <: ScoredObject[T]](
     result: QueryResult[T],
-    judgment: QueryJudgment,
+    judgment: QueryJudgments,
     strictlyEval: Boolean): Double = {
-    val relCount = judgment.numRel
+    val relCount = numRelevant(judgment)
     val retCount = result.size
     // Our return value
     if (relCount > retCount) 0.0
       else new Precision(relCount).eval(result, judgment)
   }
+
+  val name: String = "R Precision"
 }

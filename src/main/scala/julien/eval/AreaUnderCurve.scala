@@ -3,7 +3,7 @@ package eval
 
 import scala.math._
 
-class AUC extends QueryEvaluator("AUC") {
+class AreaUnderCurve extends QueryEvaluator() {
   case class Pair(key: Double, value: Double) extends Ordered[Pair] {
     // natural orderingo is "higher key == better"
     def compare(other: Pair): Int =
@@ -16,15 +16,15 @@ class AUC extends QueryEvaluator("AUC") {
   // pair array
   def eval[T <: ScoredObject[T]](
     predictions: QueryResult[T],
-    actual: QueryJudgment,
+    actual: QueryJudgments,
     strictlyEval: Boolean
   ): Double = {
     val ps = predictions.map(_.name).toSet
-    val probs = actual.map { j =>
+    val probs = actual.map { case (k,j) =>
       if (ps(j.name)) Pair(1.0, j.label) else Pair(0.0, j.label)
     }
-    val totalPositive = actual.numRel
-    val totalNegative = actual.numNonRel
+    val totalPositive = numRelevant(actual)
+    val totalNegative = numNonRelevant(actual)
     val sortedProbs = probs.toSeq.sorted
 
     var fp, tp, fpPrev, tpPrev, area = 0.0
@@ -47,4 +47,6 @@ class AUC extends QueryEvaluator("AUC") {
     area /= totalPositive.toDouble * totalNegative
     return area
   }
+
+  val name: String = "Area Under the Curve"
 }

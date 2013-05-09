@@ -72,4 +72,52 @@ class UnorderedWindowSpec extends FlatSpec with MockFactory {
 //
 //      expectResult(hits) {ow1.positions}
   }
+
+  it should "correctly count the number of windows non-adjacent" in {
+    val f = fixture
+    import f._
+
+    val pos1 = Array(6,24)
+    val pos2 = Array(22)
+
+    val p1 = new ExtentArray(pos1)
+    val p2 = new ExtentArray(pos2)
+
+    mock1.expects('positions)().returning(p1)
+    mock2.expects('positions)().returning(p2)
+
+    val uw = UnorderedWindow(8, mock1, mock2)
+
+    val expected = new ExtentArray(Array(22), Array(24))
+    val hits = uw.positions
+    expectResult(expected) {hits}
+
+    //     val ow1 = OrderedWindow(1, mock1, mock2, mock3)
+    //
+    //      expectResult(hits) {ow1.positions}
+  }
+
+  it should "correctly return no hits" in {
+    val f = fixture
+    import f._
+
+    val pos1 = Array(24,26)
+    val pos2 = Array.empty[Int]
+
+    val p1 = new ExtentArray(pos1)
+    val p2 = new ExtentArray(pos2)
+
+    mock1.expects('positions)().returning(p1)
+    mock2.expects('positions)().returning(p2)
+
+    val uw = UnorderedWindow(8, mock1, mock2)
+
+    val expected = new ExtentArray(Array.empty[Int])
+    val hits = uw.positions
+    expectResult(expected) {hits}
+
+    //     val ow1 = OrderedWindow(1, mock1, mock2, mock3)
+    //
+    //      expectResult(hits) {ow1.positions}
+  }
 }

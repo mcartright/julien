@@ -1,13 +1,15 @@
 package julien
 package eval
 
-class Recall(n: String, docsRetrieved: Int = Int.MaxValue)
-    extends QueryEvaluator(n) {
+class Recall(docsRetrieved: Int = Int.MaxValue)
+    extends QueryEvaluator {
   val relRet = new CountRelevantRetrieved(docsRetrieved)
 
   def eval[T <: ScoredObject[T]](
     result: QueryResult[T],
-    judgment: QueryJudgment,
+    judgment: QueryJudgments,
     strictlyEval: Boolean): Double =
-    relRet.eval(result, judgment) / judgment.numRel
+    relRet.eval(result, judgment) / numRelevant(judgment)
+
+  val name: String = "Recall"
 }

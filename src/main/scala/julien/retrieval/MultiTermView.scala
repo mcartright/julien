@@ -5,21 +5,21 @@ import gnu.trove.map.hash.TIntIntHashMap
 import galago.core.util.ExtentArray
 
 abstract class MultiTermView(terms: Seq[PositionStatsView])
-    extends PositionStatsView
-    with Bounded
-    with NeedsPreparing {
+  extends PositionStatsView
+  with Bounded
+  with NeedsPreparing {
 
   def children: Seq[Operator] = terms
-  private val loc = {
-    val movers = terms.filter(_.isInstanceOf[Movable])
-    if (movers.isEmpty) null else movers.head.asInstanceOf[Movable]
-  }
+//  private val loc = {
+//    val movers = terms.filter(_.isInstanceOf[Movable])
+//    if (movers.isEmpty) null else movers.head.asInstanceOf[Movable]
+//  }
   def count: Int = {
-    if (loc != null && countCache.containsKey(loc.at)) {
-      countCache.get(loc.at)
-    } else {
+//    if (loc != null && countCache.containsKey(loc.at)) {
+//      countCache.get(loc.at)
+//    } else {
       this.positions.length
-    }
+ //   }
   }
 
   // For use in subclasses to hold hits
@@ -49,12 +49,11 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
   def updateStatistics(docid: InternalId) = {
     val c = count
     // Don't cache if we can't locate later.
-    if (loc != null) countCache.put(docid, c)
+  //  if (loc != null) countCache.put(docid, c)
     statistics.collFreq += c
     statistics.docFreq += 1
     statistics.max = scala.math.min(statistics.max, c)
     statistics.numDocs = terms.head.statistics.numDocs
-    statistics.collLength =
-      terms.head.statistics.collLength - adjustment
+    statistics.collLength = terms.head.statistics.collLength - adjustment
   }
 }

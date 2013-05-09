@@ -32,7 +32,7 @@ final class Term private (val t: String, val field: Option[String])
   def count: Int = if (matched) underlying.count else 0
 
   /** Returns the current positions of the underlying iterator. */
-  def positions: ExtentArray = underlying.extents()
+  def positions: ExtentArray = if (matched) underlying.extents() else ExtentArray.empty
 
   lazy val statistics: CountStatistics = {
     val ns = underlying.asInstanceOf[ARNA].getStatistics
