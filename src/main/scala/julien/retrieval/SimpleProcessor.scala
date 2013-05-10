@@ -74,20 +74,19 @@ class SimpleProcessor
         }
 
         var i = 0
-        while (i < active.length) {
+        while (i < numActive) {
+//          println("Moving to: " + candidate)
           active(i).moveTo(candidate)
           i += 1
         }
 
-        if (matches(active, candidate)) {
-          for (p <- unprepped) {
-            p.asInstanceOf[NeedsPreparing].
-              updateStatistics(InternalId(candidate))
-          }
+        for (p <- unprepped) {
+          p.asInstanceOf[NeedsPreparing].updateStatistics(InternalId(candidate))
         }
 
         var j = 0
         while (j < numActive) {
+//          println("Moving past doc:" + candidate)
           active(j).movePast(candidate)
           j += 1
         }
@@ -142,7 +141,8 @@ class SimpleProcessor
       if (matches(drivers, candidate)) {
         // Time to score
 
-
+       // val name = index.name(candidate)
+       // debug(s"SCORING: candidate: $candidate name: $name")
         //        val score = scorers.foldLeft(0.0) {
         //          (t, s) => t + s.eval
         //        }
