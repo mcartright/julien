@@ -44,13 +44,17 @@ class RankNet(
     var nIter = 0
     var error = Double.MaxValue
     while (nIter < maxIter && error > threshold) {
-      // for now we do batch-style updating
+      // use micro-batch updating:
 
-      // Make a sample from the main set of queries
-      val qSample = sampleQueries
-      // Do a forward-backward round on each,
-      // returning all the activations and gradients
-
+      // For a given query:
+      // run the net against every document, produce a score
+      // generate lambda_abs from the QJs and QRs
+      // aggregate to lambda_as for each query (need to use pairs and inverses)
+      // Sum over the lambdas to perform weight updates - use
+      // the gradients you derived before.
+      //
+      // You also need to cache all the acivations, inputs, and sums for each
+      // synapse/query pair (check gradient functions for args).
     }
   }
 }

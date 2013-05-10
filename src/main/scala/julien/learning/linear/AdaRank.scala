@@ -10,7 +10,6 @@ import julien.eval._
 object AdaRank {
   val nIter = 500
   val tolerance = 0.002
-  val trainWithEnqueue = true
   val maxSelCount = 5
 
   // Just for wrapping
@@ -36,10 +35,9 @@ class AdaRank(
   var trainedFeatures = ListBuffer[ScalarWeightedFeature]()
 
   def train: Unit = {
-    var iter = 0
     var trainableFeatures = ListBuffer[ScalarWeightedFeature]() ++=
     f.map(_.asInstanceOf[ScalarWeightedFeature])
-    while (iter < nIter && !trainableFeatures.isEmpty) {
+    while (!trainableFeatures.isEmpty) {
       val wr = selectWeakRanker(trainableFeatures)
       val wrScores = weightedQueries.map(wq => scoreQuery(wq, wr))
       val num = weightedQueries.view.zip(wrScores).map { case (wq, ws) =>
@@ -55,7 +53,6 @@ class AdaRank(
       trainableFeatures -= wr
 
       updateQueryWeights
-      iter += 1
     }
   }
 
