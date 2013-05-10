@@ -70,7 +70,7 @@ class Dirichlet(
     val den = (l + mu)
     val rawScore = scala.math.log((c + (mu * cf)) / (l + mu))
     val score = localWeight * scala.math.log((c + (mu * cf)) / (l + mu))
-    debug(s"DIRICHLET  c: $c cf: $cf mu: $mu num: $num den: $den raw: $rawScore weight: $weight final score: $score")
+    //debug(s"DIRICHLET  c: $c cf: $cf mu: $mu num: $num den: $den raw: $rawScore weight: $weight final score: $score")
     score
   }
 }

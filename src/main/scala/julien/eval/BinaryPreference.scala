@@ -5,24 +5,24 @@ package eval
   * the version in Galago. This needs a code review against the 2006 corrected
   * version of this paper.
   */
-class BinaryPreference(n: String) extends QueryEvaluator(n) {
+class BinaryPreference extends QueryEvaluator() {
   def eval[T <: ScoredObject[T]](
     result: QueryResult[T],
-    judgment: QueryJudgment,
+    judgments: QueryJudgments,
     strictlyEval: Boolean): Double = {
-    val totalRel = judgment.numRel
+    val totalRel = numRelevant(judgments)
     if (totalRel == 0)
       if (strictlyEval)
         throw new Exception(s"No relevant docs for query")
       else return 0
 
     val nonRelCount =
-      if (totalRel > judgment.numNonRel) judgment.numNonRel else totalRel
+      if (totalRel > numNonRelevant(judgments)) numNonRelevant(judgments) else totalRel
     val (judged, unjudged) = result.partition { so =>
-      judgment.contains(so.name)
+      judgments.contains(so.name)
     }
     val (relevant , nonrelevant) = judged.partition { so =>
-      judgment.isRelevant(so.name)
+      isRelevant(so.name, judgments)
     }
 
     var sum = if (nonrelevant.size == 0) relevant.size.toDouble else 0.0
@@ -38,4 +38,6 @@ class BinaryPreference(n: String) extends QueryEvaluator(n) {
     }
     sum / totalRel.toDouble
   }
+
+  val name: String = "Binary Preference"
 }

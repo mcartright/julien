@@ -26,6 +26,7 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
 
   override def positions: ExtentArray = {
     hits.clear
+    reset(iterators)
     while (iterators(0).hasNext) {
       // if while advancing, we don't find a hit:
       if(!advance(iterators)) {
@@ -68,5 +69,13 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     }
     // found a hit that satisfies all our conditions
     true
+  }
+
+  private def reset(iterators: Array[ExtentArray]): Unit = {
+    var j = 0
+    while (j < iterators.length) {
+      iterators(j).reset()
+      j += 1
+    }
   }
 }

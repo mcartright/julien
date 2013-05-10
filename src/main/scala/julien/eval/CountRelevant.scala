@@ -1,9 +1,11 @@
 package julien
 package eval
 
-class CountRelevant(n: String) extends QueryEvaluator(n) {
+class CountRelevant() extends QueryEvaluator() {
   def eval[T <: ScoredObject[T]](
     result: QueryResult[T],
-    judgment: QueryJudgment,
-    strictlyEval: Boolean): Double = judgment.numRel
+    judgment: QueryJudgments,
+    strictlyEval: Boolean): Double = numRelevant(judgment)
+
+  val name: String = "Relevant"
 }

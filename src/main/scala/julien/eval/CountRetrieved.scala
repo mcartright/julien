@@ -1,9 +1,11 @@
 package julien
 package eval
 
-class CountRetrieved(n: String) extends QueryEvaluator(n) {
+class CountRetrieved extends QueryEvaluator() {
   def eval[T <: ScoredObject[T]](
     result: QueryResult[T],
-    judgment: QueryJudgment,
+    judgment: QueryJudgments,
     strictlyEval: Boolean): Double = result.size.toDouble
+
+  val name: String = "Retrieved"
 }

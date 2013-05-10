@@ -4,17 +4,16 @@ package eval
 import scala.math._
 import scala.annotation.tailrec
 
-class ERR(n: String, docsRetrieved: Int = Int.MaxValue)
-    extends QueryEvaluator(n) {
+class ExpectedReciprocalRank(docsRetrieved: Int = Int.MaxValue)
+    extends QueryEvaluator {
   val maxTrecValue = 4
-  def this(numRet: Int) = this(s"ERR@$numRet", numRet)
 
   def eval[T <: ScoredObject[T]](
     result: QueryResult[T],
-    judgment: QueryJudgment,
+    judgment: QueryJudgments,
     strictlyEval: Boolean): Double = {
     val relevances = result.map { so =>
-      if (judgment(so.name) > 0) judgment(so.name).toDouble else 0.0
+      if (judgment(so.name).label > 0) judgment(so.name).label.toDouble else 0.0
     }.toArray
     getERR(relevances, min(relevances.length, docsRetrieved))
   }
@@ -33,4 +32,6 @@ class ERR(n: String, docsRetrieved: Int = Int.MaxValue)
       getERR(scores, limit, i+1, score + (r * decay / i+1), decay * (1 - r))
     }
   }
+
+  val name: String = s"Expected Reciprocal Rank @ $docsRetrieved"
 }

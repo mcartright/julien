@@ -5,8 +5,8 @@ import julien.access.Index
 import collection.mutable.{ArrayBuffer, HashMap}
 import org.lemurproject.galago.core.retrieval
 import retrieval.processing.RankedDocumentModel
-import julien.eval.Evaluator
 import julien.InternalId
+import org.lemurproject.galago.core.retrieval.ScoredDocument
 
 //import edu.umass.ciir.galago.{GalagoSearcher, GalagoQueryLib}
 
@@ -23,18 +23,18 @@ object GalagoJulienRetrievalQuality extends App {
  //  Thread.sleep(10000)
   val myTestQueries = Array("1 wood construction")
 
-  val queries = myTestQueries //tsvToJulienQuery()
+  val queries =  tsvToJulienQuery() // myTestQueries
 
   val julResults = runJulienQueries(queries)
   val galagoResults = runGalagoQueries(queries)
-   verifyRanks(queries, julResults, galagoResults)
+  verifyRanks(queries, julResults, galagoResults)
   verifyEval("./data/qrels/robust04.qrels", galagoResults)
   verifyEval("./data/qrels/robust04.qrels", julResults)
 
 
   def verifyEval(qrelFile: String, results: Map[String, Seq[ScoredDocument]]) {
     val evalFormat = "%2$-16s%1$3s %3$6.5f";
-    val evalScores = Evaluator.evaluate(qrelFile, results)
+    val evalScores = GalagoEvaluator.evaluate(qrelFile, results)
     evalScores._1.map(m => println(evalFormat.format("web", m._1, m._2)))
   }
 
@@ -48,8 +48,8 @@ object GalagoJulienRetrievalQuality extends App {
       if (res1.size != res2.size) {
         throw new Exception("sizes don't match!")
       }
-      val names1 = res1.map(_.name)
-      val names2 = res2.map(_.name)
+      val names1 = res1.map(_.documentName)
+      val names2 = res2.map(_.documentName)
 
       val namesMatch = names1 equals names2
       if (!namesMatch) {
@@ -58,7 +58,7 @@ object GalagoJulienRetrievalQuality extends App {
           if (!name1.equals(names2(idx))) {
             val r1 = res1(idx)
             val r2 = res2(idx)
-            println("julien: " + r1.name + "," + r1.score + "galago: " + r2.name + "," + r2.score)
+            println("julien: " + r1.documentName + "," + r1.score + "galago: " + r2.documentName + "," + r2.score)
           }
         }
       }
@@ -73,7 +73,7 @@ object GalagoJulienRetrievalQuality extends App {
           if (!((score1 - scores2(idx)).abs < 0.00001)) {
             val r1 = res1(idx)
             val r2 = res2(idx)
-            println("Mismatch scores. julien: " + r1.name + "," + r1.score + " galago: " + r2.name + "," + r2.score)
+            println("Mismatch scores. julien: " + r1.documentName + "," + r1.score + " galago: " + r2.documentName + "," + r2.score)
           }
         }
       }
@@ -82,9 +82,9 @@ object GalagoJulienRetrievalQuality extends App {
   }
 
   def runJulienQueries(queries: Seq[String]) = {
-    //implicit val index = Index.memoryFromDisk("/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-jul-11")
+    implicit val index = Index.disk("/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-jul-11")
 
-    implicit val index = Index.disk("/usr/dan/users4/jdalton/code/julien/data/test-index-julien")
+    //implicit val index = Index.disk("/usr/dan/users4/jdalton/code/julien/data/test-index-julien")
 
     val resultMap = HashMap[String, Seq[ScoredDocument]]()
 
@@ -141,14 +141,14 @@ object GalagoJulienRetrievalQuality extends App {
 
         // run it and get results
         val results = processor.run()
-        for ((r, idx) <- results.zipWithIndex) yield {
+        val galagoResults = for ((r, idx) <- results.zipWithIndex) yield {
           val doc = r.asInstanceOf[julien.retrieval.ScoredDocument]
           val name = index.name(doc.id)
           doc.name = name
-         // new retrieval.ScoredDocument(name, idx + 1, r._1.asInstanceOf[julien.retrieval.ScoredDocument].score)
+          new retrieval.ScoredDocument(name, idx + 1, doc.score)
         }
         // printResults(results, index)
-        resultMap += (line.split("\\s+")(0) -> results)
+        resultMap += (line.split("\\s+")(0) -> galagoResults)
       }
     }
     val end = System.currentTimeMillis()
@@ -165,9 +165,9 @@ object GalagoJulienRetrievalQuality extends App {
     p.set("uniw", 0.87264)
     p.set("odw", 0.07906)
     p.set("uww", 0.04829)
-    p.set("index", "/usr/dan/users4/jdalton/code/julien/data/test-index-galago34")
-   // p.set("index", "/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-g34")
-    p.set("requested", 1000)
+   // p.set("index", "/usr/dan/users4/jdalton/code/julien/data/test-index-galago34")
+    p.set("index", "/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-g34")
+    p.set("requested", 5)
     p.set("annotate", true)
     p.set("stemming", false)
     p.set("deltaReady", false)
@@ -177,8 +177,11 @@ object GalagoJulienRetrievalQuality extends App {
 
     val text2ConceptRetrieval = RetrievalFactory.instance(p).asInstanceOf[LocalRetrieval]
     println("starting galago queries")
-    val start = System.currentTimeMillis()
+    var start = System.currentTimeMillis()
     for (i <- 1 to 1) {
+      if (i == 2) {
+        start = System.currentTimeMillis()
+      }
       for (queryLine <- lines) {
         val queryString = text2Query(queryLine.split("\\s+").drop(1).mkString(" "))
 
@@ -189,17 +192,17 @@ object GalagoJulienRetrievalQuality extends App {
         val transformed = text2ConceptRetrieval.transformQuery(root, p)
         // println(transformed.toPrettyString)
         val proc = new RankedDocumentModel(text2ConceptRetrieval)
-        var results = proc.execute(transformed, p) //text2ConceptRetrieval.runQuery(transformed, p) //
+        var results =  proc.execute(transformed, p) //text2ConceptRetrieval.runQuery(transformed, p) //
         if (results == null) {
           results = Array.empty[org.lemurproject.galago.core.retrieval.ScoredDocument]
         }
 
-        val julienResults = for ((r,idx) <- results.zipWithIndex) yield {
-          //          val name = index.name(r._1.asInstanceOf[julien.retrieval.ScoredDocument].docid)
-                    new ScoredDocument(new InternalId(-1), r.score, r.documentName, idx + 1)
-                  }
+//        val julienResults = for ((r,idx) <- results.zipWithIndex) yield {
+//          //          val name = index.name(r._1.asInstanceOf[julien.retrieval.ScoredDocument].docid)
+//                    new ScoredDocument(new InternalId(-1), r.score, r.documentName, idx + 1)
+//                  }
 
-        resultMap += (queryLine.split("\\s+")(0) -> julienResults)
+        resultMap += (queryLine.split("\\s+")(0) -> results)
 
               for (r <- results) {
                 val name = text2ConceptRetrieval.getDocumentName(r.document)
@@ -226,7 +229,7 @@ object GalagoJulienRetrievalQuality extends App {
     val queryFile = io.Source.fromFile("./data/test-queries/rob04.titles.tsv")
     val lines = queryFile.getLines()
 
-    val filtered = lines.toList //.filter(_.split("\\s+")(0).toInt > 600).toList
+    val filtered = lines.filter(_.split("\\s+")(0).toInt > 600).toList take 1
     filtered
   }
 

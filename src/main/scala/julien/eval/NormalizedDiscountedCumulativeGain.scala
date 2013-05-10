@@ -6,25 +6,30 @@ import scala.annotation.tailrec
 import scala.collection.JavaConversions._
 import gnu.trove.map.hash.TIntDoubleHashMap
 
-class DCG(n: String, docsRetrieved: Int = Int.MaxValue)
-    extends QueryEvaluator(n) {
-  def this(numRet: Int) = this(s"DCG@$numRet", numRet)
+class NormalizedDiscountedCumulativeGain(docsRetrieved: Int = Int.MaxValue)
+    extends QueryEvaluator {
 
   def eval[T <: ScoredObject[T]](
     result: QueryResult[T],
-    judgment: QueryJudgment,
+    judgment: QueryJudgments,
     strictlyEval: Boolean): Double = {
 
     val docJudgments = result.map { so =>
-      if (judgment(so.name) > 0) judgment(so.name) else 0.0
+      if (judgment(so.name).label > 0) judgment(so.name).label else 0.0
     }.toArray
     val limit = min(docJudgments.length, docsRetrieved)
     val dcg = getDCG(docJudgments, limit)
-    return dcg
+
+    val ideal = judgment.map { case (k,j) =>
+      if (j.label > 0) j.label.toDouble else 0.0
+    }.toArray.sorted.reverse
+    val normalizer = getDCG(ideal, limit)
+    return dcg / normalizer
   }
 
   val logs = new TIntDoubleHashMap()
 
+  @inline
   private def getLog(idx: Int) : Double = {
     if (logs.containsKey(idx)) logs.get(idx)
     else {
@@ -46,4 +51,6 @@ class DCG(n: String, docsRetrieved: Int = Int.MaxValue)
       getDCG(gains, limit, idx+1, sum + inc)
     }
   }
+
+  val name: String = s"NDCG @ $docsRetrieved"
 }

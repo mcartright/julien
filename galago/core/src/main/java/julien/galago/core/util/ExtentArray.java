@@ -8,7 +8,7 @@ import java.util.Arrays;
  * In most cases, this is just a list of positions (i.e.
  * term positions). However this class is capable of holding
  * spans of (begin, end) - so proper spans are possible.
- *
+ * <p/>
  * Also iterator behavior has been incorporated into this class.
  * Primarily, the methods 'hasNext', 'next', 'reset', and
  * 'end' (with no parameters) implement this behavior.
@@ -16,24 +16,23 @@ import java.util.Arrays;
  * @author irmarc
  */
 public class ExtentArray {
-  public static final ExtentArray empty = new ExtentArray();
+    public static final ExtentArray empty = new ExtentArray();
+    public int length;
+    private int[] begins;
+    private int[] ends;
+    private int curPos;
 
-  private int[] begins;
-  private int[] ends;
-  public int length;
-  private int curPos;
 
+    public ExtentArray(int capacity) {
+        begins = new int[capacity];
+        ends = null; // lazy load these
+        curPos = length = 0;
+    }
 
-  public ExtentArray(int capacity) {
-    begins = new int[capacity];
-    ends = null; // lazy load these
-    curPos = length = 0;
-  }
-
-  public ExtentArray(int[] begins) {
-      this.begins = begins;
-      length = begins.length;
-  }
+    public ExtentArray(int[] begins) {
+        this.begins = begins;
+        length = begins.length;
+    }
 
     public ExtentArray(int[] begins, int[] ends) {
         this.begins = begins;
@@ -41,79 +40,83 @@ public class ExtentArray {
         length = begins.length;
     }
 
-  public ExtentArray() {
-    this(16);
-  }
-
-  private void makeRoom() {
-    begins = Arrays.copyOf(begins, begins.length * 2);
-    if (ends != null) ends = Arrays.copyOf(ends, ends.length * 2);
-  }
-
-  public int capacity() {
-    return begins.length;
-  }
-
-  public void add(int begin) {
-    if (length == begins.length) {
-      makeRoom();
+    public ExtentArray() {
+        this(16);
     }
 
-    begins[length] = begin;
-    length += 1;
-  }
-
-  public void add(int begin, int end) {
-    if (length == begins.length) {
-      makeRoom();
+    private void makeRoom() {
+        begins = Arrays.copyOf(begins, begins.length * 2);
+        if (ends != null) ends = Arrays.copyOf(ends, ends.length * 2);
     }
 
-    begins[length] = begin;
-    if (ends == null && length == 0) ends = new int[begins.length];
-    ends[length] = end;
-    length += 1;
-  }
+    public int capacity() {
+        return begins.length;
+    }
 
-  public int begin(int index) {
-    return begins[index];
-  }
+    public void add(int begin) {
+        if (length == begins.length) {
+            makeRoom();
+        }
 
-  public int end(int index) {
-    if (ends == null) return begins[index]+1;
-    return ends[index];
-  }
+        begins[length] = begin;
+        length += 1;
+    }
 
-  public void clear() {
-    length = 0;
-  }
+    public void add(int begin, int end) {
+        if (length == begins.length) {
+            makeRoom();
+        }
 
-  public String toString(){
-    return String.format("ExtentArray:count=%d", length);
-  }
+        begins[length] = begin;
+        if (ends == null && length == 0) ends = new int[begins.length];
+        ends[length] = end;
+        length += 1;
+    }
 
-  // ITERATOR ITERATOR ITERATOR ITERATOR ITERATOR
-  public boolean hasNext() {
-      return curPos < length;
-  }
+    public int begin(int index) {
+        return begins[index];
+    }
 
-  public int next() {
-    int toReturn = begins[curPos];
-    curPos++;
-    return toReturn;
-  }
+    public int end(int index) {
+        if (ends == null) return begins[index] + 1;
+        return ends[index];
+    }
 
-  public int head() {
-    return begins[curPos];
-  }
+    public void clear() {
+        length = 0;
+    }
 
-  public int end() {
-    if (ends == null) return begins[curPos]+1;
-    else return ends[curPos];
-  }
+    public String toString() {
+        return String.format("ExtentArray:count=%d", length);
+    }
 
-  public void reset() {
-    curPos = 0;
-  }
+    // ITERATOR ITERATOR ITERATOR ITERATOR ITERATOR
+    public boolean hasNext() {
+        return curPos < length;
+    }
+
+    public int next() {
+        int toReturn = begins[curPos];
+        curPos++;
+        return toReturn;
+    }
+
+    public int head() {
+        return begins[curPos];
+    }
+
+    public int end() {
+        if (ends == null) return begins[curPos] + 1;
+        else return ends[curPos];
+    }
+
+    public void reset() {
+        curPos = 0;
+    }
+
+    public int[] getBegins() {
+        return begins;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -122,14 +125,8 @@ public class ExtentArray {
 
         ExtentArray that = (ExtentArray) o;
 
-        if (!activePositionsEqual(begins,
-				  length,
-				  that.begins,
-				  that.length)) return false;
-        if (! activePositionsEqual(ends,
-				   length,
-				   that.ends,
-				   that.length)) return false;
+        if (!activePositionsEqual(begins, length, that.begins, that.length)) return false;
+        if (!activePositionsEqual(ends, length, that.ends, that.length)) return false;
         return true;
     }
 
