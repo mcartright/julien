@@ -24,11 +24,11 @@ excludeFilter in Compile := new SimpleFilter(s =>
 )
 
 scalacOptions in (Compile, doc) ++=
-		Opts.doc.sourceUrl("https://github.com/CIIR/julien/tree/master/src/main/scala/€{FILE_PATH}.scala") ++
-	       Opts.doc.title("Julien") ++
-	       Seq("-d", "/var/www/julien-docs/julien")
+Opts.doc.sourceUrl("https://github.com/CIIR/julien/tree/master/src/main/scala/€{FILE_PATH}.scala") ++
+Opts.doc.title("Julien") ++
+Seq("-d", "/var/www/julien-docs/julien")
 
 doc in Compile <<= (doc in Compile) map { in =>
-  Seq("bash","-c",""" for x in $(find target/scala-2.10/api/ -type f); do sed -i "s_/usr/ayr/tmp1/irmarc/projects/julien/src/main/scala/__" $x; done """).!
+  Seq("bash","-c",""" for x in $(find target/scala-2.10/api/ -type f); do sed -i "s_/usr/ayr/tmp1/irmarc/projects/thesis/code/julien/src/main/scala/__" $x; done """).!
   in
 }

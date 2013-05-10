@@ -18,40 +18,37 @@ case class FlowType(val clazz: Class[_], val order: Option[Order[_]]) {
   override def toString = {
     var sb = new StringBuilder
     sb ++= simpleName
-    
     if(order.nonEmpty) {
       sb ++= ":("
       sb ++= order.get.getOrderSpec.mkString(" ")
       sb ++= ")"
     }
-    
     sb.result
   }
+
   def sorts: Seq[String] = {
     order match {
       case Some(obj) => obj.getOrderSpec.toSeq
       case None => Seq()
     }
   }
+
   def canPipeTo(other: FlowType): Boolean = {
-    if(className != other.className) {
-      return false
-    }
-    // make sure that all the sort requirements of the next stage are present in this stage
+    if(className != other.className) return false
+
+    // make sure that all the sort requirements of the next stage
+    // are present in this stage
     val inSort = sorts
     val outSort = other.sorts
 
     // other is more strict
     if(outSort.size > inSort.size) {
-      //println("out stage more strict")
       false;
     } else if(outSort.size == inSort.size) {
-      //println("stages equally strict")
       inSort.zip(outSort).forall {
         case (a, b) => a == b
       }
     } else { // if(inSort.size > outSort.size) {
-      //println("input stage possibly more strict")
       inSort.take(outSort.size).zip(outSort).forall {
         case (a, b) => a == b
       }
@@ -59,36 +56,45 @@ case class FlowType(val clazz: Class[_], val order: Option[Order[_]]) {
   }
 }
 
-// This trait is the enum for the type of stage connection
-// Tupleflow calls them each and combined, but I found split
-// and join easier to understand
-//
-// split breaks the outputs into multiple tasks (map in mapreduce)
-// join requires all the split inputs to be pulled back together (reduce in mapreduce)
+/** This trait is the enum for the type of stage connection
+  * Tupleflow calls them each and combined, but I found split
+  * and join easier to understand
+  *
+  * split breaks the outputs into multiple tasks (map in mapreduce)
+  * join requires all the split inputs to be pulled
+  * back together (reduce in mapreduce)
+  */
 trait FlowNodeKind
 case class FlowNodeSplit() extends FlowNodeKind // splitTo, each
 case class FlowNodeJoin() extends FlowNodeKind // joinTo, combined
 
-// This represents a node; it is used as an output for one Stage and
-// an input for another. If you are making these directly, you're doing
-// too much work.
-//
-// See FlowStage.makeInputNode, FlowStage.makeOutputNode, 
-// FlowStage.joinTo, FlowStage.splitTo and FlowStage.pipeTo
-//
-case class FlowNode(val flowType: FlowType, val kind: FlowNodeKind, val name: String = gensym("node")) { }
 
+/** This represents a node; it is used as an output for one Stage and
+  * an input for another. If you are making these directly, you're doing
+  * too much work.
+  *
+  * See FlowStage.makeInputNode, FlowStage.makeOutputNode,
+  * FlowStage.joinTo, FlowStage.splitTo and FlowStage.pipeTo
+  */
+case class FlowNode(
+  val flowType: FlowType,
+  val kind: FlowNodeKind,
+  val name: String = gensym("node")
+)
 
-// additional constructors for FlowStages
+/** FlowStage Factory. */
 object FlowStage {
-  def apply(clz: Class[_], parms: Parameters = new Parameters) = new FlowStage(FlowStep(clz, parms), gensym(clz.getSimpleName))
+  def apply(
+    clz: Class[_],
+    parms: Parameters = new Parameters
+  ) = new FlowStage(FlowStep(clz, parms), gensym(clz.getSimpleName))
+
   def apply(fs: AbstractFlowStep) = new FlowStage(fs)
 }
 
-// 
-// A class representing knowledge about a particular stage.
-// Is mutable, so not a case class - see inputs and outputs HashSets
-//
+/** A class representing knowledge about a particular stage.
+  * Is mutable, so not a case class - see inputs and outputs HashSets
+  */
 class FlowStage(val step: AbstractFlowStep, val name: String=gensym("stage")) {
   // validate input, unfortunately not possible at compile time, afaik
   step match {
@@ -127,7 +133,10 @@ class FlowStage(val step: AbstractFlowStep, val name: String=gensym("stage")) {
 
   // walk our tree and construct a set of all the atomic steps we contain
   def allSteps: Set[AbstractFlowStep] = {
-    def findAllSteps(start: AbstractFlowStep, accum: Set[AbstractFlowStep]): Set[AbstractFlowStep] = start match {
+    def findAllSteps(
+      start: AbstractFlowStep,
+      accum: Set[AbstractFlowStep]
+    ): Set[AbstractFlowStep] = start match {
       case lfs: FlowLinearStep =>
         accum ++ lfs.steps.map(grp => findAllSteps(grp, Set())).flatten
       case mfs: FlowMultiStep =>
@@ -154,7 +163,7 @@ class FlowStage(val step: AbstractFlowStep, val name: String=gensym("stage")) {
     }
     getStepString(step)
   }
-  
+
   // build up a list of all input and output types
   def inputTypes = inputs.map(_.flowType)
   def outputTypes = outputs.map(_.flowType)
@@ -165,12 +174,15 @@ class FlowStage(val step: AbstractFlowStep, val name: String=gensym("stage")) {
   }
 
   //TODO better error messages here
-  // generate an input node on this stage, crashing if not possible
-  def makeInputNode(kind: FlowNodeJoin, orderOverride: Option[Order[_]]=None) = {
+  /** generate an input node on this stage, crashing if not possible */
+  def makeInputNode(
+    kind: FlowNodeJoin,
+    orderOverride: Option[Order[_]] = None
+  ) = {
     val flowType = step.inputType match {
       case Some(FlowType(clz, None)) => {
         if(orderOverride.isEmpty) {
-          Console.err.println("Stage: "+this+" has an input type "+step.inputType+" that has no defined order. This is unpossible in GalagoTupleflow. Dying.")
+          Console.err.println("Stage: "+this+" has an input type "+step.inputType+" that has no defined order. This is impossible in GalagoTupleflow. Dying.")
           ???
         } else {
           FlowType(clz, orderOverride)
@@ -187,8 +199,12 @@ class FlowStage(val step: AbstractFlowStep, val name: String=gensym("stage")) {
     inputs += node
     node
   }
-  // generate an input node on this stage, crashing if not possible
-  def makeOutputNode(kind: FlowNodeKind, orderOverride: Option[Order[_]]=None) = {
+
+  /** Generate an input node on this stage, crashing if not possible */
+  def makeOutputNode(
+    kind: FlowNodeKind,
+    orderOverride: Option[Order[_]] = None
+  ) = {
     val flowType = step.outputType match {
       case Some(FlowType(clz, None)) => {
         if(orderOverride.isEmpty) {
@@ -213,7 +229,7 @@ class FlowStage(val step: AbstractFlowStep, val name: String=gensym("stage")) {
   // convenience methods based around pipeTo
   def splitTo(other: FlowStage) = pipeTo(other, FlowNodeSplit())
   def joinTo(other: FlowStage) = pipeTo(other, FlowNodeJoin())
-  
+
   // in order to pipe result of this stage to another, they must have the same type, and neither can be None
   def pipeTo(other: FlowStage, pipeKind: FlowNodeKind) = {
     val pipeName = gensym(name+"_"+other.name)
@@ -236,7 +252,7 @@ class FlowStage(val step: AbstractFlowStep, val name: String=gensym("stage")) {
     val pipeType = {
       val inType = other.step.inputType.get
       val outType = step.outputType.get
-      
+
       if(!outType.canPipeTo(inType)) {
         Console.err.println("Incompatible types in pipeTo: ")
         Console.err.println("  this stage offers:    "+outType)
@@ -280,7 +296,11 @@ object FlowStep {
   }
 }
 
-case class FlowStep[T](val action: Class[T], val parms: Parameters = new Parameters(), val name: String=gensym("step")) extends AbstractFlowStep {
+case class FlowStep[T](
+  val action: Class[T],
+  val parms: Parameters = new Parameters(),
+  val name: String=gensym("step"))
+    extends AbstractFlowStep {
   def inputType = getInputType(action)
   def outputType = {
     // if this is a Sorter, it's type is dependent upon its parms,
@@ -295,14 +315,16 @@ case class FlowStep[T](val action: Class[T], val parms: Parameters = new Paramet
   }
 }
 
-// a linear collection of steps; not explicit in tupleflow, but simpler here
-case class FlowLinearStep(val steps: Seq[AbstractFlowStep]) extends AbstractFlowStep {
+/** A linear collection of steps; not explicit in tupleflow, but simpler here */
+case class FlowLinearStep(val steps: Seq[AbstractFlowStep])
+    extends AbstractFlowStep {
   def inputType = steps.head.inputType
   def outputType = steps.last.outputType
 }
 
-// a set of steps to execute in parallel, each getting a copy of the input
-case class FlowMultiStep(val steps: Seq[AbstractFlowStep]) extends AbstractFlowStep {
+/** a set of steps to execute in parallel, each getting a copy of the input */
+case class FlowMultiStep(val steps: Seq[AbstractFlowStep])
+    extends AbstractFlowStep {
   private val inType = steps(0).inputType
   private val outType = steps(0).outputType
 

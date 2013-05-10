@@ -19,11 +19,10 @@ import collection.JavaConversions._
 import julien.flow._
 import Recipe._
 
-
-/**
-  * Refactored from Galago's BuildIndex
+/** Refactored from Galago's BuildIndex
   *
   * @author irmarc
+  * @author jfoley
   */
 object BuildIndex extends TupleFlowFunction {
   val slash = File.separator
@@ -34,8 +33,8 @@ object BuildIndex extends TupleFlowFunction {
 
     // inputPath may be a string, or a list of strings -- required
     if (!gblParms.containsKey("inputPath")) {
-      errorLog ++= "Parameter 'inputPath' is required as a string or list of strings.\n"
-    } else {
+      errorLog ++=
+      "Parameter 'inputPath' is required as a string or list of strings.\n"
     }
 
     // indexPath may be a string
@@ -95,7 +94,8 @@ object BuildIndex extends TupleFlowFunction {
     }
 
     // filter input paths into files and directories
-    val inputPaths = bp.getAsList("inputPath").asInstanceOf[java.util.List[String]].toSet
+    val inputPaths =
+      bp.getAsList("inputPath").asInstanceOf[java.util.List[String]].toSet
     var files = new ListBuffer[String]
     var directories = new ListBuffer[String]
 
@@ -118,23 +118,34 @@ object BuildIndex extends TupleFlowFunction {
     writeBuildManifest(bp)
 
     // build up stages
-    val splitInput = new FlowStage(FlowLinearStep(Seq(
-        FlowStep(classOf[DocumentSource], getSplitParms(bp)),
-        FlowStep(new DocumentSplit.FileNameOrder())
-    )), gensym("DocumentSource"))
+    val splitInput = new FlowStage(
+      FlowLinearStep(
+        Seq(
+          FlowStep(classOf[DocumentSource], getSplitParms(bp)),
+          FlowStep(new DocumentSplit.FileNameOrder())
+        )
+      ),
+      gensym("DocumentSource")
+    )
 
     val countDocs = FlowStage(classOf[ParserCounter])
     val offsetDocs = FlowStage(classOf[SplitOffsetter])
 
     // build up output of fork stage first
-    val writeNames = FlowStage(classOf[DiskNameWriter], indexFileParms(bp, "names"))
-    val writeNamesRev = FlowStage(classOf[DiskNameReverseWriter], indexFileParms(bp, "names.reverse"))
-    val writeLengths = FlowStage(classOf[DiskLengthsWriter], indexFileParms(bp, "lengths"))
+    val writeNames =
+      FlowStage(classOf[DiskNameWriter], indexFileParms(bp, "names"))
+    val writeNamesRev =
+      FlowStage(classOf[DiskNameReverseWriter],
+        indexFileParms(bp, "names.reverse"))
+    val writeLengths =
+      FlowStage(classOf[DiskLengthsWriter], indexFileParms(bp, "lengths"))
     // PositionFieldIndexWriter uses this name as a prefix to calculate names
-    val writeExtentPostings = FlowStage(classOf[PositionFieldIndexWriter], indexFileParms(bp, ""))
+    val writeExtentPostings = FlowStage(classOf[PositionFieldIndexWriter],
+      indexFileParms(bp, ""))
 
     val writeContent = if(bp.get("content", true)) {
-      Some(FlowStage(classOf[PositionContentWriter],indexFileParms(bp, "content")))
+      Some(FlowStage(classOf[PositionContentWriter],
+        indexFileParms(bp, "content")))
     } else None
 
     val writeCorpus = if(bp.get("corpus", true)) {
@@ -142,7 +153,8 @@ object BuildIndex extends TupleFlowFunction {
     } else None
 
     val writePostings = if(bp.get("nonStemmedPostings", true)) {
-      Some(FlowStage(classOf[PositionIndexWriter], indexFileParms(bp, "all.postings")))
+      Some(FlowStage(classOf[PositionIndexWriter],
+        indexFileParms(bp, "all.postings")))
     } else None
 
     // build up complicated fork stage
@@ -156,19 +168,28 @@ object BuildIndex extends TupleFlowFunction {
         extractor(classOf[FieldLengthExtractor], Some(writeLengths)),
         extractor(classOf[NumberedDocumentDataExtractor], Some(writeNames)),
         extractor(classOf[NumberedDocumentDataExtractor], Some(writeNamesRev)),
-        extractor(classOf[NumberedExtentPostingsExtractor], Some(writeExtentPostings)),
+        extractor(classOf[NumberedExtentPostingsExtractor],
+          Some(writeExtentPostings)),
 
         //--- optional bits:
         extractor(classOf[NumberedPostingsPositionExtractor], writePostings),
-        extractor(classOf[ContentEncoder], writeContent, bp.getMap("tokenizer")),
+        extractor(classOf[ContentEncoder],
+          writeContent,
+          bp.getMap("tokenizer")),
 
         // enforce custom sort on CorpusFolderWriter;
         // it doesn't need a sort but is faster with one
-        extractor(classOf[CorpusFolderWriter], writeCorpus, bp.getMap("storeParams"), Some(new KeyValuePair.KeyOrder()))
+        extractor(classOf[CorpusFolderWriter],
+          writeCorpus,
+          bp.getMap("storeParams"),
+          Some(new KeyValuePair.KeyOrder()))
 
       ).flatten // remove anything that wasn't included in the build
 
-      new FlowStage(FlowLinearStep(leadup ++ Seq(FlowMultiStep(branches))), gensym("ParseDocs"))
+      new FlowStage(
+        FlowLinearStep(leadup ++ Seq(FlowMultiStep(branches))),
+        gensym("ParseDocs")
+      )
     }
 
     // DSL for when we don't want to create nodes explicitly
@@ -180,9 +201,12 @@ object BuildIndex extends TupleFlowFunction {
 
     // the rest of the stages will be joined automagically by sharing nodes
     // build up our set of stages
-    val inputStages: Set[FlowStage] = Set(splitInput, countDocs, offsetDocs, parseDocs)
-    val mustWriteStages: Set[FlowStage] = Set(writeNames, writeNamesRev, writeLengths, writeExtentPostings)
-    val mightWriteStages: Set[FlowStage] = Set(writeCorpus, writeContent, writePostings).flatten
+    val inputStages: Seq[FlowStage] =
+      Seq(splitInput, countDocs, offsetDocs, parseDocs)
+    val mustWriteStages: Seq[FlowStage] =
+      Seq(writeNames, writeNamesRev, writeLengths, writeExtentPostings)
+    val mightWriteStages: Seq[FlowStage] =
+      Seq(writeCorpus, writeContent, writePostings).flatten
 
     val graph = inputStages ++
                 mustWriteStages ++

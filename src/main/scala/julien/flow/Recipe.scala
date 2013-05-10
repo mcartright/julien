@@ -20,16 +20,14 @@ object Recipe {
 
     // build a list of steps
     var steps = ListBuffer[AbstractFlowStep]()
-    
+
     // do the extraction step
     steps += FlowStep(extractor, extractParms)
 
     // infer the necessary sort if not forced
     if(forceSort.nonEmpty) {
-      //println("forcing sort order of "+targetStage.name+" to be "+forceSort.get.getClass.getSimpleName)
       steps += FlowStep(forceSort.get)
     } else if(needsSort.nonEmpty) {
-      //println("inferred sort order of "+targetStage.name+" as "+needsSort.get.getClass.getSimpleName)
       steps += FlowStep(needsSort.get)
     }
 

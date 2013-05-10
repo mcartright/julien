@@ -16,12 +16,14 @@ sealed abstract class Layer {
   def apply(i: Int) = neurons(i)
   var bias: Option[BiasNeuron] = None
   def size: = neurons.size
-  def feedTo(other: Layer): Unit = {
-    for (n1 <- neurons; n2 <- other.neurons) Synapse(n1 ,n2)
+  def feedTo(other: Layer): ArrayBuffer[Synapse] = {
+    val conns = ArrayBuffer[Synapse]
+    for (n1 <- neurons; n2 <- other.neurons) conns += Synapse(n1 ,n2)
     // create a bias neuron for the forward layer
     val b = new BiasNeuron()
-    for (n2 <- other.neurons) Synapse(b, n2)
+    for (n2 <- other.neurons) conns += Synapse(b, n2)
     bias = Some(b)
+    return conns
   }
 }
 

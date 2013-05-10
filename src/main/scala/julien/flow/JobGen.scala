@@ -69,11 +69,15 @@ object JobGen {
     }
   }
 
-  // build a Tupleflow Stage from a Flow Stage
-  //  called publicly from create
-  private def stageFromFlowStage(fs: FlowStage, graph: Set[FlowStage]): Stage = {
+  /** Build a Tupleflow Stage from a Flow Stage
+    * called publicly from create.
+    */
+  private def stageFromFlowStage(
+    fs: FlowStage,
+    graph: Seq[FlowStage]
+  ): Stage = {
     val stage = new Stage(fs.name)
-    
+
     // add all inputs, generating input steps conditionally
     fs.inputs.foreach(input => {
       stage.addInput(input.name, input.flowType.order.get)
@@ -96,7 +100,7 @@ object JobGen {
     stage
   }
 
-  def create(graph: Set[FlowStage]): Job = {
+  def create(graph: Seq[FlowStage]): Job = {
     val job = new Job()
 
     // generate each stage
@@ -122,7 +126,7 @@ object JobGen {
     job
   }
 
-  def createAndVerify(graph: Set[FlowStage]): Job = {
+  def createAndVerify(graph: Seq[FlowStage]): Job = {
     val job = create(graph)
     val store = new ErrorStore
     Verification.verify(job, store)

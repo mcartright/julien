@@ -34,28 +34,67 @@ class RankNet(
   Layer.neurons(nOutput).
     result // make it an immutable Array
 
-  // Hooks up the network
+  val connections = ArrayBuffer[Synapse]()
+
+  // Hook up the network
   for (layerPair <- layers.sliding(2,1)) {
-    layerPair(0) feedTo layerPair(1)
+    connections ++= layerPair(0) feedTo layerPair(1)
   }
 
+  // Make the caching structure
+  val signalCache = new NetworkSignalCache
+
   // And it's ready to go.
+
   def train: Unit = {
     var nIter = 0
     var error = Double.MaxValue
+
+    startMonitoringNetwork
     while (nIter < maxIter && error > threshold) {
       // use micro-batch updating:
 
       // For a given query:
-      // run the net against every document, produce a score
-      // generate lambda_abs from the QJs and QRs
-      // aggregate to lambda_as for each query (need to use pairs and inverses)
-      // Sum over the lambdas to perform weight updates - use
-      // the gradients you derived before.
-      //
+      for ((qid, text) <- queries) {
+        // run the net against every document, produce a score
+        val qresult = processAndCacheNetworkSignals(qid)
+        // generate lambda_abs from the QJs and QRs
+        // aggregate to lambda_as for each query
+        // (need to use pairs and inverses)
+        val lambdaUpdates = generateLambdas(qresult, judgments(qid))
+
+        // Sum over the lambdas to perform weight updates - use
+        // the gradients you derived before.
+        applyLambdaUpdates(lambdaUpdates)
+      }
+
       // You also need to cache all the acivations, inputs, and sums for each
       // synapse/query pair (check gradient functions for args).
     }
+  }
+
+  def processAndCacheNetworkSignals(qid: String) : QueryResult {
+    // Need some way to just have the nodes be there.
+    val query = queries(qid)
+    v
+  }
+
+  def generateLambdas(
+    qResult: QueryResult,
+    judgment: QueryJudgment): Map[String, LambdaUpdate] = {
+  }
+
+  def applyLambdaUpdates(lambdas: Map[String, LambdaUpdate]): Unit = {
+  }
+
+  def startMonitoringNetwork: Unit {
+
+  }
+
+  /** Internal class to aid in caching signals needed for later.
+    * Values are added via publisher/subscription service.
+    */
+  class NetworkSignalCache extends Subscriber[NetworkEvent, Neuron] {
   }
 }
 

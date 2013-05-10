@@ -11,7 +11,11 @@ object Neuron {
   ) = new StandardNeuron(learningRate, tfunc)
 }
 
-sealed abstract class Neuron(val learningRate: Double) {
+case class NetworkEvent(val synapse: Synapse, val signal: Double)
+sealed abstract class Neuron(val learningRate: Double)
+    extends Publisher[NetworkEvent] {
+  type Pub = this
+
   // Structures to hold in place
   val inLinks = ArrayBuffer[Synapse]()
   val outLinks = ArrayBuffer[Synapse]()
@@ -43,6 +47,7 @@ class StandardNeuron(val lr: Double, val tf: TransferFunction)
     extends ComputedNeuron(lr, tf) {
   def output: Double = {
     val wsum = inLinks.map(s => s.source.output * s.weight).sum
-    g.compute(wsum)
+    val outVal = g.compute(wsum)
+
   }
 }

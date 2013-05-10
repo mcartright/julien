@@ -16,7 +16,6 @@ import gt.execution.{Job,InputStep,MultiStep,OutputStep, Stage, Step}
 import collection.mutable.{ListBuffer,HashSet}
 import collection.JavaConversions._
 
-
 package object flow {
   type Job = gt.execution.Job
   type Parameters = gt.Parameters
@@ -31,7 +30,10 @@ package object flow {
   }
 
   // look up inheritance tree to find Annotation
-  def findAnnotation[T <: java.lang.annotation.Annotation](objClass: Class[_], annClass: Class[T]): Option[T] = {
+  def findAnnotation[T <: java.lang.annotation.Annotation](
+    objClass: Class[_],
+    annClass: Class[T]
+  ): Option[T] = {
     var cur = objClass
     while(cur != null) {
       if(cur.isAnnotationPresent(annClass)) {
@@ -55,7 +57,7 @@ package object flow {
       case None => return None
       case Some(clz) => clz
     }
-    
+
     val order = getOrder(inputClass, ic.order)
     Some(FlowType(inputClass, order))
   }
@@ -79,7 +81,7 @@ package object flow {
       case None => return None
       case Some(clz) => clz
     }
-    
+
     val order = getOrder(outputClass, oc.order)
     Some(FlowType(outputClass, order))
   }
