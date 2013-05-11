@@ -1,14 +1,17 @@
 // BSD License (http://lemurproject.org/galago-license)
 package julien.galago.core.index.disk;
 
-import julien.galago.core.index.AggregateReader.AggregateIndexPart;
-import julien.galago.core.index.AggregateReader.IndexPartStatistics;
-import julien.galago.core.index.AggregateReader.NodeAggregateIterator;
-import julien.galago.core.index.AggregateReader.NodeStatistics;
+import java.io.DataInput;
+import java.io.IOException;
+
 import julien.galago.core.index.BTreeReader;
 import julien.galago.core.index.ExtentIterator;
 import julien.galago.core.index.Iterator;
 import julien.galago.core.index.KeyListReader;
+import julien.galago.core.index.AggregateReader.AggregateIndexPart;
+import julien.galago.core.index.AggregateReader.IndexPartStatistics;
+import julien.galago.core.index.AggregateReader.NodeAggregateIterator;
+import julien.galago.core.index.AggregateReader.NodeStatistics;
 import julien.galago.core.parse.stem.Stemmer;
 import julien.galago.core.util.ExtentArray;
 import julien.galago.tupleflow.DataStream;
@@ -16,16 +19,13 @@ import julien.galago.tupleflow.Parameters;
 import julien.galago.tupleflow.Utility;
 import julien.galago.tupleflow.VByteInput;
 
-import java.io.DataInput;
-import java.io.IOException;
-
 
 /**
  * Reads a simple positions-based index, where each inverted list in the index
  * contains both term count information and term length information. The term
  * counts data is stored separately from term length information for faster
  * query processing when no positions are needed.
- * <p/>
+ *
  * (12/16/2010, irmarc): In order to facilitate faster count-only processing,
  * the default iterator created will not even open the positions list when
  * iterating. This is an interesting enough change that there are now two
@@ -126,8 +126,6 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
     public class TermExtentIterator extends KeyListReader.ListIterator
             implements NodeAggregateIterator, ExtentIterator {
 
-        // to support resets
-        protected long startPosition, endPosition;
         private BTreeReader.BTreeIterator iterator;
         private int documentCount;
         private int totalPositionCount;
@@ -139,6 +137,8 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
         private int currentDocument;
         private int currentCount;
         private ExtentArray extentArray;
+        // to support resets
+        protected long startPosition, endPosition;
         // to support skipping
         private VByteInput skips;
         private VByteInput skipPositions;
@@ -347,12 +347,15 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
                 documentIndex = Math.min(documentIndex + 1, documentCount);
                 if (!isDone()) {
                     loadNextPosting();
-                }  else {
-                    extentArray.clear();
-                    currentDocument = -1;
-                    currentCount = 0;
+                    loadExtents();
                 }
             }
+
+//            if (document == currentDocument) {
+//                loadExtents();
+//            } else {
+//                extentArray.clear();
+//            }
         }
 
         // This only moves forward in tier 1, reads from tier 2 only when

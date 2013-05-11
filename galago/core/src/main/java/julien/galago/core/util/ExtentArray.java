@@ -16,7 +16,7 @@ import java.util.Arrays;
  * @author irmarc
  */
 public class ExtentArray {
-    public static final ExtentArray empty = new ExtentArray();
+    public static final ExtentArray empty = new ExtentArray(500);
     public int length;
     private int[] begins;
     private int[] ends;

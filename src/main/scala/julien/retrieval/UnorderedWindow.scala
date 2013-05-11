@@ -65,6 +65,9 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
         break = true
       }
     }
+//    if (hits.length > 0) {
+//      println(hits.length )
+//    }
     hits
   }
 
@@ -72,7 +75,7 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     var j = 0
     while (j < iterators.length) {
       iterators(j).reset()
-   //   println(iterators(j).length  + " " + iterators(j).getBegins.mkString(" "))
+ //     debug(iterators(j).length  + " " + iterators(j).getBegins.mkString(" "))
       j += 1
     }
   }

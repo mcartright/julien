@@ -21,9 +21,9 @@ import org.lemurproject.galago.core.retrieval.query.StructuredQuery
 object GalagoJulienRetrievalQuality extends App {
 
  //  Thread.sleep(10000)
-  val myTestQueries = Array("1 wood construction")
+  val myTestQueries = Array("2 turkey war")
 
-  val queries =  tsvToJulienQuery() // myTestQueries
+  val queries =  tsvToJulienQuery() //myTestQueries
 
   val julResults = runJulienQueries(queries)
   val galagoResults = runGalagoQueries(queries)
@@ -82,9 +82,9 @@ object GalagoJulienRetrievalQuality extends App {
   }
 
   def runJulienQueries(queries: Seq[String]) = {
-    implicit val index = Index.disk("/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-jul-11")
+    //implicit val index = Index.disk("/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-jul-11")
 
-    //implicit val index = Index.disk("/usr/dan/users4/jdalton/code/julien/data/test-index-julien")
+    implicit val index = Index.disk("/usr/dan/users4/jdalton/code/julien/data/test-index-julien")
 
     val resultMap = HashMap[String, Seq[ScoredDocument]]()
 
@@ -165,8 +165,8 @@ object GalagoJulienRetrievalQuality extends App {
     p.set("uniw", 0.87264)
     p.set("odw", 0.07906)
     p.set("uww", 0.04829)
-   // p.set("index", "/usr/dan/users4/jdalton/code/julien/data/test-index-galago34")
-    p.set("index", "/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-g34")
+    p.set("index", "/usr/dan/users4/jdalton/code/julien/data/test-index-galago34")
+   // p.set("index", "/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-g34")
     p.set("requested", 5)
     p.set("annotate", true)
     p.set("stemming", false)
@@ -192,7 +192,7 @@ object GalagoJulienRetrievalQuality extends App {
         val transformed = text2ConceptRetrieval.transformQuery(root, p)
         // println(transformed.toPrettyString)
         val proc = new RankedDocumentModel(text2ConceptRetrieval)
-        var results =  proc.execute(transformed, p) //text2ConceptRetrieval.runQuery(transformed, p) //
+        var results =  proc.execute(transformed, p) //text2ConceptRetrieval.runQuery(transformed, p)
         if (results == null) {
           results = Array.empty[org.lemurproject.galago.core.retrieval.ScoredDocument]
         }
@@ -229,7 +229,7 @@ object GalagoJulienRetrievalQuality extends App {
     val queryFile = io.Source.fromFile("./data/test-queries/rob04.titles.tsv")
     val lines = queryFile.getLines()
 
-    val filtered = lines.filter(_.split("\\s+")(0).toInt > 600).toList take 1
+    val filtered = lines.filter(_.split("\\s+")(0).toInt > 600).toList //take 1
     filtered
   }
 
