@@ -4,8 +4,14 @@ import java.io.File
 import collection.mutable.{ListBuffer,HashSet}
 import julien.galago.tupleflow.Utility
 
-// commonly used Recipes for new Flow interface
+/** Commonly used recipes (i.e. patterns) in building Tupleflow
+  * jobs.
+  */
 object Recipe {
+
+  /** Adds a step -> optional sort -> output step combination. Mainly used when
+    * repeating outputs from a Tupleflow MultiStep.
+    */
   def extractor(
         extractor: Class[_],
         output: Option[FlowStage],
@@ -38,7 +44,10 @@ object Recipe {
     Some(FlowLinearStep(steps.toSeq))
   }
 
-  // for every index file we need to make parameters including at least its name
+  /** Constructs default parameters for an index file writer.
+    * This method needs refactoring, as it adds more than is necesary
+    * for most writers.
+    */
   def indexFileParms(bp: Parameters, indexName: String): Parameters = {
     val p = new Parameters
     p.set("filename", bp.getString("indexPath") + File.separator + indexName)
@@ -47,6 +56,9 @@ object Recipe {
     p
   }
 
+  /** Writes a build manifest to the location indicated in the provided
+    * parameters.
+    */
   def writeBuildManifest(bp: Parameters) {
     val indexPath = new File(bp.getString("indexPath")).getCanonicalPath
     val buildManifest = new File(indexPath, "buildManifest.json")

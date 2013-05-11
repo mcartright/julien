@@ -16,20 +16,30 @@ import gt.execution.{Job,InputStep,MultiStep,OutputStep, Stage, Step}
 import collection.mutable.{ListBuffer,HashSet}
 import collection.JavaConversions._
 
+/** The flow package facilitates creation of Tupleflow jobs. Tupleflow itself
+  * is a suitable software package for distributed computation, however the API
+  * is not very pleasant, making the generation of new Tupleflow jobs painful.
+  */
 package object flow {
   type Job = gt.execution.Job
   type Parameters = gt.Parameters
   type Order[T] = gt.Order[T]
 
-  // ugly mutable state for gensym
-  var count = 0
+  // ugly mutable state for gensym - don't let anyone see it.
+  private var count = 0
+
+  /** Function to generate a unique id for connecting jobs together.
+    * A prefix can be supplied if desired.
+    */
   def gensym(base: String="gensym"): String = {
     var output = base+count
     count += 1
     output
   }
 
-  // look up inheritance tree to find Annotation
+  /** Hunts for a particular annotation attached to a class. If found,
+    * returns an option filled w/ the annotation. Otherwise returns None.
+    */
   def findAnnotation[T <: java.lang.annotation.Annotation](
     objClass: Class[_],
     annClass: Class[T]
@@ -47,6 +57,12 @@ package object flow {
     None
   }
 
+  /** Optionally returns the input type of a Tupleflow step.
+    * We may return None, if no input class
+    * is defined (e.g. a source step), and even in the returned FlowType,
+    * we may not have an Order defined if the class is an internal
+    * step.
+    */
   def getInputType(stepClass: Class[_]): Option[FlowType] = {
     val ic = findAnnotation(stepClass, classOf[InputClass]) match {
       case None => return None
@@ -62,6 +78,7 @@ package object flow {
     Some(FlowType(inputClass, order))
   }
 
+  /** Optionally returns a class for the given string. */
   def getClassOption(className: String): Option[Class[_]] = {
     try {
       Some(Class.forName(className))
@@ -70,7 +87,12 @@ package object flow {
     }
   }
 
-  // Given a class, look up it's annotations to determine it's output type and ordering
+  /** Given a class, look up it's annotations to determine it's
+    * output type and order. We may return None, if no output class
+    * is defined (e.g. a writer step), and even in the returned FlowType,
+    * we may not have an Order defined if the class is an internal
+    * step.
+    */
   def getOutputType(stepClass: Class[_]): Option[FlowType] = {
     val oc = findAnnotation(stepClass,classOf[OutputClass]) match {
       case None => return None
@@ -86,7 +108,10 @@ package object flow {
     Some(FlowType(outputClass, order))
   }
 
-  // Given a class and an ordering string, create an Order object
+  /** Given a class and an ordering string, tries to create an Order object
+    * that is an actual Order of the given type. If the given order does not
+    * exist, returns None.
+    */
   def getOrder(typeClass: Class[_], order: Array[String]): Option[Order[_]] = {
     val obj = typeClass.newInstance
     if(!obj.isInstanceOf[Type[_]]) return None

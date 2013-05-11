@@ -17,10 +17,16 @@ import gt.execution.{InputStep,MultiStep,OutputStep, Stage, Step}
 import collection.mutable.{ListBuffer,HashSet}
 import collection.JavaConversions._
 
-
+/** A series of factory methods for creating Tupleflow Jobs, or
+  * providing information about them.
+  */
 object JobGen {
-  // given a set of stages, and a start stage, find all successors
-  def successors(startStage: FlowStage, stages: Set[FlowStage]): Set[FlowStage] = {
+  /** Given a particular stage, and a set of possible successors,
+    * return the subset that are actually eligible successors.
+    */
+  def successors(
+    startStage: FlowStage,
+    stages: Set[FlowStage]): Set[FlowStage] = {
     val outPipes = startStage.outputs
 
     outPipes.map(pipe => {
@@ -28,8 +34,11 @@ object JobGen {
     }).flatten.toSet
   }
 
-  // pretty-print the type of each stage flowing together
-  def printTypeGraph(startStage: FlowStage, stages: Set[FlowStage], indent: String="") {
+  /** Pretty-print the type of each stage flowing together. */
+  def printTypeGraph(
+    startStage: FlowStage,
+    stages: Set[FlowStage],
+    indent: String="") {
     if(startStage.inputTypes.nonEmpty) {
       print(indent+startStage.inputTypes.mkString(", "))
     } else {
@@ -45,8 +54,9 @@ object JobGen {
     }
   }
 
-  // build a sequence of Tupleflow steps from FlowSteps
-  //  called publicly from create
+  /** Translates a sequence of FlowSteps into TupleFlowSteps.
+    * Called publicly from create.
+    */
   private def seqFromFlowStep(step: AbstractFlowStep): Seq[Step] = {
     step match {
       case FlowInput(node) => Seq(new InputStep(node.name))
@@ -100,6 +110,7 @@ object JobGen {
     stage
   }
 
+  /** Takes a graph of FlowStages and generates a TupleFlow job from it. */
   def create(graph: Seq[FlowStage]): Job = {
     val job = new Job()
 
@@ -126,6 +137,7 @@ object JobGen {
     job
   }
 
+  /** Adds the verification step after creating a TupleFlow job. */
   def createAndVerify(graph: Seq[FlowStage]): Job = {
     val job = create(graph)
     val store = new ErrorStore
