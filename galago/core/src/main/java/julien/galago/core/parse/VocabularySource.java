@@ -21,7 +21,7 @@ import julien.galago.tupleflow.Processor;
 import julien.galago.tupleflow.Step;
 import julien.galago.tupleflow.TupleFlowParameters;
 import julien.galago.tupleflow.Utility;
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 
 
 /**
@@ -123,7 +123,7 @@ public class VocabularySource implements ExNihiloSource<KeyValuePair> {
     return processor;
   }
 
-  public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {
+  public static void verify(TupleFlowParameters parameters, ErrorStore handler) {
     FileSource.verify(parameters, handler);
     String partPath = parameters.getJSON().getString("filename");
     try {

@@ -10,8 +10,7 @@ import java.util.List;
 import julien.galago.core.parse.Document;
 import julien.galago.tupleflow.StandardStep;
 import julien.galago.tupleflow.TupleFlowParameters;
-import julien.galago.tupleflow.execution.ErrorHandler;
-import julien.galago.tupleflow.execution.Verification;
+import julien.galago.tupleflow.execution.ErrorStore;
 
 /**
  *
@@ -92,7 +91,7 @@ public abstract class Stemmer extends StandardStep<Document, Document> {
 
   public static void verify(
 			    TupleFlowParameters parameters,
-			    ErrorHandler handler)
+			    ErrorStore handler)
       throws IOException {
       // nothing needed - just doing this for inheritance
   }

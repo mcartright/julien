@@ -5,9 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 
 import julien.galago.core.index.BTreeWriter;
 import julien.galago.core.index.CompressedByteBuffer;
@@ -19,11 +17,10 @@ import julien.galago.tupleflow.InputClass;
 import julien.galago.tupleflow.Parameters;
 import julien.galago.tupleflow.TupleFlowParameters;
 import julien.galago.tupleflow.Utility;
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 import julien.galago.tupleflow.execution.Verification;
 
 import org.xerial.snappy.SnappyInputStream;
-import org.xerial.snappy.SnappyOutputStream;
 
 /**
  * Provides a column-oriented view of the fields stored during indexing.
@@ -102,7 +99,7 @@ public class PositionContentWriter
   }
 
   public static void verify(TupleFlowParameters parameters,
-			    ErrorHandler handler) {
+			    ErrorStore handler) {
     if (!parameters.getJSON().isString("filename")) {
       handler.addError("PositionContentWriter requires a 'filename' parameter.");
       return;

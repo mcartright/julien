@@ -12,23 +12,13 @@ import julien.galago.tupleflow.Parameters;
 import julien.galago.tupleflow.Processor;
 import julien.galago.tupleflow.TupleFlowParameters;
 import julien.galago.tupleflow.TypeReader;
-import julien.galago.tupleflow.execution.ConnectionAssignmentType;
-import julien.galago.tupleflow.execution.ConnectionPointType;
-import julien.galago.tupleflow.execution.ErrorHandler;
-import julien.galago.tupleflow.execution.ErrorStore;
-import julien.galago.tupleflow.execution.Job;
-import julien.galago.tupleflow.execution.JobExecutor;
-import julien.galago.tupleflow.execution.Stage;
-import julien.galago.tupleflow.execution.StageConnectionPoint;
-import julien.galago.tupleflow.execution.Step;
-import julien.galago.tupleflow.execution.Verification;
 import julien.galago.tupleflow.types.TupleflowString;
 import julien.galago.tupleflow.types.XMLFragment;
 import junit.framework.TestCase;
 
 /**
  *  Tests the connection of two stages with multiple connections between them.
- * 
+ *
  * @author sjh
  */
 public class MultiConnectionTest extends TestCase {
@@ -97,7 +87,7 @@ public class MultiConnectionTest extends TestCase {
       return processor;
     }
 
-    public static void verify(TupleFlowParameters parameters, ErrorHandler handler) throws IOException {
+    public static void verify(TupleFlowParameters parameters, ErrorStore handler) throws IOException {
       if (!parameters.writerExists("conn-a", TupleflowString.class.getName(), TupleflowString.ValueOrder.getSpec())) {
         throw new IOException("Could not find the conn-a connection writer.");
       }
@@ -134,7 +124,7 @@ public class MultiConnectionTest extends TestCase {
       return processor;
     }
 
-    public static void verify(TupleFlowParameters parameters, ErrorHandler handler) throws IOException {
+    public static void verify(TupleFlowParameters parameters, ErrorStore handler) throws IOException {
       if (!parameters.readerExists("conn-a", TupleflowString.class.getName(), TupleflowString.ValueOrder.getSpec())) {
         throw new IOException("Could not find the conn-a connection reader.");
       }

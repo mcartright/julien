@@ -8,7 +8,7 @@ import java.io.IOException;
 import julien.galago.core.parse.Document;
 import julien.galago.core.types.KeyValuePair;
 import julien.galago.tupleflow.*;
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 
 
 /**
@@ -38,7 +38,7 @@ public class ConflationExtractor extends StandardStep<Document, KeyValuePair> {
     }
   }
 
-  public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {
+  public static void verify(TupleFlowParameters parameters, ErrorStore handler) {
     if (!parameters.getJSON().isString("stemmerClass")) {
       handler.addError(ConflationExtractor.class.getName() + " requires a stemmerClass parameter.");
     } else {

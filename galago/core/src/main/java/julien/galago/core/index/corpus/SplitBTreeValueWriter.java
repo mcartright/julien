@@ -21,7 +21,7 @@ import julien.galago.tupleflow.Step;
 import julien.galago.tupleflow.StreamCreator;
 import julien.galago.tupleflow.TupleFlowParameters;
 import julien.galago.tupleflow.Utility;
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 import julien.galago.tupleflow.execution.Verification;
 
 
@@ -31,10 +31,10 @@ import julien.galago.tupleflow.execution.Verification;
  *  - Index is a mapping from byte[] to byte[]
  *
  *  - allows values to be written out of order to a set of files
- *  - a unified ordered key structure should be kept in a folder 
+ *  - a unified ordered key structure should be kept in a folder
  *    with these value files, as created by SplitIndexKeyWriter
  *  - SplitIndexReader will read this data
- * 
+ *
  *  This class if useful for writing a corpus structure
  *  - documents can be written to disk in any order
  *  - the key structure allows the documents to be found quickly
@@ -147,7 +147,7 @@ public class SplitBTreeValueWriter implements BTreeWriter,
     return next;
   }
 
-  public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {
+  public static void verify(TupleFlowParameters parameters, ErrorStore handler) {
     if (!parameters.getJSON().isString("filename")) {
       handler.addError("DocumentIndexWriter requires an 'filename' parameter.");
       return;

@@ -496,7 +496,7 @@ public class Verification {
         store.addWarning( "Class " + step.getClassName()
                 + " has a verify method, but it isn't static.");
       } else {
-        verify.invoke(null, vp, new VerificationErrorStore(store));
+        verify.invoke(null, vp, new ErrorStore());
       }
     } catch (InvocationTargetException e) {
       store.addError(

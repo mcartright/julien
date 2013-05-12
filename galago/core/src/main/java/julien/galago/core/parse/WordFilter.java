@@ -13,15 +13,15 @@ import julien.galago.tupleflow.OutputClass;
 import julien.galago.tupleflow.StandardStep;
 import julien.galago.tupleflow.TupleFlowParameters;
 import julien.galago.tupleflow.Utility;
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 
 /**
  * WordFilter filters out unnecessary words from documents.  Typically this object
- * takes a stopword list as parameters and removes all the listed words.  However, 
+ * takes a stopword list as parameters and removes all the listed words.  However,
  * this can also be used to keep only the specified list of words in the index, which
  * can be used to create an index that is tailored for only a small set
  * of experimental queries.
- * 
+ *
  * @author trevor
  */
 @InputClass(className = "julien.galago.core.parse.Document")
@@ -64,7 +64,7 @@ public class WordFilter extends StandardStep<Document, Document> {
     processor.process(document);
   }
 
-  public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {
+  public static void verify(TupleFlowParameters parameters, ErrorStore handler) {
     if (parameters.getJSON().containsKey("filename")) {
       return;
     }

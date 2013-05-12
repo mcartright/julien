@@ -3,14 +3,12 @@ package julien.galago.core.index.disk;
 
 import java.io.IOException;
 
-import julien.galago.core.parse.NumericParameterAccumulator;
 import julien.galago.core.types.FieldNumberWordPosition;
 import julien.galago.core.types.NumberWordPosition;
 import julien.galago.tupleflow.InputClass;
-import julien.galago.tupleflow.Parameters;
 import julien.galago.tupleflow.Processor;
 import julien.galago.tupleflow.TupleFlowParameters;
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 import julien.galago.tupleflow.execution.Verification;
 
 
@@ -57,7 +55,7 @@ public class PositionFieldIndexWriter implements Processor<FieldNumberWordPositi
     }
   }
 
-  public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {
+  public static void verify(TupleFlowParameters parameters, ErrorStore handler) {
     if (!parameters.getJSON().isString("filename")) {
       handler.addError("PositionFieldIndexWriter requires a 'filename' parameter.");
       return;

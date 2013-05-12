@@ -23,7 +23,7 @@ import javax.management.Notification;
 import javax.management.NotificationEmitter;
 import javax.management.NotificationListener;
 
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 import julien.galago.tupleflow.execution.Verification;
 
 /**
@@ -107,7 +107,7 @@ public class Sorter<T> extends StandardStep<T, T> implements NotificationListene
     this.temporaryFiles = new ArrayList<File>();
     this.lessThanCompare = order.lessThan();
     this.compression = CompressionType.VBYTE;
-    
+
     setLimits(new Parameters());
 
     requestMemoryWarnings();
@@ -229,7 +229,7 @@ public class Sorter<T> extends StandardStep<T, T> implements NotificationListene
     }
   }
 
-  public static void verify(TupleFlowParameters fullParameters, ErrorHandler handler) {
+  public static void verify(TupleFlowParameters fullParameters, ErrorStore handler) {
     Parameters parameters = fullParameters.getJSON();
     String[] requiredParameters = {"order", "class"};
 

@@ -12,7 +12,7 @@ import julien.galago.tupleflow.InputClass;
 import julien.galago.tupleflow.Processor;
 import julien.galago.tupleflow.TupleFlowParameters;
 import julien.galago.tupleflow.Utility;
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 import julien.galago.tupleflow.execution.Verification;
 
 
@@ -59,7 +59,7 @@ public class SplitBTreeKeyWriter implements Processor<KeyValuePair> {
     writer.close();
   }
 
-  public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {
+  public static void verify(TupleFlowParameters parameters, ErrorStore handler) {
     if (!parameters.getJSON().isString("filename")) {
       handler.addError("DocumentIndexWriter requires an 'filename' parameter.");
       return;

@@ -663,14 +663,13 @@ public class JobExecutor {
       ConnectionDescription description = new ConnectionDescription(connection);
 
       // verify that the class, order, and hash exist
-      ErrorHandler handler = store.getErrorHandler();
-      Verification.requireClass(connection.getClassName(), handler);
-      Verification.requireOrder(connection.getClassName(), connection.getOrder(), handler);
+      Verification.requireClass(connection.getClassName(), store);
+      Verification.requireOrder(connection.getClassName(), connection.getOrder(), store);
 
       if (connection.getHash() != null) {
         Verification.requireOrder(connection.getClassName(),
                 connection.getHash(),
-                handler);
+                store);
       }
       description.input = createEndPoint(description, connection.input);
       description.outputs = createEndPoints(description, connection.outputs);
@@ -704,7 +703,7 @@ public class JobExecutor {
       StageGroupDescription stage = stages.get(stageName);
 
       // if stage has no inputs, then we store 1 in stageCounts
-      if (stageInputs.get(stageName).size() == 0) {
+      if (stageInputs.get(stageName).isEmpty()) {
         stage.instanceCount = 1;
       } else {
         // find out what the assignment is for this connection.

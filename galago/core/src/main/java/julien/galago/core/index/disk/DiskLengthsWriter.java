@@ -6,7 +6,7 @@ import java.io.*;
 import julien.galago.core.index.IndexElement;
 import julien.galago.core.types.FieldLengthData;
 import julien.galago.tupleflow.*;
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 import julien.galago.tupleflow.execution.Verification;
 
 
@@ -105,7 +105,7 @@ public class DiskLengthsWriter implements Processor<FieldLengthData> {
     writer.close();
   }
 
-  public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {
+  public static void verify(TupleFlowParameters parameters, ErrorStore handler) {
     if (!parameters.getJSON().isString("filename")) {
       handler.addError("KeyValueWriters require a 'filename' parameter.");
       return;

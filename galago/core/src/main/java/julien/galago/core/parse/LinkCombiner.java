@@ -3,7 +3,6 @@ package julien.galago.core.parse;
 
 import java.io.IOException;
 
-import julien.galago.core.types.DocumentData;
 import julien.galago.core.types.ExtractedLink;
 import julien.galago.core.types.IdentifiedLink;
 import julien.galago.core.types.NumberedDocumentData;
@@ -16,7 +15,7 @@ import julien.galago.tupleflow.Processor;
 import julien.galago.tupleflow.Step;
 import julien.galago.tupleflow.TupleFlowParameters;
 import julien.galago.tupleflow.TypeReader;
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 import julien.galago.tupleflow.execution.Verification;
 
 
@@ -93,7 +92,7 @@ public class LinkCombiner implements ExNihiloSource<IdentifiedLink>, IdentifiedL
     return IdentifiedLink.class;
   }
 
-  public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {
+  public static void verify(TupleFlowParameters parameters, ErrorStore handler) {
     if (!Verification.requireParameters(new String[]{"extractedLinks", "documentDatas"},
             parameters.getJSON(), handler)) {
       return;
@@ -101,8 +100,5 @@ public class LinkCombiner implements ExNihiloSource<IdentifiedLink>, IdentifiedL
 
     String extractedLinksName = parameters.getJSON().getString("extractedLinks");
     String documentDatasName = parameters.getJSON().getString("documentDatas");
-
-    //Verification.verifyTypeReader(extractedLinksName, ExtractedLink.class, parameters, handler);
-    //Verification.verifyTypeReader(documentDatasName, DocumentData.class, parameters, handler);
   }
 }

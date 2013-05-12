@@ -9,7 +9,7 @@ import java.io.IOException;
 import julien.galago.tupleflow.Parameters;
 import julien.galago.tupleflow.Processor;
 import julien.galago.tupleflow.TupleFlowParameters;
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 import julien.galago.tupleflow.execution.Verification;
 
 /**
@@ -41,7 +41,7 @@ public class DiskTextWriter<T> implements Processor<T> {
         return parameters.getJSON().getString("class");
     }
 
-    public static boolean verify(TupleFlowParameters parameters, ErrorHandler handler) {
+    public static boolean verify(TupleFlowParameters parameters, ErrorStore handler) {
         Parameters p = parameters.getJSON();
         if (!Verification.requireParameters(new String[] { "filename", "class" }, p, handler))
             return false;

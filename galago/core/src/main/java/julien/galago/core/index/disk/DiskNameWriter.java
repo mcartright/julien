@@ -1,20 +1,17 @@
 // BSD License (http://lemurproject.org/galago-license)
 package julien.galago.core.index.disk;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import julien.galago.core.index.GenericElement;
-import julien.galago.core.types.KeyValuePair;
 import julien.galago.core.types.NumberedDocumentData;
 import julien.galago.tupleflow.Counter;
 import julien.galago.tupleflow.InputClass;
 import julien.galago.tupleflow.Parameters;
 import julien.galago.tupleflow.Processor;
-import julien.galago.tupleflow.Sorter;
 import julien.galago.tupleflow.TupleFlowParameters;
 import julien.galago.tupleflow.Utility;
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 
 
 /**
@@ -82,7 +79,7 @@ public class DiskNameWriter implements Processor<NumberedDocumentData> {
     writer.close();
   }
 
-  public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {
+  public static void verify(TupleFlowParameters parameters, ErrorStore handler) {
     if (!parameters.getJSON().isString("filename")) {
       handler.addError("DocumentNameWriter requires a 'filename' parameter.");
       return;

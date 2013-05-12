@@ -17,7 +17,7 @@ import java.util.zip.GZIPInputStream;
 
 import julien.galago.core.types.DocumentSplit;
 import julien.galago.tupleflow.*;
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 import julien.galago.tupleflow.execution.Verified;
 
 
@@ -357,7 +357,7 @@ public class DocumentSource implements ExNihiloSource<DocumentSplit> {
     return processor;
   }
 
-  public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {
+  public static void verify(TupleFlowParameters parameters, ErrorStore handler) {
     FileSource.verify(parameters, handler);
   }
 }

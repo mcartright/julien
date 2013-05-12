@@ -15,7 +15,7 @@ import julien.galago.tupleflow.InputClass;
 import julien.galago.tupleflow.Parameters;
 import julien.galago.tupleflow.TupleFlowParameters;
 import julien.galago.tupleflow.Utility;
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 import julien.galago.tupleflow.execution.Verification;
 
 import org.xerial.snappy.SnappyInputStream;
@@ -97,7 +97,7 @@ public class DocumentAggregator implements KeyValuePair.KeyOrder.ShreddedProcess
     bufferedDocuments.clear();
   }
 
-  public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {
+  public static void verify(TupleFlowParameters parameters, ErrorStore handler) {
     if (!parameters.getJSON().isString("filename")) {
       handler.addError("DocumentAggregator requires a 'filename' parameter.");
       return;

@@ -6,7 +6,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 import julien.galago.tupleflow.execution.Verification;
 
 /**
@@ -36,7 +36,7 @@ public class TextWriter<T extends Type> implements Processor<T> {
         return parameters.getJSON().getString("class");
     }
 
-    public static boolean verify(TupleFlowParameters parameters, ErrorHandler handler) {
+    public static boolean verify(TupleFlowParameters parameters, ErrorStore handler) {
         Parameters p = parameters.getJSON();
         if (!Verification.requireParameters(new String[] { "filename", "class" }, p, handler))
             return false;

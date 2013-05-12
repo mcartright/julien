@@ -12,13 +12,13 @@ import julien.galago.tupleflow.InputClass;
 import julien.galago.tupleflow.Parameters;
 import julien.galago.tupleflow.TupleFlowParameters;
 import julien.galago.tupleflow.Utility;
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 import julien.galago.tupleflow.execution.Verification;
 
 
 /**
- * Writes the document indicator file 
- * 
+ * Writes the document indicator file
+ *
  * @author sjh
  */
 @InputClass(className = "julien.galago.core.types.DocumentFeature", order = {"+document"})
@@ -65,7 +65,7 @@ public class DocumentPriorWriter extends KeyValueWriter<DocumentFeature> {
     super.close();
   }
 
-  public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {
+  public static void verify(TupleFlowParameters parameters, ErrorStore handler) {
     if (!parameters.getJSON().isString("filename")) {
       handler.addError("KeyValueWriters require a 'filename' parameter.");
       return;

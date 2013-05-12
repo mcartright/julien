@@ -15,7 +15,7 @@ import julien.galago.tupleflow.InputClass;
 import julien.galago.tupleflow.Parameters;
 import julien.galago.tupleflow.TupleFlowParameters;
 import julien.galago.tupleflow.Utility;
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 import julien.galago.tupleflow.execution.Verification;
 
 
@@ -71,8 +71,6 @@ public class PositionIndexWriter implements
     actualParams = parameters.getJSON();
     actualParams.set("writerClass", getClass().getName());
     actualParams.set("readerClass", PositionIndexReader.class.getName());
-    actualParams.set("defaultOperator", "counts");
-
     writer = new DiskBTreeWriter(parameters);
 
     // look for skips
@@ -138,7 +136,7 @@ public class PositionIndexWriter implements
     writer.close();
   }
 
-  public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {
+  public static void verify(TupleFlowParameters parameters, ErrorStore handler) {
     if (!parameters.getJSON().isString("filename")) {
       handler.addError("PositionIndexWriter requires a 'filename' parameter.");
       return;

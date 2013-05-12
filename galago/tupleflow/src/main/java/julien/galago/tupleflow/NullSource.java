@@ -4,7 +4,7 @@ package julien.galago.tupleflow;
 
 import java.io.IOException;
 
-import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.ErrorStore;
 import julien.galago.tupleflow.execution.Verification;
 
 /**
@@ -24,7 +24,7 @@ public class NullSource<T> implements ExNihiloSource<T> {
         this.outputClass = outputClass;
     }
 
-    public static void verify(TupleFlowParameters parameters, ErrorHandler handler) {
+    public static void verify(TupleFlowParameters parameters, ErrorStore handler) {
         Verification.requireParameters(new String[]{"class"}, parameters.getJSON(), handler);
         Verification.requireClass(parameters.getJSON().getString("class"), handler);
     }
