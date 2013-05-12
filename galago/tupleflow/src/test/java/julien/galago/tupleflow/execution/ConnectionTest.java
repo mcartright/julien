@@ -17,7 +17,6 @@ import julien.galago.tupleflow.TypeReader;
 import julien.galago.tupleflow.Parameters.Type;
 import julien.galago.tupleflow.execution.ConnectionAssignmentType;
 import julien.galago.tupleflow.execution.ConnectionPointType;
-import julien.galago.tupleflow.execution.ErrorHandler;
 import julien.galago.tupleflow.execution.ErrorStore;
 import julien.galago.tupleflow.execution.Job;
 import julien.galago.tupleflow.execution.JobExecutor;
@@ -526,14 +525,14 @@ public class ConnectionTest extends TestCase {
     }
 
     @Override
-    public julien.galago.tupleflow.Step 
-            setProcessor(julien.galago.tupleflow.Step processor) 
+    public julien.galago.tupleflow.Step
+            setProcessor(julien.galago.tupleflow.Step processor)
             throws IncompatibleProcessorException {
       Linkage.link(this, processor);
       return processor;
     }
 
-    public static void verify(TupleFlowParameters parameters, ErrorHandler handler) throws IOException {
+    public static void verify(TupleFlowParameters parameters, ErrorStore error) throws IOException {
     }
   }
 
@@ -565,23 +564,23 @@ public class ConnectionTest extends TestCase {
     }
 
     @Override
-    public julien.galago.tupleflow.Step 
-            setProcessor(julien.galago.tupleflow.Step processor) 
+    public julien.galago.tupleflow.Step
+            setProcessor(julien.galago.tupleflow.Step processor)
             throws IncompatibleProcessorException {
       Linkage.link(this, processor);
       return processor;
     }
 
-    public static void verify(TupleFlowParameters parameters, ErrorHandler handler) throws IOException {
+    public static void verify(TupleFlowParameters parameters, ErrorStore error) throws IOException {
       if (!parameters.getJSON().isString("name")) {
-        handler.addError("Generator - Could not find the name of the stage in parameters");
+        error.addError("Generator - Could not find the name of the stage in parameters");
       }
       if (!parameters.getJSON().isList("conn", Type.STRING)) {
-        handler.addError("Generator - Could not find any connections specified in parameters");
+        error.addError("Generator - Could not find any connections specified in parameters");
       }
       for (String conn : (List<String>) parameters.getJSON().getList("conn")) {
         if (!parameters.writerExists(conn, TupleflowString.class.getName(), TupleflowString.ValueOrder.getSpec())) {
-          handler.addError("Generator - Could not verify connection: " + conn);
+          error.addError("Generator - Could not verify connection: " + conn);
         }
       }
     }
@@ -617,22 +616,22 @@ public class ConnectionTest extends TestCase {
     }
 
     @Override
-    public julien.galago.tupleflow.Step 
-            setProcessor(julien.galago.tupleflow.Step processor) 
+    public julien.galago.tupleflow.Step
+            setProcessor(julien.galago.tupleflow.Step processor)
             throws IncompatibleProcessorException {
       Linkage.link(this, processor);
       return processor;
     }
 
-    public static void verify(TupleFlowParameters parameters, ErrorHandler handler) throws IOException {
+    public static void verify(TupleFlowParameters parameters, ErrorStore error) throws IOException {
       if (!parameters.getJSON().isString("name")) {
-        handler.addError("PassThrough - Could not find the name of the stage in parameters");
+        error.addError("PassThrough - Could not find the name of the stage in parameters");
       }
       if (!parameters.getJSON().isList("connIn", Type.STRING)) {
-        handler.addError("PassThrough - Could not find any Input connections specified in parameters");
+        error.addError("PassThrough - Could not find any Input connections specified in parameters");
       }
       if (!parameters.getJSON().isList("connOut", Type.STRING)) {
-        handler.addError("PassThrough - Could not find any Output connections specified in parameters");
+        error.addError("PassThrough - Could not find any Output connections specified in parameters");
       }
     }
   }
@@ -668,22 +667,22 @@ public class ConnectionTest extends TestCase {
     }
 
     @Override
-    public julien.galago.tupleflow.Step 
-            setProcessor(julien.galago.tupleflow.Step processor) 
+    public julien.galago.tupleflow.Step
+            setProcessor(julien.galago.tupleflow.Step processor)
             throws IncompatibleProcessorException {
       Linkage.link(this, processor);
       return processor;
     }
 
-    public static void verify(TupleFlowParameters parameters, ErrorHandler handler) throws IOException {
+    public static void verify(TupleFlowParameters parameters, ErrorStore error) throws IOException {
       if (!parameters.getJSON().isString("name")) {
-        handler.addError("PassThrough - Could not find the name of the stage in parameters");
+        error.addError("PassThrough - Could not find the name of the stage in parameters");
       }
       if (!parameters.getJSON().isList("connIn", Type.STRING)) {
-        handler.addError("PassThrough - Could not find any Input connections specified in parameters");
+        error.addError("PassThrough - Could not find any Input connections specified in parameters");
       }
       if (!parameters.getJSON().isString("connOut")) {
-        handler.addError("PassThrough - Could not find an Output connection specified in parameters");
+        error.addError("PassThrough - Could not find an Output connection specified in parameters");
       }
     }
   }
@@ -716,16 +715,16 @@ public class ConnectionTest extends TestCase {
     }
 
     @Override
-    public julien.galago.tupleflow.Step 
-            setProcessor(julien.galago.tupleflow.Step processor) 
+    public julien.galago.tupleflow.Step
+            setProcessor(julien.galago.tupleflow.Step processor)
             throws IncompatibleProcessorException {
       Linkage.link(this, processor);
       return processor;
     }
 
-    public static void verify(TupleFlowParameters parameters, ErrorHandler handler) throws IOException {
+    public static void verify(TupleFlowParameters parameters, ErrorStore error) throws IOException {
       if (!parameters.getJSON().isList("connIn", Type.STRING)) {
-        handler.addError("PassThrough - Could not find any Input connections specified in parameters");
+        error.addError("PassThrough - Could not find any Input connections specified in parameters");
       }
     }
   }

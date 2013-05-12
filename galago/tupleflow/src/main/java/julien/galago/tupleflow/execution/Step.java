@@ -11,7 +11,6 @@ import julien.galago.tupleflow.Parameters;
  */
 public class Step implements Serializable {
 
-  protected FileLocation location;
   private String className;
   private Parameters parameters;
 
@@ -19,34 +18,20 @@ public class Step implements Serializable {
   }
 
   public Step(Class c) {
-    this(null, c.getName(), new Parameters());
+    this(c.getName(), new Parameters());
   }
 
   public Step(String className) {
-    this(null, className, new Parameters());
+    this(className, new Parameters());
   }
 
   public Step(Class c, Parameters parameters) {
-    this(null, c.getName(), parameters);
+    this(c.getName(), parameters);
   }
 
   public Step(String className, Parameters parameters) {
-    this(null, className, parameters);
-  }
-
-  public Step(FileLocation location, String className, Parameters parameters) {
-    this.location = location;
     this.className = className;
     this.parameters = parameters;
-  }
-
-  public FileLocation getLocation() {
-    // ensure we return a non-null location.
-    if (location == null) {
-      return new FileLocation(className, 0, 0);
-    } else {
-      return location;
-    }
   }
 
   public String getClassName() {

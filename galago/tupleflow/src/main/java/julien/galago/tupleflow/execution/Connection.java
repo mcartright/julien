@@ -8,13 +8,13 @@ import julien.galago.tupleflow.execution.Job.StagePoint;
 
 /**
  * Represents a data connection between two stages in a TupleFlow job.
- *  - each connection can have only one input, 
+ *  - each connection can have only one input,
  *    but multiple possible outputs.
  *
  * @see julien.galago.tupleflow.execution.Job
  * @author trevor
  */
-public class Connection extends Locatable implements Cloneable {
+public class Connection implements Cloneable {
 
   String className;
   String connectionName;
@@ -24,13 +24,8 @@ public class Connection extends Locatable implements Cloneable {
   CompressionType compression;
   ConnectionEndPoint input;
   public ArrayList<ConnectionEndPoint> outputs = new ArrayList<ConnectionEndPoint>();
-  
-  public Connection(FileLocation location, String connectionName, String className, String[] order, String[] hash, int hashCount) {
-    super(location);
-  }
 
-  public Connection(FileLocation location, StageConnectionPoint point, String[] hash, int hashCount) {
-    this(location, null, point.getClassName(), point.getOrder(), hash, hashCount);
+  public Connection(StageConnectionPoint point, String[] hash, int hashCount) {
     this.connectionName = null;
     this.className = point.getClassName();
     this.order = point.getOrder();
@@ -66,7 +61,7 @@ public class Connection extends Locatable implements Cloneable {
   CompressionType getCompression(){
     return compression;
   }
-  
+
   @Override
   public Connection clone() {
     try {

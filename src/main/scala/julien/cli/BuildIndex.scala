@@ -9,6 +9,7 @@ import java.io.{File, PrintStream}
 import gcore.index.corpus._
 import gcore.index.disk._
 import gcore.parse._
+import gcore.parse.stem._
 import gcore.types._
 
 import julien.galago.tupleflow.Utility
@@ -25,6 +26,11 @@ import Recipe._
   * @author jfoley
   */
 object BuildIndex extends TupleFlowFunction {
+  // We'll add the option back in later.
+  val stemmers = Map(
+    classOf[NullStemmer] -> "raw",
+    classOf[Porter2Stemmer] -> "porter"
+  )
   val slash = File.separator
 
   // check parameters
@@ -94,39 +100,60 @@ object BuildIndex extends TupleFlowFunction {
     }
 
     // filter input paths into files and directories
-    val inputPaths =
-      bp.getAsList("inputPath").asInstanceOf[java.util.List[String]].toSet
-    var files = new ListBuffer[String]
-    var directories = new ListBuffer[String]
-
-    inputPaths.foreach(path => {
-      val fp = new File(path)
-      if(fp.isFile) { files += fp.getCanonicalPath }
-      else if(fp.isDirectory) { directories += fp.getCanonicalPath }
-      else {
-        Console.err.println("Cannot find input path: "+path)
-        ???
-      }
-    })
+    val inputPaths = bp.getAsList("inputPath").toSet.asInstanceOf[Set[String]]
+    val inputFiles = inputPaths.map(p => new File(p))
+    // check we have valid inputs
+    inputFiles.foreach { f =>
+      assume(f.exists && (f.isFile || f.isDirectory),
+        s"File '${f.getPath}' either doesn't exist or is not file/directory.")
+    }
+    val (files, directories) = inputFiles.partition(_.isFile)
     splitParms.set("filename", files)
     splitParms.set("directory", directories)
-
     splitParms
+  }
+
+  def stemBranches(bp: Parameters): Seq[FlowLinearStep] = {
+    val pathways = Seq.newBuilder[FlowLinearStep]
+    // For each stemmer:
+    for ((stemmer, prefix) <- stemmers) {
+      // 1) Make the main writer
+      val postingsWriter =
+        FlowStage(classOf[PositionIndexWriter],
+          indexFileParms(bp, s"${prefix}/all.postings"))
+      val postingsOrder = postingsWriter.inputSortOrder
+      // 2) Need to create a chain of (stemmer -> NPPE -> writer) -> pathways
+      val postingsChain = Seq(
+        FlowStep(stemmer),
+        FlowStep(classOf[NumberedPostingsPositionExtractor]),
+        FlowStep(postingsOrder.get),
+        FlowOutput(postingsWriter.makeInputNode(FlowNodeJoin(), postingsOrder))
+      )
+      pathways += FlowLinearStep(postingsChain)
+
+      // 3) Make a field writer
+      val fieldsWriter =
+        FlowStage(classOf[PositionFieldIndexWriter],
+          indexFileParms(bp, s"${prefix}${slash}"))
+      val fieldsOrder = fieldsWriter.inputSortOrder
+      // 4) Create a chain of (stemmer -> NEPE -> field writer) -> pathways
+      val fieldsChain = Seq(
+        FlowStep(stemmer),
+        FlowStep(classOf[NumberedExtentPostingsExtractor]),
+        FlowStep(fieldsOrder.get),
+        FlowOutput(fieldsWriter.makeInputNode(FlowNodeJoin(), fieldsOrder))
+      )
+      pathways += FlowLinearStep(fieldsChain)
+    }
+    pathways.result
   }
 
   def constructJob(bp: Parameters): Job = {
     writeBuildManifest(bp)
 
     // build up stages
-    val splitInput = new FlowStage(
-      FlowLinearStep(
-        Seq(
-          FlowStep(classOf[DocumentSource], getSplitParms(bp)),
-          FlowStep(new DocumentSplit.FileNameOrder())
-        )
-      ),
-      gensym("DocumentSource")
-    )
+    val splitInput =
+      splitSource(classOf[DocumentSource], getSplitParms(bp))
 
     val countDocs = FlowStage(classOf[ParserCounter])
     val offsetDocs = FlowStage(classOf[SplitOffsetter])
@@ -139,10 +166,6 @@ object BuildIndex extends TupleFlowFunction {
         indexFileParms(bp, "names.reverse"))
     val writeLengths =
       FlowStage(classOf[DiskLengthsWriter], indexFileParms(bp, "lengths"))
-    // PositionFieldIndexWriter uses this name as a prefix to calculate names
-    val writeExtentPostings = FlowStage(classOf[PositionFieldIndexWriter],
-      indexFileParms(bp, ""))
-
     val writeContent = if(bp.get("content", true)) {
       Some(FlowStage(classOf[PositionContentWriter],
         indexFileParms(bp, "content")))
@@ -152,11 +175,6 @@ object BuildIndex extends TupleFlowFunction {
       Some(FlowStage(classOf[SplitBTreeKeyWriter], bp.getMap("storeParams")))
     } else None
 
-    val writePostings = if(bp.get("nonStemmedPostings", true)) {
-      Some(FlowStage(classOf[PositionIndexWriter],
-        indexFileParms(bp, "all.postings")))
-    } else None
-
     // build up complicated fork stage
     val parseDocs = {
       val leadup = Seq(
@@ -164,15 +182,12 @@ object BuildIndex extends TupleFlowFunction {
         FlowStep(classOf[TagTokenizer], bp.getMap("tokenizer"))
       )
 
-      val branches = Seq(
+      val branches = stemBranches(bp) ++ Seq(
         extractor(classOf[FieldLengthExtractor], Some(writeLengths)),
         extractor(classOf[NumberedDocumentDataExtractor], Some(writeNames)),
         extractor(classOf[NumberedDocumentDataExtractor], Some(writeNamesRev)),
-        extractor(classOf[NumberedExtentPostingsExtractor],
-          Some(writeExtentPostings)),
 
         //--- optional bits:
-        extractor(classOf[NumberedPostingsPositionExtractor], writePostings),
         extractor(classOf[ContentEncoder],
           writeContent,
           bp.getMap("tokenizer")),
@@ -183,7 +198,6 @@ object BuildIndex extends TupleFlowFunction {
           writeCorpus,
           bp.getMap("storeParams"),
           Some(new KeyValuePair.KeyOrder()))
-
       ).flatten // remove anything that wasn't included in the build
 
       new FlowStage(
@@ -204,14 +218,15 @@ object BuildIndex extends TupleFlowFunction {
     val inputStages: Seq[FlowStage] =
       Seq(splitInput, countDocs, offsetDocs, parseDocs)
     val mustWriteStages: Seq[FlowStage] =
-      Seq(writeNames, writeNamesRev, writeLengths, writeExtentPostings)
+      Seq(writeNames, writeNamesRev, writeLengths)
     val mightWriteStages: Seq[FlowStage] =
-      Seq(writeCorpus, writeContent, writePostings).flatten
+      Seq(writeCorpus, writeContent).flatten
 
     val graph = inputStages ++
                 mustWriteStages ++
                 mightWriteStages
 
+    println(graph.toString)
     JobGen.createAndVerify(graph)
   }
 

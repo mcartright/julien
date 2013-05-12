@@ -11,22 +11,14 @@ import org.xml.sax.SAXParseException;
  */
 public class ErrorStore {
     public static class Statement implements Comparable<Statement> {
-        public Statement(FileLocation location, String message) {
-            this.location = location;
+        public Statement(String message) {
             this.message = message;
         }
 
         public String toString(String messageType) {
             String result;
-
-            if (location == null) {
-                result = String.format("[unknown location] %s: %s\n", messageType,
-                                                         message);
-            } else {
-                result = String.format("%s [Line %d Column %d] %s: %s\n", location.fileName,
-                                          location.lineNumber, location.columnNumber, messageType,
-                                          message);
-            }
+	    result = String.format("%s: %s\n", messageType,
+				   message);
             return result;
         }
 
@@ -35,49 +27,20 @@ public class ErrorStore {
         }
 
         public int compareTo(Statement other) {
-            if (location == null) {
-                if (other.location == null) {
-                    return 0;
-                } else {
-                    return -1;
-                }
-            } else {
-                return location.compareTo(other.location);
-            }
+	    return 0;
         }
-        FileLocation location;
         String message;
     }
 
-    public class LocatedHandler implements ErrorHandler {
-        public LocatedHandler(FileLocation location) {
-            this.location = location;
-        }
-
-        public void addError(String message) {
-            ErrorStore.this.addError(location, message);
-        }
-
-        public void addWarning(String message) {
-            ErrorStore.this.addWarning(location, message);
-        }
-        FileLocation location;
-    }
     ArrayList<Statement> errors = new ArrayList();
     ArrayList<Statement> warnings = new ArrayList();
 
-    public void addError(FileLocation location, String message) {
-	assert (location != null);
-        errors.add(new Statement(location, message));
+    public void addError(String message) {
+        errors.add(new Statement(message));
     }
 
-    public void addWarning(FileLocation location, String message) {
-	assert (location != null);
-        warnings.add(new Statement(location, message));
-    }
-
-    public LocatedHandler getErrorHandler(FileLocation location) {
-        return new LocatedHandler(location);
+    public void addWarning(String message) {
+        warnings.add(new Statement(message));
     }
 
     public ArrayList<Statement> getErrors() {
@@ -107,12 +70,5 @@ public class ErrorStore {
         }
 
         return builder.toString();
-    }
-
-    void addError(String filename, SAXParseException e) {
-        addError(new FileLocation(filename,
-				  e.getLineNumber(),
-				  e.getColumnNumber()),
-		 e.getMessage());
     }
 }

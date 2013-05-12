@@ -13,23 +13,17 @@ import julien.galago.tupleflow.Order;
  *
  * @author trevor
  */
-public class Stage extends Locatable implements Serializable, Cloneable {
+public class Stage implements Serializable, Cloneable {
 
   public HashMap<String, StageConnectionPoint> connections = new HashMap<String, StageConnectionPoint>();
   public ArrayList<Step> steps = new ArrayList<Step>();
   public String name;
 
   public Stage() {
-    super(null);
   }
 
   public Stage(String name) {
-    super(null);
     this.name = name;
-  }
-
-  public Stage(FileLocation location) {
-    super(location);
   }
 
   public ArrayList<Step> getSteps() {
@@ -86,8 +80,8 @@ public class Stage extends Locatable implements Serializable, Cloneable {
     add(new StageConnectionPoint(ConnectionPointType.Output,
             pipeName, pipeOrder, compression));
     return this;
-  }  
-  
+  }
+
   public Stage add(StageConnectionPoint point) {
     connections.put(point.getExternalName(), point);
     return this;

@@ -24,26 +24,6 @@ import julien.galago.tupleflow.TypeReader;
  * @author trevor
  */
 public class Verification {
-
-  private static class VerificationErrorHandler implements ErrorHandler {
-
-    FileLocation location;
-    ErrorStore store;
-
-    public VerificationErrorHandler(ErrorStore store, FileLocation location) {
-      this.location = location;
-      this.store = store;
-    }
-
-    public void addWarning(String message) {
-      store.addWarning(location, message);
-    }
-
-    public void addError(String message) {
-      store.addError(location, message);
-    }
-  }
-
   private static class VerificationParameters implements TupleFlowParameters {
 
     Step step;
@@ -145,11 +125,11 @@ public class Verification {
     return true;
   }
 
-  public static boolean requireParameters(String[] required, Parameters parameters, ErrorHandler handler) {
+  public static boolean requireParameters(String[] required, Parameters parameters, ErrorStore store) {
     boolean result = true;
     for (String key : required) {
       if (!parameters.containsKey(key)) {
-        handler.addError("The parameter '" + key + "' is required.");
+        store.addError("The parameter '" + key + "' is required.");
         result = false;
       }
     }
@@ -176,7 +156,7 @@ public class Verification {
     return true;
   }
 
-  public static boolean requireOrder(String typeName, String[] orderSpec, ErrorHandler handler) {
+  public static boolean requireOrder(String typeName, String[] orderSpec, ErrorStore store) {
     if (!isOrderAvailable(typeName, orderSpec)) {
       StringBuilder builder = new StringBuilder();
 
@@ -184,47 +164,47 @@ public class Verification {
         builder.append(orderKey);
       }
 
-      handler.addError(
+      store.addError(
               "The order '" + builder.toString() + "' was not found in " + typeName + ".");
       return false;
     }
     return true;
   }
 
-  public static boolean requireClass(String typeName, ErrorHandler handler) {
+  public static boolean requireClass(String typeName, ErrorStore store) {
     if (!isClassAvailable(typeName)) {
-      handler.addError("The class '" + typeName + "' could not be found.");
+      store.addError("The class '" + typeName + "' could not be found.");
       return false;
     }
     return true;
   }
 
-  public static boolean requireWriteableFile(String pathname, ErrorHandler handler) {
+  public static boolean requireWriteableFile(String pathname, ErrorStore store) {
     File path = new File(pathname);
 
     if (path.exists() && !path.isFile()) {
-      handler.addError("Pathname " + pathname + " exists already and isn't a file.");
+      store.addError("Pathname " + pathname + " exists already and isn't a file.");
       return false;
     }
 
-    return requireWriteableDirectoryParent(pathname, handler);
+    return requireWriteableDirectoryParent(pathname, store);
 
   }
 
-  public static boolean requireWriteableDirectory(String pathname, ErrorHandler handler) {
+  public static boolean requireWriteableDirectory(String pathname, ErrorStore store) {
     File path = new File(pathname);
 
     if (path.isFile()) {
-      handler.addError("Pathname " + pathname + " is a file, but a directory is required.");
+      store.addError("Pathname " + pathname + " is a file, but a directory is required.");
       return false;
     }
 
     if (path.isDirectory() && !path.canWrite()) {
-      handler.addError("Pathname " + pathname + " is a directory, but it isn't writable.");
+      store.addError("Pathname " + pathname + " is a directory, but it isn't writable.");
       return false;
     }
 
-    return requireWriteableDirectoryParent(pathname, handler);
+    return requireWriteableDirectoryParent(pathname, store);
   }
 
   /**
@@ -243,7 +223,7 @@ public class Verification {
    * </ul>
    * </p>
    */
-  public static boolean requireWriteableDirectoryParent(final String pathname, final ErrorHandler handler) {
+  public static boolean requireWriteableDirectoryParent(final String pathname, final ErrorStore store) {
     File path = new File(pathname);
 
     if (!path.exists()) {
@@ -258,7 +238,7 @@ public class Verification {
       }
 
       if (!new File(parent).canWrite()) {
-        handler.addError(
+        store.addError(
                 "Pathname " + pathname + " doesn't exist, and the parent directory isn't writable.");
         return false;
       }
@@ -327,7 +307,7 @@ public class Verification {
         StageConnectionPoint point = stage.connections.get(input.getId());
 
         if (point == null) {
-          store.addError(step.getLocation(),
+          store.addError(
                   "Input references a connection called '"
                   + input.getId() + "', but it isn't listed in the connections section of the stage.");
         } else {
@@ -342,7 +322,7 @@ public class Verification {
         StageConnectionPoint actual = stage.connections.get(points[0]);
         boolean erred = false;
         if (actual == null) {
-          store.addError(step.getLocation(),
+          store.addError(
                   "Input references a connection called '"
                   + points[0] + "', but it isn't listed in the connections section of the stage.");
           erred = true;
@@ -352,15 +332,15 @@ public class Verification {
           for (int ip = 1; ip < points.length; ip++) {
             actual = stage.connections.get(points[ip]);
             if (actual == null) {
-              store.addError(step.getLocation(),
+              store.addError(
                       "MultiInput connection '" + points[ip] + "' isn't listed in the connections section of the stage.");
               erred = true;
             } else if (!actual.getClassName().equals(className)) {
-              store.addError(step.getLocation(),
+              store.addError(
                       "MultiInput connection '" + points[ip] + "' uses a different input type than '" + className + "'");
               erred = true;
             } else if (!equals(order, actual.getOrder())) {
-              store.addError(step.getLocation(),
+              store.addError(
                       "MultiInput connection '" + points[ip] + "', uses order " + Arrays.toString(actual.getOrder()) + ", but primary"
                       + "input uses order " + Arrays.toString(order));
               erred = true;
@@ -377,16 +357,16 @@ public class Verification {
         StageConnectionPoint point = stage.connections.get(output.getId());
 
         if (point == null) {
-          store.addError(step.getLocation(),
+          store.addError(
                   "Output references a connection called '"
                   + output.getId() + "', but it isn't listed in the connections section of the stage.");
         } else {
           if (state.isDefined() && !state.getClassName().equals(point.getClassName())) {
-            store.addError(step.getLocation(), "Previous (" + step.getClassName() + ") step makes '"
+            store.addError("Previous (" + step.getClassName() + ") step makes '"
                     + state.getClassName() + "' objects, but this output connection wants '"
                     + point.getClassName() + "' objects.");
           } else if (state.isDefined() && !compatibleOrders(state.getOrder(), point.getOrder())) {
-            store.addError(step.getLocation(), "Previous step (" + step.getClassName() + ") outputs objects in '"
+            store.addError("Previous step (" + step.getClassName() + ") outputs objects in '"
                     + Arrays.toString(state.getOrder()) + "' order, but incompatible order '"
                     + Arrays.toString(point.getOrder()) + "' is required.");
           }
@@ -407,7 +387,7 @@ public class Verification {
         try {
           clazz = Class.forName(step.getClassName());
         } catch (ClassNotFoundException ex) {
-          store.addError(step.getLocation(), "Couldn't find class: " + step.getClassName());
+          store.addError("Couldn't find class: " + step.getClassName());
           continue;
         }
 
@@ -436,7 +416,7 @@ public class Verification {
         state.update(outputClass, outputOrder);
 
         if (!Verification.isClassAvailable(outputClass)) {
-          store.addError(step.getLocation(), step.getClassName() + ": Class " + step.getClassName() + " has an "
+          store.addError(step.getClassName() + ": Class " + step.getClassName() + " has an "
                   + "@OutputClass annotation with the class name '" + outputClass
                   + "' which couldn't be found.");
           state.setDefined(false);
@@ -461,7 +441,7 @@ public class Verification {
             }
 
             if (!Verification.isClassAvailable(outputClass)) {
-              store.addError(step.getLocation(),
+              store.addError(
                       step.getClassName() + ": Class " + step.getClassName() + " returned "
                       + "an output class name '" + outputClass + "' which couldn't be found.");
               state.setDefined(false);
@@ -469,30 +449,30 @@ public class Verification {
               state.update(outputClass, outputOrder);
             }
           } else {
-            store.addError(step.getLocation(), step.getClassName() + " has a class method called getOutputClass, "
+            store.addError(step.getClassName() + " has a class method called getOutputClass, "
                     + "but it returns something other than java.lang.String.");
             state.setDefined(false);
           }
         } catch (NoSuchMethodException e) {
-          store.addWarning(step.getLocation(), step.getClassName() + ": Class " + step.getClassName() + " has no suitable "
+          store.addWarning(step.getClassName() + ": Class " + step.getClassName() + " has no suitable "
                   + "getOutputClass method and no @OutputClass annotation.");
           state.setDefined(false);
         }
       }
     } catch (InvocationTargetException e) {
-      store.addError(step.getLocation(),
+      store.addError(
               step.getClassName() + ": Caught an InvocationTargetException while verifying class: " + e.getMessage());
       state.setDefined(false);
     } catch (SecurityException e) {
-      store.addError(step.getLocation(),
+      store.addError(
               step.getClassName() + ": Caught a SecurityException while verifying class: " + e.getMessage());
       state.setDefined(false);
     } catch (IllegalArgumentException e) {
-      store.addError(step.getLocation(),
+      store.addError(
               step.getClassName() + ": Caught an IllegalArgumentException while verifying class: " + e.getMessage());
       state.setDefined(false);
     } catch (IllegalAccessException e) {
-      store.addError(step.getLocation(),
+      store.addError(
               step.getClassName() + ": Caught an IllegalAccessException while verifying class: " + e.getMessage());
       state.setDefined(false);
     }
@@ -507,32 +487,31 @@ public class Verification {
         return;
       }
       Method verify = clazz.getMethod("verify", TupleFlowParameters.class,
-              ErrorHandler.class);
+              ErrorStore.class);
 
       if (verify == null) {
-        store.addWarning(step.getLocation(), "Class " + step.getClassName()
+        store.addWarning( "Class " + step.getClassName()
                 + " has no suitable verify method.");
       } else if (Modifier.isStatic(verify.getModifiers()) == false) {
-        store.addWarning(step.getLocation(), "Class " + step.getClassName()
+        store.addWarning( "Class " + step.getClassName()
                 + " has a verify method, but it isn't static.");
       } else {
-        verify.invoke(null, vp,
-                new VerificationErrorHandler(store, step.getLocation()));
+        verify.invoke(null, vp, new VerificationErrorStore(store));
       }
     } catch (InvocationTargetException e) {
-      store.addError(step.getLocation(),
+      store.addError(
               step.getClassName() + ": Caught an InvocationTargetException while verifying step class: " + e.getMessage());
     } catch (SecurityException e) {
-      store.addError(step.getLocation(),
+      store.addError(
               step.getClassName() + ": Caught a SecurityException while verifying step class: " + e.getMessage());
     } catch (NoSuchMethodException e) {
-      store.addWarning(step.getLocation(),
+      store.addWarning(
               "Class " + step.getClassName() + " has no suitable verify method.");
     } catch (IllegalArgumentException e) {
-      store.addError(step.getLocation(),
+      store.addError(
               step.getClassName() + ": Caught an IllegalArgumentException while verifying class: " + e.getMessage());
     } catch (IllegalAccessException e) {
-      store.addError(step.getLocation(),
+      store.addError(
               step.getClassName() + ": Caught an IllegalAccessException while verifying class: " + e.getMessage());
     }
   }
@@ -576,11 +555,11 @@ public class Verification {
                   + "annotation with the class name '%s', but the process() method takes "
                   + "'%s' objects.", step.getClassName(), step.getClassName(),
                   inputClassName, inputClass.getName());
-          store.addError(step.getLocation(), outputMessage);
+          store.addError( outputMessage);
         }
 
         if (!Verification.isClassAvailable(inputClassName)) {
-          store.addError(step.getLocation(), step.getClassName() + ": Class " + step.getClassName() + " has an "
+          store.addError( step.getClassName() + ": Class " + step.getClassName() + " has an "
                   + "@InputClass annotation with the class name '" + inputClassName
                   + "' which couldn't be found.");
         }
@@ -601,16 +580,16 @@ public class Verification {
             }
 
             if (!Verification.isClassAvailable(inputClassName)) {
-              store.addError(step.getLocation(), step.getClassName() + ": Class " + step.getClassName() + " has an "
+              store.addError( step.getClassName() + ": Class " + step.getClassName() + " has an "
                       + "returned '" + inputClassName + "' from getInputClass, but "
                       + "it couldn't be found.");
             }
           } else {
-            store.addError(step.getLocation(), step.getClassName() + " has a class method called getInputClass, "
+            store.addError( step.getClassName() + " has a class method called getInputClass, "
                     + "but it returns something other than java.lang.String.");
           }
         } catch (NoSuchMethodException e) {
-          store.addWarning(step.getLocation(), step.getClassName() + ": Class " + step.getClassName() + " has no suitable "
+          store.addWarning( step.getClassName() + ": Class " + step.getClassName() + " has no suitable "
                   + "getInputClass method and has no @InputClass annotation.");
           return;
         }
@@ -621,27 +600,27 @@ public class Verification {
           String err = "Current pipeline class '" + state.getClassName()
                   + "' is different than the required type: '"
                   + inputClassName + "'.";
-          store.addError(step.getLocation(), err);
+          store.addError( err);
           throw new RuntimeException(String.format("%s\n%s\n\n", step.getClassName(), err));
         }
 
         if (!compatibleOrders(state.getOrder(), inputOrder)) {
-          store.addError(step.getLocation(),
+          store.addError(
                   "Current object order '" + Arrays.toString(state.getOrder()) + "' is incompatible "
                   + "with the required input order: '" + Arrays.toString(inputOrder) + "'.");
         }
       }
     } catch (InvocationTargetException e) {
-      store.addError(step.getLocation(),
+      store.addError(
               step.getClassName() + ": Caught an InvocationTargetException while verifying class: " + e.getMessage());
     } catch (SecurityException e) {
-      store.addError(step.getLocation(),
+      store.addError(
               step.getClassName() + ": Caught a SecurityException while verifying class: " + e.getMessage());
     } catch (IllegalArgumentException e) {
-      store.addError(step.getLocation(),
+      store.addError(
               step.getClassName() + ": Caught an IllegalArgumentException while verifying class: " + e.getMessage());
     } catch (IllegalAccessException e) {
-      store.addError(step.getLocation(),
+      store.addError(
               step.getClassName() + ": Caught an IllegalAccessException while verifying class: " + e.getMessage());
     }
   }
@@ -657,22 +636,22 @@ public class Verification {
     }
   }
 
-  public static boolean verifyTypeReader(String readerName, Class typeClass, TupleFlowParameters parameters, ErrorHandler handler) {
-    return verifyTypeReader(readerName, typeClass, new String[0], parameters, handler);
+  public static boolean verifyTypeReader(String readerName, Class typeClass, TupleFlowParameters parameters, ErrorStore store) {
+    return verifyTypeReader(readerName, typeClass, new String[0], parameters, store);
   }
 
-  public static boolean verifyTypeReader(String readerName, Class typeClass, String[] order, TupleFlowParameters parameters, ErrorHandler handler) {
+  public static boolean verifyTypeReader(String readerName, Class typeClass, String[] order, TupleFlowParameters parameters, ErrorStore store) {
     if (!parameters.readerExists(readerName, typeClass.getName(), order)) {
-      handler.addError("No reader named '" + readerName + "' was found in this stage.");
+      store.addError("No reader named '" + readerName + "' was found in this stage.");
       return false;
     }
 
     return true;
   }
 
-  public static boolean verifyTypeWriter(String readerName, Class typeClass, String order[], TupleFlowParameters parameters, ErrorHandler handler) {
+  public static boolean verifyTypeWriter(String readerName, Class typeClass, String order[], TupleFlowParameters parameters, ErrorStore store) {
     if (!parameters.writerExists(readerName, typeClass.getName(), order)) {
-      handler.addError("No writer named '" + readerName + "' was found in this stage.");
+      store.addError("No writer named '" + readerName + "' was found in this stage.");
       return false;
     }
 

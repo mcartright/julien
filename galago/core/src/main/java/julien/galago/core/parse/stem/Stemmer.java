@@ -8,26 +8,21 @@ import java.util.HashMap;
 import java.util.List;
 
 import julien.galago.core.parse.Document;
-import julien.galago.tupleflow.InputClass;
-import julien.galago.tupleflow.OutputClass;
 import julien.galago.tupleflow.StandardStep;
 import julien.galago.tupleflow.TupleFlowParameters;
-import julien.galago.tupleflow.execution.Verified;
-
+import julien.galago.tupleflow.execution.ErrorHandler;
+import julien.galago.tupleflow.execution.Verification;
 
 /**
- * 
- * 
+ *
+ *
  * @author sjh
  */
-@Verified
-@InputClass(className = "julien.galago.core.types.DocumentSplit")
-@OutputClass(className = "julien.galago.core.types.DocumentSplit")
 public abstract class Stemmer extends StandardStep<Document, Document> {
 
   // each instance of Stemmer should have it's own lock
   final Object lock = new Object();
-  
+
   long cacheLimit = 50000;
   HashMap<String, String> cache = new HashMap();
 
@@ -56,11 +51,11 @@ public abstract class Stemmer extends StandardStep<Document, Document> {
       return cache.get(term);
     }
     String stemmedTerm;
-    
+
     synchronized (lock) {
       stemmedTerm = stemTerm(term);
     }
-    
+
     if (!cache.containsKey(stemmedTerm)) {
       cache.put(term, stemmedTerm);
     }
@@ -85,5 +80,20 @@ public abstract class Stemmer extends StandardStep<Document, Document> {
       window.append(stem(t));
     }
     return window.toString();
+  }
+
+  public Class<Document> getInputClass() {
+      return Document.class;
+  }
+
+  public Class<Document> getOutputClass() {
+      return Document.class;
+  }
+
+  public static void verify(
+			    TupleFlowParameters parameters,
+			    ErrorHandler handler)
+      throws IOException {
+      // nothing needed - just doing this for inheritance
   }
 }

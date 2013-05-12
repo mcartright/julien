@@ -3,7 +3,7 @@ package julien.galago.tupleflow.execution;
 
 /**
  * Represents an output step in a TupleFlow stage.
- * 
+ *
  * @author trevor
  */
 public class OutputStep extends Step {
@@ -11,11 +11,6 @@ public class OutputStep extends Step {
 
     public OutputStep(String id) {
         this.id = id;
-    }
-
-    public OutputStep(FileLocation location, String id) {
-        this.id = id;
-        this.location = location;
     }
 
     public String getId() {

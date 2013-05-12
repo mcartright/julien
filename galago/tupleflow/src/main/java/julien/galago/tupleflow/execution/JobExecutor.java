@@ -316,17 +316,11 @@ public class JobExecutor {
     public String stageName;
     public String pointName;
     public ConnectionPointType type;
-    public FileLocation location;
 
-    public EndPointName(String stageName, String pointName, ConnectionPointType type, FileLocation location) {
+    public EndPointName(String stageName, String pointName, ConnectionPointType type) {
       this.stageName = stageName;
       this.pointName = pointName;
       this.type = type;
-      this.location = location;
-    }
-
-    public EndPointName(String stageName, String pointName, ConnectionPointType type) {
-      this(stageName, pointName, type, null);
     }
 
     public int compareTo(EndPointName other) {
@@ -369,7 +363,7 @@ public class JobExecutor {
 
       // add all connection points to the set
       for (StageConnectionPoint point : stage.connections.values()) {
-        EndPointName ep = new EndPointName(stage.name, point.getExternalName(), point.getType(), point.location);
+        EndPointName ep = new EndPointName(stage.name, point.getExternalName(), point.getType());
         endPointNames.add(ep);
       }
     }
@@ -392,7 +386,7 @@ public class JobExecutor {
 
 
     for (EndPointName ep : endPointNames) {
-      store.addError(ep.location,
+      store.addError(
               ep.stageName + ": No connection references the " + ep.type
               + " with the name '" + ep.pointName + "'.");
     }
@@ -615,23 +609,23 @@ public class JobExecutor {
     StageGroupDescription stageDescription = stages.get(endPoint.getStageName());
 
     if (stageDescription == null) {
-      store.addError(endPoint.location,
-              "The stage '" + endPoint.getStageName() + "' was not found.");
+      store.addError(
+		     "The stage '" + endPoint.getStageName() + "' was not found.");
     } else {
       Stage stage = stageDescription.getStage();
       StageConnectionPoint point = stage.getConnection(endPoint.getPointName());
 
       if (point == null) {
-        store.addError(endPoint.location, "The endpoint '" + endPoint.getPointName() + "' wasn't found in this stage, "
+        store.addError("The endpoint '" + endPoint.getPointName() + "' wasn't found in this stage, "
                 + "even though there is a connection to it.");
       } else if (!ConnectionPointType.connectable(endPoint.getType(), point.getType())) {
-        store.addError(endPoint.location,
+        store.addError(
                 "The endpoint '" + endPoint.getPointName() + "' is in this stage, but it's going the wrong direction.");
       } else if (!point.getClassName().equals(connection.connection.getClassName())) {
-        store.addError(endPoint.location, "In " + endPoint.getStageName() + ": This " + point.getType() + " has a different class name '" + point.getClassName()
+        store.addError( "In " + endPoint.getStageName() + ": This " + point.getType() + " has a different class name '" + point.getClassName()
                 + " than the connection that connects to it: " + connection.connection.getClassName() + ".");
       } else if (!Arrays.equals(point.getOrder(), connection.connection.getOrder())) {
-        store.addError(endPoint.location, "In " + endPoint.getStageName() + ": This " + point.getType() + " has a different order " + Arrays.toString(point.getOrder())
+        store.addError( "In " + endPoint.getStageName() + ": This " + point.getType() + " has a different order " + Arrays.toString(point.getOrder())
                 + " than the connection that connects to it: " + Arrays.toString(
                 connection.connection.getOrder()));
       } else {
@@ -669,7 +663,7 @@ public class JobExecutor {
       ConnectionDescription description = new ConnectionDescription(connection);
 
       // verify that the class, order, and hash exist
-      ErrorHandler handler = store.getErrorHandler(connection.location);
+      ErrorHandler handler = store.getErrorHandler();
       Verification.requireClass(connection.getClassName(), handler);
       Verification.requireOrder(connection.getClassName(), connection.getOrder(), handler);
 
@@ -725,8 +719,7 @@ public class JobExecutor {
 
           switch (assignment) {
             case One:
-              store.addError(point.location,
-                      "The 'one' mode is not currently supported.");
+              store.addError("The 'one' mode is not currently supported.");
               break;
 
             case Each:
@@ -736,7 +729,7 @@ public class JobExecutor {
                 instanceCount = inputCount;
                 unknown = false;
               } else if (!unknown && instanceCount != inputCount) {
-                store.addError(point.location, "The number of stage instances for '"
+                store.addError("The number of stage instances for '"
                         + stageName + "' is ambiguous (" + inputCount
                         + " or " + instanceCount + ")");
               }

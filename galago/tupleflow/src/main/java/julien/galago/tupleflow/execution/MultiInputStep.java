@@ -21,11 +21,6 @@ public class MultiInputStep extends Step {
         this.ids = inputs;
     }
 
-    public MultiInputStep(FileLocation location, String... inputs) {
-      this.ids = inputs;
-      this.location = location;
-    }
-
     public String[] getIds() {
         return ids;
     }

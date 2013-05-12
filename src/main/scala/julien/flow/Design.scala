@@ -333,12 +333,11 @@ object FlowStep {
   }
 }
 
-
 case class FlowStep[T](
   val action: Class[T],
-  val parms: Parameters = new Parameters(),
-  val name: String=gensym("step"))
-    extends AbstractFlowStep {
+  val parms: Parameters = new Parameters,
+  val name: String=gensym("step")
+) extends AbstractFlowStep {
   def inputType = getInputType(action)
   def outputType = {
     // if this is a Sorter, it's type is dependent upon its parms,
@@ -371,9 +370,11 @@ case class FlowMultiStep(val steps: Seq[AbstractFlowStep])
     if(inType != None) {
       val firstType = inType.get
       val thisType = step.inputType.get
-      assert(firstType == thisType)
+      assert(firstType == thisType,
+        s"type ${firstType} != ${thisType}")
     } else {
-      assert(step.inputType == inType)
+      assert(step.inputType == inType,
+        s"type ${step.inputType} != ${inType}")
     }
   })
 

@@ -3,7 +3,7 @@ package julien.galago.tupleflow.execution;
 
 /**
  * Represents an input step in a TupleFlow stage.
- * 
+ *
  * @author trevor
  */
 public class InputStep extends Step {
@@ -11,11 +11,6 @@ public class InputStep extends Step {
 
     public InputStep(String id) {
         this.id = id;
-    }
-
-    public InputStep(FileLocation location, String id) {
-        this.id = id;
-        this.location = location;
     }
 
     public String getId() {

@@ -37,6 +37,19 @@ package object flow {
     output
   }
 
+  /** Returns all of the Order classes for a given Tupleflow type.
+    */
+  def getOrders(typeClass: Class[_]) : Array[Class[Order[_]]] = {
+    val memberClasses = typeClass.getDeclaredClasses
+    val filtered = memberClasses.filter { mc =>
+      // For each member class/interface, we see what interfaces it implements,
+      // and pick ones that implement the Order interface
+      val interfaces = mc.getInterfaces
+      interfaces.exists(i => i == classOf[Order[_]])
+    }
+    return filtered.map(_.asInstanceOf[Class[Order[_]]])
+  }
+
   /** Hunts for a particular annotation attached to a class. If found,
     * returns an option filled w/ the annotation. Otherwise returns None.
     */

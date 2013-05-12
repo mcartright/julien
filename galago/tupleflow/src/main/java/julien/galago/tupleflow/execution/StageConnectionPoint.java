@@ -14,7 +14,7 @@ import julien.galago.tupleflow.Order;
  * @see julien.galago.tupleflow.execution.Job
  * @author trevor
  */
-public class StageConnectionPoint extends Locatable implements Serializable {
+public class StageConnectionPoint implements Serializable {
 
   public CompressionType compression;
   public ConnectionPointType type;
@@ -24,15 +24,10 @@ public class StageConnectionPoint extends Locatable implements Serializable {
   private String[] order;
 
   public StageConnectionPoint(ConnectionPointType type, String name, Order order) {
-    this(type, name, order, CompressionType.UNSPECIFIED, null);
+    this(type, name, order, CompressionType.UNSPECIFIED);
   }
 
   public StageConnectionPoint(ConnectionPointType type, String name, Order order, CompressionType compression) {
-    this(type, name, order, compression, null);
-  }
-
-  public StageConnectionPoint(ConnectionPointType type, String name, Order order, CompressionType compression, FileLocation location) {
-    super(location);
     this.type = type;
     this.externalName = name;
     this.internalName = name;
@@ -41,8 +36,7 @@ public class StageConnectionPoint extends Locatable implements Serializable {
     this.compression = compression;
   }
 
-  public StageConnectionPoint(ConnectionPointType type, String name, String className, String[] order, FileLocation location) {
-    super(location);
+  public StageConnectionPoint(ConnectionPointType type, String name, String className, String[] order) {
     this.type = type;
     this.externalName = name;
     this.internalName = name;
@@ -66,7 +60,7 @@ public class StageConnectionPoint extends Locatable implements Serializable {
   public CompressionType getCompression() {
     return compression;
   }
-  
+
   public String getClassName() {
     return className;
   }
