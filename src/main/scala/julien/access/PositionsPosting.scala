@@ -13,6 +13,8 @@ class PositionsPosting protected (
 }
 
 object PositionsPosting {
+  import language.implicitConversions
+
   val thePosting = new PositionsPosting(InternalId(0), 0, ExtentArray.empty)
   def apply(p: PositionsPosting) =
     new PositionsPosting(p.docid, p.count, p.positions)

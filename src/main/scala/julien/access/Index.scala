@@ -158,7 +158,7 @@ class Index private(
   /** Provided because the underlying interface provides it. However it's a
     * breach in the abstraction, and should go away in the future.
     */
-  @deprecated
+  @deprecated("partReader is a breach of abstraction", "all versions")
   def partReader(name: String): IndexPartReader = underlying.getIndexPart(name)
   private val iteratorCache =
     scala.collection.mutable.HashMap[String, ExtentIterator]()

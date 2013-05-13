@@ -9,6 +9,8 @@ package julien
   * Key/Value pairs. I plan to add more to that, time permitting.
   */
 package object access {
+  import language.implicitConversions
+
   // Makes byte-array calls much less annoying
   implicit def string2bytes(s: String) =
     julien.galago.tupleflow.Utility.fromString(s)

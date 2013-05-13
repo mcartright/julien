@@ -45,7 +45,7 @@ case class FlowType(val clazz: Class[_], val order: Option[Order[_]]) {
 
     // make sure that all the sort requirements of the next stage
     // are present in this stage
-    val inSort = this orderSpec
+    val inSort = this.orderSpec
     val outSort = other.orderSpec
 
     // other is more strict

@@ -1,6 +1,7 @@
 import edu.umass.ciir.macros.Macros._
-import scala.annotation.elidable
-import scala.math.Numeric
+import annotation.elidable
+
+import language.implicitConversions
 
 /** Provides classes that are typically used by Julien applications.
   *  ==Overview==
