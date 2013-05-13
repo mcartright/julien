@@ -20,26 +20,27 @@ import julien._
 
 object Index {
   private val dummyBytes = Utility.fromString("dummy")
-  def apply(i: DiskIndex):Index = apply(i, "all")
-  def apply(i: DiskIndex, defaultPart: String): Index =
-    new Index("unknown", i, defaultPart)
-  def apply(m: MemoryIndex):Index = apply(m, "all")
-  def apply(m: MemoryIndex, defaultPart: String): Index =
-    new Index("unknown", m, defaultPart)
-  def apply(i: GIndex): Index = apply(i, "all")
-  def apply(i: GIndex, defaultPart: String): Index =
-    new Index("unknown", i, defaultPart)
-  def disk(s: String): Index = disk(s, "all")
-  def disk(s: String, defaultPart: String): Index =
-    new Index(s, new DiskIndex(s), defaultPart)
+  def apply(i: DiskIndex):Index = apply(i, "all", "raw")
+  def apply(i: DiskIndex, defaultField: String, defaultStem: String): Index =
+    new Index("unknown", i, defaultField, defaultStem)
+  def apply(m: MemoryIndex):Index = apply(m, "all", "raw")
+  def apply(m: MemoryIndex, defaultField: String, defaultStem: String): Index =
+    new Index("unknown", m, defaultField, defaultStem)
+  def apply(i: GIndex): Index = apply(i, "all", "raw")
+  def apply(i: GIndex, defaultField: String, defaultStem: String): Index =
+    new Index("unknown", i, defaultField, defaultStem)
+  def disk(s: String): Index = disk(s, "all", "raw")
+  def disk(s: String, defaultField: String, defaultStem: String): Index =
+    new Index(s, new DiskIndex(s), defaultField, defaultStem)
   def memory(
     input: String,
-    defaultPart: String = "all",
+    defaultField: String = "all",
+    defaultStem: String = "raw",
     parameters: Parameters = Parameters.empty): Index = {
     val tmp: File = Utility.createTemporaryDirectory("memory")
     parameters.set("inputPath", List(input))
     parameters.set("indexPath", tmp.getAbsolutePath)
-    //Logger.getLogger("").setLevel(Level.OFF)
+    Logger.getLogger("").setLevel(Level.OFF)
     val receiver = new PrintStream(new ByteArrayOutputStream)
     BuildIndex.run(parameters, receiver)
     receiver.close
@@ -52,18 +53,22 @@ object Index {
     Utility.deleteDirectory(tmp)
 
     // Return using the memory index
-    return new Index(input, memoryIndex, defaultPart)
+    return new Index(input, memoryIndex, defaultField, defaultStem)
   }
 
-  def memoryFromDisk(inputPath:String,  defaultPart: String = "all") : Index = {
+  def memoryFromDisk(inputPath:String,
+    defaultField: String = "all",
+    defaultStem: String = "raw"
+  ) : Index = {
     val memoryIndex = new MemoryIndex(inputPath)
-    return new Index(inputPath, memoryIndex, defaultPart)
+    return new Index(inputPath, memoryIndex, defaultField, defaultStem)
   }
 
 
   def dynamic(
     input: String,
-    defaultPart: String = "all",
+    defaultField: String = "all",
+    defaultStem: String = "raw",
     parameters: Parameters = Parameters.empty): Index = {
     val parserParams = parameters.get("parser", Parameters.empty)
     val tokenizerParams = parameters.get("tokenizer", Parameters.empty)
@@ -83,17 +88,17 @@ object Index {
     // Run it
     docsource.run()
     // load it
-    return new Index(input, dynamicIndex, defaultPart)
+    return new Index(input, dynamicIndex, defaultField, defaultStem)
   }
 }
 
 class Index private(
   label: String,
   val underlying: GIndex,
-  private[this] var currentDefault: String) {
+  private[this] var impliedField: String,
+  private[this] var impliedStem: String) {
   // Make sure the default isn't a crock
-  assume(underlying.containsPart(s"$currentDefault.postings"),
-    s"$currentDefault is not a part in this index ($toString)")
+  checkConfiguration
 
   override def toString: String = {
     val b = new StringBuilder()
@@ -107,23 +112,31 @@ class Index private(
     b.result
   }
 
+  /** Returns the current default stemming pattern */
+  def defaultStem: String = impliedStem
+
+  /** Sets the current default stemming pattern. */
+  def defaultStem_=(newDefault: String) {
+    impliedStem = newDefault
+    checkConfiguration
+  }
+
   /** Returns the current default part */
-  def defaultPart: String = currentDefault
+  def defaultField: String = impliedField
 
   /**
     * Sets the current default part. If the part doesn't
     * exist, fails an assertion.
     */
-  def defaultPart_=(newDefault: String): Unit = {
-    assume(underlying.containsPart(s"$newDefault.postings"),
-      s"$newDefault is not a part in this index ($toString)")
-    currentDefault = newDefault
+  def defaultField_=(newDefault: String) {
+    impliedField = newDefault
+    checkConfiguration
   }
 
   val collectionStats =
-    underlying.getCollectionStatistics(currentDefault)
+    underlying.getCollectionStatistics(impliedField)
   private val postingsStats =
-    underlying.getIndexPartStatistics(getLabel(currentDefault))
+    underlying.getIndexPartStatistics(getLabel())
 
   /** In theory, releases the resources associated with this index. In theory.*/
   def close: Unit = underlying.close
@@ -154,47 +167,43 @@ class Index private(
     underlying.getIndexPart("lengths").getIterator(field).asInstanceOf[LI]
 
   def lengthsIterator(field: Option[String] = None): LI =
-    lengthsIterator(field.getOrElse(currentDefault))
+    lengthsIterator(field.getOrElse(impliedField))
 
   def clearIteratorCache: Unit = iteratorCache.clear
-  def shareableIterator(
-    key: String,
-    field: Option[String] = None): ExtentIterator =
-    shareableIterator(key, field.getOrElse(currentDefault))
 
   /** Produces a cached ExtentIterator if possible. If not found, a new iterator
     * is constructed and cached for later.
     */
-  def shareableIterator(key: String, field: String): ExtentIterator = {
+  def shareableIterator(
+    key: String,
+    field: String = defaultField,
+    stem: String = defaultStem): ExtentIterator = {
     if (!iteratorCache.contains(key)) {
-      iteratorCache(key) = iterator(key, field)
+      iteratorCache(key) = iterator(key, field, stem)
     }
     iteratorCache(key)
   }
-
-  /** Used to allow for using a default field. If a None is provided, then
-    * the current default field is used. Otherwise it will unwrap the
-    * Option and use the provided field.
-    */
-  def iterator(
-    key: String,
-    field: Option[String] = None): ExtentIterator =
-    iterator(key, field.getOrElse(currentDefault))
 
   /** Returns an ExtentIterator from the underlying index. If the requested
     * index part is missing, an assertion fails. If the key is missing, a
     * NullExtentIterator is returned.
     */
-  def iterator(key: String, field: String): ExtentIterator = {
-    val label = getLabel(field)
+  def iterator(key: String,
+    field: String = defaultField,
+    stem: String = defaultStem): ExtentIterator = {
+    val label = getLabel(field, stem)
     val part = underlying.getIndexPart(label)
     val iter = part.getIterator(key)
     if (iter != null) iter.asInstanceOf[ExtentIterator]
     else new NullExtentIterator(label)
   }
 
-  def postings(key:String): PostingSeq[PositionsPosting] =
-    new PostingSeq(iterator(key), this)
+  def postings(
+    key:String,
+    field: String = defaultField,
+    stem: String = defaultStem
+  ): PostingSeq[PositionsPosting] =
+    new PostingSeq(iterator(key, field, stem), this)
   def documents: DocumentSeq = DocumentSeq(this)
   def documents(docids: Seq[InternalId]): List[Document] = {
     val sortedNames = docids.sorted.map(underlying.getName(_))
@@ -217,8 +226,10 @@ class Index private(
   /** Returns a view of the set of keys of a given index part.
     * An assertion fails if the part is not found.
    */
-  def vocabulary(field: String = currentDefault): KeySet =
-    KeySet(underlying.getIndexPart(getLabel(field)).keys _)
+  def vocabulary(
+    field: String = impliedField,
+    stem: String = impliedStem
+  ): KeySet = KeySet(underlying.getIndexPart(getLabel(field, stem)).keys _)
   def name(docid: InternalId) : String = underlying.getName(docid)
   def identifier(name: String): InternalId =
     new InternalId(underlying.getIdentifier(name))
@@ -264,10 +275,18 @@ class Index private(
     stats
   }
 
-  private def getLabel(field: String): String = {
-    val label = s"$field.postings"
+  private def getLabel(
+    field: String = defaultField,
+    stem: String = defaultStem): String = {
+    val label = s"$field.postings.$stem"
     assume (underlying.containsPart(label),
       s"$label is not a part in this index ($toString)")
     label
+  }
+
+  private def checkConfiguration {
+    val testPart = s"$impliedField.postings.$impliedStem"
+    assume(underlying.containsPart(testPart),
+      s"$testPart is not in this index.")
   }
 }

@@ -21,7 +21,6 @@ public class SplitOffsetter extends StandardStep<DocumentSplit, DocumentSplit> {
   public void process(DocumentSplit split) throws IOException {
       split.startDocument = lastEnd;
       lastEnd += split.numDocuments;
-      System.err.printf("Offsetting: %s\n", split.toString());
       processor.process(split);
   }
 }

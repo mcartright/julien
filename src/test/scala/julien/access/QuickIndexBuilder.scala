@@ -134,6 +134,9 @@ trait QuickIndexBuilder {
     indexParams.set("parser", parserParams)
     indexParams.set("tokenizer", tokenizerParams)
     indexParams.set("filetype", "wex")
-    Index.memory(tmpSampInput.getAbsolutePath, "all", indexParams)
+    Index.memory(
+      input = tmpSampInput.getAbsolutePath,
+      defaultField = "all",
+      parameters = indexParams)
   }
 }

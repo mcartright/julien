@@ -24,7 +24,7 @@ object IndexLengths {
   ): IndexLengths = {
     val field = wrappedField match {
       case Some(f) => f
-      case None => index.defaultPart
+      case None => index.defaultField
     }
     // short-circuit
     if (cache.contains(field)) return new ArrayLengths(index, cache(field))

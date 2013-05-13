@@ -119,11 +119,11 @@ object BuildIndex extends TupleFlowFunction {
     val pathways = Seq.newBuilder[FlowLinearStep]
     val writeStages = Seq.newBuilder[FlowStage]
    // For each stemmer:
-    for ((stemmer, prefix) <- stemmers) {
+    for ((stemmer, suffix) <- stemmers) {
       // 1) Make the main writer
       val postingsWriter =
         FlowStage(classOf[PositionIndexWriter],
-          indexFileParms(bp, s"${prefix}/all.postings"))
+          indexFileParms(bp, s"all.postings.${suffix}"))
       writeStages += postingsWriter
       val postingsOrder = postingsWriter.inputSortOrder
       // 2) Need to create a chain of (stemmer -> NPPE -> writer) -> pathways
@@ -136,9 +136,11 @@ object BuildIndex extends TupleFlowFunction {
       pathways += FlowLinearStep(postingsChain)
 
       // 3) Make a field writer
+      val p = new Parameters()
+      p.set("filename", bp.getString("indexPath") + slash)
+      p.set("suffix", s".$suffix")
       val fieldsWriter =
-        FlowStage(classOf[PositionFieldIndexWriter],
-          indexFileParms(bp, s"${prefix}${slash}"))
+        FlowStage(classOf[PositionFieldIndexWriter], p)
       writeStages += fieldsWriter
       val fieldsOrder = fieldsWriter.inputSortOrder
       // 4) Create a chain of (stemmer -> NEPE -> field writer) -> pathways
@@ -233,8 +235,6 @@ object BuildIndex extends TupleFlowFunction {
     stemmingWriters ++
     mightWriteStages
 
-    println(graph.toString)
-    JobGen.printTypeGraph(graph.head, graph.tail.toSet)
     JobGen.createAndVerify(graph)
   }
 

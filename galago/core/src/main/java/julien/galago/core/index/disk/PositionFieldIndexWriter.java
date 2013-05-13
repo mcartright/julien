@@ -21,13 +21,15 @@ public class PositionFieldIndexWriter implements Processor<FieldNumberWordPositi
 
   private NumberWordPosition.WordDocumentPositionOrder.TupleShredder shredder;
   private PositionIndexWriter writer;
-  private String filePrefix;
+  private String fileSuffix;
+  private String filePath;
   private String prevField;
   private final TupleFlowParameters p;
 
   public PositionFieldIndexWriter(TupleFlowParameters p) throws IOException {
     this.p = p;
-    filePrefix = p.getJSON().getString("filename");
+    filePath = p.getJSON().getString("filename");
+    fileSuffix = p.getJSON().getString("suffix");
   }
 
   private void checkWriter(String fieldName) throws IOException {
@@ -36,7 +38,10 @@ public class PositionFieldIndexWriter implements Processor<FieldNumberWordPositi
         shredder.close();
       }
       p.getJSON().set("filename",
-		      String.format("%s%s.postings", filePrefix, fieldName));
+		      String.format("%s%s.postings%s",
+				    filePath,
+				    fieldName,
+				    fileSuffix));
       writer = new PositionIndexWriter(p);
       shredder = new NumberWordPosition.WordDocumentPositionOrder.TupleShredder(writer);
       prevField = fieldName;

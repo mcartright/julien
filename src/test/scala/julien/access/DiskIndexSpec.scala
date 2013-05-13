@@ -35,14 +35,14 @@ class DiskIndexSpec
     expect(123L) { index.collectionLength }
   }
 
-  it should "provide a valid lengths iterator for the default key" in {
-    val iterator = index.lengthsIterator(index.defaultPart)
+  it should "provide a valid lengths iterator for the default field" in {
+    val iterator = index.lengthsIterator(index.defaultField)
     assert( iterator != null )
   }
 
   it should "provide the default without arguments as well" in {
     val iterator = index.lengthsIterator()
-    expect(index.defaultPart) { Utility.toString(iterator.key) }
+    expect(index.defaultField) { Utility.toString(iterator.key) }
   }
 
   it should "provide a null extent iterator for a OOV term" in {

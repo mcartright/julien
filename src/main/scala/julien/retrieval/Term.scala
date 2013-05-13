@@ -5,8 +5,10 @@ import julien.galago.core.index.ExtentIterator
 import julien.galago.core.util.ExtentArray
 
 object Term {
-  def apply(s: String) = new Term(s, None)
-  def apply(s: String, f: String) = new Term(s, Some(f))
+  def apply(s: String) = new Term(s, None, None)
+  def apply(s: String, f: String) = new Term(s, Some(f), None)
+  def apply(s: String, f: String, stem: String) =
+    new Term(s, Some(f), Some(stem))
 }
 
 /** Represents a direct connection to an index via a key specified
@@ -16,7 +18,11 @@ object Term {
   *
   * These are always 1-to-1.
   */
-final class Term private (val t: String, val field: Option[String])
+final class Term private (
+  val t: String,
+  val field: Option[String],
+  val stem: Option[String]
+)
     extends SparseIterator[ExtentIterator]
     with PositionStatsView {
 
@@ -26,7 +32,12 @@ final class Term private (val t: String, val field: Option[String])
   /** Definition of how this class retrieves its underlying
     * iterator from a given [[Index]] instance.
     */
-  def getIterator(i: Index): ExtentIterator = i.shareableIterator(t, field)
+  def getIterator(i: Index): ExtentIterator =
+    i.shareableIterator(
+      t,
+      field.getOrElse(i.defaultField),
+      stem.getOrElse(i.defaultStem)
+    )
 
   /** Returns the current count of the underlying iterator. */
   def count: Int = if (matched) underlying.count else 0

@@ -50,13 +50,13 @@ class MemoryIndexSpec
   }
 
   it should "validate a valid lengths iterator for the default key" in {
-    val iterator = memoryIndex.lengthsIterator(memoryIndex.defaultPart)
+    val iterator = memoryIndex.lengthsIterator(memoryIndex.defaultField)
     assert ( iterator != null )
   }
 
   it should "provide the default without arguments as well" in {
     val iterator = memoryIndex.lengthsIterator()
-    expect(memoryIndex.defaultPart) { Utility.toString(iterator.key) }
+    expect(memoryIndex.defaultField) { Utility.toString(iterator.key) }
   }
 
   it should "provide a null extent iterator for a OOV term" in {
