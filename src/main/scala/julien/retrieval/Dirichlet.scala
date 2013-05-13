@@ -13,29 +13,31 @@ object Dirichlet {
     new Dirichlet(op, l, op, mu, () => 1.0)
   }
 
-  def apply(op: PositionStatsView, l: LengthsView, mu: Double, weight: Double) = {
-    new Dirichlet(op, l, op, mu, () => weight)
-  }
+  def apply(op: PositionStatsView,
+    l: LengthsView,
+    mu: Double,
+    weight: Double
+  ) = new Dirichlet(op, l, op, mu, () => weight)
 
   def apply(c: CountView, l: LengthsView, s: StatisticsView) =
     new Dirichlet(c, l, s, defMu, () => 1.0)
 
   def apply(
-             op: CountView,
-             l: LengthsView,
-             s: StatisticsView,
-             mu: Double): Dirichlet = new Dirichlet(op, l, s, mu, () => 1.0)
+    op: CountView,
+    l: LengthsView,
+    s: StatisticsView,
+    mu: Double): Dirichlet = new Dirichlet(op, l, s, mu, () => 1.0)
 }
 
 class Dirichlet(
-                 val op: CountView,
-                 val lengths: LengthsView,
-                 val statsrc: StatisticsView,
-                 val mu: Double,
-                 w: () => Double)
-  extends ScalarWeightedFeature {
+  val op: CountView,
+  val lengths: LengthsView,
+  val statsrc: StatisticsView,
+  val mu: Double,
+  w: () => Double)
+    extends ScalarWeightedFeature {
   require(mu > 0, s"Mu must be positive. Received $mu")
-  this.weight = w.apply()
+  this.weight = w()
   lazy val children: Seq[Operator] = Set[Operator](op, lengths, statsrc).toList
   lazy val views: Set[ViewOp] = Set[ViewOp](op, lengths, statsrc)
   // Runs when asked for the first time, and runs only once
@@ -68,10 +70,8 @@ class Dirichlet(
   def score(c: Int, l: Int): Double = {
     val num = (c + (mu * cf))
     val den = (l + mu)
-    val collFreq = statsrc.statistics.collFreq
     val rawScore = scala.math.log((c + (mu * cf)) / (l + mu))
     val score = localWeight * scala.math.log((c + (mu * cf)) / (l + mu))
-  //  debug(s"DIRICHLET  c: $c cf: $collFreq mu: $mu num: $num den: $den raw: $rawScore weight: $weight final score: $score")
     score
   }
 }
