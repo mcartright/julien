@@ -184,13 +184,12 @@
         <artifactId>maven-idea-plugin</artifactId>
         <configuration>
           <exclude>garage/**/*.scala</exclude>
-	  <exclude>**/learning/**/*.scala</exclude>
           <!--
-	       <exclude>**/learning/trees/**/*.scala</exclude>
-          <exclude>**/learning/neuralnet/ListNeuron.scala</exclude>
-          <exclude>**/learning/neuralnet/ListNet.scala</exclude>
-          <exclude>**/learning/neuralnet/LambdaRank.scala</exclude>
+	  <exclude>**/learning/**/*.scala</exclude>
 	  -->
+	   <exclude>**/learning/linear/CascadeRank.scala</exclude>
+	       <exclude>**/learning/trees/**/*.scala</exclude>
+          <exclude>**/learning/neuralnet/*.scala</exclude>
         </configuration>
         <version>2.2</version>
       </plugin>
@@ -205,13 +204,12 @@
           <useZincServer>true</useZincServer>
           <excludes>
             <exclude>garage/**/*.scala</exclude>
-	    <exclude>**/learning/**/*.scala</exclude>
             <!--
-		 <exclude>**/learning/trees/**/*.scala</exclude>
-		 <exclude>**/learning/neuralnet/ListNeuron.scala</exclude>
-		 <exclude>**/learning/neuralnet/ListNet.scala</exclude>
-		 <exclude>**/learning/neuralnet/LambdaRank.scala</exclude>
+	    <exclude>**/learning/**/*.scala</exclude>
 	    -->
+	   <exclude>**/learning/linear/CascadeRank.scala</exclude>
+		 <exclude>**/learning/trees/**/*.scala</exclude>
+		 <exclude>**/learning/neuralnet/*.scala</exclude>
           </excludes>
         </configuration>
         <executions>
