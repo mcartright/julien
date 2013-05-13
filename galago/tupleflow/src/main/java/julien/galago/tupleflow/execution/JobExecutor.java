@@ -1158,6 +1158,7 @@ public class JobExecutor {
     jobExecutor.prepare();
 
     if (store.hasStatements()) {
+      logger.info("Exiting early. Errors found: " + store.toString());
       return false;
     }
 
@@ -1186,38 +1187,4 @@ public class JobExecutor {
 
     return !store.hasStatements();
   }
-  /**
-   * *** DEPRECATED *********** public static void main(String[] args) throws
-   * ParserConfigurationException, SAXException, IOException,
-   * InterruptedException, ExecutionException { if (args.length < 3) {
-   * System.out.println("usage: executionModel parameterFile temporaryStorage");
-   * System.out.println( " where executionModel is one of: local, drmaa, ssh,
-   * debug, remotedebug"); System.exit(-1); }
-   *
-   * String executionModel = args[0]; String parameterFile = args[1]; String
-   * temporaryStorage = args[2]; String[] remaining = Utility.subarray(args, 3);
-   * StageExecutor executor = null;
-   *
-   * Logger logger = Logger.getLogger(JobExecutor.class.toString());
-   * logger.setLevel(Level.INFO);
-   *
-   * executor = StageExecutorFactory.newInstance(executionModel, remaining);
-   * ErrorStore store = new ErrorStore();
-   *
-   * // First, parse the job -- need to rethink that one Job job; if (true)
-   * throw new UnsupportedOperationException("Currently cannot parse a job file.
-   * New format required.\n");
-   *
-   * if (store.hasStatements()) { System.out.println(store.toString());
-   * System.exit(-1); }
-   *
-   * JobExecutor jobExecutor = new JobExecutor(job, temporaryStorage, store);
-   * jobExecutor.prepare();
-   *
-   * if (store.hasStatements()) { System.out.println(store.toString());
-   * System.exit(-1); }
-   *
-   * jobExecutor.run(executor); logger.info("Job complete");
-   * executor.shutdown(); }
-   */
 }

@@ -80,19 +80,4 @@ public abstract class Stemmer extends StandardStep<Document, Document> {
     }
     return window.toString();
   }
-
-  public Class<Document> getInputClass() {
-      return Document.class;
-  }
-
-  public Class<Document> getOutputClass() {
-      return Document.class;
-  }
-
-  public static void verify(
-			    TupleFlowParameters parameters,
-			    ErrorStore handler)
-      throws IOException {
-      // nothing needed - just doing this for inheritance
-  }
 }

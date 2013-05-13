@@ -199,6 +199,7 @@ public class DocumentSource implements ExNihiloSource<DocumentSplit> {
 			    isCompressed,
 			    0,
 			    0);
+      System.err.printf("Processing %s\n", split.toString());
       processor.process(split);
       ++fileId;
     } else {

@@ -108,19 +108,23 @@ object BuildIndex extends TupleFlowFunction {
         s"File '${f.getPath}' either doesn't exist or is not file/directory.")
     }
     val (files, directories) = inputFiles.partition(_.isFile)
-    splitParms.set("filename", files)
-    splitParms.set("directory", directories)
+    splitParms.set("filename", files.map(_.getAbsolutePath))
+    splitParms.set("directory", directories.map(_.getAbsolutePath))
     splitParms
   }
 
-  def stemBranches(bp: Parameters): Seq[FlowLinearStep] = {
+  def stemBranches(
+    bp: Parameters
+  ): Tuple2[Seq[FlowLinearStep], Seq[FlowStage]] = {
     val pathways = Seq.newBuilder[FlowLinearStep]
-    // For each stemmer:
+    val writeStages = Seq.newBuilder[FlowStage]
+   // For each stemmer:
     for ((stemmer, prefix) <- stemmers) {
       // 1) Make the main writer
       val postingsWriter =
         FlowStage(classOf[PositionIndexWriter],
           indexFileParms(bp, s"${prefix}/all.postings"))
+      writeStages += postingsWriter
       val postingsOrder = postingsWriter.inputSortOrder
       // 2) Need to create a chain of (stemmer -> NPPE -> writer) -> pathways
       val postingsChain = Seq(
@@ -135,6 +139,7 @@ object BuildIndex extends TupleFlowFunction {
       val fieldsWriter =
         FlowStage(classOf[PositionFieldIndexWriter],
           indexFileParms(bp, s"${prefix}${slash}"))
+      writeStages += fieldsWriter
       val fieldsOrder = fieldsWriter.inputSortOrder
       // 4) Create a chain of (stemmer -> NEPE -> field writer) -> pathways
       val fieldsChain = Seq(
@@ -145,7 +150,7 @@ object BuildIndex extends TupleFlowFunction {
       )
       pathways += FlowLinearStep(fieldsChain)
     }
-    pathways.result
+    (pathways.result, writeStages.result)
   }
 
   def constructJob(bp: Parameters): Job = {
@@ -176,13 +181,14 @@ object BuildIndex extends TupleFlowFunction {
     } else None
 
     // build up complicated fork stage
+    val (stemmingBranches, stemmingWriters) = stemBranches(bp)
     val parseDocs = {
       val leadup = Seq(
         FlowStep(classOf[ParserSelector], bp.getMap("parser")),
         FlowStep(classOf[TagTokenizer], bp.getMap("tokenizer"))
       )
 
-      val branches = stemBranches(bp) ++ Seq(
+      val branches = stemmingBranches ++ Seq(
         extractor(classOf[FieldLengthExtractor], Some(writeLengths)),
         extractor(classOf[NumberedDocumentDataExtractor], Some(writeNames)),
         extractor(classOf[NumberedDocumentDataExtractor], Some(writeNamesRev)),
@@ -223,10 +229,12 @@ object BuildIndex extends TupleFlowFunction {
       Seq(writeCorpus, writeContent).flatten
 
     val graph = inputStages ++
-                mustWriteStages ++
-                mightWriteStages
+    mustWriteStages ++
+    stemmingWriters ++
+    mightWriteStages
 
     println(graph.toString)
+    JobGen.printTypeGraph(graph.head, graph.tail.toSet)
     JobGen.createAndVerify(graph)
   }
 

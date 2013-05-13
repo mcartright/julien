@@ -29,8 +29,8 @@ object Recipe {
     }
 
     return new FlowStage(
-      FlowLinearStep(Seq(FlowStep(outClass, params), FlowStep(outOrder))),
-      gensym(outClass.getSimpleName)
+      FlowLinearStep(Seq(FlowStep(srcClass, params), FlowStep(outOrder))),
+      gensym(srcClass.getSimpleName)
     )
   }
 

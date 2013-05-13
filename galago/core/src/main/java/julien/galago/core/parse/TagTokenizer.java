@@ -740,6 +740,7 @@ public class TagTokenizer extends StandardStep<Document, Document> {
    * @throws java.io.IOException
    */
   public void process(Document document) throws IOException {
+      System.err.printf("Tokenizing: %s\n", document.name);
     tokenize(document);
     processor.process(document);
   }

@@ -37,6 +37,9 @@ package julien.galago.core.parse.stem;
 import java.io.FileReader;
 import java.io.LineNumberReader;
 import java.util.HashMap;
+import julien.galago.tupleflow.InputClass;
+import julien.galago.tupleflow.OutputClass;
+import julien.galago.tupleflow.execution.Verified;
 
 /**
  * <p>Title: Kstemmer</p>
@@ -49,6 +52,9 @@ import java.util.HashMap;
 /**
 This class implements the Kstem algorithm
  */
+@Verified
+@InputClass(className="julien.galago.core.parse.Document")
+@OutputClass(className="julien.galago.core.parse.Document")
 public class KrovetzStemmer extends Stemmer {
 
   /** Default size of the cache that stores <code>(word,stem)</code> pairs.
@@ -1294,7 +1300,7 @@ public class KrovetzStemmer extends Stemmer {
     return;
   }
 
-  /** Create a KrovetzStemmer 
+  /** Create a KrovetzStemmer
    *
    */
   public KrovetzStemmer() {

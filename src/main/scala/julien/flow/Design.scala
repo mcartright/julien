@@ -366,17 +366,11 @@ case class FlowMultiStep(val steps: Seq[AbstractFlowStep])
   private val outType = steps(0).outputType
 
   // ensure that all of the parallel steps have the same input type
-  steps.tail.foreach(step => {
-    if(inType != None) {
-      val firstType = inType.get
-      val thisType = step.inputType.get
-      assert(firstType == thisType,
-        s"type ${firstType} != ${thisType}")
-    } else {
-      assert(step.inputType == inType,
-        s"type ${step.inputType} != ${inType}")
-    }
-  })
+  assume(inType.isDefined, s"Lead substep (${steps(0)}) has no input type.")
+  for (step <- steps.tail) {
+    assert(step.inputType == inType,
+      s"type ${inType} != ${step.inputType} (substep ${step})")
+  }
 
   def inputType = steps(0).inputType
   def outputType = steps(0).outputType

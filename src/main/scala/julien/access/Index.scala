@@ -39,8 +39,7 @@ object Index {
     val tmp: File = Utility.createTemporaryDirectory("memory")
     parameters.set("inputPath", List(input))
     parameters.set("indexPath", tmp.getAbsolutePath)
-    Logger.getLogger("").setLevel(Level.OFF)
-    Logger.getLogger(classOf[JobExecutor].toString).setLevel(Level.OFF)
+    //Logger.getLogger("").setLevel(Level.OFF)
     val receiver = new PrintStream(new ByteArrayOutputStream)
     BuildIndex.run(parameters, receiver)
     receiver.close
