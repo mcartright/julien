@@ -32,7 +32,7 @@ class JelinekMercerSpec extends FlatSpec with MockFactory {
     val d = JelinekMercer(mockCV, mockLV, mockStat, lambda)
     val expectedCF =
       fakeCountStats.collFreq.toDouble / fakeCountStats.collLength
-    expect(expectedCF) { d.cf }
+    expectResult(expectedCF) { d.cf }
   }
 
   it should "complain if the provided lambda is outside [0,1]" in {
@@ -57,7 +57,7 @@ class JelinekMercerSpec extends FlatSpec with MockFactory {
     val d = JelinekMercer(mockCV, mockLV, mockStat, lambda)
     val max = fakeCountStats.max.toDouble
     val expScore = scala.math.log(lambda + ((1.0-lambda) * d.cf))
-    expect (expScore) { d.upperBound }
+    expectResult(expScore) { d.upperBound }
   }
 
   it should "produce the correct lower bound" in {
@@ -68,7 +68,7 @@ class JelinekMercerSpec extends FlatSpec with MockFactory {
     val lambda = 0.3
     val d = JelinekMercer(mockCV, mockLV, mockStat, lambda)
     val expScore = scala.math.log((1.0-lambda) * d.cf)
-    expect (expScore) { d.lowerBound }
+    expectResult(expScore) { d.lowerBound }
   }
 
   it should "produce the correct score" in {
@@ -84,6 +84,6 @@ class JelinekMercerSpec extends FlatSpec with MockFactory {
     val d = JelinekMercer(mockCV, mockLV, mockStat, lambda)
     val expScore =
       scala.math.log((lambda*(c.toDouble/l)) + ((1.0-lambda)*(d.cf)))
-    expect (expScore) { d.eval }
+    expectResult(expScore) { d.eval }
   }
 }

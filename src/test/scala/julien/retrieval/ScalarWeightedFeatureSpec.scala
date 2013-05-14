@@ -13,7 +13,7 @@ class ScalarWeightedFeatureSpec extends FlatSpec {
   "A scalar weight operator" should "provide a default value of 1.0" in {
     val f = fixture
     import f._
-    expect(1.0) { swOp.weight }
+    expectResult(1.0) { swOp.weight }
   }
 
   it should "allow a new scalar value to be set" in {
@@ -26,9 +26,9 @@ class ScalarWeightedFeatureSpec extends FlatSpec {
     val f = fixture
     import f._
 
-    expect(1.0) { swOp.weight }
+    expectResult(1.0) { swOp.weight }
     val newWeight = scala.util.Random.nextDouble
     swOp.weight = newWeight
-    expect(newWeight) { swOp.weight }
+    expectResult(newWeight) { swOp.weight }
   }
 }

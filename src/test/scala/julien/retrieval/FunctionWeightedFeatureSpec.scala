@@ -2,6 +2,7 @@ package julien
 package retrieval
 
 import org.scalatest._
+import scala.language.reflectiveCalls
 
 class FunctionWeightedFeatureSpec extends FlatSpec {
   def fixture = new {
@@ -13,7 +14,7 @@ class FunctionWeightedFeatureSpec extends FlatSpec {
   "A function weight operator" should "provide a default value of 1.0" in {
     val f = fixture
     import f._
-    expect(1.0) { swOp.weight }
+    expectResult(1.0) { swOp.weight }
   }
 
   it should "allow a new weight function to be set" in {
@@ -30,18 +31,18 @@ class FunctionWeightedFeatureSpec extends FlatSpec {
     // Because the Queue implementation is silly...
     val tmp = new {
       var q = Queue(3.0, 4.5, 99.0, 112.1)
-      def apply(): Double = {
+      def apply: Double = {
         val result = q.dequeue
         q = result._2
         result._1
       }
     }
-    expect(1.0) { swOp.weight }
-    swOp.weight = tmp.apply _
-    expect(3.0) { swOp.weight }
-    expect(4.5) { swOp.weight }
-    expect(99.0) { swOp.weight }
-    expect(112.1) { swOp.weight }
+    expectResult(1.0) { swOp.weight }
+    swOp.weight = tmp.apply
+    expectResult(3.0) { swOp.weight }
+    expectResult(4.5) { swOp.weight }
+    expectResult(99.0) { swOp.weight }
+    expectResult(112.1) { swOp.weight }
     intercept[NoSuchElementException] { swOp.weight }
   }
 

@@ -31,7 +31,6 @@ class QueryEvaluation(
   val processor = SimpleProcessor()
   val scalarFeatures = f.map(_.asInstanceOf[ScalarWeightedFeature]).toArray
   processor.add(scalarFeatures: _*)
-  processor.add(index)
 
   // return a list of features on demand
   def features = f
@@ -79,20 +78,19 @@ class CoordinateAscent(evaluation: AbstractEvaluation) {
   var maxIterations = 2500
 
   case class Configuration(val score: Double, val weights: Array[Double])
-  import CoordinateAscent._
 
   // Initialization
   assume(evaluation.features.forall(_.isInstanceOf[ScalarWeightedFeature]),
     s"Coordinate Ascent needs scalar-weighted features.")
   val features = evaluation.features.map(_.asInstanceOf[ScalarWeightedFeature]).toArray
-  
+
   // running best configuration
   var bestConfig = Configuration(evaluation.run(), features.map(_.weight))
 
   def train: Unit = {
     Random.shuffle(features.toList).foreach(feature => {
       val bestFromFeature = optimizeFeature(feature, bestConfig)
-      
+
       if (bestConfig.score < bestFromFeature.score)
         bestConfig = bestFromFeature
     })
@@ -105,7 +103,7 @@ class CoordinateAscent(evaluation: AbstractEvaluation) {
     val fIdx = features.indexOf(feature)
 
     (0 until maxIterations).foreach( iteration => {
-      val (upwards, downwards) = step(fIdx, stepSize)
+      val (upwards, downwards) = step(features(fIdx), stepSize)
 
       //println("current score: "+currentBest.score+" alt: ["+upwards+","+downwards+"]")
       // Is the change big enough?
@@ -133,7 +131,7 @@ class CoordinateAscent(evaluation: AbstractEvaluation) {
 
   def step(feature: ScalarWeightedFeature, delta: Double): (Double, Double) = {
     val initialWeight = feature.weight
-    
+
     // try the upwards step
     feature.weight = initialWeight + delta
     val upscore = evaluation.run()
@@ -141,7 +139,7 @@ class CoordinateAscent(evaluation: AbstractEvaluation) {
     // and now the downwards step
     feature.weight = initialWeight - delta
     val downscore = evaluation.run()
-    
+
     // reset weight
     feature.weight = initialWeight
     return (upscore, downscore)

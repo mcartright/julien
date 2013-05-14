@@ -13,8 +13,9 @@ object AdaRank {
   val maxSelCount = 5
 
   // Just for wrapping
-  implicit
-  def swf2seq(f: ScalarWeightedFeature): Seq[ScalarWeightedFeature] = Seq(f)
+  implicit def swf2seq(
+    f: ScalarWeightedFeature
+  ): Seq[ScalarWeightedFeature] = Seq(f)
 }
 
 class AdaRank(
@@ -59,7 +60,6 @@ class AdaRank(
   private def scoreQuery(wq: WeightedQuery, feats: Seq[ScalarWeightedFeature]): Double = {
     processor.clear
     processor.add(feats: _*)
-    processor add index
     evaluator.eval(processor.run(), judgments(wq.qid))
   }
 
