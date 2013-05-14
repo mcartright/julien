@@ -50,6 +50,7 @@ trait Operator extends Traversable[Operator] {
 }
 
 object Operator {
+  import language.implicitConversions
   // Slight simplification
   implicit def op2feature(op: Operator): FeatureOp = op.asInstanceOf[FeatureOp]
   implicit def op2view(op: Operator): ViewOp = op.asInstanceOf[ViewOp]

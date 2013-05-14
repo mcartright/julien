@@ -7,15 +7,60 @@ import scala.util.Random
 import julien.retrieval._
 import julien.eval._
 
-object CoordinateAscent {
-  val slack = 0.001
-  val regularized = false
-  val tolerance = 0.001
-  val stepSize = 0.05
-  val stepScale = 2.0
-  val stepBase = 0.05
-  val nRestart = 2
-  val maxIterations = 25
+trait AbstractEvaluation {
+  def features: Seq[FeatureOp]
+  def run(): Double
+}
+
+class QueryEvaluation(
+  queries: Map[String, String],
+  preparer: QueryPreparer,
+  judgments: QueryJudgmentSet,
+  evaluator: QueryEvaluator,
+  index: Index,
+  f: Seq[FeatureOp]) extends AbstractEvaluation {
+
+  // some magic to reuse accumulators
+  private val myAcc = DefaultAccumulator[ScoredDocument]()
+  def acc: Accumulator[ScoredDocument] = {
+    myAcc.clear
+    myAcc
+  }
+
+  // create a processor
+  val processor = SimpleProcessor()
+  val scalarFeatures = f.map(_.asInstanceOf[ScalarWeightedFeature]).toArray
+  processor.add(scalarFeatures: _*)
+  processor.add(index)
+
+  // return a list of features on demand
+  def features = f
+
+  // get a new score based on any changes to our features
+  def run() = {
+    evaluator.eval(processor.runBatch(queries, preparer, acc), judgments)
+  }
+}
+
+class SimpleVariable extends ScalarWeightedFeature {
+  def views = ???
+  def children = Seq()
+  def eval = scalarWeight
+}
+
+class Evaluation2D(val targetX: Double, val targetY: Double) extends AbstractEvaluation {
+  val x = new SimpleVariable()
+  val y = new SimpleVariable()
+  def features = Seq(x,y)
+  def run() = {
+    val xt = (x.eval - targetX)
+    val yt = (y.eval - targetY)
+    // paraboloid opening down
+    val score = -(xt*xt + yt*yt)
+
+    //println((x.eval, y.eval) + " = "+score)
+    score
+  }
 }
 
 /** Uses a simple coordinate ascent algorithm to tune the weights of the
@@ -28,52 +73,41 @@ object CoordinateAscent {
   * - track progress (to avoid repeating a retrieval)
   * - simulated annealing
   */
-class CoordinateAscent(
-  queries: Map[String, String],
-  preparer: QueryPreparer,
-  judgments: QueryJudgmentSet,
-  evaluator: QueryEvaluator,
-  index: Index,
-  f: Seq[FeatureOp]) {
+class CoordinateAscent(evaluation: AbstractEvaluation) {
+  var tolerance = 0.05
+  var stepSize = 0.03
+  var maxIterations = 2500
+
   case class Configuration(val score: Double, val weights: Array[Double])
   import CoordinateAscent._
 
-  private val myAcc = DefaultAccumulator[ScoredDocument]()
-  def acc: Accumulator[ScoredDocument] = {
-    myAcc.clear
-    myAcc
-  }
-
   // Initialization
-  assume(f.forall(_.isInstanceOf[ScalarWeightedFeature]),
+  assume(evaluation.features.forall(_.isInstanceOf[ScalarWeightedFeature]),
     s"Coordinate Ascent needs scalar-weighted features.")
-  val features = f.map(_.asInstanceOf[ScalarWeightedFeature]).toArray
-  val processor = SimpleProcessor()
-  processor.add(features: _*)
-  processor add index
-  val initialResults = processor.runBatch(queries, preparer, acc)
-  val startScore = evaluator.eval(initialResults, judgments)
-  var bestConfig = Configuration(startScore, features.map(_.weight))
+  val features = evaluation.features.map(_.asInstanceOf[ScalarWeightedFeature]).toArray
+  
+  // running best configuration
+  var bestConfig = Configuration(evaluation.run(), features.map(_.weight))
 
   def train: Unit = {
-    var featuresToOptimize = Random.shuffle(features.toList)
-    while (!featuresToOptimize.isEmpty) {
-      var feature = featuresToOptimize.head
-      featuresToOptimize = featuresToOptimize.tail
+    Random.shuffle(features.toList).foreach(feature => {
       val bestFromFeature = optimizeFeature(feature, bestConfig)
+      
       if (bestConfig.score < bestFromFeature.score)
         bestConfig = bestFromFeature
-    }
+    })
   }
 
   def optimizeFeature(
-    f: ScalarWeightedFeature,
+    feature: ScalarWeightedFeature,
     startConfig: Configuration): Configuration = {
     var currentBest = startConfig
-    val fIdx = features.indexOf(f)
-    while (true) {
+    val fIdx = features.indexOf(feature)
+
+    (0 until maxIterations).foreach( iteration => {
       val (upwards, downwards) = step(fIdx, stepSize)
 
+      //println("current score: "+currentBest.score+" alt: ["+upwards+","+downwards+"]")
       // Is the change big enough?
       if (abs(upwards - currentBest.score) < tolerance &&
         abs(downwards - currentBest.score) < tolerance)
@@ -88,21 +122,29 @@ class CoordinateAscent(
         c.weights(fIdx) -= stepSize
         c
       }
-    }
+
+      // update feature weights
+      features.indices.foreach(idx => {
+        features(idx).weight = currentBest.weights(idx)
+      })
+    })
     currentBest
   }
 
-  def step(fidx: Int, delta: Double): Tuple2[Double, Double] = {
+  def step(feature: ScalarWeightedFeature, delta: Double): (Double, Double) = {
+    val initialWeight = feature.weight
+    
     // try the upwards step
-    features(fidx).weight += delta
-    val upscore =
-      evaluator.eval(processor.runBatch(queries, preparer, acc), judgments)
+    feature.weight = initialWeight + delta
+    val upscore = evaluation.run()
 
     // and now the downwards step
-    features(fidx).weight -= (2*delta)
-    val downscore =
-      evaluator.eval(processor.runBatch(queries, preparer, acc), judgments)
-    features(fidx).weight += delta
+    feature.weight = initialWeight - delta
+    val downscore = evaluation.run()
+    
+    // reset weight
+    feature.weight = initialWeight
     return (upscore, downscore)
   }
 }
+

@@ -3,6 +3,8 @@ package access
 
 import julien.galago.core.index.CountIterator
 
+import language.implicitConversions
+
 class CountPosting protected (var docid: InternalId, var count: Int)
     extends Posting[CountPosting]
     with CountSrc {
