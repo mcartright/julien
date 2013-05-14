@@ -18,7 +18,7 @@ import julien.galago.tupleflow.execution.Verification;
  * data stored in each document 'field' lengths list:
  *
  *   stats:
- *  - number of non-zero document lengths (document count)
+ *  - number of documents
  *  - sum of document lengths (collection length)
  *  - average document length
  *  - maximum document length
@@ -53,7 +53,6 @@ public class DiskLengthsWriter implements Processor<FieldLengthData> {
     p.set("writerClass", DiskLengthsWriter.class.getName());
     p.set("readerClass", DiskLengthsReader.class.getName());
     p.set("version", 3);
-    p.set("longs", true);
     if(!p.containsKey("blockSize")) {
       p.set("blockSize", 512);
     }
@@ -121,8 +120,8 @@ public class DiskLengthsWriter implements Processor<FieldLengthData> {
     private DataOutputStream stream;
     private byte[] field;
     // stats
-    private long totalDocumentCount;
-    private long nonZeroDocumentCount;
+      private long nonZeroDocCount;
+    private long documentCount;
     private long collectionLength;
     private long maxLength;
     private long minLength;
@@ -135,8 +134,8 @@ public class DiskLengthsWriter implements Processor<FieldLengthData> {
       stream = StreamCreator.realOutputStream(tempFile.getAbsolutePath());
       this.field = key;
 
-      this.totalDocumentCount = 0;
-      this.nonZeroDocumentCount = 0;
+      this.documentCount = 0;
+      this.nonZeroDocCount = 0;
       this.collectionLength = 0;
       this.maxLength = Integer.MIN_VALUE;
       this.minLength = Integer.MAX_VALUE;
@@ -146,17 +145,15 @@ public class DiskLengthsWriter implements Processor<FieldLengthData> {
     }
 
     public void add(int currentDocument, int length) throws IOException {
-      totalDocumentCount++;
-      // we ignore zero length documents, as this is the default returned value
-      if (length == 0) {
-        return;
-      }
-
       // update stats
-      this.nonZeroDocumentCount++;
+      this.documentCount++;
       this.collectionLength += length;
       this.maxLength = Math.max(this.maxLength, length);
-      this.minLength = Math.min(this.minLength, length);
+
+      if (length > 0) {
+	this.nonZeroDocCount++;
+	this.minLength = Math.min(this.minLength, length);
+      }
 
       // the previous document should be less than the current document
       assert (this.prevDocument < currentDocument);
@@ -187,27 +184,28 @@ public class DiskLengthsWriter implements Processor<FieldLengthData> {
       //  4 bytes for each of 2 integer statistics
       //  8 bytes for each of 6 long/double stats
       //  and the stream data
-      return (4 * 2) + (8 * 5) + stream.size();
+      return (4 * 2) + (8 * 6) + stream.size();
     }
 
     public boolean isEmpty() {
-      return nonZeroDocumentCount == 0;
+      return documentCount == 0;
     }
 
     @Override
     public void write(OutputStream fileStream) throws IOException {
 
-      assert (totalDocumentCount > 0) : "Can not write an empty lengths file for field: " + Utility.toString(field);
+      assert (documentCount > 0) : "Can not write an empty lengths file for field: " + Utility.toString(field);
 
-      //  ensure the array of documents is at least totalDocumentCount long
-      //(in case someone asks for the length of docId =totalDocumentCount)
+      //  ensure the array of documents is at least documentCount long
+      //(in case someone asks for the length of docId = documentCount)
 
       // close the length-list buffer
       stream.close();
 
-      double avgLength = (double) collectionLength / (double) totalDocumentCount;
+      double avgLength = (double) collectionLength / (double) documentCount;
 
-      fileStream.write(Utility.fromLong(nonZeroDocumentCount));
+      fileStream.write(Utility.fromLong(nonZeroDocCount));
+      fileStream.write(Utility.fromLong(documentCount));
       fileStream.write(Utility.fromLong(collectionLength));
       fileStream.write(Utility.fromDouble(avgLength));
       fileStream.write(Utility.fromLong(maxLength));

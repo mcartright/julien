@@ -11,18 +11,7 @@ trait IteratedHook[I <: GIterator]
     with IndexHook
     with Movable {
   /** The iterator attached to this hook. */
-  var underlying: I = _
-
-  /** Iterator getter. This is for internal use only. */
-  protected def getIterator(i: Index): I
-
-  /** Overriden to add functionality to additionally attach
-    * the iterator used in providing data.
-    */
-  override def attach(i: Index) {
-    super.attach(i)
-    underlying = getIterator(i)
-  }
+  val underlying: I
 
   /** We have an iterator, so we can determine if its dense (has an entry
     * for every retrieval item in the collection).

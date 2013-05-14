@@ -55,9 +55,6 @@ Required parameters:
     //processor.debugger =
     //  Some(julien.retrieval.LinePrintingDebugger().printState _)
 
-    // Attach the query model to the index
-    sdm.hooks.foreach(_.attach(index))
-
     // Add the model to the processor
     processor.add(sdm)
 

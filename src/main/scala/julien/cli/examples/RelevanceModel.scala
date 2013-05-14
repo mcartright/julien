@@ -43,9 +43,6 @@ Required parameters:
     // Make a processor to run it
     val processor = SimpleProcessor()
 
-    // Attach the query model to the index
-    ql.hooks.foreach(_.attach(index))
-
     // Add the model to the processor
     processor.add(ql)
 
@@ -67,7 +64,6 @@ Required parameters:
     )
 
     processor.clear
-    rm3.hooks.foreach(_.attach(index))
     processor.add(rm3)
 
     val finalResults = processor.run()

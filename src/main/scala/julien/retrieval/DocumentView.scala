@@ -4,16 +4,15 @@ package retrieval
 import julien.galago.core.index.DataIterator
 
 object DocumentView {
-  def apply() = new DocumentView()
+  def apply()(implicit index: Index) = new DocumentView(index)
 }
 
-final class DocumentView private()
+final class DocumentView private(override val index: Index)
     extends IteratedHook[DataIterator[GDoc]]
     with DataView[Document] {
+  override val underlying = index.documentIterator()
 
   override def toString: String =
-    "DocumentView: " + (if (isAttached) index.toString else "")
-
-  def getIterator(i: Index): DataIterator[GDoc] = i.documentIterator()
+    "DocumentView: " + index.toString
   def data: Document = DocumentClone(underlying.getData)
 }

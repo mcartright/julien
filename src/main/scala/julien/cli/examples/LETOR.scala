@@ -118,8 +118,6 @@ Required parameters:
     // Execute it
     val model = modelFeatures.result
     val processor = SimpleProcessor()
-    val hooks = model.flatMap(m => m.iHooks).toSet
-    hooks.foreach(_.attach(index))
     processor.add(model: _*)
     val results = processor.run()
     printResults(results, index, out)

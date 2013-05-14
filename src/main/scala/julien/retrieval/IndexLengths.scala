@@ -6,11 +6,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import julien.galago.core.index.LengthsReader._
 
-sealed abstract class IndexLengths(index: Index)
-    extends LengthsView
-    with ChildlessOp
-    with Movable
-
 object IndexLengths {
   def apply()(implicit index: Index) = memoryIfPossible(index, None)
   def apply(f: String)(implicit index: Index) = memoryIfPossible(index, Some(f))
@@ -54,14 +49,18 @@ object IndexLengths {
   }
 }
 
-final class StreamLengths(i: Index, li: LengthsIterator)
-    extends IndexLengths(i)
+sealed abstract class IndexLengths(index: Index)
+    extends LengthsView
+    with ChildlessOp
+    with Movable
+
+final class StreamLengths(override val index: Index, li: LengthsIterator)
+    extends IndexLengths(index)
     with IteratedHook[LengthsIterator] {
-  underlying = li
+  override val underlying = li
   override def toString = s"lengths:" + index.toString
   def length: Int = underlying.getCurrentLength
   override def isDense: Boolean = true
-  def getIterator(i: Index): LengthsIterator = underlying
 }
 
 final class ArrayLengths(i: Index, nascentArray: Future[Array[Int]])

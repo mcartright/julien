@@ -1,7 +1,7 @@
 package julien
 package retrieval
 
-import scala.collection.BufferedIterator
+import collection.Traversable
 import collection.mutable.ArrayBuffer
 import galago.core.util.ExtentArray
 
@@ -76,6 +76,34 @@ class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     while (j < iterators.length) {
       iterators(j).reset()
       j += 1
+    }
+  }
+
+  // Traversable works better here because we can mark the locations of
+  // the underlying movers, reset, iterate over all of them, and then
+  // go back to where we started - all encapsulated in this one function.
+  def walker = new Traversable[Posting] {
+    val thePosting = new Posting(0, ExtentArray.empty)
+    def foreach[U](f: Posting => U) {
+      val movers = terms.flatMap(_.grab[Movable]).distinct
+      if (movers.isEmpty) return
+      val startPositions = movers.map(_.at)
+      movers.foreach(_.reset)
+      while (movers.forall(!_.isDone)) {
+        val candidate = movers.map(_.at).max
+        movers.foreach(_.moveTo(candidate))
+        if (movers.forall(_.matches(candidate))) {
+          val p = positions
+          thePosting.docid = candidate
+          thePosting.positions = p
+          f(thePosting)
+        }
+        movers.foreach(_.movePast(candidate))
+      }
+
+      // Done iterating - now move to the right positions
+      movers.foreach(_.reset)
+      for ((m, p) <- movers.zip(startPositions)) m.moveTo(p)
     }
   }
 }

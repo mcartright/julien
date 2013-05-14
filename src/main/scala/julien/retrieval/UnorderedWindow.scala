@@ -16,15 +16,12 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     assume(terms.size > 1 && width >= terms.size,
       s"Window size must be >1 and at least as big as the number of iterators")
 
-  // this is lazy because it needs to be attached to a data source aka "hooked up"
-  // before underlying data source can be accessed.
   lazy val iterators: Array[ExtentArray] = {
     val itBuffer = Array.newBuilder[ExtentArray]
     var t = 0
     val numTerms =  terms.size
     while (t < numTerms) {
       itBuffer += terms(t).positions
-//      println(terms(t).positions.getBegins().mkString(" "))
       t += 1
     }
     itBuffer.result()
@@ -65,9 +62,6 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
         break = true
       }
     }
-//    if (hits.length > 0) {
-//      println(hits.length )
-//    }
     hits
   }
 
@@ -75,12 +69,14 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     var j = 0
     while (j < iterators.length) {
       iterators(j).reset()
- //     debug(iterators(j).length  + " " + iterators(j).getBegins.mkString(" "))
       j += 1
     }
   }
 
-  private def moveMinForward(iterators: Array[ExtentArray], minPos : Int): Unit = {
+  private def moveMinForward(
+    iterators: Array[ExtentArray],
+    minPos : Int
+  ): Unit = {
     var j = 0
     while (j < iterators.length) {
       val cur = iterators(j).head
@@ -120,5 +116,30 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
       j += 1
     }
     (min, max, minIdx)
+  }
+
+  def walker = new Traversable[Posting] {
+    val thePosting = new Posting(0, ExtentArray.empty)
+    def foreach[U](f: Posting => U) {
+      val movers = terms.flatMap(_.grab[Movable]).distinct
+      if (movers.isEmpty) return
+      val startPositions = movers.map(_.at)
+      movers.foreach(_.reset)
+      while (movers.exists(!_.isDone)) {
+        val candidate = movers.map(_.at).min
+        movers.foreach(_.moveTo(candidate))
+        if (movers.exists(_.matches(candidate))) {
+          val p = positions
+          thePosting.docid = candidate
+          thePosting.positions = p
+          f(thePosting)
+        }
+        movers.foreach(_.movePast(candidate))
+      }
+
+      // Done iterating - now move to the right positions
+      movers.foreach(_.reset)
+      for ((m, p) <- movers.zip(startPositions)) m.moveTo(p)
+    }
   }
 }

@@ -10,7 +10,7 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
   with NeedsPreparing {
 
   def children: Seq[Operator] = terms
-//  private val loc = {
+//  private lazy val loc = {
 //    val movers = terms.filter(_.isInstanceOf[Movable])
 //    if (movers.isEmpty) null else movers.head.asInstanceOf[Movable]
 //  }
@@ -56,4 +56,6 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
     statistics.numDocs = terms.head.statistics.numDocs
     statistics.collLength = terms.head.statistics.collLength - adjustment
   }
+
+  case class Posting(var docid: Int, var positions: ExtentArray)
 }

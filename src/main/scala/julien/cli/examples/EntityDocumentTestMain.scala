@@ -50,12 +50,8 @@ object EntityDocumentTestMain extends App {
   modelFeatures += sdm
 
   // Make a processor to run it
-  val processor = SimpleProcessor()
-
   val model = modelFeatures.result
-
-  val hooks = model.flatMap(m => m.iHooks).toSet
-  hooks.foreach(_.attach(index))
+  val processor = SimpleProcessor()
   processor.add(model: _*)
 
   // Add the model to the processor

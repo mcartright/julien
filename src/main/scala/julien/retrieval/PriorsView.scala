@@ -6,12 +6,11 @@ import julien.access._
 
 // Simple class that grabs stored priors and presents them as a hybrid
 // feature/view.
-class PriorsView
+class PriorsView private(override val index: Index)
     extends SparseIterator[ScoreIterator]
     with ScalarWeightedFeature {
-  def getIterator(i: Index): ScoreIterator = {
-    i.partReader("priors").getIterator("priors").asInstanceOf[ScoreIterator]
-  }
+  override val underlying =
+    index.partReader("priors").getIterator("priors").asInstanceOf[ScoreIterator]
 
   lazy val views: Set[ViewOp] = Set[ViewOp](this)
   def eval: Double = underlying.score

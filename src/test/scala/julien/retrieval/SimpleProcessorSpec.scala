@@ -52,13 +52,11 @@ trait SimpleProcessorBehavior extends QuickIndexBuilder { this: FlatSpec =>
 
       // Do the simple run
       val sp = ref
-      sp add index
       sp add query
       val simpleResults = sp.run(DefaultAccumulator[ScoredDocument](3))
 
       // Now do alternate run
       val alt = pFactory
-      alt add index
       alt add query
       val altResults = alt.run(DefaultAccumulator[ScoredDocument](3))
 
@@ -83,13 +81,11 @@ trait SimpleProcessorBehavior extends QuickIndexBuilder { this: FlatSpec =>
 
       // Do the simple run
       val sp = ref
-      sp add index
       sp add query
       val simpleResults = sp.run(DefaultAccumulator[ScoredDocument](10000))
 
       // Now do maxscore run
       val alt = pFactory
-      alt add index
       alt add query
       val altResults = alt.run(DefaultAccumulator[ScoredDocument](10000))
 
@@ -179,11 +175,9 @@ class SimpleProcessorSpec
     val queryTerms =
       List("arrangement", "baptist", "goethe", "liberal", "october")
     val l = IndexLengths()(index)
-    val query = Combine(queryTerms.map(t => TF(Term(t), l)))
-    query.iHooks.foreach(_.attach(index))
+    val query = Combine(queryTerms.map(t => TF(Term(t)(index), l)))
     val sp = simpleProc
     sp add query
-    sp add index
     val acc = DefaultAccumulator[ScoredDocument](size = 1000)
     val results: QueryResult[ScoredDocument] = sp.run(acc)
 

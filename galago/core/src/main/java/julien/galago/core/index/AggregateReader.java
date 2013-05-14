@@ -65,6 +65,8 @@ public class AggregateReader {
     public String fieldName = null;
     // total number of terms in field in the collection
     public long collectionLength = 0;
+    // number of non-zero length documents in this field.
+    public long nonZeroDocCount = 0;
     // total number of documents that contain field
     public long documentCount = 0;
     // note for the next three values:

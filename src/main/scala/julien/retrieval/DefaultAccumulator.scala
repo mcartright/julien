@@ -4,6 +4,7 @@ package retrieval
 //import java.util.PriorityQueue
 import scala.collection.mutable.PriorityQueue
 
+
 object DefaultAccumulator {
   val defaultSize: Int = 5
 

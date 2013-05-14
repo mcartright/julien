@@ -5,10 +5,11 @@ import julien.galago.core.index.ExtentIterator
 import julien.galago.core.util.ExtentArray
 
 object Term {
-  def apply(s: String) = new Term(s, None, None)
-  def apply(s: String, f: String) = new Term(s, Some(f), None)
-  def apply(s: String, f: String, stem: String) =
-    new Term(s, Some(f), Some(stem))
+  def apply(s: String)(implicit i: Index) = new Term(s, None, None, i)
+  def apply(s: String, f: String)(implicit i: Index) =
+    new Term(s, Some(f), None, i)
+  def apply(s: String, f: String, stem: String)(implicit i: Index) =
+    new Term(s, Some(f), Some(stem), i)
 }
 
 /** Represents a direct connection to an index via a key specified
@@ -21,33 +22,30 @@ object Term {
 final class Term private (
   val t: String,
   val field: Option[String],
-  val stem: Option[String]
+  val stem: Option[String],
+  override val index: Index
 )
     extends SparseIterator[ExtentIterator]
     with PositionStatsView {
 
-  override def toString: String =
-    s"$t: " + (if (isAttached) index.toString else "")
+  override def toString: String = s"$t: " + index.toString
 
-  /** Definition of how this class retrieves its underlying
-    * iterator from a given [[Index]] instance.
-    */
-  def getIterator(i: Index): ExtentIterator =
-    i.shareableIterator(
-      t,
-      field.getOrElse(i.defaultField),
-      stem.getOrElse(i.defaultStem)
-    )
+  override val underlying = index.shareableIterator(
+    t,
+    field.getOrElse(index.defaultField),
+    stem.getOrElse(index.defaultStem)
+  )
 
   /** Returns the current count of the underlying iterator. */
   def count: Int = if (matched) underlying.count else 0
 
   /** Returns the current positions of the underlying iterator. */
-  def positions: ExtentArray = if (matched) underlying.extents() else ExtentArray.empty
+  def positions: ExtentArray =
+    if (matched) underlying.extents() else ExtentArray.empty
 
   lazy val statistics: CountStatistics = {
     val ns = underlying.asInstanceOf[ARNA].getStatistics
-    val cs = attachedIndex.
+    val cs = index.
       lengthsIterator(field).
       asInstanceOf[ARCA].
       getStatistics
@@ -58,7 +56,7 @@ final class Term private (
       cs.collectionLength,
       ns.nodeDocumentCount,
       ns.maximumCount.toInt,
-      attachedIndex.collectionStats.maxLength.toInt
+      index.collectionStats.maxLength.toInt
     )
   }
 }

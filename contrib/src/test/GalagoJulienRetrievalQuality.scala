@@ -232,5 +232,4 @@ object GalagoJulienRetrievalQuality extends App {
     val filtered = lines.filter(_.split("\\s+")(0).toInt > 600).toList //take 1
     filtered
   }
-
 }

@@ -5,18 +5,11 @@ High-Level Features:
 - query iteration
 - scoring a single document (repeatedly, but with different parameters)
 
-THINGS TO FIX/IMPROVE:
-- How do we memoize
-  - decompression
-  - basic feature calculation?
-
-- To make the toolkit configurable, should we focus on schema-validated JSON
-  or a series of case classes? (Note: case classes have a 22-parameter limit,
-  but are built into Scala more cleanly than JSON)
-
 TODO:
 
 - Cascade Ranking Model
 - Cost-Estimate? (check paper)
 - Delayed execution
 - feature-rewriting (delta-fns)
+
+AQUAINT SIZE: 1033461
