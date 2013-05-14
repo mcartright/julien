@@ -25,7 +25,7 @@ class CombineSpec extends FlatSpec with MockFactory {
     mock3.expects('eval)().returning(v3)
     mock3.expects('weight)().returning(1.0)
     val c = Combine(List(mock1, mock2, mock3))
-    expect(v1+v2+v3) { c.eval }
+    expectResult(v1+v2+v3) { c.eval }
   }
 
   it should "accept other viable reduce functions" in {
@@ -41,7 +41,7 @@ class CombineSpec extends FlatSpec with MockFactory {
     val prod = (s: Seq[FeatureOp]) =>
     s.foldLeft(1.0)((s , feat) => s * feat.eval)
     val c = Combine(combiner = prod, children = List(mock1, mock2, mock3))
-    expect(v1*v2*v3) { c.eval }
+    expectResult(v1*v2*v3) { c.eval }
   }
 
   it should "return the passed in feature ops as children" in {
@@ -49,7 +49,7 @@ class CombineSpec extends FlatSpec with MockFactory {
     import f._
 
     val c = Combine(List(mock1, mock2, mock3))
-    expect(3) { c.children.size }
+    expectResult(3) { c.children.size }
     assert(c.children.exists(_ == mock1))
     assert(c.children.exists(_ == mock2))
     assert(c.children.exists(_ == mock3))

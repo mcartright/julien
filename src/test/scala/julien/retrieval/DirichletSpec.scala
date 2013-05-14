@@ -31,7 +31,7 @@ class DirichletSpec extends FlatSpec with MockFactory {
     val d = Dirichlet(mockCV, mockLV, mockStat)
     val expectedCF =
       fakeCountStats.collFreq.toDouble / fakeCountStats.collLength
-    expect(expectedCF) { d.cf }
+    expectResult(expectedCF) { d.cf }
   }
 
   it should "complain if it receives a negative mu" in {
@@ -52,7 +52,7 @@ class DirichletSpec extends FlatSpec with MockFactory {
     val d = Dirichlet(mockCV, mockLV, mockStat, mu)
     val max = fakeCountStats.max.toDouble
     val expScore = scala.math.log((max + (mu * d.cf)) / (max + mu))
-    expect (expScore) { d.upperBound }
+    expectResult(expScore) { d.upperBound }
   }
 
   it should "produce the correct lower bound" in {
@@ -64,7 +64,7 @@ class DirichletSpec extends FlatSpec with MockFactory {
     val d = Dirichlet(mockCV, mockLV, mockStat, mu)
     val expScore =
       scala.math.log((mu * d.cf) / (Dirichlet.totallyMadeUpValue + mu))
-    expect (expScore) { d.lowerBound }
+    expectResult(expScore) { d.lowerBound }
   }
 
   it should "produce the correct score" in {
@@ -79,6 +79,6 @@ class DirichletSpec extends FlatSpec with MockFactory {
     mockLV.expects('length)().returning(l)
     val d = Dirichlet(mockCV, mockLV, mockStat, mu)
     val expScore = scala.math.log((c + (mu*d.cf)) / (mu + l))
-    expect (expScore) { d.eval.underlying }
+    expectResult(expScore) { d.eval.underlying }
   }
 }
