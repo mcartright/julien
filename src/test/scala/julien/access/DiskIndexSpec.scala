@@ -28,11 +28,11 @@ class DiskIndexSpec
   }
 
   it should "have 86 unique terms" in {
-    expect(86L) { index.vocabularySize }
+    expectResult(86L) { index.vocabularySize }
   }
 
   it should "have 123 term instances" in {
-    expect(123L) { index.collectionLength }
+    expectResult(123L) { index.collectionLength }
   }
 
   it should "provide a valid lengths iterator for the default field" in {
@@ -42,7 +42,7 @@ class DiskIndexSpec
 
   it should "provide the default without arguments as well" in {
     val iterator = index.lengthsIterator()
-    expect(index.defaultField) { Utility.toString(iterator.key) }
+    expectResult(index.defaultField) { Utility.toString(iterator.key) }
   }
 
   it should "provide a null extent iterator for a OOV term" in {

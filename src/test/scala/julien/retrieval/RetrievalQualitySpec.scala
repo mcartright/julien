@@ -5,46 +5,68 @@ import org.scalatest._
 import org.scalatest.matchers.ShouldMatchers._
 import julien.eval._
 import java.io.File
+import org.lemurproject.galago.tupleflow.Parameters
 import org.lemurproject.galago.core.index.disk.{DiskIndex => DIndex}
 import org.lemurproject.galago.core.retrieval.iterator._
 import org.lemurproject.galago.core.retrieval.processing.ScoringContext
-import org.lemurproject.galago.core.retrieval.query.{Node,NodeParameters}
+import org.lemurproject.galago.core.retrieval.query._
+import org.lemurproject.galago.core.retrieval._
 import julien.galago.tupleflow.Utility
 import scala.collection.BufferedIterator
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 import scala.util.Random
 import scala.math._
+import scala.collection.JavaConversions._
 
-class RetrievalQualitySpec extends FlatSpec {
+class RetrievalQualitySpec
+    extends FlatSpec
+    with BeforeAndAfterEach {
   type GARNA = org.lemurproject.galago.core.index.AggregateReader.NodeAggregateIterator
   type GARCA = org.lemurproject.galago.core.index.AggregateReader.CollectionAggregateIterator
   type GMEI = org.lemurproject.galago.core.retrieval.iterator.MovableExtentIterator
 
   private var readyToRun: Boolean = false
   private var cMap: Map[String, Any] = Map.empty
-  private var julienIndex: Index = null
-  private var galagoIndex: DIndex = null
+  private var julienPath: String = null
+  private var galagoPath: String = null
   private var queries: Map[String, String] = Map.empty
   private var qrels: QueryJudgmentSet = null
   private var sampleRate: Double = 0.1
   private val vocabulary = collection.mutable.ListBuffer[String]()
 
-  def config = cMap
-  override def run(testName: Option[String], args: Args): Status = {
-    cMap = args.configMap
+  var julienIndex: Index = null
+  var galagoIndex: DIndex = null
+
+  override def beforeEach(td: TestData) {
+    cMap = td.configMap
     readyToRun = if (!cMap.contains("qualityDir")) false
     else checkConfiguration(cMap("qualityDir").asInstanceOf[String])
     if (config.contains("qSampleRate"))
       sampleRate = config("qSampleRate").asInstanceOf[String].toDouble
-    super.run(testName, args)
+    if (readyToRun) {
+      julienIndex = Index.disk(julienPath)
+      galagoIndex = new DIndex(galagoPath)
+    }
   }
 
+  override def afterEach() {
+    if (readyToRun) {
+      julienIndex.close
+      galagoIndex.close
+    }
+  }
+
+  def config = cMap
   private def checkConfiguration(dir: String): Boolean = {
     try {
-      // Try to open the indexes
-      julienIndex = Index.disk(new File(dir, "julien").getAbsolutePath)
-      galagoIndex = new DIndex(new File(dir, "galago").getAbsolutePath)
+      // Get index paths
+      julienPath = new File(dir, "julien").getAbsolutePath
+      val jtest = Index.disk(julienPath)
+
+      galagoPath = new File(dir, "galago").getAbsolutePath
+      val gtest = new DIndex(galagoPath)
+      gtest.close
 
       // Get the queries
       // Assumes a TSV format of "<qid>        <query>"
@@ -58,12 +80,13 @@ class RetrievalQualitySpec extends FlatSpec {
       qrels = QueryJudgmentSet.fromTrec(new File(dir, "qrels").getAbsolutePath)
 
       // Load the vocabulary to save time later
-      val vIter = julienIndex.vocabulary().iterator
+      val vIter = jtest.vocabulary().iterator
       while (vIter.hasNext) vocabulary += vIter.next
+      jtest.close
       true
     } catch {
       // This will be clear because we're skipping all the tests
-      case e: Exception => false
+      case e: Exception => { println(s"Whoops: $e"); false }
     }
   }
 
@@ -79,6 +102,22 @@ class RetrievalQualitySpec extends FlatSpec {
       }
     }
     buffer.result
+  }
+
+  def getSampleQueries(range: Int, low: Int): ListBuffer[Seq[String]] = {
+    val queries = ListBuffer[Seq[String]]()
+    var localSample = termSample
+    if (config.contains("qualityQuery")) {
+      queries += localSample
+    } else {
+      while (!localSample.isEmpty) {
+        val desiredSize = min(localSample.length, Random.nextInt(range)+low)
+        val (cut, leftover) = localSample splitAt desiredSize
+        queries += cut
+        localSample = leftover
+      }
+    }
+    queries
   }
 
   "Julien" should "have the same collection statistics as Galago" in {
@@ -129,14 +168,7 @@ class RetrievalQualitySpec extends FlatSpec {
   it should "produce the same OD statistics as Galago" in {
     if (!readyToRun) cancel("'qualityDir' was not defined.")
     // First make our set of windows
-    val windows = ListBuffer[Seq[String]]()
-    var localSample = termSample
-    while (!localSample.isEmpty) {
-      val desiredSize = min(localSample.length, Random.nextInt(4)+2)
-      val (cut, leftover) = localSample splitAt desiredSize
-      windows += cut
-      localSample = leftover
-    }
+    val windows = getSampleQueries(4, 2)
 
     // For each window, we need to compare the hit locations and
     // counts at each location
@@ -209,14 +241,7 @@ class RetrievalQualitySpec extends FlatSpec {
   it should "produce the same UW statistics as Galago" in {
     if (!readyToRun) cancel("'qualityDir' was not defined.")
     // First make our set of windows
-    val windows = ListBuffer[Seq[String]]()
-    var localSample = termSample
-    while (!localSample.isEmpty) {
-      val desiredSize = min(localSample.length, Random.nextInt(4)+2)
-      val (cut, leftover) = localSample splitAt desiredSize
-      windows += cut
-      localSample = leftover
-    }
+    val windows = getSampleQueries(4, 2)
 
     // For each window, we need to compare the hit locations and
     // counts at each location
@@ -230,10 +255,7 @@ class RetrievalQualitySpec extends FlatSpec {
       for (posting <- juw.walker) {
         val name = julienIndex.name(posting.docid)
         val count = posting.positions.length
-        if (count > 0) {
-          //println(s"Julien matched at ${posting.docid} ($name, $count)")
-          jhits(name) = count
-        }
+        if (count > 0) jhits(name) = count
       }
 
       // Make and run the galago counterpart
@@ -261,7 +283,6 @@ class RetrievalQualitySpec extends FlatSpec {
         val gmatch =  guw.hasMatch(candidate)
         if (guw.hasMatch(candidate)) {
           val count = guw.extents.size
-          //println(s"Galago matched at $candidate ($name, $count)")
           ghits(name) = count
         }
         guw.movePast(candidate)
@@ -287,7 +308,50 @@ class RetrievalQualitySpec extends FlatSpec {
     }
   }
 
-  it should "produce the same scores as Galago for simple queries" in (pending)
+  it should "produce the same scores as Galago for simple queries" in {
+    if (!readyToRun) cancel("'qualityDir' was not defined.")
+    // Generate queries
+    val queries = getSampleQueries(4, 1)
+
+    // Set up processing structures
+    val processor = SimpleProcessor()
+    val retrieval = new LocalRetrieval(galagoIndex, new Parameters)
+
+    // For each query, run against each index and compare results
+    implicit val jIndex = julienIndex
+    for ((query, idx) <- queries.zipWithIndex) {
+      val genericClue = s"Query $idx: '${query.mkString(";")}'"
+      try {
+        // Julien
+        val ql = bow(query, Dirichlet.apply)
+        processor.clear
+        processor add ql
+        val jResult = processor.run(DefaultAccumulator[ScoredDocument](100))
+        jResult.foreach(jr => jr.name = jIndex.name(jr.id))
+
+        // Galago
+        val queryParams = new Parameters()
+        queryParams.set("requested", 100)
+        val galagoQL = "#combine(" + query.mkString(" ") + ")"
+        val root = StructuredQuery.parse(galagoQL)
+        val node = retrieval.transformQuery(root, queryParams)
+        val gResult = retrieval.runQuery(node, queryParams)
+
+        // Need to compare results
+        expectResult(gResult.length)(jResult.length)
+        for ((jr, gr) <- jResult.zip(gResult)) {
+          withClue(s"$genericClue: ${gr.toString}, ${jr.toString}") {
+            expectResult(gr.rank)(jr.rank)
+            expectResult(gr.documentName)(jr.name)
+            expectResult(gr.score)(gr.score)
+          }
+        }
+      } catch {
+        case e: Exception => fail(e.getMessage, e)
+      }
+    }
+  }
+
   it should "produce the same scores as Galago for SDM queries" in (pending)
 
 

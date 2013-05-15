@@ -126,7 +126,7 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
       if (movers.isEmpty) return
       val startPositions = movers.map(_.at)
       movers.foreach(_.reset)
-      while (movers.exists(!_.isDone)) {
+      while (movers.forall(!_.isDone)) {
         val candidate = movers.map(_.at).max
         movers.foreach(_.moveTo(candidate))
         if (movers.forall(_.matches(candidate))) {

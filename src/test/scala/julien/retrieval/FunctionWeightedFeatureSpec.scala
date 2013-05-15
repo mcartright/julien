@@ -31,14 +31,14 @@ class FunctionWeightedFeatureSpec extends FlatSpec {
     // Because the Queue implementation is silly...
     val tmp = new {
       var q = Queue(3.0, 4.5, 99.0, 112.1)
-      def apply: Double = {
+      def apply(): Double = {
         val result = q.dequeue
         q = result._2
         result._1
       }
     }
     expectResult(1.0) { swOp.weight }
-    swOp.weight = tmp.apply
+    swOp.weight = tmp.apply _
     expectResult(3.0) { swOp.weight }
     expectResult(4.5) { swOp.weight }
     expectResult(99.0) { swOp.weight }

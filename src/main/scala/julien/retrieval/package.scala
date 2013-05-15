@@ -29,4 +29,13 @@ package object retrieval {
   }
 
   def getType[T](x: T)(implicit tag: TypeTag[T]) = tag.tpe
+
+  // Basic query operations - subject to moving
+  def bow(
+    terms: Seq[String],
+    scorer: (Term, IndexLengths) => FeatureOp)
+  (implicit index: Index) : FeatureOp = {
+    Combine(terms.map(t =>
+      scorer(Term(t)(index), IndexLengths()(index))))
+  }
 }

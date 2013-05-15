@@ -247,18 +247,10 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
             }
 
             documentIndex = 0;
-            extentsLoaded = true; // Not really, but this keeps it from reading ahead too soon.
             loadNextPosting();
         }
 
         private void loadNextPosting() throws IOException {
-            if (!extentsLoaded) {
-                if (currentCount > inlineMinimum) {
-                    positions.skipBytes(extentsByteSize);
-                } else {
-                    loadExtents();
-                }
-            }
             currentDocument += documents.readInt();
             currentCount = counts.readInt();
 
@@ -267,10 +259,9 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
             extentsLoaded = false;
             if (currentCount > inlineMinimum) {
                 extentsByteSize = positions.readInt();
-            } else {
-                // Load them aggressively since we can't skip them
-                loadExtents();
-            }
+	    }
+	    // For now ALWAYS load the extents - greatly simplifies logic.
+	    loadExtents();
         }
 
         // Loads up a single set of positions for an intID. Basically it's the
@@ -347,15 +338,8 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
                 documentIndex = Math.min(documentIndex + 1, documentCount);
                 if (!isDone()) {
                     loadNextPosting();
-                    loadExtents();
                 }
             }
-
-//            if (document == currentDocument) {
-//                loadExtents();
-//            } else {
-//                extentArray.clear();
-//            }
         }
 
         // This only moves forward in tier 1, reads from tier 2 only when
@@ -419,12 +403,7 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
 
         @Override
         public ExtentArray extents() {
-            try {
-                loadExtents();
-                return extentArray;
-            } catch (IOException ioe) {
-                throw new RuntimeException(ioe);
-            }
+	    return extentArray;
         }
 
         @Override

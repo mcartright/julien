@@ -56,7 +56,7 @@ class MemoryIndexSpec
 
   it should "provide the default without arguments as well" in {
     val iterator = memoryIndex.lengthsIterator()
-    expect(memoryIndex.defaultField) { Utility.toString(iterator.key) }
+    expectResult(memoryIndex.defaultField) { Utility.toString(iterator.key) }
   }
 
   it should "provide a null extent iterator for a OOV term" in {

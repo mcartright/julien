@@ -5,6 +5,7 @@ import org.scalatest._
 import org.scalamock.scalatest.proxy.MockFactory
 import julien._
 import galago.core.util.ExtentArray
+import scala.util.Random
 
 class OrderedWindowSpec extends FlatSpec with MockFactory {
 
@@ -17,7 +18,15 @@ class OrderedWindowSpec extends FlatSpec with MockFactory {
   "An ordered window" should
   "require all children to be from the same index" in (pending)
 
-  it should "complain if given a window size < 1" in (pending)
+  it should "complain if given a window size < 1" in {
+    val f = fixture
+    import f._
+
+    intercept[AssertionError] {
+      val badWindow = -(Random.nextInt(3))
+      val ow = OrderedWindow(badWindow, mock1, mock2, mock3)
+    }
+  }
 
   it should "correctly count the number of windows" in {
     val f = fixture

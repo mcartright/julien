@@ -14,7 +14,7 @@ trait FieldIndexBehavior extends QuickIndexBuilder { this: FlatSpec =>
 
     it should "provide the vocabulary KeySet over an existing part" in {
       val keys = idx.vocabulary("anchor")
-      expect(355) { keys.size }
+      expectResult(355) { keys.size }
     }
 
     it should "provide an extents iterator for a particular field" in {

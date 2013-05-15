@@ -66,7 +66,7 @@ class BM25Spec extends FlatSpec with MockFactory {
     val expectedIDF = scala.math.log(
       fakeCountStats.numDocs.toDouble / (fakeCountStats.docFreq + 0.5)
     )
-    expect(expectedIDF) { d.idf }
+    expectResult(expectedIDF) { d.idf }
   }
 
   it should "produce the correct upper bound" in {
@@ -81,7 +81,7 @@ class BM25Spec extends FlatSpec with MockFactory {
     val numerator = max * (k + 1)
     val denominator = max + (k * (1 - b + (b * max / d.avgDocLength)));
     val expScore = d.idf * numerator / denominator
-    expect (expScore) { d.upperBound }
+    expectResult(expScore) { d.upperBound }
   }
 
   it should "produce the correct lower bound" in {
@@ -90,7 +90,7 @@ class BM25Spec extends FlatSpec with MockFactory {
 
     mockStat.expects('statistics)().returning(fakeCountStats).noMoreThanTwice
     val d = BM25(mockCV, mockLV, mockStat)
-    expect (0) { d.lowerBound }
+    expectResult(0) { d.lowerBound }
   }
 
   it should "produce the correct score" in {
@@ -108,6 +108,6 @@ class BM25Spec extends FlatSpec with MockFactory {
     val numerator = c * (k + 1)
     val denominator = c + (k * (1 - b + (b * l / d.avgDocLength)));
     val expScore = d.idf * numerator / denominator
-    expect (expScore) { d.eval }
+    expectResult(expScore) { d.eval }
   }
 }
