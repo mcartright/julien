@@ -34,16 +34,13 @@ class UnorderedWindowSpec extends FlatSpec with MockFactory {
     mock2.expects('positions)().returning(p2) noMoreThanTwice()
     mock3.expects('positions)().returning(p3) noMoreThanTwice()
 
-    val thrown = intercept[AssertionError] {
+    intercept[AssertionError] {
       val uw = UnorderedWindow(1, mock1, mock2, mock3)
     }
 
-    assert(thrown.getMessage === "assumption failed: Window size must be >1 and at least as big as the number of iterators")
-
-    val thrown1 = intercept[AssertionError] {
+    intercept[AssertionError] {
       val uw = UnorderedWindow(2, mock1, mock2, mock3)
     }
-    assert(thrown1.getMessage === "assumption failed: Window size must be >1 and at least as big as the number of iterators")
   }
 
   it should "correctly count the number of windows" in {

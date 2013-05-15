@@ -4,33 +4,54 @@ package retrieval
 import org.scalatest._
 import scala.util.Random
 import scala.reflect.runtime.universe._
+import scala.collection.mutable.ArrayBuffer
 
 trait StandardAccumulatorBehavior { this: FlatSpec =>
   def aStandardAccumulator[T <: ScoredObject[T]](
-    acc: Accumulator[T],
+    genericAcc: Accumulator[T],
     universeSz: Int,
     requested: Int
   ) {
-    it should "return the requested number of scoreables" in (pending)
-  }
+    it should "return the requested number of scoreables" in {
+      val acc = genericAcc.asInstanceOf[Accumulator[ScoredDocument]]
+      // Make some fake samples
+      val limit = Random.nextInt(universeSz)+1
+      val samples = ArrayBuffer[ScoredDocument]()
+      for (i <- 0 until limit) {
+        val sd = ScoredDocument(
+          id = InternalId(i),
+          score = Random.nextDouble*100
+        )
+        samples += sd
+        acc += sd
+      }
 
-  // Would REALLY like to make this work over the different subtypes of
-  // ScoredObject
-  val scoreable = typeTag[ScoredDocument]
+      // Make the reference list
+      val topRanked = samples.result.sorted.take(requested)
+      val results = acc.result
+
+      expectResult(topRanked.size)(results.size)
+      for ((sd1, sd2) <- topRanked.zip(results)) {
+        expectResult(sd1)(sd2)
+      }
+    }
+  }
 }
 
 class AccumulatorSpec
     extends FlatSpec
     with StandardAccumulatorBehavior {
 
-  def defAcc[T <: ScoredObject[T]](ev: TypeTag[T]) = DefaultAccumulator[T]()
-  def arrayAcc[T <: ScoredObject[T]](ev: TypeTag[T], idxSz: Int, sz: Int) =
-    ArrayAccumulator[T](idxSz, sz)
+  // Still allows for tests where universe < requested
+  val requested = Random.nextInt(1000) + 10
+  val universeSz = Random.nextInt(requested * 100) + 1
 
+  val defAcc = DefaultAccumulator[ScoredDocument](requested)
   "A DefaultAccumulator" should
-  behave like aStandardAccumulator(defAcc(scoreable), 1000, 10)
+  behave like aStandardAccumulator(defAcc, universeSz, requested)
+
+  val arrayAcc = ArrayAccumulator[ScoredDocument](universeSz, requested)
 
   "An ArrayAccumulator" should
-  behave like aStandardAccumulator(arrayAcc(scoreable, 1000 ,10), 1000, 10)
-
+  behave like aStandardAccumulator(arrayAcc, universeSz, requested)
 }

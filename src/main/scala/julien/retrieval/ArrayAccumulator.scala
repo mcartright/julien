@@ -53,22 +53,20 @@ class ArrayAccumulator[T <: ScoredObject[T]] private(
     val topK = new PriorityQueue[ScoredDocument]()
 
     var i = 0
+    // pre-load
+    while (i < acc.length && topK.size < limit) {
+      topK += ScoredDocument(InternalId(i), acc(i))
+    }
+
+    // NOW we compare
     while (i < acc.length) {
       val curScore = acc(i)
-      if (curScore > 0) {
-
-        if (topK.size >= limit) {
-          if (curScore > topK.head.score) {
-            topK.dequeue
-            topK += ScoredDocument(InternalId(i), curScore)
-          }
-        } else {
-          topK  += ScoredDocument(InternalId(i), curScore)
-        }
+      if (curScore > topK.head.score) {
+        topK.dequeue
+        topK += ScoredDocument(InternalId(i), curScore)
       }
       i += 1
     }
-
 
     val b = scala.collection.mutable.ListBuffer[T]()
     // building it back-to-front (i.e. a series of prepends)

@@ -36,7 +36,7 @@ class RetrievalQualitySpec extends FlatSpec {
     readyToRun = if (!cMap.contains("qualityDir")) false
     else checkConfiguration(cMap("qualityDir").asInstanceOf[String])
     if (config.contains("qSampleRate"))
-      sampleRate = config("qSampleRate").asInstanceOf[Double]
+      sampleRate = config("qSampleRate").asInstanceOf[String].toDouble
     super.run(testName, args)
   }
 
@@ -132,7 +132,7 @@ class RetrievalQualitySpec extends FlatSpec {
     val windows = ListBuffer[Seq[String]]()
     var localSample = termSample
     while (!localSample.isEmpty) {
-      val desiredSize = min(localSample.length, Random.nextInt(5)+1)
+      val desiredSize = min(localSample.length, Random.nextInt(4)+2)
       val (cut, leftover) = localSample splitAt desiredSize
       windows += cut
       localSample = leftover
@@ -140,7 +140,7 @@ class RetrievalQualitySpec extends FlatSpec {
 
     // For each window, we need to compare the hit locations and
     // counts at each location
-    for ((window, idx) <- windows.zipWithIndex) {
+    for ((window, idx) <- windows.zipWithIndex; if window.size > 1) {
       val genericClue = s"Query $idx: '${window.mkString(";")}'"
       // Run the Julien OD
       implicit val jIndex = julienIndex
@@ -150,8 +150,10 @@ class RetrievalQualitySpec extends FlatSpec {
       for (posting <- jod.walker) {
         val name = julienIndex.name(posting.docid)
         val count = posting.positions.length
-        println(s"Julien matched at ${posting.docid} ($name, $count)")
-        jhits(name) = count
+        if (count > 0) {
+          //println(s"Julien matched at ${posting.docid} ($name, $count)")
+          jhits(name) = count
+        }
       }
 
       // Make and run the galago counterpart
@@ -172,10 +174,14 @@ class RetrievalQualitySpec extends FlatSpec {
         val candidate = god.currentCandidate
         sc.document = candidate
         god.syncTo(candidate)
+        val name = galagoIndex.getName(candidate)
+        val ats = innerIterators.map(_.currentCandidate).mkString(",")
+        val dones = innerIterators.map(_.isDone).mkString(",")
+        val matches = innerIterators.map(_.hasMatch(candidate)).mkString(",")
+        val gmatch =  god.hasMatch(candidate)
         if (god.hasMatch(candidate)) {
-          val name = galagoIndex.getName(candidate)
           val count = god.extents.size
-          println(s"Galago matched at $candidate ($name, $count)")
+          //println(s"Galago matched at $candidate ($name, $count)")
           ghits(name) = count
         }
         god.movePast(candidate)
@@ -199,7 +205,88 @@ class RetrievalQualitySpec extends FlatSpec {
       }
     }
   }
-  it should "produce the same UW statistics as Galago" in (pending)
+
+  it should "produce the same UW statistics as Galago" in {
+    if (!readyToRun) cancel("'qualityDir' was not defined.")
+    // First make our set of windows
+    val windows = ListBuffer[Seq[String]]()
+    var localSample = termSample
+    while (!localSample.isEmpty) {
+      val desiredSize = min(localSample.length, Random.nextInt(4)+2)
+      val (cut, leftover) = localSample splitAt desiredSize
+      windows += cut
+      localSample = leftover
+    }
+
+    // For each window, we need to compare the hit locations and
+    // counts at each location
+    for ((window, idx) <- windows.zipWithIndex; if window.size > 1) {
+      val genericClue = s"Query $idx: '${window.mkString(";")}'"
+      // Run the Julien UW
+      implicit val jIndex = julienIndex
+      val jterms = window.map(t => Term(t))
+      val juw = UnorderedWindow(8, jterms: _*)
+      val jhits = scala.collection.mutable.HashMap[String, Int]()
+      for (posting <- juw.walker) {
+        val name = julienIndex.name(posting.docid)
+        val count = posting.positions.length
+        if (count > 0) {
+          //println(s"Julien matched at ${posting.docid} ($name, $count)")
+          jhits(name) = count
+        }
+      }
+
+      // Make and run the galago counterpart
+      val sc = new ScoringContext
+      val innerIterators = window.map { t =>
+        val n = new Node("#extents", t)
+        n.getNodeParameters.set("part", "postings")
+        val it = galagoIndex.getIterator(n).asInstanceOf[GMEI]
+        assert(it != null)
+        it
+      }
+      val np = new NodeParameters()
+      np.set("default", 8)
+      val guw = new UnorderedWindowIterator(np, innerIterators.toArray)
+      guw.setContext(sc)
+      val ghits = scala.collection.mutable.HashMap[String, Int]()
+      while (!guw.isDone) {
+        val candidate = guw.currentCandidate
+        sc.document = candidate
+        guw.syncTo(candidate)
+        val name = galagoIndex.getName(candidate)
+        val ats = innerIterators.map(_.currentCandidate).mkString(",")
+        val dones = innerIterators.map(_.isDone).mkString(",")
+        val matches = innerIterators.map(_.hasMatch(candidate)).mkString(",")
+        val gmatch =  guw.hasMatch(candidate)
+        if (guw.hasMatch(candidate)) {
+          val count = guw.extents.size
+          //println(s"Galago matched at $candidate ($name, $count)")
+          ghits(name) = count
+        }
+        guw.movePast(candidate)
+      }
+
+      // Now compare
+      if (ghits.size != jhits.size) {
+        // Let's have a nice detailed message
+        val inGalago = ghits -- jhits.keys
+        val inJulien = jhits -- ghits.keys
+        val b = new StringBuilder()
+        b ++= s"@ $genericClue \n"
+        b ++= s"sizes uneven. Galago: ${ghits.size}, Julien: ${jhits.size}\n"
+        b ++= s"In Galago only: ${inGalago.mkString(",")}\n"
+        b ++= s"In Julien only: ${inJulien.mkString(",")}\n"
+        fail(b.toString)
+      }
+      for (key <- ghits.keys.toSeq.sorted) {
+        expectResult(true)(jhits.contains(key))
+        val clue = s"@ $genericClue: @ doc $key, ${ghits(key)} != ${jhits(key)}"
+        expectResult(ghits(key), clue)(jhits(key))
+      }
+    }
+  }
+
   it should "produce the same scores as Galago for simple queries" in (pending)
   it should "produce the same scores as Galago for SDM queries" in (pending)
 

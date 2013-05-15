@@ -13,8 +13,9 @@ object UnorderedWindow {
 // width = -1 means that the whole document is considered a match
 class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     extends MultiTermView(terms) {
-    assume(terms.size > 1 && width >= terms.size,
-      s"Window size must be >1 and at least as big as the number of iterators")
+  assume(terms.size > 1, s"UnorderedWindow expects > 1 term")
+  assume(width >= terms.size,
+    s"width should be > # of iterators (got ${terms.length})")
 
   lazy val iterators: Array[ExtentArray] = {
     val itBuffer = Array.newBuilder[ExtentArray]
@@ -126,9 +127,9 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
       val startPositions = movers.map(_.at)
       movers.foreach(_.reset)
       while (movers.exists(!_.isDone)) {
-        val candidate = movers.map(_.at).min
+        val candidate = movers.map(_.at).max
         movers.foreach(_.moveTo(candidate))
-        if (movers.exists(_.matches(candidate))) {
+        if (movers.forall(_.matches(candidate))) {
           val p = positions
           thePosting.docid = candidate
           thePosting.positions = p

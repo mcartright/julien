@@ -11,6 +11,7 @@ object OrderedWindow {
 
 class OrderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   extends MultiTermView(terms) {
+  assume(terms.size > 1, s"OrderedWindow expects > 1 term.")
   assume(width > 0, s"OrderedWindow needs a positive width. Got $width")
 
   lazy val iterators: Array[ExtentArray] = {

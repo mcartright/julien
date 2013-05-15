@@ -40,9 +40,5 @@ class OrderedWindowSpec extends FlatSpec with MockFactory {
     val expectedHits = new ExtentArray(Array(20))
     val h1 = ow.positions
     expectResult(expectedHits) {h1}
-
-//    val ow1 = OrderedWindow(1, mock1, mock2, mock3)
-//    val h2 = ow1.positions
-//    expectResult(expectedHits) {h2}
   }
 }
