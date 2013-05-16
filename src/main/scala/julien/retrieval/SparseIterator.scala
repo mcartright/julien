@@ -12,6 +12,6 @@ trait SparseIterator[I <: GIterator] extends IteratedHook[I] {
 
   override def movePast(id: Int) {
     underlying.movePast(id)
-    matched = underlying.hasMatch(id)
+    matched = false
   }
 }

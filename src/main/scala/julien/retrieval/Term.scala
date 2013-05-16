@@ -59,4 +59,21 @@ final class Term private (
       index.collectionStats.maxLength.toInt
     )
   }
+
+  case class Posting(var docid: Int, var positions: ExtentArray)
+  def walker : Traversable[Posting] = new Traversable[Posting] {
+    val thePosting = Posting(0, ExtentArray.empty)
+    def foreach[U](f: Posting => U) {
+      val start = at
+      reset
+      while (!isDone) {
+        thePosting.docid = at
+        thePosting.positions = positions
+        f(thePosting)
+        movePast(at)
+      }
+      reset
+      moveTo(start)
+    }
+  }
 }

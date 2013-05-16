@@ -171,7 +171,8 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
         // Even though we check for skips multiple times, in terms of how the data is loaded
         // its easier to do the parts when appropriate
         protected void initialize() throws IOException {
-            DataStream valueStream = iterator.getSubValueStream(0, iterator.getValueLength());
+            DataStream valueStream =
+		iterator.getSubValueStream(0, iterator.getValueLength());
             DataInput stream = new VByteInput(valueStream);
 
             // metadata

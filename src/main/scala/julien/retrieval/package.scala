@@ -53,14 +53,14 @@ package object retrieval {
       // List of unigram, od, and uw features
       List[FeatureOp](
         // unigram feature
-        Combine(children = terms.map(a => Dirichlet(a,IndexLengths())),
+        CombineNorm(children = terms.map(a => Dirichlet(a,IndexLengths())),
           weight = unigramWeight),
         // ordered window feature
-        Combine(children = terms.sliding(2,1).map { p =>
+        CombineNorm(children = terms.sliding(2,1).map { p =>
           Dirichlet(OrderedWindow(odWindowSize, p: _*), IndexLengths())
         }.toSeq, weight = odWeight),
         // unordered window feature
-        Combine(terms.sliding(2,1).map { p =>
+        CombineNorm(terms.sliding(2,1).map { p =>
           Dirichlet(UnorderedWindow(uwWindowSize, p: _*), IndexLengths())
         }.toSeq, weight = uwWeight)
       )

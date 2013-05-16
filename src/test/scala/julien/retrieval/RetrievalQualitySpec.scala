@@ -326,15 +326,19 @@ class RetrievalQualitySpec
     julienCombiner: (Seq[String], Index) => FeatureOp,
     galagoCombiner: String
   ) {
+    println("@1")
     // Generate queries
-    val queries = getSampleQueries(4, 1)
+    val queries = getSampleQueries(4, 2)
 
     // Set up processing structures
     val processor = SimpleProcessor()
     val retrieval = new LocalRetrieval(galagoIndex, new Parameters)
 
+    println("@2")
+
     // For each query, run against each index and compare results
-    for ((query, idx) <- queries.zipWithIndex) {
+    for ((query, idx) <- queries.zipWithIndex; if (query.size > 0)) {
+      val clue = new StringBuilder()
       val genericClue = s"Query $idx: '${query.mkString(";")}'"
       try {
         val requested = 100
@@ -342,10 +346,11 @@ class RetrievalQualitySpec
         val jquery = julienCombiner(query, julienIndex)
         processor.clear
         processor add jquery
+        println("@3")
         val jUnstableResult =
           processor.run(DefaultAccumulator[ScoredDocument](requested))
         jUnstableResult.foreach(jr => jr.name = julienIndex.name(jr.id))
-
+        println("@4")
         // Galago
         val queryParams = new Parameters()
         queryParams.set("processingModel",
@@ -378,7 +383,7 @@ class RetrievalQualitySpec
         for (((gscore, jscore), idx) <- gScores.zip(jScores).zipWithIndex) {
           val jr = jResult(jscore)
           val gr = gResult(gscore)
-          val clue = new StringBuilder()
+          clue.clear
           clue ++= s"$genericClue: position [$idx]\n"
           clue ++= s"G: ${gr.toString}, \n J: ${jr.toString}"
           withClue(clue.toString) {
@@ -396,7 +401,11 @@ class RetrievalQualitySpec
           }
         }
       } catch {
-        case e: Exception => fail(e.getMessage, e)
+        case e: Exception => {
+          val msg = if (clue.size > 0) clue else genericClue
+          e.printStackTrace(Console.err)
+          fail(s"$msg => ${e.getMessage}", e)
+        }
       }
     }
   }
