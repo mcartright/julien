@@ -33,7 +33,6 @@ class DefaultAccumulator[T <: ScoredObject[T]] private(
 
   override def clear: Unit = q.clear
   override def +=(elem: T): this.type = {
-
     if (q.size >= limit) {
       if (elem.score > q.head.score) {
         q.dequeue

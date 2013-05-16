@@ -40,14 +40,16 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
 
     // establish upper bound of all features - every document starts at
     // this value and is progressively lowered to the true score
-    val startingScore = sentinels.map(_.feat.upperBound).sum
+    val startingScore = sentinels.foldLeft(0.0) { (sum, sen) =>
+      sum + sen.feat.upperBound
+    }
 
     // Now start looking for cutoffs
     var threshold = hackedAcc.head.score
     var sidx = getSentinelIndex(sentinels, 0, threshold, startingScore)
 
     // Has to sit outside the sentinels...because, for now.
-    val lengths = iterators.filter(_.isInstanceOf[IndexLengths]).head
+    val lengths = getLengthsIterator(iterators)
 
     // Scala does not natively support a "break" construct, so let's avoid it.
     // We simply need to set the candidate once before entering the while
@@ -81,7 +83,13 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
           }
         }
       }
-      drivers.foreach(_.movePast(candidate))
+
+      var i = 0
+      while (i < drivers.length) {
+        drivers(i).movePast(candidate)
+        i += 1
+      }
+
       drivers = drivers.filterNot(_.isDone)
 
       // Grab next candidate
@@ -121,4 +129,13 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
       return idx
     else
       getSentinelIndex(sents, idx+1, threshold, currentScore - sents(idx).dec)
+
+  // Assumption: There is a lengths iterator *some*where in the array.
+  // Note that it does no length check
+  @tailrec
+  private def getLengthsIterator(
+    iters: Array[Movable],
+    idx: Int = 0): Movable =
+    if (iters(idx).isInstanceOf[IndexLengths]) return iters(idx)
+    else getLengthsIterator(iters, idx+1)
 }

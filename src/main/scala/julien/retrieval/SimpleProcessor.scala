@@ -48,8 +48,6 @@ class SimpleProcessor
         unprepped.flatMap(_.movers).toSet.filterNot(_.isDense).toArray
 
       while (!isDone(iterators)) {
-    //    val active = iterators.filterNot(_.isDone)
-
         val activeBuf = Array.newBuilder[Movable]
         var l=0
         while (l < iterators.length) {
@@ -75,7 +73,6 @@ class SimpleProcessor
 
         var i = 0
         while (i < numActive) {
-//          println("Moving to: " + candidate)
           active(i).moveTo(candidate)
           i += 1
         }
@@ -86,7 +83,6 @@ class SimpleProcessor
 
         var j = 0
         while (j < numActive) {
-//          println("Moving past doc:" + candidate)
           active(j).movePast(candidate)
           j += 1
         }
@@ -120,7 +116,6 @@ class SimpleProcessor
       var k=0
       var candidate = Int.MaxValue
       while (k < drivers.length) {
-
         val drv = drivers(k)
         if (!drv.isDone) {
           if (drv.at < candidate) candidate = drv.at
@@ -128,10 +123,6 @@ class SimpleProcessor
         k += 1
       }
 
-//      val document = index.name(candidate)
-//      if (document equals "FT923-11593") {
-//        val test = "test"
-//      }
       var i = 0
       while (i < iterators.length) {
         iterators(i).moveTo(candidate)
@@ -140,12 +131,6 @@ class SimpleProcessor
 
       if (matches(drivers, candidate)) {
         // Time to score
-
-       // val name = index.name(candidate)
-       // debug(s"SCORING: candidate: $candidate name: $name")
-        //        val score = scorers.foldLeft(0.0) {
-        //          (t, s) => t + s.eval
-        //        }
         var score = 0.0
         var i=0
         while (i < scorers.length) {

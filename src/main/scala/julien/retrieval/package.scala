@@ -34,8 +34,36 @@ package object retrieval {
   def bow(
     terms: Seq[String],
     scorer: (Term, IndexLengths) => FeatureOp)
-  (implicit index: Index) : FeatureOp = {
-    Combine(terms.map(t =>
+  (implicit index: Index): FeatureOp = {
+    CombineNorm(terms.map(t =>
       scorer(Term(t)(index), IndexLengths()(index))))
+  }
+
+  def sdm(
+    rawterms: Seq[String],
+    scorer: (Term, IndexLengths) => FeatureOp,
+    unigramWeight: Double = 0.8,
+    odWeight: Double = 0.15,
+    uwWeight: Double = 0.05,
+    odWindowSize: Int = 1,
+    uwWindowSize: Int = 8)
+    (implicit index: Index): FeatureOp = {
+    val terms = rawterms.map(Term(_)(index))
+    return Combine(
+      // List of unigram, od, and uw features
+      List[FeatureOp](
+        // unigram feature
+        Combine(children = terms.map(a => Dirichlet(a,IndexLengths())),
+          weight = unigramWeight),
+        // ordered window feature
+        Combine(children = terms.sliding(2,1).map { p =>
+          Dirichlet(OrderedWindow(odWindowSize, p: _*), IndexLengths())
+        }.toSeq, weight = odWeight),
+        // unordered window feature
+        Combine(terms.sliding(2,1).map { p =>
+          Dirichlet(UnorderedWindow(uwWindowSize, p: _*), IndexLengths())
+        }.toSeq, weight = uwWeight)
+      )
+    )
   }
 }

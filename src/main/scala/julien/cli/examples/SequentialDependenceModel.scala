@@ -34,7 +34,9 @@ Required parameters:
     implicit val index : Index = Index.disk(params.getString("index"))
 
     val query = params.getString("query").split(" ").map(Term(_))
-    val sdm =
+    // Shorthand is:
+    // val seqdep = sdm(query, Dirichlet.apply)
+    val seqdep =
       Combine(List[FeatureOp](
         Combine(children = query.map(a => Dirichlet(a,IndexLengths())),
           weight = 0.8),
@@ -56,7 +58,7 @@ Required parameters:
     //  Some(julien.retrieval.LinePrintingDebugger().printState _)
 
     // Add the model to the processor
-    processor.add(sdm)
+    processor.add(seqdep)
 
     // run it and get results
     val results = processor.run()

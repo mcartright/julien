@@ -25,7 +25,6 @@ class CombineNorm private(val ops: Seq[FeatureOp],
   lazy final val childrenSize = ops.size
 
   val weightSum : Double = {
-
     var i = 0
     var sum = 0.0
     while (i < childrenSize) {
@@ -34,17 +33,9 @@ class CombineNorm private(val ops: Seq[FeatureOp],
       i+=1
     }
     sum
-    //    @tailrec def scoreNormalizeHelper(sops:Seq[FeatureOp], score:Double) : Double = {
-    //      sops match {
-    //        case Nil => score
-    //        case w =>  scoreNormalizeHelper(sops.tail, score + ops.head.weight)
-    //      }
-    //    }
-    // scoreNormalizeHelper(ops, 0.0)
   }
 
   def combine() : Double = {
-
     var i = 0
     var score = 0.0
     while (i < childrenSize) {

@@ -41,7 +41,9 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
 
     // Start with a full sort - the only one needed
     var sortedSentinels = allSentinels.sorted(SentinelOrdering)
-    val scoreMinimum = sortedSentinels.map(_.feat.lowerBound).sum
+    val scoreMinimum = sortedSentinels.foldLeft(0.0) { (sum, sen) =>
+      sum + sen.feat.lowerBound
+    }
 
     var running = true
     var threshold = hackedAcc.head.score * factor // Soft limit
