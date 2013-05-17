@@ -12,7 +12,6 @@ import julien.galago.core.index.AggregateReader.AggregateIndexPart;
 import julien.galago.core.index.AggregateReader.IndexPartStatistics;
 import julien.galago.core.index.AggregateReader.NodeAggregateIterator;
 import julien.galago.core.index.AggregateReader.NodeStatistics;
-import julien.galago.core.parse.stem.Stemmer;
 import julien.galago.core.util.ExtentArray;
 import julien.galago.tupleflow.DataStream;
 import julien.galago.tupleflow.Parameters;
@@ -34,20 +33,12 @@ import julien.galago.tupleflow.VByteInput;
  */
 public class PositionIndexReader extends KeyListReader implements AggregateIndexPart {
 
-  Stemmer stemmer = null;
-
   public PositionIndexReader(BTreeReader reader) throws Exception {
     super(reader);
-    if (reader.getManifest().containsKey("stemmer")) {
-      stemmer = (Stemmer) Class.forName(reader.getManifest().getString("stemmer")).newInstance();
-    }
   }
 
   public PositionIndexReader(String pathname) throws Exception {
     super(pathname);
-    if (reader.getManifest().containsKey("stemmer")) {
-      stemmer = (Stemmer) Class.forName(reader.getManifest().getString("stemmer")).newInstance();
-    }
   }
 
   @Override
@@ -170,82 +161,87 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
     // Even though we check for skips multiple times, in terms of how the data is loaded
     // its easier to do the parts when appropriate
     protected void initialize() throws IOException {
-      DataStream valueStream =
-              iterator.getSubValueStream(0, iterator.getValueLength());
-      DataInput stream = new VByteInput(valueStream);
+      // Need to lock the iterator to make sure
+      synchronized (iterator) {
+        iterator.find(key);
+        DataStream valueStream =
+                iterator.getSubValueStream(0, iterator.getValueLength());
+        DataInput stream = new VByteInput(valueStream);
 
-      // metadata
-      int options = stream.readInt();
+        // metadata
+        int options = stream.readInt();
 
-      if ((options & HAS_INLINING) == HAS_INLINING) {
-        inlineMinimum = stream.readInt();
-      } else {
-        inlineMinimum = Integer.MAX_VALUE;
+        if ((options & HAS_INLINING) == HAS_INLINING) {
+          inlineMinimum = stream.readInt();
+        } else {
+          inlineMinimum = Integer.MAX_VALUE;
+        }
+
+        documentCount = stream.readInt();
+        totalPositionCount = stream.readInt();
+
+        if ((options & HAS_MAXTF) == HAS_MAXTF) {
+          maximumPositionCount = stream.readInt();
+        } else {
+          maximumPositionCount = Integer.MAX_VALUE;
+        }
+
+        if ((options & HAS_SKIPS) == HAS_SKIPS) {
+          skipDistance = stream.readInt();
+          skipResetDistance = stream.readInt();
+          numSkips = stream.readLong();
+        }
+
+        // segment lengths
+        long documentByteLength = stream.readLong();
+        long countsByteLength = stream.readLong();
+        long positionsByteLength = stream.readLong();
+        long skipsByteLength = 0;
+        long skipPositionsByteLength = 0;
+
+        if ((options & HAS_SKIPS) == HAS_SKIPS) {
+          skipsByteLength = stream.readLong();
+          skipPositionsByteLength = stream.readLong();
+        }
+
+        long documentStart = valueStream.getPosition();
+        long countsStart = documentStart + documentByteLength;
+        long positionsStart = countsStart + countsByteLength;
+        long positionsEnd = positionsStart + positionsByteLength;
+
+        documentsStream = iterator.getSubValueStream(documentStart, documentByteLength);
+        countsStream = iterator.getSubValueStream(countsStart, countsByteLength);
+        positionsStream = iterator.getSubValueStream(positionsStart, positionsByteLength);
+
+        documents = new VByteInput(documentsStream);
+        counts = new VByteInput(countsStream);
+        positions = new VByteInput(positionsStream);
+
+        if ((options & HAS_SKIPS) == HAS_SKIPS) {
+
+          long skipsStart = positionsStart + positionsByteLength;
+          long skipPositionsStart = skipsStart + skipsByteLength;
+          long skipPositionsEnd = skipPositionsStart + skipPositionsByteLength;
+
+          assert skipPositionsEnd == endPosition - startPosition;
+
+          skips = new VByteInput(iterator.getSubValueStream(skipsStart, skipsByteLength));
+          skipPositionsStream = iterator.getSubValueStream(skipPositionsStart, skipPositionsByteLength);
+          skipPositions = new VByteInput(skipPositionsStream);
+          
+          // load up
+          nextSkipDocument = skips.readInt();
+          documentsByteFloor = 0;
+          countsByteFloor = 0;
+          positionsByteFloor = 0;
+          skipsRead = 0;
+          lastSkipPosition = 0;
+        } else {
+          assert positionsEnd == endPosition - startPosition;
+          skips = null;
+          skipPositions = null;
+        }
       }
-
-      documentCount = stream.readInt();
-      totalPositionCount = stream.readInt();
-
-      if ((options & HAS_MAXTF) == HAS_MAXTF) {
-        maximumPositionCount = stream.readInt();
-      } else {
-        maximumPositionCount = Integer.MAX_VALUE;
-      }
-
-      if ((options & HAS_SKIPS) == HAS_SKIPS) {
-        skipDistance = stream.readInt();
-        skipResetDistance = stream.readInt();
-        numSkips = stream.readLong();
-      }
-
-      // segment lengths
-      long documentByteLength = stream.readLong();
-      long countsByteLength = stream.readLong();
-      long positionsByteLength = stream.readLong();
-      long skipsByteLength = 0;
-      long skipPositionsByteLength = 0;
-
-      if ((options & HAS_SKIPS) == HAS_SKIPS) {
-        skipsByteLength = stream.readLong();
-        skipPositionsByteLength = stream.readLong();
-      }
-
-      long documentStart = valueStream.getPosition();
-      long countsStart = documentStart + documentByteLength;
-      long positionsStart = countsStart + countsByteLength;
-      long positionsEnd = positionsStart + positionsByteLength;
-
-      documentsStream = iterator.getSubValueStream(documentStart, documentByteLength);
-      countsStream = iterator.getSubValueStream(countsStart, countsByteLength);
-      positionsStream = iterator.getSubValueStream(positionsStart, positionsByteLength);
-
-      documents = new VByteInput(documentsStream);
-      counts = new VByteInput(countsStream);
-      positions = new VByteInput(positionsStream);
-
-      if ((options & HAS_SKIPS) == HAS_SKIPS) {
-
-        long skipsStart = positionsStart + positionsByteLength;
-        long skipPositionsStart = skipsStart + skipsByteLength;
-        long skipPositionsEnd = skipPositionsStart + skipPositionsByteLength;
-
-        assert skipPositionsEnd == endPosition - startPosition;
-
-        skips = new VByteInput(iterator.getSubValueStream(skipsStart, skipsByteLength));
-        skipPositionsStream = iterator.getSubValueStream(skipPositionsStart, skipPositionsByteLength);
-        skipPositions = new VByteInput(skipPositionsStream);
-
-        // load up
-        nextSkipDocument = skips.readInt();
-        documentsByteFloor = 0;
-        countsByteFloor = 0;
-        positionsByteFloor = 0;
-      } else {
-        assert positionsEnd == endPosition - startPosition;
-        skips = null;
-        skipPositions = null;
-      }
-
       documentIndex = 0;
       loadNextPosting();
     }

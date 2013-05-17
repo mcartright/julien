@@ -6,6 +6,7 @@ import language.implicitConversions
 /** Provides classes that are typically used by Julien applications.
   *
   * ==Overview==
+  *
   * Julien is a retrieval toolkit built on top of the
   * [[http://http://www.lemurproject.org/galago.php Galago]] search system.
   * Specifically, Julien uses trimmed versions of TupleFlow and the index

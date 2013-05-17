@@ -1,16 +1,44 @@
 package julien
 
+import scala.reflect.runtime.universe._
+
 /** High-level container of the "retrieval" behaviors in Julien.
   * This package contains all the definitions for operators (views
   * and features), as well as the processor classes necessary to
-  * execute a query.
+  * execute a query or batch of queries.
   *
   * This package makes substantial use of the functionality provided
   * by the access API.
+  *
+  * Running a single query:
+  *
+  * {{{
+  * // Import the retrieval package
+  * scala> import julien.retrieval._
+  * import julien.retrieval._
+  *
+  * // Open an index. We set it as implicit to provide defaults
+  * // to all the operators that need it.
+  * scala> implicit val index = Index.disk("./myJulienIndex")
+  * index: julien.access.Index = disk:./myJulienIndex
+  *
+  * // Create a query-likelihood query. `Dirichlet.apply` is the
+  * // scoring function applied over each query term.
+  * scala> val ql = bow(List("new", "york", "city"), Dirichlet.apply)
+  * ql: julien.retrieval.FeatureOp = CombineNorm(Dirichlet(new: ...
+  *
+  * Make a processor for the query
+  * scala> val processor = SimpleProcessor()
+  * processor: julien.retrieval.SimpleProcessor = julien.retrieval.SimpleProcessor@611c048e
+  *
+  * // Add the query to the processor
+  * scala> processor add ql
+  *
+  * // Run and get results
+  * scala> val results = processor.run()
+  * results: julien.eval.QueryResult[julien.retrieval.ScoredDocument] = List(...
+  * }}}
   */
-
-import scala.reflect.runtime.universe._
-
 package object retrieval {
   type Combiner = (InternalId, Seq[FeatureOp]) => Double
   type QueryPreparer = (String) => Seq[FeatureOp]

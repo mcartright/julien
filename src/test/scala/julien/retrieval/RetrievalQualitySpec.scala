@@ -412,12 +412,14 @@ class RetrievalQualitySpec
 
 
   it should "produce the same scores as Galago for simple queries" in {
-    if (!readyToRun) cancel("'qualityDir' was not defined.")
-    //compareRetrievals(qlWrap _, "combine")
+    //if (!readyToRun)
+    cancel("'qualityDir' was not defined.")
+    compareRetrievals(qlWrap _, "combine")
   }
 
   it should "produce the same scores as Galago for SDM queries" in {
     if (!readyToRun) cancel("'qualityDir' was not defined.")
+    println("Running SDM queries!")
     compareRetrievals(sdmWrap _, "sdm")
   }
 }
