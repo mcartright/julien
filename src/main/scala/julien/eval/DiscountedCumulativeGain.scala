@@ -15,7 +15,7 @@ class DiscountedCumulativeGain(docsRetrieved: Int = Int.MaxValue)
     strictlyEval: Boolean): Double = {
 
     val docJudgments = result.map { so =>
-      if (judgment(so.name).label > 0) judgment(so.name).label else 0.0
+      if (judgment(so.name) > 0) judgment(so.name) else 0.0
     }.toArray
     val limit = min(docJudgments.length, docsRetrieved)
     val dcg = getDCG(docJudgments, limit)

@@ -13,7 +13,7 @@ class ExpectedReciprocalRank(docsRetrieved: Int = Int.MaxValue)
     judgment: QueryJudgments,
     strictlyEval: Boolean): Double = {
     val relevances = result.map { so =>
-      if (judgment(so.name).label > 0) judgment(so.name).label.toDouble else 0.0
+      if (judgment(so.name) > 0) judgment(so.name).toDouble else 0.0
     }.toArray
     getERR(relevances, min(relevances.length, docsRetrieved))
   }

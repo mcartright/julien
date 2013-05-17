@@ -14,7 +14,7 @@ trait CountSrc { def count(id: InternalId): Int }
 /** A trait that indicates a length can be provided. */
 trait LengthsSrc { def length(id: InternalId): Int }
 
-/** A trait that indicates [[Positions]] can be provided. */
+/** A trait that indicates positions (as `ExtentArray`s) can be provided. */
 trait PositionSrc { def positions(id: InternalId): ExtentArray }
 
 /** A trait that indicates a generic type T can be provided. */

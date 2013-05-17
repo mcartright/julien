@@ -3,7 +3,8 @@ package julien
 import scala.language.existentials
 
 /** A view of a single Document in the collection.
-  * An [[Index]] can support a [[julien.seq.DocumentSeq]]
+  * An [[julien.access.Index Index]] can support a
+  * [[julien.seq.DocumentSeq DocumentSeq]]
   * over its collection for instances that implement this
   * behavior.
   */

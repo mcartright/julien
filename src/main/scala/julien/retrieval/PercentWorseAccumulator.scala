@@ -11,7 +11,7 @@ object PercentWorseAccumulator {
 }
 
 /** This accumulator operates by only keeping
-  * [[julien.retrieval.ScoredObject ScoredObjects]] within a
+  * [[julien.ScoredObject ScoredObjects]] within a
   * certain percentage of the maximum score in the accumulator.
   */
 class PercentWorseAccumulator[T <: ScoredObject[T]] private(

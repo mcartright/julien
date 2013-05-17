@@ -15,12 +15,12 @@ class NormalizedDiscountedCumulativeGain(docsRetrieved: Int = Int.MaxValue)
     strictlyEval: Boolean): Double = {
 
     val docJudgments = result.map { so =>
-      if (judgment(so.name).label > 0) judgment(so.name).label else 0.0
+      if (judgment(so.name) > 0) judgment(so.name) else 0.0
     }.toArray
     val limit = min(docJudgments.length, docsRetrieved)
     val dcg = getDCG(docJudgments, limit)
 
-    val ideal = judgment.map { case (k,j) =>
+    val ideal = judgment.map { j =>
       if (j.label > 0) j.label.toDouble else 0.0
     }.toArray.sorted.reverse
     val normalizer = getDCG(ideal, limit)

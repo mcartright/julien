@@ -20,7 +20,7 @@ class AreaUnderCurve extends QueryEvaluator() {
     strictlyEval: Boolean
   ): Double = {
     val ps = predictions.map(_.name).toSet
-    val probs = actual.map { case (k,j) =>
+    val probs = actual.map { j =>
       if (ps(j.name)) Pair(1.0, j.label) else Pair(0.0, j.label)
     }
     val totalPositive = numRelevant(actual)

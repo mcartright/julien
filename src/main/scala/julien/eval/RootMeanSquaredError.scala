@@ -10,7 +10,7 @@ class RootMeanSquredError extends QueryEvaluator {
     strictlyEval: Boolean
   ): Double = {
     val ps = predictions.map(_.name).toSet
-    val diffs = actual.map { case(k,j) =>
+    val diffs = actual.map { j =>
       if (ps(j.name)) 1.0 - j.label else 0.0 - j.label
     }
     val rmse = sqrt(diffs.map(d => d * d).sum / actual.size)

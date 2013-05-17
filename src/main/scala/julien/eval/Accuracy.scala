@@ -8,7 +8,7 @@ class Accuracy extends QueryEvaluator() {
     strictlyEval: Boolean
   ): Double = {
     val ps = predictions.map(_.name).toSet
-    val counts = for ((doc,judgment) <- actual) yield {
+    val counts = for (judgment <- actual) yield {
       if (judgment.label == 1) {
         // It's actually relevant
         if (ps(judgment.name)) 1 // TP

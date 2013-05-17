@@ -7,11 +7,7 @@ import scala.Predef.Map
 
 package object eval {
   type QuerySetEvaluation = TreeMap[String, Double]
-  type QueryJudgments = Map[DocumentId, RelevanceJudgment]
-  type Query = String
-  type DocumentId = String
-  type QueryJudgmentSet = Map[Query, QueryJudgments]
-
+  type QueryJudgmentSet = Map[String, QueryJudgments]
 
   // These are carried over from the 'aggregate' package of Galago's eval
 //  def gMean(values: Array[Double]): Double =

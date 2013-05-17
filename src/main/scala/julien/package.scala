@@ -4,7 +4,8 @@ import annotation.elidable
 import language.implicitConversions
 
 /** Provides classes that are typically used by Julien applications.
-  *  ==Overview==
+  *
+  * ==Overview==
   * Julien is a retrieval toolkit built on top of the
   * [[http://http://www.lemurproject.org/galago.php Galago]] search system.
   * Specifically, Julien uses trimmed versions of TupleFlow and the index
@@ -26,7 +27,7 @@ import language.implicitConversions
   * return a [[julien.eval.QueryResult QueryResult]], which can be directly
   * passed to an evaluation function such as
   * [[julien.eval.MeanAveragePrecision MAP]] along with a
-  * [[julien.eval.QueryJudgment]] to produce a score).
+  * [[julien.eval.QueryJudgments QueryJudgments]] to produce a score).
   *
   * The [[julien.learning learning]] package is still under construction at the
   * moment, therefore not all intended components are fully listed at the

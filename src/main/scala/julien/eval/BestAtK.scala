@@ -12,7 +12,7 @@ class BestAtK(docsRetrieved: Int = Int.MaxValue)
   ): Double = {
     val toK = if (docsRetrieved > result.length) result
     else result.take(docsRetrieved)
-    val maxLabel = toK.map(so => judgments(so.name).label).max
+    val maxLabel = toK.map(so => judgments(so.name)).max
     return maxLabel
   }
 

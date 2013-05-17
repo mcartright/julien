@@ -10,7 +10,7 @@ class BalancedYoundenIndex extends QueryEvaluator() {
     strictlyEval: Boolean
   ): Double = {
     val ps = predictions.map(_.name).toSet
-    val paired = actual.map { case(k,j) => (j.label, (if (ps(j.name)) 1.0 else 0.0)) }
+    val paired = actual.map { j => (j.label, (if (ps(j.name)) 1.0 else 0.0)) }
 
     // a pair is (target, prediction) - bin and count
     val (predictTrue, predictFalse) = paired.partition(_._2 > threshold)

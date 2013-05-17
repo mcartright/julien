@@ -16,20 +16,19 @@ object QueryJudgmentSet {
   def fromTrec(src: String, useBinary: Boolean = false): QueryJudgmentSet = {
     val reader = Source.fromFile(src).bufferedReader
 
-    val buffer = new ListBuffer[RelevanceJudgment]
+    val mutableMap =
+      scala.collection.mutable.HashMap[String, QueryJudgments]().
+        withDefault(s => new QueryJudgments(s))
     while(reader.ready) {
       val line = reader.readLine
       val columns = line.split("\\s+")
       val queryId = columns(0)
       val docId = columns(2)
       val relevance = columns(3).toInt
-
-      buffer += RelevanceJudgment(queryId, docId, relevance)
+      mutableMap(queryId).update(docId, relevance)
     }
-
-    val queryJudgments = buffer.toSeq.groupBy(_.query).mapValues(_.groupBy(_.name).mapValues(_.head))
     reader.close
-    queryJudgments
+    mutableMap.toMap
   }
 }
 
