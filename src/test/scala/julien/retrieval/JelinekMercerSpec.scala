@@ -78,12 +78,13 @@ class JelinekMercerSpec extends FlatSpec with MockFactory {
     val c = 23
     val l = 312
     val lambda = 0.45
+    val id = 15
     mockStat.expects('statistics)().returning(fakeCountStats).noMoreThanTwice
-    mockCV.expects('count)().returning(c)
-    mockLV.expects('length)().returning(l)
+    mockCV.expects('count)(id).returning(c)
+    mockLV.expects('length)(id).returning(l)
     val d = JelinekMercer(mockCV, mockLV, mockStat, lambda)
     val expScore =
       scala.math.log((lambda*(c.toDouble/l)) + ((1.0-lambda)*(d.cf)))
-    expectResult(expScore) { d.eval }
+    expectResult(expScore) { d.eval(id) }
   }
 }

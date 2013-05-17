@@ -44,6 +44,12 @@ public class ExtentArray {
         this(16);
     }
 
+    public ExtentArray copy() {
+	int[] extBegins = Arrays.copyOf(begins, length);
+	int[] extEnds = (ends == null) ? null : Arrays.copyOf(ends, length);
+	return new ExtentArray(extBegins, extEnds);
+    }
+
     private void makeRoom() {
         begins = Arrays.copyOf(begins, begins.length * 2);
         if (ends != null) ends = Arrays.copyOf(ends, ends.length * 2);

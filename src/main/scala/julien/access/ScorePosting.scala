@@ -5,8 +5,7 @@ import julien.galago.core.index.ScoreIterator
 import language.implicitConversions
 
 class ScorePosting protected (var docid: InternalId, var score: Double)
-    extends Posting[ScorePosting]
-    with ScoreSrc {
+    extends Posting[ScorePosting] {
   def copy: ScorePosting = ScorePosting(this)
 }
 

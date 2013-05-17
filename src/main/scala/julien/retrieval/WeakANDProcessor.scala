@@ -77,7 +77,7 @@ class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
           i = 0
           var score = 0.0
           while (i < sortedSentinels.length) {
-            score += sortedSentinels(i).feat.eval
+            score += sortedSentinels(i).feat.eval(pivot)
             i += 1
           }
 

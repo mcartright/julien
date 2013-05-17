@@ -16,21 +16,23 @@ class Synonym(terms: Seq[Term])
     var t = 0
     val numTerms =  terms.size
     while (t < numTerms) {
-      itBuffer += terms(t).positions
+      itBuffer += terms(t).underlying.extents
       t += 1
     }
     itBuffer.result()
   }
 
-  override def positions: ExtentArray = {
+  private val hits: ExtentArray = new ExtentArray()
 
+  override def positions(id: InternalId): ExtentArray = {
+    hits.clear
+    if (!ensurePosition(id)) return hits
     val b = ArrayBuffer[Int]()
     for (it <- iterators) {
       it.reset
       while(it.hasNext) b += it.next
     }
 
-    hits.clear
     for (p <- b.sorted) hits.add(p)
     hits
   }
@@ -42,16 +44,18 @@ class Synonym(terms: Seq[Term])
       if (movers.isEmpty) return
       val startPositions = movers.map(_.at)
       movers.foreach(_.reset)
+      var candidate = movers.map(_.at).min
       while (movers.exists(!_.isDone)) {
-        val candidate = movers.map(_.at).min
-        movers.foreach(_.moveTo(candidate))
-        if (movers.exists(_.matches(candidate))) {
-          val p = positions
+        if (movers.exists(_.moveTo(candidate))) {
+          val p = positions(candidate)
           thePosting.docid = candidate
           thePosting.positions = p
           f(thePosting)
         }
-        movers.foreach(_.movePast(candidate))
+        candidate = movers.
+          filterNot(_.isDone).
+          map(_.movePast(candidate)).
+          min
       }
 
       // Done iterating - now move to the right positions

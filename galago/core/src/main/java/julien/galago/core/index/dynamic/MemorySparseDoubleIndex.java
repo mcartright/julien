@@ -365,20 +365,22 @@ public class MemorySparseDoubleIndex implements MemoryIndexPart {
     }
 
     @Override
-    public void syncTo(int identifier) throws IOException {
+    public boolean syncTo(int identifier) throws IOException {
       // TODO: need to implement skip lists
 
       while (!isDone() && (currDocument < identifier)) {
         read();
       }
+      return currDocument == identifier;
     }
 
     @Override
-    public void movePast(int identifier) throws IOException {
+    public int movePast(int identifier) throws IOException {
 
       while (!isDone() && (currDocument <= identifier)) {
         read();
       }
+      return currDocument;
     }
 
     @Override

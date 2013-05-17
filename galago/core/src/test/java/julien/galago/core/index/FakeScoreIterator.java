@@ -47,17 +47,19 @@ public class FakeScoreIterator implements ScoreIterator {
   }
 
   @Override
-  public void syncTo(int document) throws IOException {
+  public boolean syncTo(int document) throws IOException {
     while (!isDone() && document > docs[index]) {
       index++;
     }
+    return currentCandidate() == document;
   }
 
   @Override
-  public void movePast(int document) throws IOException {
+  public int movePast(int document) throws IOException {
     while (!isDone() && document >= docs[index]) {
       index++;
     }
+    return currentCandidate();
   }
 
   @Override

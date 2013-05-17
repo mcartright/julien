@@ -433,19 +433,19 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
     }
 
     @Override
-    public void syncTo(int identifier) throws IOException {
-      // TODO: need to implement skip lists
-
+    public boolean syncTo(int identifier) throws IOException {
       while (!isDone() && (currDocument < identifier)) {
         read();
       }
+      return identifier == currDocument;
     }
 
     @Override
-    public void movePast(int identifier) throws IOException {
+    public int movePast(int identifier) throws IOException {
       while (!isDone() && (currDocument <= identifier)) {
         read();
       }
+      return currDocument;
     }
 
     @Override

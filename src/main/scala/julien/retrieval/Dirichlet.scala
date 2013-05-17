@@ -65,7 +65,7 @@ class Dirichlet(
     score(0, Dirichlet.totallyMadeUpValue)
   }
 
-  def eval: Double = score(op.count, lengths.length)
+  def eval(id: InternalId): Double = score(op.count(id), lengths.length(id))
 
   def score(c: Int, l: Int): Double = {
     val num = (c + (mu * cf))

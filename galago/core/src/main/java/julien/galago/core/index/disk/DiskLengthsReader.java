@@ -172,7 +172,7 @@ public class DiskLengthsReader extends KeyListReader implements LengthsReader {
     }
 
     @Override
-    public void syncTo(int identifier) throws IOException {
+    public boolean syncTo(int identifier) throws IOException {
       assert identifier >= currDocument : String.format("current doc: %d, syncing to: %d\n",
               currDocument, identifier);
 
@@ -188,10 +188,11 @@ public class DiskLengthsReader extends KeyListReader implements LengthsReader {
         currDocument = identifier;
         currLength = -1;
       }
+      return currDocument == identifier;
     }
 
     @Override
-    public void movePast(int identifier) throws IOException {
+    public int movePast(int identifier) throws IOException {
       // select the next document:
       identifier += 1;
 
@@ -209,6 +210,7 @@ public class DiskLengthsReader extends KeyListReader implements LengthsReader {
         currDocument = identifier;
         currLength = -1;
       }
+      return currDocument;
     }
 
     @Override

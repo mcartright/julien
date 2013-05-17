@@ -12,6 +12,6 @@ class TermCount(val op: CountView)
   lazy val children: Seq[Operator] = Set[Operator](op).toList
   lazy val views: Set[ViewOp] = Set[ViewOp](op)
   override val lowerBound: Double = 0.0
-  def eval: Double = score(op.count)
+  def eval(id: InternalId): Double = score(op.count(id))
   def score(c: Int): Double = c.toDouble
 }

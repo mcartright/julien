@@ -5,20 +5,50 @@ import language.implicitConversions
 
 /** Provides classes that are typically used by Julien applications.
   *  ==Overview==
+  * Julien is a retrieval toolkit built on top of the
+  * [[http://http://www.lemurproject.org/galago.php Galago]] search system.
+  * Specifically, Julien uses trimmed versions of TupleFlow and the index
+  * layer of Galago as data sources to a composable retrieval stack implemented
+  * in Julien.
   *
+  * The [[julien.access access]] package provides classes and traits that mostly
+  * deal with direct access to an underlying index for easier data exploration
+  * work in the Scala [[http://www.scala-lang.org/node/2097 REPL]].
+  *
+  * The [[julien.retrieval retrieval]] package focuses more on creating
+  * retrieval models to run over a set collection of documents, stored in an
+  * index. Components such as scoring functions and query processors are in
+  * this package.
+  *
+  * The [[julien.eval eval]] package is a port of the Galago eval package,
+  * with minor modifications to more tightly integrate the evaluation
+  * components with the other parts of Julien (for example, all processors
+  * return a [[julien.eval.QueryResult QueryResult]], which can be directly
+  * passed to an evaluation function such as
+  * [[julien.eval.MeanAveragePrecision MAP]] along with a
+  * [[julien.eval.QueryJudgment]] to produce a score).
+  *
+  * The [[julien.learning learning]] package is still under construction at the
+  * moment, therefore not all intended components are fully listed at the
+  * moment.
+  *
+  * The [[julien.flow flow]] package is a higher-level wrapper around TupleFlow
+  * to facilitate constructing TupleFlow jobs. Given the conciseness of Scala
+  * and several highly-touted packages that facilitate distributed computation
+  * (i.e. [[http://akka.io/ akka]]), we may eventually replace much of the
+  * communication and mangement logic of TupleFlow - however the type system
+  * will most likely stay, as that is the core idea of the system, and makes it
+  * fairly flexible, once jobs are built.
+  *
+  * The [[julien.config config]] package is meant to be a place for
+  * configuration classes and convenience methods. Currently these is some
+  * active debate about how we should go about performing configuration
+  * throughout Julien; luckily it is
+  * early enough in the system's lifecycle that should we make a major change,
+  * we can refactor the codebase without too much difficulty.
+  * <i>Feedback is welcome</i>.
   */
 package object julien {
-/** Correctness enforced using value classes for any value we might throw
-  *  around the in the system. Might be a little overkill, but it allows
-  *  for strong type-checking at compile time.
-  *
-  *   See SIP-15 (http://docs.scala-lang.org/sips/pending/value-classes.html)
-  *   for value class details.
-  *
-  *  Also using SIP-13, implicit classes
-  *  (http://docs.scala-lang.org/sips/pending/implicit-classes.html)
-  */
-
   /**
     * Value for a document identifier. We "wrap" these with a value class
     * because even though the underlying type is an Int, we don't want to
@@ -26,6 +56,13 @@ package object julien {
     *
     * Good use of a value class - when you want an AnyVal, but you want to
     * actually *remove* some of the functionality of the AnyVal.
+    *
+    * See SIP-15 (http://docs.scala-lang.org/sips/pending/value-classes.html)
+    * for value class details.
+    *
+    * Also see SIP-13 for details on implicit classes
+    * (http://docs.scala-lang.org/sips/pending/implicit-classes.html)
+    *
     */
   implicit class InternalId(val underlying: Int) extends AnyVal
   implicit object InternalIdOrder extends Ordering[InternalId] {

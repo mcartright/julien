@@ -53,7 +53,7 @@ Required parameters:
       val lView = IndexLengths(f)
       // Turn it into a feature
       new ScalarWeightedFeature with ChildlessOp {
-        def eval: Double = lView.length.toDouble
+        def eval(id: InternalId): Double = lView.length(id).toDouble
         lazy val views: Set[ViewOp] = Set[ViewOp](lView)
       }
     }

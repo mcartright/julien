@@ -334,16 +334,18 @@ public class MemoryDocumentLengths implements MemoryIndexPart, LengthsReader {
     }
 
     @Override
-    public void movePast(int identifier) throws IOException {
+    public int movePast(int identifier) throws IOException {
       syncTo(identifier + 1);
+      return this.currDoc;
     }
 
     @Override
-    public void syncTo(int identifier) throws IOException {
+    public boolean syncTo(int identifier) throws IOException {
       this.currDoc = Math.min(identifier, this.fieldLengths.lastDocument);
       if (identifier > this.fieldLengths.lastDocument) {
         done = true;
       }
+      return this.currDoc == identifier;
     }
 
     @Override

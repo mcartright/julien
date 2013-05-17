@@ -31,13 +31,15 @@ public abstract class KeyToListIterator implements Iterator {
   }
 
   @Override
-  public void syncTo(int identifier) throws IOException {
+  public boolean syncTo(int identifier) throws IOException {
     iterator.skipToKey(Utility.fromInt(identifier));
+    return hasMatch(identifier);
   }
 
   @Override
-  public void movePast(int identifier) throws IOException {
+  public int movePast(int identifier) throws IOException {
     iterator.skipToKey(Utility.fromInt(identifier + 1));
+    return Utility.toInt(iterator.getKey());
   }
 
   @Override

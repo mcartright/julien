@@ -79,11 +79,13 @@ public class NullExtentIterator
   }
 
   @Override
-  public void syncTo(int identifier) throws IOException {
+  public boolean syncTo(int identifier) throws IOException {
+    return false;
   }
 
   @Override
-  public void movePast(int identifier) throws IOException {
+  public int movePast(int identifier) throws IOException {
+    return Integer.MAX_VALUE;
   }
 
   @Override

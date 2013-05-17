@@ -91,7 +91,7 @@ trait FeatureOp extends Operator {
   def weight: Double
   def weight_=(newWeight: WeightType): Unit
   def views: Set[ViewOp]
-  def eval: Double
+  def eval(id: InternalId): Double
   def upperBound: Double = Double.PositiveInfinity
   def lowerBound: Double = Double.NegativeInfinity
 }

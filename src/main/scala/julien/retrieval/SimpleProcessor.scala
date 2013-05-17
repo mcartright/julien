@@ -107,52 +107,53 @@ class SimpleProcessor
     val model = _models.head
     val iterators: Array[Movable] = _models.flatMap(_.movers).distinct.toArray
     val drivers: Array[Movable] = iterators.filterNot(_.isDense).toArray
-
     val scorers: Array[FeatureOp] = _models.toArray
 
     // Go
-    while (!isDone(drivers)) {
-      var k=0
-      var candidate = Int.MaxValue
-      while (k < drivers.length) {
-        val drv = drivers(k)
-        if (!drv.isDone) {
-          if (drv.at < candidate) candidate = drv.at
-        }
-        k += 1
-      }
 
-      var i = 0
-      while (i < iterators.length) {
-        iterators(i).moveTo(candidate)
+    // Use this outside the loop once, then we update *when* we move.
+    var i = 0
+    var candidate = Int.MaxValue
+    while (i < drivers.length) {
+      val drv = drivers(i)
+      if (!drv.isDone) {
+        if (drv.at < candidate) candidate = drv.at
+      }
+      i += 1
+    }
+
+    while (!isDone(drivers)) {
+      // At this point the next candidate should be chosen
+      // Time to score
+      var score = 0.0
+      i = 0
+      while (i < scorers.length) {
+        score += scorers(i).eval(candidate)
         i += 1
       }
 
-      if (matches(drivers, candidate)) {
-        // Time to score
-        var score = 0.0
-        var i=0
-        while (i < scorers.length) {
-          score += scorers(i).eval
-          i += 1
+      // How do we instantiate an object without knowing what it is, and
+      // knowing what it needs? One method in the QueryProcessor?
+
+      // For now, put a nasty hack in to make it work.
+      // SAFETY OFF
+      val hackedAcc = acc.asInstanceOf[Accumulator[ScoredDocument]]
+      val sd = ScoredDocument(candidate, score)
+      hackedAcc += sd
+      if (debugger.isDefined) debugger.get(sd, scorers, index, this)
+
+      // As we move forward, set the candidate since movePast reports it
+      i = 0
+      var newCandidate = Int.MaxValue
+      while (i < drivers.length) {
+        if (!drivers(i).isDone) {
+          val tmp = drivers(i).movePast(candidate)
+          if (tmp < newCandidate) newCandidate = tmp
         }
-
-        // How do we instantiate an object without knowing what it is, and
-        // knowing what it needs? One method in the QueryProcessor?
-
-        // For now, put a nasty hack in to make it work.
-        // SAFETY OFF
-        val hackedAcc = acc.asInstanceOf[Accumulator[ScoredDocument]]
-        val sd = ScoredDocument(candidate, score)
-        hackedAcc += sd
-        if (debugger.isDefined) debugger.get(sd, scorers, index, this)
+        i += 1
       }
-
-      var j = 0
-      while (j < drivers.length) {
-        drivers(j).movePast(candidate)
-        j += 1
-      }
+      // Update the next candidate to score
+      candidate = newCandidate
     }
     QueryResult(acc.result)
   }

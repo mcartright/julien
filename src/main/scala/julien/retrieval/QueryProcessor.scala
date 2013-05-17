@@ -52,10 +52,7 @@ trait QueryProcessor {
   final def isDone(drivers: Array[Movable]): Boolean = {
     var j = 0
     while (j < drivers.length) {
-      val curDone = drivers(j).isDone
-      if (curDone == false) {
-        return false
-      }
+      if (!drivers(j).isDone) return false
       j += 1
     }
     return true

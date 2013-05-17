@@ -52,21 +52,23 @@ object IndexLengths {
 sealed abstract class IndexLengths(index: Index)
     extends LengthsView
     with ChildlessOp
-    with Movable
 
 final class StreamLengths(override val index: Index, li: LengthsIterator)
     extends IndexLengths(index)
+    with Movable
     with IteratedHook[LengthsIterator] {
   override val underlying = li
   override def toString = s"lengths:" + index.toString
-  def length: Int = underlying.getCurrentLength
+  def length(id: InternalId): Int = {
+    underlying.syncTo(id)
+    underlying.getCurrentLength
+  }
   override def isDense: Boolean = true
 }
 
 final class ArrayLengths(i: Index, nascentArray: Future[Array[Int]])
     extends IndexLengths(i)
-    with Movable {
-  private var current: Int = 0
+    with Bounded {
   def isDense: Boolean = true
 
   // This will block to set this array if the read operation isn't complete,
@@ -78,11 +80,6 @@ final class ArrayLengths(i: Index, nascentArray: Future[Array[Int]])
     Await.result(nascentArray, Duration.Inf) // arbitrary
   }
 
-  def reset: Unit = current = 0
-  def length: Int = lengthArray(current)
-  def isDone: Boolean = current >= lengthArray.length - 1
-  def at: Int = current
-  def moveTo(id: Int) = current = id
-  def movePast(id: Int) = current = id+1
+  def length(id: InternalId): Int = lengthArray(id)
   override def size: Int = lengthArray.length
 }

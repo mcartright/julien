@@ -49,7 +49,7 @@ abstract class SimplePreloadingProcessor
     var drivers = iterators.filter(_.isSparse).toArray
     preLoadAccumulator(sentinels, drivers, iterators, hackedAcc)
 
-    val raw = if (drivers.isEmpty)
+    val raw = if (isDone(drivers))
       acc.result
     else
       finishScoring(sentinels, iterators, acc)
@@ -67,44 +67,43 @@ abstract class SimplePreloadingProcessor
     else getMinCandidate(drivers, idx+1, min(m, drivers(idx).at))
   }
 
-  @tailrec
   final def preLoadAccumulator(
     allSentinels: Array[Sentinel],
     drivers: Array[Movable],
     iterators: Array[Movable],
     acc: Accumulator[ScoredDocument]): Unit = {
-    // base case
-    if (acc.atCapacity || drivers.isEmpty) {
-      return
-    } else {
-      var i = 0
-      // otherwise throw a new candidate in there
-      val candidate = getMinCandidate(drivers)
-      if (matches(drivers, candidate)) {
-        while (i < iterators.length) {
-          iterators(i).moveTo(candidate)
-          i += 1
-        }
 
-        // Another crappy fast loop
-        i = 0
-        var score = 0.0
-        while (i < allSentinels.length) {
-          score += allSentinels(i).feat.eval
-          i += 1
-        }
-        acc += ScoredDocument(candidate, score)
+    var i = 0
+    var candidate = Int.MaxValue
+    while (i < drivers.length) {
+      val drv = drivers(i)
+      if (!drv.isDone && drv.at < candidate) candidate = drv.at
+      i += 1
+    }
+
+    while (!acc.atCapacity && !isDone(drivers)) {
+      // Score our candidate
+      i = 0
+      var score = 0.0
+      while (i < allSentinels.length) {
+        score += allSentinels(i).feat.eval(candidate)
+        i += 1
       }
 
-      drivers.foreach(_.movePast(candidate))
+      acc += ScoredDocument(candidate, score)
 
-      // Remove finished iterators from the remaining list at the next
-      // call - saves checking later
-      preLoadAccumulator(
-        allSentinels,
-        drivers.filterNot(_.isDone),
-        iterators,
-        acc)
+      // And select the next one
+      i = 0
+      var newCandidate = Int.MaxValue
+      while (i < drivers.length) {
+        val drv = drivers(i)
+        if (!drv.isDone) {
+          val tmp = drv.movePast(candidate)
+          if (tmp < newCandidate) newCandidate = tmp
+        }
+        i += 1
+      }
+      candidate = newCandidate
     }
   }
 

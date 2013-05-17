@@ -32,6 +32,6 @@ class TFIDF(
   }
 
   override lazy val lowerBound: Double = 0.0
-  def eval: Double = score(op.count, lengths.length)
+  def eval(id: InternalId): Double = score(op.count(id), lengths.length(id))
   def score(c: Int, l: Int): Double = (c.toDouble / l.toDouble) * idf
 }

@@ -3,27 +3,22 @@ package retrieval
 
 import gnu.trove.map.hash.TIntIntHashMap
 import galago.core.util.ExtentArray
+import scala.annotation.tailrec
 
 abstract class MultiTermView(terms: Seq[PositionStatsView])
   extends PositionStatsView
   with Bounded
   with NeedsPreparing {
 
-  def children: Seq[Operator] = terms
-//  private lazy val loc = {
-//    val movers = terms.filter(_.isInstanceOf[Movable])
-//    if (movers.isEmpty) null else movers.head.asInstanceOf[Movable]
-//  }
-  def count: Int = {
-//    if (loc != null && countCache.containsKey(loc.at)) {
-//      countCache.get(loc.at)
-//    } else {
-      this.positions.length
- //   }
-  }
+  lazy val movables: Seq[Movable] = terms.
+    filter(_.isInstanceOf[Movable]).
+    map(_.asInstanceOf[Movable])
 
-  // For use in subclasses to hold hits
-  protected val hits =  new ExtentArray(10000)
+  def children: Seq[Operator] = terms
+  def count(id: InternalId): Int =
+    //if (countCache.containsKey(id)) countCache.get(id)
+    //else
+    this.positions(id).length
 
   override lazy val isDense: Boolean = {
     val ops =
@@ -47,15 +42,22 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
   val adjustment = 0
 
   def updateStatistics(docid: InternalId) = {
-    val c = count
-    // Don't cache if we can't locate later.
-  //  if (loc != null) countCache.put(docid, c)
+    val c = count(docid)
+    // countCache.put(docid, c)
     statistics.collFreq += c
     statistics.docFreq += 1
     statistics.max = scala.math.min(statistics.max, c)
     statistics.numDocs = terms.head.statistics.numDocs
     statistics.collLength = terms.head.statistics.collLength - adjustment
   }
+
+  @tailrec
+  final def ensurePosition(id: InternalId, idx: Int = 0): Boolean =
+    if (idx >= movables.length) return true
+    else {
+      if (!movables(idx).moveTo(id)) return false
+      else ensurePosition(id, idx+1)
+    }
 
   case class Posting(var docid: Int, var positions: ExtentArray)
 }

@@ -55,14 +55,14 @@ class UnorderedWindowSpec extends FlatSpec with MockFactory {
     val p2 = new ExtentArray(pos2)
     val p3 = new ExtentArray(pos3)
 
-    mock1.expects('positions)().returning(p1)
-    mock2.expects('positions)().returning(p2)
-    mock3.expects('positions)().returning(p3)
+    mock1.expects('positions)(10).returning(p1)
+    mock2.expects('positions)(10).returning(p2)
+    mock3.expects('positions)(10).returning(p3)
 
     val uw = UnorderedWindow(3, mock1, mock2, mock3)
 
     val expected = new ExtentArray(Array(19), Array(21))
-    val hits = uw.positions
+    val hits = uw.positions(10)
     expectResult(expected) {hits}
   }
 
@@ -76,18 +76,15 @@ class UnorderedWindowSpec extends FlatSpec with MockFactory {
     val p1 = new ExtentArray(pos1)
     val p2 = new ExtentArray(pos2)
 
-    mock1.expects('positions)().returning(p1)
-    mock2.expects('positions)().returning(p2)
+    val id = InternalId(12)
+    mock1.expects('positions)(12).returning(p1)
+    mock2.expects('positions)(12).returning(p2)
 
     val uw = UnorderedWindow(8, mock1, mock2)
 
     val expected = new ExtentArray(Array(22), Array(24))
-    val hits = uw.positions
+    val hits = uw.positions(id)
     expectResult(expected) {hits}
-
-    //     val ow1 = OrderedWindow(1, mock1, mock2, mock3)
-    //
-    //      expectResult(hits) {ow1.positions}
   }
 
   it should "correctly return no hits" in {
@@ -100,17 +97,14 @@ class UnorderedWindowSpec extends FlatSpec with MockFactory {
     val p1 = new ExtentArray(pos1)
     val p2 = new ExtentArray(pos2)
 
-    mock1.expects('positions)().returning(p1)
-    mock2.expects('positions)().returning(p2)
+    val id = 50
+    mock1.expects('positions)(id).returning(p1)
+    mock2.expects('positions)(id).returning(p2)
 
     val uw = UnorderedWindow(8, mock1, mock2)
 
     val expected = new ExtentArray(Array.empty[Int])
-    val hits = uw.positions
+    val hits = uw.positions(id)
     expectResult(expected) {hits}
-
-    //     val ow1 = OrderedWindow(1, mock1, mock2, mock3)
-    //
-    //      expectResult(hits) {ow1.positions}
   }
 }

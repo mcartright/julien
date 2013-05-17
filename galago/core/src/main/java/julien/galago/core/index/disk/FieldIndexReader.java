@@ -149,23 +149,25 @@ public class FieldIndexReader extends KeyListReader {
     }
 
     @Override
-    public void syncTo(int document) throws IOException {
+    public boolean syncTo(int document) throws IOException {
       while (!isDone() && document > currentDocument) {
         documentIndex = Math.min(documentIndex + 1, documentCount);
         if (!isDone()) {
           loadValue();
         }
       }
+      return document == currentDocument;
     }
 
     @Override
-    public void movePast(int document) throws IOException {
+    public int movePast(int document) throws IOException {
       while (!isDone() && document >= currentDocument) {
         documentIndex = Math.min(documentIndex + 1, documentCount);
         if (!isDone()) {
           loadValue();
         }
       }
+      return currentDocument;
     }
 
     private void loadValue() throws IOException {

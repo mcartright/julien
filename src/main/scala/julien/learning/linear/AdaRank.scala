@@ -2,6 +2,7 @@ package julien
 package learning
 package linear
 
+import scala.language.implicitConversions
 import scala.collection.mutable.ListBuffer
 import scala.math._
 import julien.retrieval._

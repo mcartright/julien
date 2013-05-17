@@ -20,7 +20,7 @@ class CombineNorm private(val ops: Seq[FeatureOp],
   lazy val localChildren : Array[FeatureOp] = ops.toArray
   def views: Set[ViewOp] =
     ops.foldLeft(Set[ViewOp]()) { (s, op) => s ++ op.views }
-  def eval : Double = combine()
+  def eval(id: InternalId) : Double = combine(id)
 
   lazy final val childrenSize = ops.size
 
@@ -35,11 +35,11 @@ class CombineNorm private(val ops: Seq[FeatureOp],
     sum
   }
 
-  def combine() : Double = {
+  def combine(id: InternalId) : Double = {
     var i = 0
     var score = 0.0
     while (i < childrenSize) {
-      score += localChildren(i).eval
+      score += localChildren(i).eval(id)
       i+=1
     }
     score / weightSum

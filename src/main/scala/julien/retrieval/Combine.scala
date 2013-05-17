@@ -22,11 +22,15 @@ object Combine {
     weight: () => Double,
     combiner: Combiner) = new Combine(children, weight, combiner)
 
-  val summer: Combiner = (sops: Seq[FeatureOp]) => {
-    sops.foldLeft(0.0) { (score, op) =>
-      val weightedScore = (op.weight * op.eval)
-      score + weightedScore
+  val summer: Combiner = (id: InternalId, sops: Seq[FeatureOp]) => {
+    // Inlined sum is faster than method call (i.e. 'foldLeft')
+    var sum = 0.0
+    var i = 0
+    while (i < sops.length) {
+      sum += sops(i).weight * sops(i).eval(id)
+      i += 1
     }
+    sum
   }
 }
 
@@ -39,5 +43,5 @@ class Combine private(
   lazy val children: Seq[Operator] = ops
   def views: Set[ViewOp] =
     ops.foldLeft(Set[ViewOp]()) { (s, op) => s ++ op.views }
-  def eval : Double = combiner(ops)
+  def eval(id: InternalId) : Double = combiner(id, ops)
 }

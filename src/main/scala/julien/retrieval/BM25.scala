@@ -49,7 +49,8 @@ class BM25(
     score(maxtf, maxtf)
   }
 
-  def eval: Double = score(op.count, lengths.length)
+  def eval(id: InternalId): Double = score(op.count(id), lengths.length(id))
+
   def score(c: Int, l: Int) = {
     val num = c * (k + 1)
     val den = c + (k * (1 - b + (b * l / avgDocLength)))

@@ -7,8 +7,7 @@ class PositionsPosting protected (
   var docid: InternalId,
   var count: Int,
   var positions: ExtentArray)
-    extends Posting[PositionsPosting]
-    with PositionSrc {
+    extends Posting[PositionsPosting] {
   def copy: PositionsPosting = PositionsPosting(this)
 }
 

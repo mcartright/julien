@@ -50,10 +50,10 @@ class AbsoluteDiscount(
       1.0 / AbsoluteDiscount.totallyMadeUpValue
     )
 
-  def eval: Double = {
-    val doc = docsrc.data
+  def eval(id: InternalId): Double = {
+    val doc = docsrc.data(id)
     val ratio = doc.vocabulary.size.toDouble / doc.termVector.size
-    score(op.count, lengths.length, ratio)
+    score(op.count(id), lengths.length(id), ratio)
   }
   def score(c: Int, l: Int, ratio: Double): Double = {
     val foreground = scala.math.max(c.toDouble - delta, 0.0) / l.toDouble

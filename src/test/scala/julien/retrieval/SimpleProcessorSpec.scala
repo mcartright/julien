@@ -182,17 +182,17 @@ class SimpleProcessorSpec
     val results: QueryResult[ScoredDocument] = sp.run(acc)
 
     // Now let's do this by hand, and compare results
-    l.reset
+    if (l.isInstanceOf[Movable]) l.asInstanceOf[Movable].reset
     val counts = scala.collection.mutable.ListBuffer[ScoredDocument]()
     val iterators = queryTerms.map(t => index.iterator(t))
     while (iterators.exists(!_.isDone)) {
       val min = iterators.filterNot(_.isDone).map(_.currentCandidate).min
       iterators.foreach(_.syncTo(min))
-      l.moveTo(min)
+      if (l.isInstanceOf[Movable]) l.asInstanceOf[Movable].moveTo(min)
       if (iterators.exists(_.hasMatch(min))) {
         val total = iterators.foldLeft(0.0) { (sum , iter) =>
           if (iter.hasMatch(min))
-            sum + (iter.count.toDouble / l.length)
+            sum + (iter.count.toDouble / l.length(min))
           else
             sum
         }

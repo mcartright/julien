@@ -49,7 +49,7 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
     var sidx = getSentinelIndex(sentinels, 0, threshold, startingScore)
 
     // Has to sit outside the sentinels...because, for now.
-    val lengths = getLengthsIterator(iterators)
+    //val lengths = getLengthsIterator(iterators)
 
     // Scala does not natively support a "break" construct, so let's avoid it.
     // We simply need to set the candidate once before entering the while
@@ -59,13 +59,9 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
     var candidate = getMinCandidate(drivers)
     while (candidate < Int.MaxValue) {
       if (drivers.exists(_.matches(candidate))) {
-        // line up lengths
-        lengths.moveTo(candidate)
-
         // Sum the active sentinels
         val senscore = selected.foldLeft(startingScore) { (score, sent) =>
-          sent.iter.moveTo(candidate)
-          val r = score + (sent.feat.eval - sent.feat.upperBound)
+          val r = score + (sent.feat.eval(candidate) - sent.feat.upperBound)
           r
         }
         // Now add the rest of them until we're done or it's below threshold
@@ -114,8 +110,8 @@ class MaxscoreProcessor extends SimplePreloadingProcessor {
       (oldScore, idx)
     else {
       // Add one more sentinel to the total
-      sents(idx).iter.moveTo(candidate)
-      val r = oldScore + (sents(idx).feat.eval - sents(idx).feat.upperBound)
+      val s = sents(idx)
+      val r = oldScore + (s.feat.eval(candidate) - s.feat.upperBound)
       conditionalAddSentinel(sents, candidate, idx+1, threshold, r)
     }
 

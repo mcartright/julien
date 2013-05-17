@@ -26,7 +26,8 @@ final class Term private (
   override val index: Index
 )
     extends SparseIterator[ExtentIterator]
-    with PositionStatsView {
+    with PositionStatsView
+    with PositionsBufferView {
 
   override def toString: String = s"$t: " + index.toString
 
@@ -37,11 +38,22 @@ final class Term private (
   )
 
   /** Returns the current count of the underlying iterator. */
-  def count: Int = if (matched) underlying.count else 0
+  def count(id: InternalId): Int = {
+    underlying.syncTo(id)
+    if (underlying.hasMatch(id)) underlying.count else 0
+  }
 
   /** Returns the current positions of the underlying iterator. */
-  def positions: ExtentArray =
-    if (matched) underlying.extents() else ExtentArray.empty
+  def positions(id: InternalId): ExtentArray = {
+    underlying.syncTo(id)
+    if (underlying.hasMatch(id)) underlying.extents() else ExtentArray.empty
+  }
+
+  /** Return the underlying buffer of extents. Note that the buffer will be
+    * volatile (it will be directly updated by the iterator underlying this
+    * view.
+    */
+  def positionsBuffer: ExtentArray = underlying.extents()
 
   lazy val statistics: CountStatistics = {
     val ns = underlying.asInstanceOf[ARNA].getStatistics
@@ -68,7 +80,7 @@ final class Term private (
       reset
       while (!isDone) {
         thePosting.docid = at
-        thePosting.positions = positions
+        thePosting.positions = underlying.extents
         f(thePosting)
         movePast(at)
       }

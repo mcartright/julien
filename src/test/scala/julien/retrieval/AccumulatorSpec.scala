@@ -12,6 +12,8 @@ trait StandardAccumulatorBehavior { this: FlatSpec =>
     universeSz: Int,
     requested: Int
   ) {
+    val clue = s"|U| = $universeSz, |R| = $requested"
+
     it should "return the requested number of scoreables" in {
       val acc = genericAcc.asInstanceOf[Accumulator[ScoredDocument]]
       // Make some fake samples
@@ -30,9 +32,11 @@ trait StandardAccumulatorBehavior { this: FlatSpec =>
       val topRanked = samples.result.sorted.take(requested)
       val results = acc.result
 
-      expectResult(topRanked.size)(results.size)
-      for ((sd1, sd2) <- topRanked.zip(results)) {
-        expectResult(sd1)(sd2)
+      withClue(clue) {
+        expectResult(topRanked.size)(results.size)
+        for ((sd1, sd2) <- topRanked.zip(results)) {
+          expectResult(sd1)(sd2)
+        }
       }
     }
   }

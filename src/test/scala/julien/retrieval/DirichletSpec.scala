@@ -74,11 +74,12 @@ class DirichletSpec extends FlatSpec with MockFactory {
     val c = 5
     val l = 150
     val mu = 1750
+    val id = 100
     mockStat.expects('statistics)().returning(fakeCountStats).noMoreThanTwice
-    mockCV.expects('count)().returning(c)
-    mockLV.expects('length)().returning(l)
+    mockCV.expects('count)(id).returning(c)
+    mockLV.expects('length)(id).returning(l)
     val d = Dirichlet(mockCV, mockLV, mockStat, mu)
     val expScore = scala.math.log((c + (mu*d.cf)) / (mu + l))
-    expectResult(expScore) { d.eval.underlying }
+    expectResult(expScore) { d.eval(id).underlying }
   }
 }

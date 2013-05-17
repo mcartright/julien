@@ -276,7 +276,7 @@ public class CountIndexReader extends KeyListReader implements AggregateIndexPar
 
     // If we have skips - it's go time
     @Override
-    public void syncTo(int document) throws IOException {
+    public boolean syncTo(int document) throws IOException {
       if (skips != null) {
         synchronizeSkipPositions();
         if (document > nextSkipDocument) {
@@ -297,11 +297,13 @@ public class CountIndexReader extends KeyListReader implements AggregateIndexPar
           load();
         }
       }
+      return currentDocument == document;
     }
 
     @Override
-    public void movePast(int document) throws IOException {
+    public int movePast(int document) throws IOException {
       syncTo(document + 1);
+      return currentDocument;
     }
 
     // This only moves forward in tier 1, reads from tier 2 only when

@@ -18,5 +18,6 @@ class IDF(val statsrc: StatisticsView) extends ScalarWeightedFeature {
   override lazy val upperBound: Double = idf
   override lazy val lowerBound: Double = idf
   lazy val score: Double = idf
-  val eval: Double = score
+  // Static value
+  def eval(id: InternalId): Double = score
 }

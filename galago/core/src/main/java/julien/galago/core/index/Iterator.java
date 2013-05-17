@@ -73,7 +73,7 @@ public interface Iterator extends Comparable<Iterator> {
    * this avoids making small (unnecessary) jumps for iterators that have all candidates
    *
    */
-  public void movePast(int identifier) throws IOException;
+  public int movePast(int identifier) throws IOException;
 
   /**
    * Moves the iterator to the specified candidate
@@ -81,7 +81,7 @@ public interface Iterator extends Comparable<Iterator> {
    * Unlike the 'next' function this should move all iterators.
    * Even where 'hasAllCandidates' is true.
    */
-  public void syncTo(int identifier) throws IOException;
+  public boolean syncTo(int identifier) throws IOException;
 
   /**
    * returns true if the iterator is at this candidate,

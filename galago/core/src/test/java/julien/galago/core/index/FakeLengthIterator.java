@@ -51,15 +51,17 @@ public class FakeLengthIterator implements LengthsIterator {
   }
 
   @Override
-  public void movePast(int identifier) throws IOException {
+  public int movePast(int identifier) throws IOException {
     syncTo(identifier + 1);
+    return currentCandidate();
   }
 
   @Override
-  public void syncTo(int identifier) throws IOException {
+  public boolean syncTo(int identifier) throws IOException {
     while (!isDone() && ids[position] < identifier) {
       position++;
     }
+    return currentCandidate() == identifier;
   }
 
   @Override

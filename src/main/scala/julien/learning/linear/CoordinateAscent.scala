@@ -44,7 +44,8 @@ class QueryEvaluation(
 class SimpleVariable extends ScalarWeightedFeature {
   def views = ???
   def children = Seq()
-  def eval = scalarWeight
+  def eval(id: InternalId) = scalarWeight
+  def score = scalarWeight
 }
 
 class Evaluation2D(val targetX: Double, val targetY: Double) extends AbstractEvaluation {
@@ -52,8 +53,8 @@ class Evaluation2D(val targetX: Double, val targetY: Double) extends AbstractEva
   val y = new SimpleVariable()
   def features = Seq(x,y)
   def run() = {
-    val xt = (x.eval - targetX)
-    val yt = (y.eval - targetY)
+    val xt = (x.score - targetX)
+    val yt = (y.score - targetY)
     // paraboloid opening down
     val score = -(xt*xt + yt*yt)
 

@@ -11,7 +11,7 @@ class CoordinateAscentSpec extends FlatSpec with ShouldMatchers {
 
     coordAscent.train
 
-    eval2d.x.eval should be (13.0 plusOrMinus 1.0)
-    eval2d.y.eval should be (26.0 plusOrMinus 1.0)
+    eval2d.x.score should be (13.0 plusOrMinus 1.0)
+    eval2d.y.score should be (26.0 plusOrMinus 1.0)
   }
 }

@@ -8,7 +8,7 @@ class FunctionWeightedFeatureSpec extends FlatSpec {
   def fixture = new {
     val swOp = new FunctionWeightedFeature with ChildlessOp {
       val views = Set.empty[ViewOp]
-      def eval = 1.0
+      def eval(id: InternalId) = 1.0
     }
   }
   "A function weight operator" should "provide a default value of 1.0" in {

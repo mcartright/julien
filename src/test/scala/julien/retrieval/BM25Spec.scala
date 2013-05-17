@@ -101,13 +101,14 @@ class BM25Spec extends FlatSpec with MockFactory {
     val l = 150
     val b = 0.99
     val k = 2.3
+    val id = 250
     mockStat.expects('statistics)().returning(fakeCountStats).noMoreThanTwice
-    mockCV.expects('count)().returning(c)
-    mockLV.expects('length)().returning(l)
+    mockCV.expects('count)(id).returning(c)
+    mockLV.expects('length)(id).returning(l)
     val d = BM25(mockCV, mockLV, mockStat, b, k)
     val numerator = c * (k + 1)
     val denominator = c + (k * (1 - b + (b * l / d.avgDocLength)));
     val expScore = d.idf * numerator / denominator
-    expectResult(expScore) { d.eval }
+    expectResult(expScore) { d.eval(id) }
   }
 }
