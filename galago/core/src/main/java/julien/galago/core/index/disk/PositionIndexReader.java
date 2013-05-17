@@ -335,6 +335,8 @@ public class PositionIndexReader extends KeyListReader implements AggregateIndex
         documentIndex = Math.min(documentIndex + 1, documentCount);
         if (!isDone()) {
           loadNextPosting();
+        } else {
+          currentDocument = Integer.MAX_VALUE;
         }
       }
       return currentDocument == document;

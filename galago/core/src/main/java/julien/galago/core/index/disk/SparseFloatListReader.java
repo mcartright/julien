@@ -104,6 +104,7 @@ public class SparseFloatListReader extends KeyListReader {
       } else {
         // ensure we never overflow
         index = documentCount;
+        currentDocument = Integer.MAX_VALUE;
       }
     }
 

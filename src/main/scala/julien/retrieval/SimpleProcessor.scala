@@ -152,6 +152,7 @@ class SimpleProcessor
         }
         i += 1
       }
+
       // Update the next candidate to score
       candidate = newCandidate
     }

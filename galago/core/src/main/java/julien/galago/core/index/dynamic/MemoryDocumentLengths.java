@@ -344,6 +344,7 @@ public class MemoryDocumentLengths implements MemoryIndexPart, LengthsReader {
       this.currDoc = Math.min(identifier, this.fieldLengths.lastDocument);
       if (identifier > this.fieldLengths.lastDocument) {
         done = true;
+        this.currDoc = Integer.MAX_VALUE;
       }
       return this.currDoc == identifier;
     }

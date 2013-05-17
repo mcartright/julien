@@ -191,7 +191,6 @@ class RetrievalQualitySpec
         val name = julienIndex.name(posting.docid)
         val count = posting.positions.length
         if (count > 0) {
-          //println(s"Julien matched at ${posting.docid} ($name, $count)")
           jhits(name) = count
         }
       }
@@ -221,7 +220,6 @@ class RetrievalQualitySpec
         val gmatch =  god.hasMatch(candidate)
         if (god.hasMatch(candidate)) {
           val count = god.extents.size
-          //println(s"Galago matched at $candidate ($name, $count)")
           ghits(name) = count
         }
         god.movePast(candidate)
@@ -326,7 +324,6 @@ class RetrievalQualitySpec
     julienCombiner: (Seq[String], Index) => FeatureOp,
     galagoCombiner: String
   ) {
-    println("@1")
     // Generate queries
     val queries = getSampleQueries(4, 2)
 
@@ -334,10 +331,8 @@ class RetrievalQualitySpec
     val processor = SimpleProcessor()
     val retrieval = new LocalRetrieval(galagoIndex, new Parameters)
 
-    println("@2")
-
     // For each query, run against each index and compare results
-    for ((query, idx) <- queries.zipWithIndex; if (query.size > 0)) {
+    for ((query, idx) <- queries.zipWithIndex; if (query.size > 1)) {
       val clue = new StringBuilder()
       val genericClue = s"Query $idx: '${query.mkString(";")}'"
       try {
@@ -346,11 +341,9 @@ class RetrievalQualitySpec
         val jquery = julienCombiner(query, julienIndex)
         processor.clear
         processor add jquery
-        println("@3")
         val jUnstableResult =
           processor.run(DefaultAccumulator[ScoredDocument](requested))
         jUnstableResult.foreach(jr => jr.name = julienIndex.name(jr.id))
-        println("@4")
         // Galago
         val queryParams = new Parameters()
         queryParams.set("processingModel",
@@ -359,11 +352,7 @@ class RetrievalQualitySpec
         val galagoQL = s"#${galagoCombiner}(" + query.mkString(" ") + ")"
         val root = StructuredQuery.parse(galagoQL)
         val node = retrieval.transformQuery(root, queryParams)
-        println(s"galago query: $node")
         val gUnstableResult = retrieval.runQuery(node, queryParams)
-
-        // Need to compare results
-        expectResult(gUnstableResult.length)(jUnstableResult.length)
 
         // group by score, then compare group by group (so things with the same
         // scores all have the same order
@@ -374,11 +363,8 @@ class RetrievalQualitySpec
           gUnstableResult.groupBy(_.score.toFloat).mapValues(_.toSet)
         val gScores = gResult.keys.toSeq.sorted
 
-        for ((gs, js) <- gScores.zip(jScores)) {
-          val gSet = gResult(gs).map(_.documentName)
-          val jSet = jResult(js).map(_.name)
-          println(s"G: $gs -> ${gSet}\nJ: $js -> ${jSet}")
-        }
+        // Need to compare results
+        expectResult(gUnstableResult.length)(jUnstableResult.length)
 
         for (((gscore, jscore), idx) <- gScores.zip(jScores).zipWithIndex) {
           val jr = jResult(jscore)
@@ -412,14 +398,12 @@ class RetrievalQualitySpec
 
 
   it should "produce the same scores as Galago for simple queries" in {
-    //if (!readyToRun)
-    cancel("'qualityDir' was not defined.")
+    if (!readyToRun) cancel("'qualityDir' was not defined.")
     compareRetrievals(qlWrap _, "combine")
   }
 
   it should "produce the same scores as Galago for SDM queries" in {
     if (!readyToRun) cancel("'qualityDir' was not defined.")
-    println("Running SDM queries!")
     compareRetrievals(sdmWrap _, "sdm")
   }
 }

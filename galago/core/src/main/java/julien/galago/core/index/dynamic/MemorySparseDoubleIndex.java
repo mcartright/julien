@@ -19,8 +19,6 @@ import julien.galago.tupleflow.Utility;
 import julien.galago.tupleflow.VByteInput;
 import julien.galago.tupleflow.Utility.ByteArrComparator;
 
-
-
 /*
  * author sjh
  *
@@ -355,6 +353,7 @@ public class MemorySparseDoubleIndex implements MemoryIndexPart {
     private void read() throws IOException {
       if (iteratedDocs >= postings.termPostingsCount) {
         done = true;
+        currDocument = Integer.MAX_VALUE;
         return;
       } else {
         currDocument += documents_reader.readInt();
@@ -376,7 +375,6 @@ public class MemorySparseDoubleIndex implements MemoryIndexPart {
 
     @Override
     public int movePast(int identifier) throws IOException {
-
       while (!isDone() && (currDocument <= identifier)) {
         read();
       }

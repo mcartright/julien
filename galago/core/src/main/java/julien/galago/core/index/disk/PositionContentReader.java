@@ -294,7 +294,7 @@ public class PositionContentReader extends KeyListReader {
         } else {
           extentArray.clear();
           entryList.clear();
-          currentDocument = -1;
+          currentDocument = Integer.MAX_VALUE;
           currentCount = 0;
         }
       }

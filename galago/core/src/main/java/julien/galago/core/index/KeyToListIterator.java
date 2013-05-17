@@ -39,7 +39,11 @@ public abstract class KeyToListIterator implements Iterator {
   @Override
   public int movePast(int identifier) throws IOException {
     iterator.skipToKey(Utility.fromInt(identifier + 1));
-    return Utility.toInt(iterator.getKey());
+    if (!isDone()) {
+      return Utility.toInt(iterator.getKey());
+    } else {
+      return Integer.MAX_VALUE;
+    }
   }
 
   @Override

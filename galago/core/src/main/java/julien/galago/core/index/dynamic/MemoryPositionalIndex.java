@@ -25,8 +25,6 @@ import julien.galago.tupleflow.Utility;
 import julien.galago.tupleflow.VByteInput;
 import julien.galago.tupleflow.Utility.ByteArrComparator;
 
-
-
 /*
  * author sjh
  *
@@ -85,7 +83,7 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
       int document = mi.currentCandidate();
       ExtentArray ea = mi.extents();
       for (int i = 0; i < ea.length; i++) {
-	postingList.add(document, ea.begin(i));
+        postingList.add(document, ea.begin(i));
       }
       mi.movePast(document);
     }
@@ -367,7 +365,7 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
   }
 
   public class ExtentsIterator
-      implements NodeAggregateIterator, ExtentIterator {
+          implements NodeAggregateIterator, ExtentIterator {
 
     PositionalPostingList postings;
     VByteInput documents_reader;
@@ -449,6 +447,7 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
     public void read() throws IOException {
       if (iteratedDocs >= postings.termDocumentCount) {
         done = true;
+        currDocument = Integer.MAX_VALUE;
         return;
       } else if (iteratedDocs == postings.termDocumentCount - 1) {
         currDocument = postings.lastDocument;
@@ -474,7 +473,6 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
 
     @Override
     public int movePast(int identifier) throws IOException {
-
       while (!isDone() && (currDocument <= identifier)) {
         read();
       }
@@ -606,6 +604,7 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
     public void read() throws IOException {
       if (iteratedDocs >= postings.termDocumentCount) {
         done = true;
+        currDocument = Integer.MAX_VALUE;
         return;
       } else if (iteratedDocs == postings.termDocumentCount - 1) {
         currDocument = postings.lastDocument;
@@ -630,7 +629,6 @@ public class MemoryPositionalIndex implements MemoryIndexPart, AggregateReader.A
 
     @Override
     public int movePast(int identifier) throws IOException {
-
       while (!isDone() && (currDocument <= identifier)) {
         read();
       }

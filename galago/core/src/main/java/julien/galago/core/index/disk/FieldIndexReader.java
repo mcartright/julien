@@ -165,6 +165,8 @@ public class FieldIndexReader extends KeyListReader {
         documentIndex = Math.min(documentIndex + 1, documentCount);
         if (!isDone()) {
           loadValue();
+        } else {
+          currentDocument = Integer.MAX_VALUE;
         }
       }
       return currentDocument;

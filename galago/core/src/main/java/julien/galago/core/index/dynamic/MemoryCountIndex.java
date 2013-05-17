@@ -420,6 +420,7 @@ public class MemoryCountIndex implements MemoryIndexPart, AggregateReader.Aggreg
     private void read() throws IOException {
       if (iteratedDocs >= postings.termDocumentCount) {
         done = true;
+        currDocument = Integer.MAX_VALUE;
         return;
       } else if (iteratedDocs == postings.termDocumentCount - 1) {
         currDocument = postings.lastDocument;

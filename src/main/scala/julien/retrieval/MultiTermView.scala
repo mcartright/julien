@@ -45,8 +45,8 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
     val c = count(docid)
     // countCache.put(docid, c)
     statistics.collFreq += c
-    statistics.docFreq += 1
-    statistics.max = scala.math.min(statistics.max, c)
+    if (c > 0) statistics.docFreq += 1
+    statistics.max = scala.math.max(statistics.max, c)
     statistics.numDocs = terms.head.statistics.numDocs
     statistics.collLength = terms.head.statistics.collLength - adjustment
   }

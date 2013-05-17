@@ -201,7 +201,7 @@ public class DiskLengthsReader extends KeyListReader implements LengthsReader {
       // we can't move past the last document
       if (identifier > lastDocument) {
         done = true;
-        identifier = lastDocument;
+        identifier = Integer.MAX_VALUE;
       }
 
       if (currDocument < identifier) {

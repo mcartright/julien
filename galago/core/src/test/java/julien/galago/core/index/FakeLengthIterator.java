@@ -8,7 +8,6 @@ import java.io.IOException;
 
 import julien.galago.core.index.LengthsReader.LengthsIterator;
 
-
 /**
  *
  * @author marc
@@ -37,7 +36,11 @@ public class FakeLengthIterator implements LengthsIterator {
 
   @Override
   public int currentCandidate() {
-    return ids[position];
+    if (isDone()) {
+      return Integer.MAX_VALUE;
+    } else {
+      return ids[position];
+    }
   }
 
   @Override
