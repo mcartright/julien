@@ -114,10 +114,10 @@ class RetrievalQualitySpec
 
   def getSampleQueries(range: Int, low: Int): ListBuffer[Seq[String]] = {
     val queries = ListBuffer[Seq[String]]()
-    var localSample = termSample
     if (config.contains("qualityQuery")) {
-      queries += localSample
+      queries += termSample
     } else {
+      var localSample = Random.shuffle(termSample)
       while (!localSample.isEmpty) {
         val desiredSize = min(localSample.length, Random.nextInt(range)+low)
         val (cut, leftover) = localSample splitAt desiredSize
@@ -324,12 +324,25 @@ class RetrievalQualitySpec
     julienCombiner: (Seq[String], Index) => FeatureOp,
     galagoCombiner: String
   ) {
+
+    // For timing purposes
+    def time[R](block: => R): Tuple2[R, Long] = {
+      val t0 = System.currentTimeMillis
+      val result = block
+      val t1 = System.currentTimeMillis
+      Tuple2(result, t1-t0)
+    }
+
     // Generate queries
     val queries = getSampleQueries(4, 2)
 
     // Set up processing structures
     val processor = SimpleProcessor()
     val retrieval = new LocalRetrieval(galagoIndex, new Parameters)
+
+    var jTotalTime = 0L
+    var gTotalTime = 0L
+    var numRun = 0
 
     // For each query, run against each index and compare results
     for ((query, idx) <- queries.zipWithIndex; if (query.size > 1)) {
@@ -338,21 +351,31 @@ class RetrievalQualitySpec
       try {
         val requested = 100
         // Julien
-        val jquery = julienCombiner(query, julienIndex)
-        processor.clear
-        processor add jquery
-        val jUnstableResult =
-          processor.run(DefaultAccumulator[ScoredDocument](requested))
-        jUnstableResult.foreach(jr => jr.name = julienIndex.name(jr.id))
+        val (jUnstableResult, jSingleTime) = time {
+          val jquery = julienCombiner(query, julienIndex)
+          processor.clear
+          processor add jquery
+          val r = processor.run(DefaultAccumulator[ScoredDocument](requested))
+          // Because Galago does it without asking - trying to be fair
+          r.foreach(jr => jr.name = julienIndex.name(jr.id))
+          r
+        }
+
+        jTotalTime += jSingleTime
+
         // Galago
         val queryParams = new Parameters()
         queryParams.set("processingModel",
           "org.lemurproject.galago.core.retrieval.processing.RankedDocumentModel")
         queryParams.set("requested", requested)
-        val galagoQL = s"#${galagoCombiner}(" + query.mkString(" ") + ")"
-        val root = StructuredQuery.parse(galagoQL)
-        val node = retrieval.transformQuery(root, queryParams)
-        val gUnstableResult = retrieval.runQuery(node, queryParams)
+        val (gUnstableResult, gSingleTime) = time {
+          val galagoQL = s"#${galagoCombiner}(" + query.mkString(" ") + ")"
+          val root = StructuredQuery.parse(galagoQL)
+          val node = retrieval.transformQuery(root, queryParams)
+          retrieval.runQuery(node, queryParams)
+        }
+        gTotalTime += gSingleTime
+        numRun += 1
 
         // group by score, then compare group by group (so things with the same
         // scores all have the same order
@@ -394,6 +417,13 @@ class RetrievalQualitySpec
         }
       }
     }
+
+    // Report times
+    val jAvg = jTotalTime.toDouble / numRun.toDouble
+    val gAvg = gTotalTime.toDouble / numRun.toDouble
+    info(s"queries run: $numRun")
+    info(s"Julien avg: ${jAvg}, ($jTotalTime)")
+    info(s"Galago avg: ${gAvg}, ($gTotalTime)")
   }
 
 
