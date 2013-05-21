@@ -1,6 +1,7 @@
 package julien
 package eval
 
+/** Returnsd the highest label found by rank k. */
 class BestAtK(docsRetrieved: Int = Int.MaxValue)
     extends QueryEvaluator {
   val relRet = new CountRelevantRetrieved(docsRetrieved)

@@ -18,7 +18,7 @@ object QueryJudgmentSet {
 
     val mutableMap =
       scala.collection.mutable.HashMap[String, QueryJudgments]().
-        withDefault(s => new QueryJudgments(s))
+        withDefault(s => QueryJudgments(s))
     while(reader.ready) {
       val line = reader.readLine
       val columns = line.split("\\s+")

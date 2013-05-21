@@ -3,7 +3,9 @@ package eval
 
 import scala.annotation.tailrec
 
-class CountRelevantRetrieved(docsRetrieved : Int = Int.MaxValue) extends QueryEvaluator {
+/** Counts the number of relevant documents that were retrieved. */
+class CountRelevantRetrieved(docsRetrieved : Int = Int.MaxValue)
+    extends QueryEvaluator {
 
   def eval[T <: ScoredObject[T]](
     result: QueryResult[T],

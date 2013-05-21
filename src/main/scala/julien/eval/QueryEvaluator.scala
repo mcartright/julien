@@ -42,8 +42,9 @@ abstract class QueryEvaluator() {
     sum
   }
 
-  def numRelevant(judgments : QueryJudgments) : Int = judgments.numRel
-  def numNonRelevant(judgments : QueryJudgments) : Int = judgments.numNonRel
+  def numRelevant(judgments : QueryJudgments) : Int = judgments.numRelevant
+  def numNonRelevant(judgments : QueryJudgments) : Int =
+    judgments.numNonRelevant
   def isRelevant(judgment: Judgment) : Boolean =
     if (judgment.label > 0) true else false
 

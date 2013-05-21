@@ -46,16 +46,11 @@ class Synonym(terms: Seq[Term])
       movers.foreach(_.reset)
       var candidate = movers.map(_.at).min
       while (movers.exists(!_.isDone)) {
-        if (movers.exists(_.moveTo(candidate))) {
-          val p = positions(candidate)
-          thePosting.docid = candidate
-          thePosting.positions = p
-          f(thePosting)
-        }
-        candidate = movers.
-          filterNot(_.isDone).
-          map(_.movePast(candidate)).
-          min
+        val p = positions(candidate)
+        thePosting.docid = candidate
+        thePosting.positions = p
+        f(thePosting)
+        candidate = movers.map(_.movePast(candidate)).min
       }
 
       // Done iterating - now move to the right positions

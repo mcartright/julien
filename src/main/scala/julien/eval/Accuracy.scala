@@ -1,6 +1,12 @@
 package julien
 package eval
 
+/** Reports the accuracy for a given query result/judgment pair.
+  * Accuracy is defined as:
+  *
+  * Acc = (true pos + true neg) / (all predictions)
+  *
+  */
 class Accuracy extends QueryEvaluator() {
   def eval[T <: ScoredObject[T]](
     predictions: QueryResult[T],
@@ -9,7 +15,7 @@ class Accuracy extends QueryEvaluator() {
   ): Double = {
     val ps = predictions.map(_.name).toSet
     val counts = for (judgment <- actual) yield {
-      if (judgment.label == 1) {
+      if (judgment.isRelevant) {
         // It's actually relevant
         if (ps(judgment.name)) 1 // TP
         else 0 // FN

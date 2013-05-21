@@ -1,6 +1,7 @@
 package julien
 package eval
 
+/** Counts the number of documents judged to be relevant */
 class CountRelevant() extends QueryEvaluator() {
   def eval[T <: ScoredObject[T]](
     result: QueryResult[T],

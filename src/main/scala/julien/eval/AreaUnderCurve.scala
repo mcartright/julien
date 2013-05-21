@@ -3,12 +3,16 @@ package eval
 
 import scala.math._
 
+/** Measures the area under the curve, approximated
+  * by measuring rectangles formed by
+  *
+  */
 class AreaUnderCurve extends QueryEvaluator() {
-  case class Pair(key: Double, value: Double) extends Ordered[Pair] {
-    // natural orderingo is "higher key == better"
+  case class Pair(predicted: Double, actual: Double) extends Ordered[Pair] {
+    // natural ordering is "higher predicted == better"
     def compare(other: Pair): Int =
-      if (key > other.key) return -1
-      else if (key < other.key) return 1
+      if (predicted > other.predicted) return -1
+      else if (predicted < other.predicted) return 1
       else return 0
   }
 
@@ -31,14 +35,14 @@ class AreaUnderCurve extends QueryEvaluator() {
     var fPrev = Double.MinValue
     // Start with the highest prediction first, and increase downwards
     for (pair <- sortedProbs) {
-      val curF = pair.key
+      val curF = pair.predicted
       if (curF != fPrev) {
         area += abs(fp - fpPrev) * ((tp + tpPrev) / 2.0)
         fPrev = curF
         fpPrev = fp
         tpPrev = tp
       }
-      if (pair.value == 1)
+      if (pair.actual == 1)
         tp += 1
       else
         fp += 1

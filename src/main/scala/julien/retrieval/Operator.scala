@@ -123,12 +123,8 @@ trait FunctionWeightedFeature extends FeatureOp {
   }
 }
 
-/** A FeatureView is a store-supplied feature -basically anything precomputed,
+/** A FeatureView is a store-supplied feature - basically anything precomputed,
   * but that definition is quite loose.
   */
 trait FeatureView extends ViewOp with FeatureOp with ChildlessOp
-
-// Overloaded operators that do both -- these need work
-// case class Require[T](test: (_) => Boolean, op: Operator) extends FeatureOp
-// case class Reject[T](test: (_) => Boolean, op: Operator) extends FeatureOp
 

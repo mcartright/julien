@@ -72,10 +72,7 @@ final class ArrayLengths(i: Index, nascentArray: Future[Array[Int]])
   def isDense: Boolean = true
 
   // This will block to set this array if the read operation isn't complete,
-  // but it will only block when it's asked for (hence the lazy)
-  // I'm only hoping that if the Future is already done, that this doesn't
-  // somehow cause the Await to block forever
-  // (it should instead return immediately)
+  // but it will only block when it's asked for (hence the lazy).
   lazy val lengthArray: Array[Int] = {
     Await.result(nascentArray, Duration.Inf) // arbitrary
   }
