@@ -18,6 +18,7 @@ package object access {
 
   implicit def ei2posting(e: ExtentIterator) =
     PositionsPosting(
+      julien.galago.tupleflow.Utility.toString(e.key),
       InternalId(e.currentCandidate),
       e.count,
       e.extents

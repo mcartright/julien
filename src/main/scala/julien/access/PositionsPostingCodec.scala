@@ -5,7 +5,7 @@ import java.io._
 import julien.galago.tupleflow.Utility
 import julien.galago.core.util.ExtentArray
 
-class PositionsPostingsCodec extends Codec[PositionsPosting] {
+class PositionsPostingCodec extends Codec[PositionsPosting] {
   // This is all the state we need
   var lastDocid = 0
 
@@ -36,7 +36,7 @@ class PositionsPostingsCodec extends Codec[PositionsPosting] {
     maxPositionsInPosting = math.max(maxPositionsInPosting, p.count)
   }
 
-  private val thePosting = PositionsPosting(0,0,new ExtentArray)
+  private val thePosting = PositionsPosting("",0,0,new ExtentArray)
   def decode(in: DataInput): PositionsPosting = {
     // d-gapping, so add
     thePosting.docid = VByte.uncompressInt(in) + lastDocid
