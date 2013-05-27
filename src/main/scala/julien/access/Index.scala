@@ -198,13 +198,6 @@ class Index private(
     else new NullExtentIterator(label)
   }
 
-  def postings(
-    key:String,
-    field: String = defaultField,
-    stem: String = defaultStem
-  ): PostingSeq[PositionsPosting] =
-    new PostingSeq(iterator(key, field, stem), this)
-  def documents: DocumentSeq = DocumentSeq(this)
   def documents(docids: Seq[InternalId]): List[Document] = {
     val sortedNames = docids.sorted.map(underlying.getName(_))
     val gdocs: scala.collection.mutable.Map[String, GDoc] =
@@ -233,9 +226,6 @@ class Index private(
   def name(docid: InternalId) : String = underlying.getName(docid)
   def identifier(name: String): InternalId =
     new InternalId(underlying.getIdentifier(name))
-  def names: PairSeq[String] =
-    new PairSeq[String](underlying.getIndexPart("names").keys,
-    (k: KeyIterator) => Utility.toString(k.getValueBytes) : String )
   def count(key: String, targetId: String): Int =
     positions(key, targetId).length
   def collectionCount(key: String): Long = getKeyStatistics(key).nodeFrequency

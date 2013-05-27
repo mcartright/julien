@@ -51,14 +51,15 @@ object IndexLengths {
 
 sealed abstract class IndexLengths(index: Index)
     extends LengthsView
-    with ChildlessOp
+    with ChildlessOp {
+  override def toString = s"lengths:" + index.toString
+}
 
 final class StreamLengths(override val index: Index, li: LengthsIterator)
     extends IndexLengths(index)
     with Movable
     with IteratedHook[LengthsIterator] {
   override val underlying = li
-  override def toString = s"lengths:" + index.toString
   def length(id: InternalId): Int = {
     underlying.syncTo(id)
     underlying.getCurrentLength

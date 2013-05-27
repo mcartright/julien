@@ -16,7 +16,7 @@ class Synonym(terms: Seq[Term])
     var t = 0
     val numTerms =  terms.size
     while (t < numTerms) {
-      itBuffer += terms(t).underlying.extents
+      itBuffer += terms(t).positionsBuffer
       t += 1
     }
     itBuffer.result()

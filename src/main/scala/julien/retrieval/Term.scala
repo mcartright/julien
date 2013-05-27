@@ -1,15 +1,25 @@
 package julien
 package retrieval
 
+import scala.concurrent.{Future,Await,future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 import julien.galago.core.index.ExtentIterator
 import julien.galago.core.util.ExtentArray
 
 object Term {
-  def apply(s: String)(implicit i: Index) = new Term(s, None, None, i)
+  def apply(s: String)(implicit i: Index) = new StreamedTerm(s, None, None, i)
   def apply(s: String, f: String)(implicit i: Index) =
-    new Term(s, Some(f), None, i)
+    new StreamedTerm(s, Some(f), None, i)
   def apply(s: String, f: String, stem: String)(implicit i: Index) =
-    new Term(s, Some(f), Some(stem), i)
+    new StreamedTerm(s, Some(f), Some(stem), i)
+}
+
+sealed abstract class Term(t: String, index: Index)
+  extends PositionStatsView
+  with PositionsBufferView
+  with ChildlessOp {
+  override def toString: String = s"$t: " + index.toString
 }
 
 /** Represents a direct connection to an index via a key specified
@@ -19,17 +29,14 @@ object Term {
   *
   * These are always 1-to-1.
   */
-final class Term private (
+final class StreamedTerm (
   val t: String,
   val field: Option[String],
   val stem: Option[String],
   override val index: Index
 )
-    extends SparseIterator[ExtentIterator]
-    with PositionStatsView
-    with PositionsBufferView {
-
-  override def toString: String = s"$t: " + index.toString
+    extends Term(t, index)
+    with SparseIterator[ExtentIterator] {
 
   override val underlying = index.shareableIterator(
     t,

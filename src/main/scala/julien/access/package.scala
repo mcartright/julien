@@ -10,8 +10,16 @@ package julien
   */
 package object access {
   import language.implicitConversions
+  import julien.galago.core.index.ExtentIterator
 
   // Makes byte-array calls much less annoying
   implicit def string2bytes(s: String) =
     julien.galago.tupleflow.Utility.fromString(s)
+
+  implicit def ei2posting(e: ExtentIterator) =
+    PositionsPosting(
+      InternalId(e.currentCandidate),
+      e.count,
+      e.extents
+    )
 }

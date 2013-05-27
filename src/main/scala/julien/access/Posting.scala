@@ -9,6 +9,3 @@ trait Posting[T <: Posting[T]] {
   def docid: InternalId
   def copy: T
 }
-
-//TODO: Implement this? Unclear - it's so generic, may not be worth it.
-// trait DataPosting extends Posting with DataSrc

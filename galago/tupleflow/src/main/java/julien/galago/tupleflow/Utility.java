@@ -92,7 +92,7 @@ public class Utility {
     return drmaaOptions;
   }
 
-  /** 
+  /**
    * Sorter parameters
    */
   public static Parameters getSorterOptions() {
@@ -128,7 +128,7 @@ public class Utility {
   public static Step getSorter(Order sortOrder) {
     return getSorter(sortOrder, null, CompressionType.VBYTE);
   }
-  
+
   public static Step getSorter(Order sortOrder, CompressionType c) {
     return getSorter(sortOrder, null, c);
   }
@@ -143,7 +143,7 @@ public class Utility {
   public static Step getSorter(Order sortOrder, Class reducerClass) {
     return getSorter(sortOrder, null, CompressionType.VBYTE);
   }
-  
+
   public static Step getSorter(Order sortOrder, Class reducerClass, CompressionType c) {
     Parameters p = new Parameters();
     p.set("class", sortOrder.getOrderedClass().getName());
@@ -154,7 +154,7 @@ public class Utility {
 //    } else {
 //      System.err.println("NOT setting sorter to : null -- " + join(sortOrder.getOrderSpec()));
     }
-    
+
     if (reducerClass != null) {
       try {
         reducerClass.asSubclass(Reducer.class);
@@ -645,7 +645,7 @@ public class Utility {
 
   /**
    * remove all data from all temp directories - be very careful when using this function!
-   * 
+   *
    * @throws IOException
    */
   public static void cleanTemporaryDirectories() throws IOException {
