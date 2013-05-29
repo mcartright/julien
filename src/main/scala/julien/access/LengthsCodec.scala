@@ -12,6 +12,21 @@ class LengthsCodec extends Codec[Int] {
   var numEntries = 0
   var max = 0
 
+  override def setKey(newKey: Array[Byte]) {
+    numEntries = 0
+    max = 0
+  }
+
+  override def writeHeader(out: DataOutput) {
+    out.writeInt(numEntries)
+    out.writeInt(max)
+  }
+
+  override def readHeader(in: DataInput) {
+    numEntries = in.readInt
+    max = in.readInt
+  }
+
   def encode(i: Int, out: DataOutput) {
     out.writeInt(i)
     numEntries += 1
@@ -19,8 +34,4 @@ class LengthsCodec extends Codec[Int] {
   }
 
   def decode(in: DataInput): Int = in.readInt
-
-  // No state to get/set
-  def state: Array[Byte] = Array.empty[Byte]
-  def state_=(bytes: Array[Byte]) {}
 }

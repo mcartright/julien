@@ -5,14 +5,14 @@ import java.io._
 import julien.access._
 import julien.galago.core.util.ExtentArray
 
-class IndexWriterFunction[T](
+class IndexWriterFunction[T <: KeyedData](
   val dst: String,
   val suffix: String,
   val codec: Codec[T]
 ) extends Function1[T, Unit] {
   @transient lazy val writer = new IndexFileWriter(dst + suffix, codec)
   def close = writer.close
-  def apply(key: Array[Byte], data: T) = writer.append(key, data)
+  def apply(data: T) = writer.append(data.key, data)
 }
 
 // Define the writer function
@@ -84,17 +84,22 @@ val normalize = (d: Doc) => d.copy(text = d.text.map(_.toLowerCase))
 val parsedDocuments =
   shifted.par.flatMap(intoDocuments).map(tokenize).map(normalize)
 
-case class IdLength(val id: Int, val length: Int)
+case class IdLength(val id: Int, val length: Int) extends KeyedData {
+  val key = id.toString
+}
 
 val writeLengths = new Writer[IdLength, Unit](prefix, "lengths") {
   def apply(p: IdLength): Unit = dstFile.write(s"${p.id}\t${p.length}\n")
 }
 
+val encodeLengths = new IndexWriterFunction[IdLength](prefix, "lengths",
+  new LengthsCodec())
+
 parsedDocuments.map {
   doc => IdLength(doc.id, doc.text.length)
-}.seq.sortBy(_.id).foreach(writeLengths)
+}.seq.sortBy(_.id).foreach(encodeLengths)
 
-writeLengths.close
+encodeLengths.close
 
 // names
 case class IdName(val id: Int, val name: String)

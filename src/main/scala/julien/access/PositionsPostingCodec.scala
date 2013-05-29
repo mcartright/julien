@@ -5,7 +5,10 @@ import java.io._
 import julien.galago.tupleflow.Utility
 import julien.galago.core.util.ExtentArray
 
+
 class PositionsPostingCodec extends Codec[PositionsPosting] {
+  val byteOrder = IndexFile.byteOrdering
+
   // This is all the state we need
   var lastDocid = 0
 
@@ -13,6 +16,10 @@ class PositionsPostingCodec extends Codec[PositionsPosting] {
   var numPostings = 0
   var numPositions = 0L
   var maxPositionsInPosting = 0
+
+  override def setKey(newKey: Array[Byte]) {
+    lastDocid = 0
+  }
 
   def encode(p: PositionsPosting, out: DataOutput) {
     // d-gap docids
@@ -69,6 +76,6 @@ class PositionsPostingCodec extends Codec[PositionsPosting] {
     maxPositionsInPosting = in.readInt
   }
 
-  def state: Array[Byte] = Utility.fromInt(lastDocid)
-  def state_=(bytes: Array[Byte]) = lastDocid = Utility.toInt(bytes)
+  override def state: Array[Byte] = Utility.fromInt(lastDocid)
+  override def state_=(bytes: Array[Byte]) = lastDocid = Utility.toInt(bytes)
 }

@@ -4,6 +4,7 @@ package access
 import java.io.{DataOutputStream, FileOutputStream}
 import scala.collection.immutable.TreeMap
 import IndexFile.ValueInfo
+import julien.galago.tupleflow.Utility
 
 class IndexFileWriter[@specialized(Int,Long) T](
   val filename: String,
@@ -40,17 +41,21 @@ class IndexFileWriter[@specialized(Int,Long) T](
 
   def append(key: Array[Byte], data: T) {
     val result = IndexFile.byteOrdering.compare(currentKey, key)
-    assert (result >= 0,
-      s"Keys must be received in ascending order. at: $currentKey. Got $key")
+    assert (result <= 0,
+      "Keys must be received in ascending order. " +
+        s"at: ${Utility.toString(currentKey)}; Got ${Utility.toString(key)}")
 
-    if (result > 0) {
+    if (result < 0 || currentKey.length == 0) {
       if (currentKey.length > 0) closeCurrentList
       openNewList(key)
+      currentKey = key
     }
     listWriter.append(data)
   }
 
   private def openNewList(key: Array[Byte]) {
+    // In case it's maintaining state per-key
+    codec.setKey(key)
     listWriter = new IndexListWriter(key, dataStream, codec)
   }
 

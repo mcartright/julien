@@ -9,7 +9,9 @@ case class PositionsPosting(
   var docid: InternalId,
   var count: Int,
   var positions: ExtentArray)
-extends Ordered[PositionsPosting] {
+    extends KeyedData
+    with Ordered[PositionsPosting] {
+  def key = term
   def compare(that: PositionsPosting): Int = {
     var r = this.term compare that.term
     if (r != 0) return r
