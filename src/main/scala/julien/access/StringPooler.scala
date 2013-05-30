@@ -15,13 +15,13 @@ class StringPooler private(maxSize: Long) {
 
   def collapse(terms: Array[String]): Array[String] = {
     if (maxSize > 0 && pool.size > maxSize) pool.clear
-    val builder = List.newBuilder[String]()
+    val builder = List.newBuilder[String]
     var i = 0
     while (i < terms.length) {
       val t = terms(i)
       val ref = pool.get(t) // get the WeakRef
       val insert = if (ref.isDefined) {
-        ref.get.get
+        ref.get.get.asInstanceOf[String]
       } else {
         pool.put(t, WeakReference(t))
         t

@@ -14,7 +14,7 @@
   <repositories>
     <repository>
       <id>galago</id>
-      <url>http://ayr.cs.umass.edu/m2/repository</url>
+      <url>http://scm-ciir.cs.umass.edu/maven</url>
       <snapshots>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
@@ -43,14 +43,14 @@
       <name>Scala-tools Maven2 Repository</name>
       <url>http://scala-tools.org/repo-releases</url>
     </pluginRepository>
-    <pluginRepository>
+    <!-- <pluginRepository>
       <id>galago</id>
       <url>http://ryde.cs.umass.edu/stuff/m2/repository</url>
       <snapshots>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
       </snapshots>
-    </pluginRepository>
+    </pluginRepository> -->
   </pluginRepositories>
   <dependencies>
     <dependency>
