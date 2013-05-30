@@ -1,7 +1,0 @@
-package julien.galago.tupleflow.types;
-
-type SerializedParameters {
-    String parameters;
-
-    order: +parameters;
-}

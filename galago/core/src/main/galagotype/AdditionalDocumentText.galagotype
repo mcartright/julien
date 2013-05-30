@@ -1,9 +1,0 @@
-package julien.galago.core.types;
-
-type AdditionalDocumentText {
-    int identifier;
-    String text;
-
-    order: ;
-    order: +identifier;
-};

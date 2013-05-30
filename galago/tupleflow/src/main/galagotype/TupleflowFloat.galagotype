@@ -1,7 +1,0 @@
-package julien.galago.tupleflow.types;
-
-type TupleflowFloat {
-    float value;
-
-    order: +value;
-}

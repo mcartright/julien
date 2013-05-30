@@ -1,7 +1,0 @@
-package julien.galago.tupleflow.types;
-
-type TupleflowInt {
-    int value;
-
-    order: +value;
-}

@@ -1,7 +1,0 @@
-package julien.galago.tupleflow.types;
-
-type TupleflowLong {
-    long value;
-
-    order: +value;
-}

@@ -1,7 +1,0 @@
-package julien.galago.tupleflow.types;
-
-type FileName {
-    String filename;
-    
-    order: +filename;
-}
