@@ -58,7 +58,7 @@ object GalagoJulienRetrievalQuality extends App {
           if (!name1.equals(names2(idx))) {
             val r1 = res1(idx)
             val r2 = res2(idx)
-            println("julien: " + r1.documentName + "," + r1.score + "galago: " + r2.documentName + "," + r2.score)
+            println("julien: " + r1.documentName + "," + r1.score + " galago: " + r2.documentName + "," + r2.score)
           }
         }
       }
@@ -82,9 +82,9 @@ object GalagoJulienRetrievalQuality extends App {
   }
 
   def runJulienQueries(queries: Seq[String]) = {
-    //implicit val index = Index.disk("/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-jul-11")
+    implicit val index = Index.disk("/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-jul-12")
 
-    implicit val index = Index.disk("/usr/dan/users4/jdalton/code/julien/data/test-index-julien")
+    //implicit val index = Index.disk("/usr/dan/users4/jdalton/code/julien/data/test-index-julien")
 
     val resultMap = HashMap[String, Seq[ScoredDocument]]()
 
@@ -94,7 +94,7 @@ object GalagoJulienRetrievalQuality extends App {
 
     for (i <- 1 to 1) {
 
-      if (i == 2) {
+      if (i == 1) {
         start = System.currentTimeMillis()
       }
 
@@ -132,8 +132,8 @@ object GalagoJulienRetrievalQuality extends App {
 
         val model = modelFeatures.result
 
-        val hooks = model.flatMap(m => m.iHooks).toSet
-        hooks.foreach(_.attach(index))
+       // val hooks = model.flatMap(m => m.iHooks).toSet
+       // hooks.foreach(_.attach(index))
         // processor.add(model: _*)
 
         // Add the model to the processor
@@ -145,6 +145,7 @@ object GalagoJulienRetrievalQuality extends App {
           val doc = r.asInstanceOf[julien.retrieval.ScoredDocument]
           val name = index.name(doc.id)
           doc.name = name
+      //    println(s"$name $idx $doc.score")
           new retrieval.ScoredDocument(name, idx + 1, doc.score)
         }
         // printResults(results, index)
@@ -165,10 +166,10 @@ object GalagoJulienRetrievalQuality extends App {
     p.set("uniw", 0.87264)
     p.set("odw", 0.07906)
     p.set("uww", 0.04829)
-    p.set("index", "/usr/dan/users4/jdalton/code/julien/data/test-index-galago34")
-   // p.set("index", "/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-g34")
-    p.set("requested", 5)
-    p.set("annotate", true)
+  //  p.set("index", "/usr/dan/users4/jdalton/code/julien/data/test-index-galago34")
+    p.set("index", "/usr/dan/users4/jdalton/scratch2/thesis/document-retrieval-modeling/data/indices/robust04-g34")
+    p.set("requested", 10)
+ //   p.set("annotate", true)
     p.set("stemming", false)
     p.set("deltaReady", false)
     // conceptIndexParams.set("print", true)
@@ -178,7 +179,7 @@ object GalagoJulienRetrievalQuality extends App {
     val text2ConceptRetrieval = RetrievalFactory.instance(p).asInstanceOf[LocalRetrieval]
     println("starting galago queries")
     var start = System.currentTimeMillis()
-    for (i <- 1 to 1) {
+    for (i <- 1 to 2) {
       if (i == 2) {
         start = System.currentTimeMillis()
       }
@@ -192,7 +193,7 @@ object GalagoJulienRetrievalQuality extends App {
         val transformed = text2ConceptRetrieval.transformQuery(root, p)
         // println(transformed.toPrettyString)
         val proc = new RankedDocumentModel(text2ConceptRetrieval)
-        var results =  proc.execute(transformed, p) //text2ConceptRetrieval.runQuery(transformed, p)
+        var results =   text2ConceptRetrieval.runQuery(transformed, p) //proc.execute(transformed, p)
         if (results == null) {
           results = Array.empty[org.lemurproject.galago.core.retrieval.ScoredDocument]
         }
@@ -204,14 +205,14 @@ object GalagoJulienRetrievalQuality extends App {
 
         resultMap += (queryLine.split("\\s+")(0) -> results)
 
-              for (r <- results) {
-                val name = text2ConceptRetrieval.getDocumentName(r.document)
-                println("document: " + name)
-                println(r.annotation.toString)
-                r.documentName = name
-                println(f"test ${r.documentName} ${r.score}%10.8f ${r.rank} galago")
-
-              }
+//              for (r <- results) {
+//                val name = text2ConceptRetrieval.getDocumentName(r.document)
+//                println("document: " + name)
+//                println(r.annotation.toString)
+//                r.documentName = name
+//                println(f"test ${r.documentName} ${r.score}%10.8f ${r.rank} galago")
+//
+//              }
       }
     }
     val end = System.currentTimeMillis()
