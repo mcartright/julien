@@ -16,6 +16,7 @@ package object access {
   implicit def string2bytes(s: String) =
     julien.galago.tupleflow.Utility.fromString(s)
 
+/*
   implicit def ei2posting(e: ExtentIterator) =
     PositionsPosting(
       julien.galago.tupleflow.Utility.toString(e.key),
@@ -23,4 +24,5 @@ package object access {
       e.count,
       e.extents
     )
+ */
 }
