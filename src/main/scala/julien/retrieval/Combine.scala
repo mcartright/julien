@@ -2,27 +2,27 @@ package julien
 package retrieval
 
 object Combine {
-  def apply(children: Seq[FeatureOp]) =
+  def apply(children: Seq[Feature]) =
     new Combine(children, () => 1.0, summer)
 
-  def apply(children: Seq[FeatureOp], weight: Double) =
+  def apply(children: Seq[Feature], weight: Double) =
     new Combine(children, () => weight, summer)
 
-  def apply(children: Seq[FeatureOp], weight: Double, combiner: Combiner) =
+  def apply(children: Seq[Feature], weight: Double, combiner: Combiner) =
     new Combine(children, () => weight, combiner)
 
-  def apply(children: Seq[FeatureOp], weight: () => Double) =
+  def apply(children: Seq[Feature], weight: () => Double) =
     new Combine(children, weight, summer)
 
-  def apply(children: Seq[FeatureOp], combiner: Combiner) =
+  def apply(children: Seq[Feature], combiner: Combiner) =
     new Combine(children, () => 1.0, combiner)
 
   def apply(
-    children: Seq[FeatureOp],
+    children: Seq[Feature],
     weight: () => Double,
     combiner: Combiner) = new Combine(children, weight, combiner)
 
-  val summer: Combiner = (id: InternalId, sops: Seq[FeatureOp]) => {
+  val summer: Combiner = (id: InternalId, sops: Seq[Feature]) => {
     // Inlined sum is faster than method call (i.e. 'foldLeft')
     var sum = 0.0
     var i = 0
@@ -35,13 +35,13 @@ object Combine {
 }
 
 class Combine private(
-  val ops: Seq[FeatureOp],
+  val ops: Seq[Feature],
   w: () => Double,
   var combiner: Combiner)
     extends FunctionWeightedFeature {
   this.weight = w
   lazy val children: Seq[Operator] = ops
-  def views: Set[ViewOp] =
-    ops.foldLeft(Set[ViewOp]()) { (s, op) => s ++ op.views }
+  def views: Set[View] =
+    ops.foldLeft(Set[View]()) { (s, op) => s ++ op.views }
   def eval(id: InternalId) : Double = combiner(id, ops)
 }

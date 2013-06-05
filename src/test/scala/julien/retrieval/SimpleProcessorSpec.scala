@@ -21,7 +21,7 @@ trait SimpleProcessorBehavior extends QuickIndexBuilder { this: FlatSpec =>
     case false => Random.shuffle(vocabulary).take(5).toList
   }
 
-  def getQuery(terms: List[String]): Tuple2[FeatureOp, String] = {
+  def getQuery(terms: List[String]): Tuple2[Feature, String] = {
     implicit val defaultIndex = index
     val models = List("BM25", "JM", "Dir")
     val chosen = if (config.contains("scorer"))

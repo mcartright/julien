@@ -2,10 +2,10 @@ package julien
 package learning
 package neuralnet
 
-import julien.retrieval.FeatureOp
+import julien.retrieval.Feature
 
 object Layer {
-  def neurons(f: Seq[FeatureOp]) = new FeatureLayer(f)
+  def neurons(f: Seq[Feature]) = new FeatureLayer(f)
   def neurons(s: Int) = new NeuronLayer(s)
   def lists(s: Int) = new ListLayer(s)
 }
@@ -27,7 +27,7 @@ sealed abstract class Layer {
   }
 }
 
-final class FeatureLayer(f: Seq[FeatureOp]) extends Layer {
+final class FeatureLayer(f: Seq[Feature]) extends Layer {
   type T = FeatureNeuron
   val neurons = f.map(new FeatureNeuron(_)).toArray
 }

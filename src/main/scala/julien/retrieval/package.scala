@@ -25,7 +25,7 @@ import scala.reflect.runtime.universe._
   * // Create a query-likelihood query. `Dirichlet.apply` is the
   * // scoring function applied over each query term.
   * scala> val ql = bow(List("new", "york", "city"), Dirichlet.apply)
-  * ql: julien.retrieval.FeatureOp = CombineNorm(Dirichlet(new: ...
+  * ql: julien.retrieval.Feature = CombineNorm(Dirichlet(new: ...
   *
   * Make a processor for the query
   * scala> val processor = SimpleProcessor()
@@ -40,8 +40,8 @@ import scala.reflect.runtime.universe._
   * }}}
   */
 package object retrieval {
-  type Combiner = (InternalId, Seq[FeatureOp]) => Double
-  type QueryPreparer = (String) => Seq[FeatureOp]
+  type Combiner = (InternalId, Seq[Feature]) => Double
+  type QueryPreparer = (String) => Seq[Feature]
 
   // Bring in local references to some of the access structures
   type Index = julien.access.Index
@@ -61,25 +61,25 @@ package object retrieval {
   // Basic query operations - subject to moving
   def bow(
     terms: Seq[String],
-    scorer: (Term, IndexLengths) => FeatureOp)
-  (implicit index: Index): FeatureOp = {
+    scorer: (Term, IndexLengths) => Feature)
+  (implicit index: Index): Feature = {
     CombineNorm(terms.map(t =>
       scorer(Term(t)(index), IndexLengths()(index))))
   }
 
   def sdm(
     rawterms: Seq[String],
-    scorer: (Term, IndexLengths) => FeatureOp,
+    scorer: (Term, IndexLengths) => Feature,
     unigramWeight: Double = 0.8,
     odWeight: Double = 0.15,
     uwWeight: Double = 0.05,
     odWindowSize: Int = 1,
     uwWindowSize: Int = 8)
-    (implicit index: Index): FeatureOp = {
+    (implicit index: Index): Feature = {
     val terms = rawterms.map(Term(_)(index))
     return Combine(
       // List of unigram, od, and uw features
-      List[FeatureOp](
+      List[Feature](
         // unigram feature
         CombineNorm(children = terms.map(a => Dirichlet(a,IndexLengths())),
           weight = unigramWeight),

@@ -52,8 +52,8 @@ trait Operator extends Traversable[Operator] {
 object Operator {
   import language.implicitConversions
   // Slight simplification
-  implicit def op2feature(op: Operator): FeatureOp = op.asInstanceOf[FeatureOp]
-  implicit def op2view(op: Operator): ViewOp = op.asInstanceOf[ViewOp]
+  implicit def op2feature(op: Operator): Feature = op.asInstanceOf[Feature]
+  implicit def op2view(op: Operator): View = op.asInstanceOf[View]
 
   implicit def canBuildFrom: CanBuildFrom[Operator, Operator, List[Operator]] =
     new CanBuildFrom[Operator, Operator, List[Operator]] {
@@ -64,18 +64,6 @@ object Operator {
 }
 
 // Views
-
-/** Views provide values to the Features, but this line is
-  *  blurry.
-  */
-trait ViewOp extends Operator
-trait BooleanView extends ViewOp with BoolSrc
-trait CountView extends ViewOp with CountSrc
-trait StatisticsView extends ViewOp with StatisticsSrc
-trait PositionsView extends CountView with PositionSrc
-trait PositionStatsView extends PositionsView with StatisticsView
-trait LengthsView extends ViewOp with LengthsSrc
-trait DataView[T] extends ViewOp with DataSrc[T]
 trait ChildlessOp extends Operator {
   lazy val children: Seq[Operator] = List.empty
   // Ever so slightly faster here
@@ -83,23 +71,23 @@ trait ChildlessOp extends Operator {
 }
 
 /** Root of all Features */
-trait FeatureOp extends Operator {
+trait Feature extends Operator {
   type WeightType
   /** Provides a read-only view of the weight. Subtraits provide
     * mechanisms for setting the weight.
     */
   def weight: Double
   def weight_=(newWeight: WeightType): Unit
-  def views: Set[ViewOp]
+  def views: Set[View]
   def eval(id: InternalId): Double
   def upperBound: Double = Double.PositiveInfinity
   def lowerBound: Double = Double.NegativeInfinity
 }
 
-/** Instantiates the weight of a [[FeatureOp]] as publicly
+/** Instantiates the weight of a [[Feature]] as publicly
   * exposed variable. Simplest implementation.
   */
-trait ScalarWeightedFeature extends FeatureOp {
+trait ScalarWeightedFeature extends Feature {
   override type WeightType = Double
   protected var scalarWeight: Double = 1.0
   override def weight: Double = scalarWeight
@@ -107,11 +95,11 @@ trait ScalarWeightedFeature extends FeatureOp {
     this.scalarWeight = newWeight
 }
 
-/** Instantiates the weight of a [[FeatureOp]] as a settable
+/** Instantiates the weight of a [[Feature]] as a settable
   * function. For now we assume the function takes zero parameters but produces
   * a double on demand.
   */
-trait FunctionWeightedFeature extends FeatureOp {
+trait FunctionWeightedFeature extends Feature {
   override type WeightType = () => Double
   private val defWeightFn = () => 1.0
   protected var weightFn: Option[() => Double] = None
@@ -122,9 +110,3 @@ trait FunctionWeightedFeature extends FeatureOp {
     weightFn = Some(newWeight)
   }
 }
-
-/** A FeatureView is a store-supplied feature - basically anything precomputed,
-  * but that definition is quite loose.
-  */
-trait FeatureView extends ViewOp with FeatureOp with ChildlessOp
-

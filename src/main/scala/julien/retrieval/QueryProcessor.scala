@@ -6,14 +6,14 @@ import julien.eval.{QueryResult, QueryResultSet}
 /** Generic definition of a query processor. */
 trait QueryProcessor {
   type DebugHook =
-  (ScoredDocument, Seq[FeatureOp], Index, QueryProcessor) => Unit
+  (ScoredDocument, Seq[Feature], Index, QueryProcessor) => Unit
   type GHook = IteratedHook[_ <: GIterator]
 
   protected var _indexes = Set[Index]()
-  protected var _models = Seq[FeatureOp]()
-  def add(f: FeatureOp*) { _models = f ++: _models }
+  protected var _models = Seq[Feature]()
+  def add(f: Feature*) { _models = f ++: _models }
   def indexes: Set[Index] = _indexes
-  def models: Seq[FeatureOp] = _models
+  def models: Seq[Feature] = _models
 
   // The things that need implementing in subclasses
   // makes sure that all views are ready to provide info upwards
@@ -34,7 +34,7 @@ trait QueryProcessor {
 
   def clear: Unit = {
     _indexes = Set[Index]()
-    _models = List[FeatureOp]()
+    _models = List[Feature]()
   }
 
   // This probably needs work -- should probably refactor to objects as
@@ -45,7 +45,7 @@ trait QueryProcessor {
     return true
   }
 
-  def isBounded(op: FeatureOp): Boolean =
+  def isBounded(op: Feature): Boolean =
     op.upperBound < Double.PositiveInfinity &&
   op.lowerBound > Double.NegativeInfinity
 

@@ -321,7 +321,7 @@ class RetrievalQualitySpec
     sdm(query, Dirichlet.apply)(i)
 
   def compareRetrievals(
-    julienCombiner: (Seq[String], Index) => FeatureOp,
+    julienCombiner: (Seq[String], Index) => Feature,
     galagoCombiner: String
   ) {
 

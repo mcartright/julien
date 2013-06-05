@@ -27,7 +27,7 @@ class AbsoluteDiscount(
   require(delta > 0, s"Delta must be positive. Received $delta")
   lazy val children: Seq[Operator] =
     Set[Operator](op, lengths, statsrc, docsrc).toList
-  lazy val views: Set[ViewOp] = Set[ViewOp](op, lengths, statsrc, docsrc)
+  lazy val views: Set[View] = Set[View](op, lengths, statsrc, docsrc)
   // Runs when asked for the first time, and runs only once
   lazy val cf = {
     val stats: CountStatistics = statsrc.statistics

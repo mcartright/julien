@@ -2,24 +2,24 @@ package julien
 package retrieval
 
 object CombineNorm {
-  def apply(children: Seq[FeatureOp]) =
+  def apply(children: Seq[Feature]) =
     new CombineNorm(children, () => 1.0)
 
-  def apply(children: Seq[FeatureOp], weight: Double) =
+  def apply(children: Seq[Feature], weight: Double) =
     new CombineNorm(children, () => weight)
 
-  def apply(children: Seq[FeatureOp], weight: () => Double) =
+  def apply(children: Seq[Feature], weight: () => Double) =
     new CombineNorm(children, weight)
 }
 
-class CombineNorm private(val ops: Seq[FeatureOp],
+class CombineNorm private(val ops: Seq[Feature],
                           w: () => Double)
   extends FunctionWeightedFeature {
   this.weight = w
   lazy val children: Seq[Operator] = ops
-  lazy val localChildren : Array[FeatureOp] = ops.toArray
-  def views: Set[ViewOp] =
-    ops.foldLeft(Set[ViewOp]()) { (s, op) => s ++ op.views }
+  lazy val localChildren : Array[Feature] = ops.toArray
+  def views: Set[View] =
+    ops.foldLeft(Set[View]()) { (s, op) => s ++ op.views }
   def eval(id: InternalId) : Double = combine(id)
 
   lazy final val childrenSize = ops.size

@@ -10,7 +10,7 @@ object TermCount {
 class TermCount(val op: CountView)
     extends ScalarWeightedFeature {
   lazy val children: Seq[Operator] = Set[Operator](op).toList
-  lazy val views: Set[ViewOp] = Set[ViewOp](op)
+  lazy val views: Set[View] = Set[View](op)
   override val lowerBound: Double = 0.0
   def eval(id: InternalId): Double = score(op.count(id))
   def score(c: Int): Double = c.toDouble

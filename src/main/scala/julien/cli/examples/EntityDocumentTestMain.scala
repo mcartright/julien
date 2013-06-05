@@ -30,10 +30,10 @@ object EntityDocumentTestMain extends App {
   println("docs: " + index.numDocuments + " cf:" + index.collectionLength)
 
   val query = args(0).split(" ").map(Term(_))
-  val modelFeatures = List.newBuilder[FeatureOp]
+  val modelFeatures = List.newBuilder[Feature]
 
   val sdm =
-    Combine(List[FeatureOp](
+    Combine(List[Feature](
       Combine(children = query.map(a => Dirichlet(a, IndexLengths())),
         weight = 0.8),
       Combine(children = query.sliding(2, 1).map {

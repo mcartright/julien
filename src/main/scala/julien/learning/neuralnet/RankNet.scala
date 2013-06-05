@@ -17,7 +17,7 @@ class RankNet(
   judgments: QueryJudgmentSet,
   evaluator: QueryEvaluator,
   index: Index,
-  f: Seq[FeatureOp],
+  f: Seq[Feature],
 ) {
   import RankNet._
 

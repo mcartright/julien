@@ -8,7 +8,7 @@ object IDF { def apply(s: StatisticsView) = new IDF(s) }
   */
 class IDF(val statsrc: StatisticsView) extends ScalarWeightedFeature {
   lazy val children: Seq[Operator] = List[Operator](statsrc)
-  lazy val views: Set[ViewOp] = Set[ViewOp](statsrc)
+  lazy val views: Set[View] = Set[View](statsrc)
   // Runs when asked for the first time, and runs only once
   lazy val idf = {
     val stats: CountStatistics = statsrc.statistics

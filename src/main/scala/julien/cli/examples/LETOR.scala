@@ -42,7 +42,7 @@ Required parameters:
     val queryTerms = params.getString("query").split(" ")
     val fields = params.getList("fields").asInstanceOf[List[String]]
 
-    val modelFeatures = List.newBuilder[FeatureOp]
+    val modelFeatures = List.newBuilder[Feature]
     // F1: BM25 of the query terms
     modelFeatures += Combine(queryTerms.map {
       a => BM25(Term(a), IndexLengths())
@@ -54,7 +54,7 @@ Required parameters:
       // Turn it into a feature
       new ScalarWeightedFeature with ChildlessOp {
         def eval(id: InternalId): Double = lView.length(id).toDouble
-        lazy val views: Set[ViewOp] = Set[ViewOp](lView)
+        lazy val views: Set[View] = Set[View](lView)
       }
     }
 

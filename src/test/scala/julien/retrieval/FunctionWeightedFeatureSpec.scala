@@ -7,7 +7,7 @@ import scala.language.reflectiveCalls
 class FunctionWeightedFeatureSpec extends FlatSpec {
   def fixture = new {
     val swOp = new FunctionWeightedFeature with ChildlessOp {
-      val views = Set.empty[ViewOp]
+      val views = Set.empty[View]
       def eval(id: InternalId) = 1.0
     }
   }

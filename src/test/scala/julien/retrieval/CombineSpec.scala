@@ -6,9 +6,9 @@ import org.scalamock.scalatest.proxy.MockFactory
 
 class CombineSpec extends FlatSpec with MockFactory {
   def fixture = new {
-    val mock1 = mock[FeatureOp]
-    val mock2 = mock[FeatureOp]
-    val mock3 = mock[FeatureOp]
+    val mock1 = mock[Feature]
+    val mock2 = mock[Feature]
+    val mock3 = mock[Feature]
   }
 
   "A combine operator" should "by default sum its children" in {
@@ -41,7 +41,7 @@ class CombineSpec extends FlatSpec with MockFactory {
     mock2.expects('eval)(id).returning(v2)
     mock3.expects('eval)(id).returning(v3)
 
-    val prod = (id: InternalId, s: Seq[FeatureOp]) =>
+    val prod = (id: InternalId, s: Seq[Feature]) =>
     s.foldLeft(1.0)((s , feat) => s * feat.eval(id))
 
     val c = Combine(combiner = prod, children = List(mock1, mock2, mock3))

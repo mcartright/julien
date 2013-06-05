@@ -36,7 +36,7 @@ abstract class ComputedNeuron(val lr: Double, val g: TransferFunction)
   * implemented, we should do it here.
   */
 class FeatureNeuron(
-  val feature: FeatureOp
+  val feature: Feature
   val lr: Double = 0.001,
   val tf: TransferFunction = new LogiFunction()
 ) extends ComputedNeuron(lr, tf) {

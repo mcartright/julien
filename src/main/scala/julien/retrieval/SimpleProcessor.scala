@@ -107,7 +107,7 @@ class SimpleProcessor
     val model = _models.head
     val iterators: Array[Movable] = _models.flatMap(_.movers).distinct.toArray
     val drivers: Array[Movable] = iterators.filterNot(_.isDense).toArray
-    val scorers: Array[FeatureOp] = _models.toArray
+    val scorers: Array[Feature] = _models.toArray
 
     // Go
 

@@ -37,7 +37,7 @@ Required parameters:
     // Shorthand is:
     // val seqdep = sdm(query, Dirichlet.apply)
     val seqdep =
-      Combine(List[FeatureOp](
+      Combine(List[Feature](
         Combine(children = query.map(a => Dirichlet(a,IndexLengths())),
           weight = 0.8),
         Combine(children = query.sliding(2,1).map { p =>

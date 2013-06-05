@@ -6,7 +6,7 @@ import org.scalatest._
 class ScalarWeightedFeatureSpec extends FlatSpec {
   def fixture = new {
     val swOp = new ScalarWeightedFeature with ChildlessOp {
-      val views = Set.empty[ViewOp]
+      val views = Set.empty[View]
       def eval(id: InternalId) = 1.0
     }
   }

@@ -10,7 +10,7 @@ abstract class SimplePreloadingProcessor
     extends SimpleProcessor {
   // For encapsulation - note we assume 1-to-1
   // of features to non-lengths iterators
-  case class Sentinel(feat: FeatureOp, iter: Movable, dec: Double)
+  case class Sentinel(feat: Feature, iter: Movable, dec: Double)
 
   // Also want an ordering on the Sentinels based on current location
   object SentinelOrdering extends Ordering[Sentinel] {
@@ -121,7 +121,7 @@ abstract class SimplePreloadingProcessor
       // Do children explicitly so we don't traverse the entire
       // subtree rooted here.
       result = result && combiner.children.forall { child =>
-        child.isInstanceOf[FeatureOp] &&
+        child.isInstanceOf[Feature] &&
         isBounded(child) &&
         child.movers.filter(_.isSparse).size == 1 // make sure it's 1-to-1
       }
@@ -133,8 +133,8 @@ abstract class SimplePreloadingProcessor
     super.prepare() // Do all the stuff we normally do
 
     // Verified earlier that the models here consist of a
-    // bunch of combines with bounded FeatureOp children,
+    // bunch of combines with bounded Feature children,
     // (i.e. a bag-of-words type structure).
-    _models = _models.flatMap(c => c.children.map(_.asInstanceOf[FeatureOp]))
+    _models = _models.flatMap(c => c.children.map(_.asInstanceOf[Feature]))
   }
 }

@@ -25,7 +25,7 @@ class AdaRank(
   judgments: QueryJudgmentSet,
   evaluator: QueryEvaluator,
   index: Index,
-  f: Seq[FeatureOp]
+  f: Seq[Feature]
 ) {
   import AdaRank._
   case class WeightedQuery(val qid: String, var weight: Double = 1.0)

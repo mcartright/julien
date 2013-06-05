@@ -41,13 +41,13 @@ class CascadeRank(queries: Map[String, String],
   judgments: QueryJudgmentSet,
   evaluator: QueryEvaluator,
   index: Index,
-  f: Seq[FeatureOp]) {
+  f: Seq[Feature]) {
   import CascadeRank._
 
   case class WeightedQuery(val qid: String, var weight: Double = 1.0)
   case class CascadeStage(
     val pruner: ResultPruner,
-    val feature: FeatureOp,
+    val feature: Feature,
     var weight: Double = 1.0
   )
   case class CascadeResult(

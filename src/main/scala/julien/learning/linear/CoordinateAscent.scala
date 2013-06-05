@@ -8,7 +8,7 @@ import julien.retrieval._
 import julien.eval._
 
 trait AbstractEvaluation {
-  def features: Seq[FeatureOp]
+  def features: Seq[Feature]
   def run(): Double
 }
 
@@ -18,7 +18,7 @@ class QueryEvaluation(
   judgments: QueryJudgmentSet,
   evaluator: QueryEvaluator,
   index: Index,
-  f: Seq[FeatureOp]) extends AbstractEvaluation {
+  f: Seq[Feature]) extends AbstractEvaluation {
 
   // some magic to reuse accumulators
   private val myAcc = DefaultAccumulator[ScoredDocument]()

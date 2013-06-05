@@ -6,7 +6,7 @@ package retrieval
   * as its underlying data source.
   */
 trait IteratedHook[I <: GIterator]
-    extends ViewOp
+    extends View
     with ChildlessOp
     with IndexHook
     with Movable {
