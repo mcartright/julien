@@ -1,6 +1,8 @@
 package julien
 package retrieval
 
+import julien.behavior._
+
 object JelinekMercer {
   private val totallyMadeUpValue = 600
   private val defLambda = 0.3
@@ -22,7 +24,9 @@ class JelinekMercer(
   val lengths: LengthsView,
   val statsrc: StatisticsView,
   val lambda: Double)
-    extends ScalarWeightedFeature {
+    extends ScalarWeightedFeature
+    with Bounded
+{
   require(lambda >= 0.0 && lambda <= 1.0, s"Lambda must be [0,1]. Got: $lambda")
   lazy val children: Seq[Operator] = Set[Operator](op, lengths, statsrc).toList
   lazy val views: Set[View] = Set[View](op, lengths, statsrc)

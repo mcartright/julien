@@ -1,6 +1,8 @@
 package julien
 package retrieval
 
+import julien.behavior._
+
 object TFIDF {
   def apply(op: PositionStatsView, l: LengthsView) = {
     new TFIDF(op, l, op)
@@ -16,7 +18,9 @@ class TFIDF(
   val op: CountView,
   val lengths: LengthsView,
   val statsrc: StatisticsView)
-    extends ScalarWeightedFeature {
+    extends ScalarWeightedFeature
+    with Bounded
+{
 
   lazy val children: Seq[Operator] = Set[Operator](op, lengths, statsrc).toList
   lazy val views: Set[View] = Set[View](op, lengths, statsrc)

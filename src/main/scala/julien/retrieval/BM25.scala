@@ -1,6 +1,8 @@
 package julien
 package retrieval
 
+import julien.behavior._
+
 object BM25 {
   private val defB = 0.75
   private val defK = 1.2
@@ -31,7 +33,9 @@ class BM25(
   val statsrc: StatisticsView,
   val b: Double,
   val k: Double)
-    extends ScalarWeightedFeature {
+    extends ScalarWeightedFeature
+    with Bounded
+{
   require(b > 0.0 && b < 1.0, s"b must be in [0,1]. Got $b")
   require(k > 0.0, s"k must be positive. Got $k")
   lazy val children: Seq[Operator] = Set[Operator](op, lengths, statsrc).toList

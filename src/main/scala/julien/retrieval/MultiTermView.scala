@@ -4,11 +4,13 @@ package retrieval
 import gnu.trove.map.hash.TIntIntHashMap
 import galago.core.util.ExtentArray
 import scala.annotation.tailrec
+import julien.behavior._
 
 abstract class MultiTermView(terms: Seq[PositionStatsView])
-  extends PositionStatsView
-  with Bounded
-  with NeedsPreparing {
+    extends PositionStatsView
+    with Conjunction
+    with Finite
+    with NeedsPreparing {
 
   lazy val movables: Seq[Movable] = terms.
     filter(_.isInstanceOf[Movable]).

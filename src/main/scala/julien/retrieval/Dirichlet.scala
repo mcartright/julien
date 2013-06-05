@@ -1,6 +1,8 @@
 package julien
 package retrieval
 
+import julien.behavior._
+
 object Dirichlet {
   private val defMu = 1500D
   val totallyMadeUpValue = 600
@@ -35,7 +37,9 @@ class Dirichlet(
   val statsrc: StatisticsView,
   val mu: Double,
   w: () => Double)
-    extends ScalarWeightedFeature {
+    extends ScalarWeightedFeature
+    with Bounded
+{
   require(mu > 0, s"Mu must be positive. Received $mu")
   this.weight = w()
   lazy val children: Seq[Operator] = Set[Operator](op, lengths, statsrc).toList

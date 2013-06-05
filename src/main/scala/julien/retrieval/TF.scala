@@ -1,11 +1,15 @@
 package julien
 package retrieval
 
+import julien.behavior._
+
 object TF { def apply(c: CountView, l: LengthsView) = new TF(c, l) }
 
 /** Simple Term Frequency (# times the term occurs in D / |D|) feature. */
 class TF(val op: CountView, val lengths: LengthsView)
-    extends ScalarWeightedFeature {
+    extends ScalarWeightedFeature
+    with Bounded
+{
   lazy val children: Seq[Operator] = Set[Operator](op, lengths).toList
   lazy val views: Set[View] = Set[View](op, lengths)
   override val upperBound: Double = 1.0

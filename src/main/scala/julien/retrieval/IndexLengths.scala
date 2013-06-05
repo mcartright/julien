@@ -5,6 +5,7 @@ import scala.concurrent.{Future,Await,future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import julien.galago.core.index.LengthsReader._
+import julien.behavior._
 
 object IndexLengths {
   def apply()(implicit index: Index) = memoryIfPossible(index, None)
@@ -69,7 +70,9 @@ final class StreamLengths(override val index: Index, li: LengthsIterator)
 
 final class ArrayLengths(i: Index, nascentArray: Future[Array[Int]])
     extends IndexLengths(i)
-    with Bounded {
+    with Finite
+    with RandomAccess
+{
   def isDense: Boolean = true
 
   // This will block to set this array if the read operation isn't complete,

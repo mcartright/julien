@@ -45,10 +45,6 @@ trait QueryProcessor {
     return true
   }
 
-  def isBounded(op: Feature): Boolean =
-    op.upperBound < Double.PositiveInfinity &&
-  op.lowerBound > Double.NegativeInfinity
-
   final def isDone(drivers: Array[Movable]): Boolean = {
     var j = 0
     while (j < drivers.length) {

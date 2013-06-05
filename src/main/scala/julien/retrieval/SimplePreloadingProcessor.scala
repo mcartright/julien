@@ -122,7 +122,7 @@ abstract class SimplePreloadingProcessor
       // subtree rooted here.
       result = result && combiner.children.forall { child =>
         child.isInstanceOf[Feature] &&
-        isBounded(child) &&
+        child.isInstanceOf[Finite]
         child.movers.filter(_.isSparse).size == 1 // make sure it's 1-to-1
       }
     }

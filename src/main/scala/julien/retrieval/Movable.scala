@@ -5,7 +5,7 @@ package retrieval
   * necessary. Currently this requires a bounded data source,
   * but that assumption seems restrictive.
   */
-trait Movable extends Bounded {
+trait Movable extends Finite {
   def matches(id: Int): Boolean = true
   def reset: Unit
   def isDone: Boolean

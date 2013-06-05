@@ -1,5 +1,5 @@
 package julien
-package retrieval
+package behavior
 
 /** Trait to indicate that something has finite length,
   * and whether it is defined for every value between its
