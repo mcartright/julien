@@ -4,6 +4,7 @@ package retrieval
 import scala.collection.mutable.PriorityQueue
 import scala.annotation.tailrec
 import julien._
+import julien.behavior._
 
 object MaxscoreProcessor {
   def apply() = new MaxscoreProcessor()

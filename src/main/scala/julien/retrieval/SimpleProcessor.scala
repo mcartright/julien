@@ -3,6 +3,7 @@ package retrieval
 
 import julien._
 import julien.eval.QueryResult
+import julien.behavior._
 import collection.mutable
 import collection.mutable.ArrayBuffer
 

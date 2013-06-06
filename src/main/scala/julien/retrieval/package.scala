@@ -40,6 +40,7 @@ import scala.reflect.runtime.universe._
   * }}}
   */
 package object retrieval {
+
   type Combiner = (InternalId, Seq[Feature]) => Double
   type QueryPreparer = (String) => Seq[Feature]
 

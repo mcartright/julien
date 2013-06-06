@@ -2,6 +2,7 @@ package julien
 package retrieval
 
 import julien.eval.{QueryResult, QueryResultSet}
+import julien.behavior._
 
 /** Generic definition of a query processor. */
 trait QueryProcessor {

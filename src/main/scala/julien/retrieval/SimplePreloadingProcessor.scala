@@ -4,6 +4,7 @@ package retrieval
 import scala.annotation.tailrec
 import julien.eval.QueryResult
 import julien._
+import julien.behavior._
 import scala.math._
 
 abstract class SimplePreloadingProcessor

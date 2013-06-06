@@ -6,6 +6,7 @@ import scala.collection.immutable.List
 import scala.collection.mutable.{Builder,ListBuffer,Queue}
 import scala.collection.generic.CanBuildFrom
 import scala.reflect.runtime.universe._
+import julien.behavior._
 
 trait Operator extends Traversable[Operator] {
   def children: Seq[Operator]

@@ -5,6 +5,7 @@ import scala.annotation.tailrec
 import julien.galago.core.util._
 import collection.mutable
 import collection.mutable.ArrayBuffer
+import julien.behavior._
 
 object UnorderedWindow {
   /** Attempts to provide the fastest implementation of the unordered

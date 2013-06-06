@@ -9,6 +9,7 @@ import java.util.logging.{Level,Logger}
 import scala.util.Random
 import julien.access.QuickIndexBuilder
 import julien.eval.QueryResult
+import julien.behavior.Movable
 
 trait SimpleProcessorBehavior extends QuickIndexBuilder { this: FlatSpec =>
   def index: Index

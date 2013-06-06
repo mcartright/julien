@@ -3,6 +3,7 @@ package retrieval
 
 import scala.collection.mutable.ArrayBuffer
 import galago.core.util.ExtentArray
+import julien.behavior._
 
 object Synonym {
   def apply(terms: Term*) = new Synonym(terms)

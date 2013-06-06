@@ -4,6 +4,7 @@ package retrieval
 import scala.annotation.tailrec
 import scala.math._
 import julien._
+import julien.behavior._
 
 object WeakANDProcessor {
   def apply() = new WeakANDProcessor()

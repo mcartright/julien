@@ -4,6 +4,7 @@ package retrieval
 import collection.Traversable
 import collection.mutable.ArrayBuffer
 import galago.core.util.ExtentArray
+import julien.behavior._
 
 object OrderedWindow {
   /** Attempts to provide the fastest implementation of the ordered window
