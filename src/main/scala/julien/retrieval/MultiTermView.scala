@@ -6,6 +6,16 @@ import galago.core.util.ExtentArray
 import scala.annotation.tailrec
 import julien.behavior._
 
+/** This class represents a [[julien.retrieval.View View]] that is
+  * composed of several children views. Assumptions made for this
+  * View are:
+  *
+  * - All children must match to have the chance to generate a match for
+  *   this View.
+  * - All of the children are finite, which transitively makes this operator
+  *   finite.
+  *
+  */
 abstract class MultiTermView(terms: Seq[PositionStatsView])
     extends PositionStatsView
     with Conjunction

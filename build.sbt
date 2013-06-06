@@ -20,7 +20,10 @@ libraryDependencies ++= Seq(
 )
 
 excludeFilter in Compile := new SimpleFilter(s =>
-  s.contains("learning") || s.contains("garage") || s == "test.scala"
+  s.contains("learning") ||
+  s.contains("garage") ||
+  s == "test.scala" ||
+  s == "buildindex.scala"
 )
 
 scalacOptions in (Compile, doc) ++=
