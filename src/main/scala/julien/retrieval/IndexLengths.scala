@@ -53,7 +53,7 @@ object IndexLengths {
 sealed abstract class IndexLengths(index: Index)
     extends LengthsView
     with ChildlessOp {
-  override def toString = s"lengths:" + index.toString
+  override def toString = s"${getClass.getName}:" + index.toString
 }
 
 final class StreamLengths(override val index: Index, li: LengthsIterator)

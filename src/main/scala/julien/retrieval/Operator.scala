@@ -12,7 +12,6 @@ trait Operator extends Traversable[Operator] {
   def children: Seq[Operator]
   def foreach[U](f: Operator => U) = {
     f(this)
-    // ironically...
     for (c <- children) c foreach f
   }
 
@@ -28,15 +27,10 @@ trait Operator extends Traversable[Operator] {
 
   def movers: Traversable[Movable] = grab[Movable]
 
-  def iHooks: Traversable[IteratedHook[_ <: GIterator]] = this.
-    filter(_.isInstanceOf[IteratedHook[_ <: GIterator]]).
-    map(_.asInstanceOf[IteratedHook[_ <: GIterator]]).
-    toList
+  def iHooks: Traversable[IteratedHook[_ <: GIterator]] =
+    grab[IteratedHook[_ <: GIterator]]
 
-  def hooks: Traversable[IndexHook] = this.
-    filter(_.isInstanceOf[IndexHook]).
-    map(_.asInstanceOf[IndexHook]).
-    toList
+  def hooks: Traversable[IndexHook] = grab[IndexHook]
 
   override def toString: String = {
     val b = new StringBuilder()

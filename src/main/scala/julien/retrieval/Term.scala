@@ -38,7 +38,7 @@ final class StreamedTerm (
     extends Term(t, index)
     with SparseIterator[ExtentIterator] {
 
-  override val underlying = index.shareableIterator(
+  override lazy val underlying = index.shareableIterator(
     t,
     field.getOrElse(index.defaultField),
     stem.getOrElse(index.defaultStem)

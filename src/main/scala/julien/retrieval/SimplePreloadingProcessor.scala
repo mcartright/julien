@@ -115,7 +115,7 @@ abstract class SimplePreloadingProcessor
     // Structural check for something like:
     // Combine(f1, f2, f3, ...)
     // All top-level operators in _models should look like this.
-    var result: Boolean = _models.forall(_.isInstanceOf[Combine])
+    var result: Boolean = _models.forall(_.isInstanceOf[Distributive])
     // Make sure for each combiner, each child is a feature with
     // actual bounds.
     for (combiner <- _models) {

@@ -422,8 +422,8 @@ class RetrievalQualitySpec
     val jAvg = jTotalTime.toDouble / numRun.toDouble
     val gAvg = gTotalTime.toDouble / numRun.toDouble
     info(s"queries run: $numRun")
-    info(s"Julien avg: ${jAvg}, ($jTotalTime)")
-    info(s"Galago avg: ${gAvg}, ($gTotalTime)")
+    info(f"Julien avg: ${jAvg}%3.6f ms, ($jTotalTime ms)")
+    info(f"Galago avg: ${gAvg}%3.6f ms, ($gTotalTime ms)")
   }
 
 

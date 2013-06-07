@@ -44,7 +44,7 @@ Required parameters:
 
     val modelFeatures = List.newBuilder[Feature]
     // F1: BM25 of the query terms
-    modelFeatures += Combine(queryTerms.map {
+    modelFeatures += Sum(queryTerms.map {
       a => BM25(Term(a), IndexLengths())
     })
 
@@ -69,7 +69,7 @@ Required parameters:
     // We don't calculate it right now b/c we're not attached
     // to an index yet.
     for (f <- fields) {
-      modelFeatures += Combine(queryTerms.map(q => IDF(Term(q, f))))
+      modelFeatures += Sum(queryTerms.map(q => IDF(Term(q, f))))
     }
 
     // F13: Sitemap score
@@ -85,11 +85,11 @@ Required parameters:
     // TODO: Support for synthetic fields
     for (f <- fields) {
       val l = IndexLengths(f)
-      modelFeatures += Combine(queryTerms.map { a => BM25(Term(a, f), l) })
-      modelFeatures += Combine(queryTerms.map { a => Dirichlet(Term(a, f), l) })
+      modelFeatures += Sum(queryTerms.map { a => BM25(Term(a, f), l) })
+      modelFeatures += Sum(queryTerms.map { a => Dirichlet(Term(a, f), l) })
       modelFeatures +=
-        Combine(queryTerms.map { a => JelinekMercer(Term(a, f), l) })
-      modelFeatures += Combine(queryTerms.map { a =>
+        Sum(queryTerms.map { a => JelinekMercer(Term(a, f), l) })
+      modelFeatures += Sum(queryTerms.map { a =>
         AbsoluteDiscount(Term(a, f), l, DocumentView())
       })
     }
@@ -99,14 +99,14 @@ Required parameters:
 
     // F28-F31: summed tf of each field
     for (f <- fields) {
-      modelFeatures += Combine(queryTerms.map { q =>
+      modelFeatures += Sum(queryTerms.map { q =>
         TF(Term(q, f), IndexLengths(f))
       })
     }
 
     // F32-F35: summed tf*idf of each field
     for (f <- fields) {
-      modelFeatures += Combine(queryTerms.map { q =>
+      modelFeatures += Sum(queryTerms.map { q =>
         TFIDF(Term(q, f), IndexLengths(f))
       })
     }

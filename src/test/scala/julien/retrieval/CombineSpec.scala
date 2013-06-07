@@ -11,7 +11,7 @@ class CombineSpec extends FlatSpec with MockFactory {
     val mock3 = mock[Feature]
   }
 
-  "A combine operator" should "by default sum its children" in {
+  "A sum operator" should "sum its children" in {
     val f = fixture
     import f._
 
@@ -25,27 +25,31 @@ class CombineSpec extends FlatSpec with MockFactory {
     mock2.expects('weight)().returning(1.0)
     mock3.expects('eval)(id).returning(v3)
     mock3.expects('weight)().returning(1.0)
-    val c = Combine(List(mock1, mock2, mock3))
+    val c = Sum(List(mock1, mock2, mock3))
     expectResult(v1+v2+v3) { c.eval(id) }
   }
 
-  it should "accept other viable reduce functions" in {
+  "A normalized sum" should "average of the weights of the children" in {
     val f = fixture
     import f._
 
-    val v1 = 0.98
-    val v2 = 0.55
-    val v3 = 0.78887
     val id = 3
-    mock1.expects('eval)(id).returning(v1)
-    mock2.expects('eval)(id).returning(v2)
-    mock3.expects('eval)(id).returning(v3)
+    val scores = List(0.98, 0.55, 0.78887)
+    val weights = List(1.3, 4.8, 9.9)
+    mock1.expects('eval)(id).returning(scores(0))
+    mock1.expects('weight)().returning(weights(0)).noMoreThanTwice
+    mock2.expects('eval)(id).returning(scores(1))
+    mock2.expects('weight)().returning(weights(1)).noMoreThanTwice
+    mock3.expects('eval)(id).returning(scores(2))
+    mock3.expects('weight)().returning(weights(2)).noMoreThanTwice
 
-    val prod = (id: InternalId, s: Seq[Feature]) =>
-    s.foldLeft(1.0)((s , feat) => s * feat.eval(id))
+    val sum = weights.sum
+    val result = scores.zip(weights).foldLeft(0.0) { (s, pair) =>
+      s + (pair._1 * pair._2 / sum)
+    }
 
-    val c = Combine(combiner = prod, children = List(mock1, mock2, mock3))
-    expectResult(v1*v2*v3) { c.eval(id) }
+    val ns = NormalizedSum(children = List(mock1, mock2, mock3))
+    expectResult(result) { ns.eval(id) }
   }
 
   it should "return the passed in feature ops as children" in {
@@ -58,7 +62,4 @@ class CombineSpec extends FlatSpec with MockFactory {
     assert(c.children.exists(_ == mock2))
     assert(c.children.exists(_ == mock3))
   }
-
-  it should "return the set union view of its children" in (pending)
-
 }

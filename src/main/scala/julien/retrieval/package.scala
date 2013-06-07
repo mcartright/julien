@@ -40,9 +40,11 @@ import scala.reflect.runtime.universe._
   * }}}
   */
 package object retrieval {
-
-  type Combiner = (InternalId, Seq[Feature]) => Double
   type QueryPreparer = (String) => Seq[Feature]
+
+  // Do some type aliasing on objects
+  val Combine = Sum
+  val CombineNorm = NormalizedSum
 
   // Bring in local references to some of the access structures
   type Index = julien.access.Index

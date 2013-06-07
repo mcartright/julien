@@ -55,9 +55,6 @@ class Dirichlet(
     cf
   }
 
-  // save the weight as a local member to avoid method calls
-  lazy val localWeight = weight
-
   override lazy val upperBound: Double = {
     val maxtf = statsrc.statistics.max
     score(maxtf, maxtf)
@@ -75,7 +72,6 @@ class Dirichlet(
     val num = (c + (mu * cf))
     val den = (l + mu)
     val rawScore = scala.math.log((c + (mu * cf)) / (l + mu))
-    val score = localWeight * scala.math.log((c + (mu * cf)) / (l + mu))
-    score
+    scala.math.log((c + (mu * cf)) / (l + mu))
   }
 }

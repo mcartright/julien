@@ -29,19 +29,19 @@ object EntityDocumentTestMain extends App {
   }
   println("docs: " + index.numDocuments + " cf:" + index.collectionLength)
 
-  val query = args(0).split(" ").map(Term(_))
+  val query = args(0).split(" ").map(Term(_)).toSeq
   val modelFeatures = List.newBuilder[Feature]
 
   val sdm =
-    Combine(List[Feature](
-      Combine(children = query.map(a => Dirichlet(a, IndexLengths())),
+    Sum(List[Feature](
+      Sum(children = query.map(a => Dirichlet(a, IndexLengths())),
         weight = 0.8),
-      Combine(children = query.sliding(2, 1).map {
+      Sum(children = query.sliding(2, 1).map {
         p =>
           Dirichlet(OrderedWindow(1, p: _*), IndexLengths())
       }.toSeq,
         weight = 0.15),
-      Combine(query.sliding(2, 1).map {
+      Sum(query.sliding(2, 1).map {
         p =>
           Dirichlet(UnorderedWindow(8, p: _*), IndexLengths())
       }.toSeq,
