@@ -10,6 +10,5 @@ package behavior
   * are assumed to be disjunctive, which means the candidates of this
   * operator are the union of the children candidates. Many more candidates
   * will be scored, but the resulting ranked list will be the same.
-  *
   */
 trait Conjunction

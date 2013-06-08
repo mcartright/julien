@@ -2,19 +2,24 @@ package julien
 package retrieval
 
 import julien.eval.{QueryResult, QueryResultSet}
+import julien.retrieval._
 import julien.behavior._
 
-/** Generic definition of a query processor. */
+/** Factory for creating QueryProcessor instances. The apply method will
+  * eventually build up to act as a large DFA structure for choosing the
+  * most appropriate processor for a given query.
+  */
+object QueryProcessor {
+  /** Selects a QueryProcessor for the given query. */
+  def apply(root: Feature): QueryProcessor = {
+  }
+}
+
+
+/** Generic definition of a query processor instance. */
 trait QueryProcessor {
   type DebugHook =
   (ScoredDocument, Seq[Feature], Index, QueryProcessor) => Unit
-  type GHook = IteratedHook[_ <: GIterator]
-
-  protected var _indexes = Set[Index]()
-  protected var _models = Seq[Feature]()
-  def add(f: Feature*) { _models = f ++: _models }
-  def indexes: Set[Index] = _indexes
-  def models: Seq[Feature] = _models
 
   // The things that need implementing in subclasses
   // makes sure that all views are ready to provide info upwards
@@ -31,19 +36,6 @@ trait QueryProcessor {
       results += (qid -> result)
     }
     return QueryResultSet(results.result)
-  }
-
-  def clear: Unit = {
-    _indexes = Set[Index]()
-    _models = List[Feature]()
-  }
-
-  // This probably needs work -- should probably refactor to objects as
-  // a "canProcess" check - will help with Processor selection.
-  def validated: Boolean = {
-    assume(!_models.isEmpty, s"Trying to validate with no models!")
-    _indexes = _models.flatMap(_.hooks).map(_.index).toSet
-    return true
   }
 
   final def isDone(drivers: Array[Movable]): Boolean = {
