@@ -5,6 +5,7 @@ package linear
 import scala.math._
 import scala.util.Random
 import julien.retrieval._
+import julien.retrieval.processor._
 import julien.eval._
 
 trait AbstractEvaluation {
@@ -28,16 +29,15 @@ class QueryEvaluation(
   }
 
   // create a processor
-  val processor = SimpleProcessor()
   val scalarFeatures = f.map(_.asInstanceOf[ScalarWeightedFeature]).toArray
-  processor.add(scalarFeatures: _*)
+  val processor = QueryProcessor(Sum(scalarFeatures))
 
   // return a list of features on demand
   def features = f
 
   // get a new score based on any changes to our features
   def run() = {
-    evaluator.eval(processor.runBatch(queries, preparer, acc), judgments)
+    evaluator.eval(QueryProcessor.runBatch(queries), judgments)
   }
 }
 

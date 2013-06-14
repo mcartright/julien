@@ -8,6 +8,7 @@ import julien.galago.tupleflow.Parameters
 // Pull in retrieval definitions
 import julien.retrieval._
 import julien.retrieval.Utils._
+import julien.retrieval.processor._
 
 import java.io.PrintStream
 
@@ -51,14 +52,11 @@ Required parameters:
       ))
 
     // Make a processor to run it
-    val processor = SimpleProcessor()
+    val processor = QueryProcessor(seqdep)
 
     // Use this to add a line-printing debugger - still experimental
     //processor.debugger =
     //  Some(julien.retrieval.LinePrintingDebugger().printState _)
-
-    // Add the model to the processor
-    processor.add(seqdep)
 
     // run it and get results
     val results = processor.run()

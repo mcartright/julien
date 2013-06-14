@@ -12,6 +12,7 @@ import org.lemurproject.galago.core.retrieval.processing.ScoringContext
 import org.lemurproject.galago.core.retrieval.query._
 import org.lemurproject.galago.core.retrieval._
 import julien.galago.tupleflow.Utility
+import julien.retrieval.processor._
 import scala.collection.BufferedIterator
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
@@ -337,7 +338,6 @@ class RetrievalQualitySpec
     val queries = getSampleQueries(4, 2)
 
     // Set up processing structures
-    val processor = SimpleProcessor()
     val retrieval = new LocalRetrieval(galagoIndex, new Parameters)
 
     var jTotalTime = 0L
@@ -353,9 +353,10 @@ class RetrievalQualitySpec
         // Julien
         val (jUnstableResult, jSingleTime) = time {
           val jquery = julienCombiner(query, julienIndex)
-          processor.clear
-          processor add jquery
-          val r = processor.run(DefaultAccumulator[ScoredDocument](requested))
+          val r =
+            QueryProcessor(jquery).run(
+              DefaultAccumulator[ScoredDocument](requested)
+            )
           // Because Galago does it without asking - trying to be fair
           r.foreach(jr => jr.name = julienIndex.name(jr.id))
           r

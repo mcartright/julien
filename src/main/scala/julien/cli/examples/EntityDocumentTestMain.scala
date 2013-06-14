@@ -6,6 +6,7 @@ import julien._
 import access.Index
 import retrieval._
 import retrieval.Utils._
+import retrieval.processor._
 
 /**
  * User: jdalton
@@ -51,11 +52,7 @@ object EntityDocumentTestMain extends App {
 
   // Make a processor to run it
   val model = modelFeatures.result
-  val processor = SimpleProcessor()
-  processor.add(model: _*)
-
-  // Add the model to the processor
-  processor.add(sdm)
+  val processor = QueryProcessor(Sum(model))
 
   // run it and get results
   val results = processor.run()

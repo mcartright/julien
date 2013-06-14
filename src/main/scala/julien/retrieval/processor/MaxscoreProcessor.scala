@@ -1,14 +1,11 @@
 package julien
 package retrieval
+package processor
 
 import scala.collection.mutable.PriorityQueue
 import scala.annotation.tailrec
 import julien._
 import julien.behavior._
-
-object MaxscoreProcessor {
-  def apply() = new MaxscoreProcessor()
-}
 
 /** This processor handles bag-of-words queries that contain
   * features that have actual bounds (vs infinite bounds).
@@ -28,7 +25,8 @@ object MaxscoreProcessor {
   *    - Only 1 index is being used
   *    - Query is a bag of words (term independence assumption)
   */
-class MaxscoreProcessor extends SimplePreloadingProcessor {
+class MaxscoreProcessor private[processor] (root: Feature)
+    extends SimplePreloadingProcessor(root) {
   override def finishScoring[T <: ScoredObject[T]](
     allSentinels: Array[Sentinel],
     iterators: Array[Movable],

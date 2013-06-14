@@ -6,6 +6,7 @@ import scala.language.implicitConversions
 import scala.collection.mutable.ListBuffer
 import scala.math._
 import julien.retrieval._
+import julien.retrieval.processor._
 import julien.eval._
 
 object AdaRank {
@@ -32,7 +33,6 @@ class AdaRank(
 
   assume(f.forall(_.isInstanceOf[ScalarWeightedFeature]),
     s"AdaRank needs scalar-weighted features.")
-  val processor = SimpleProcessor()
   val weightedQueries = queries.keys.map(qid => WeightedQuery(qid))
   var trainedFeatures = ListBuffer[ScalarWeightedFeature]()
 
@@ -59,8 +59,7 @@ class AdaRank(
   }
 
   private def scoreQuery(wq: WeightedQuery, feats: Seq[ScalarWeightedFeature]): Double = {
-    processor.clear
-    processor.add(feats: _*)
+    val processor = QueryProcessor(Sum(feats))
     evaluator.eval(processor.run(), judgments(wq.qid))
   }
 

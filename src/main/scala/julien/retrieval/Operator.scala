@@ -17,7 +17,7 @@ trait Operator extends Traversable[Operator] {
 
   // It works, but for generic types (i.e. passing in A[_]) causes
   // debug spam to show up. Use at your own risk for now :)
-  def grab[T](implicit tag: TypeTag[T]): Traversable[T] = {
+  def grab[T](implicit tag: TypeTag[T]): Seq[T] = {
     val m = runtimeMirror(this.getClass.getClassLoader)
     this.
       filter(item => m.reflect(item).symbol.selfType <:< tag.tpe).
@@ -25,12 +25,10 @@ trait Operator extends Traversable[Operator] {
       toList
   }
 
-  def movers: Traversable[Movable] = grab[Movable]
-
-  def iHooks: Traversable[IteratedHook[_ <: GIterator]] =
+  def movers: Seq[Movable] = grab[Movable]
+  def iHooks: Seq[IteratedHook[_ <: GIterator]] =
     grab[IteratedHook[_ <: GIterator]]
-
-  def hooks: Traversable[IndexHook] = grab[IndexHook]
+  def hooks: Seq[IndexHook] = grab[IndexHook]
 
   override def toString: String = {
     val b = new StringBuilder()

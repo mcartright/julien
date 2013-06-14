@@ -5,6 +5,7 @@ package examples
 import java.io.PrintStream
 import julien.retrieval._
 import julien.retrieval.Utils._
+import julien.retrieval.processor._
 
 /** An example implementation of the features from
   * "LETOR: Benchmark Dataset for Research on Learning to Rank for Information
@@ -117,8 +118,7 @@ Required parameters:
 
     // Execute it
     val model = modelFeatures.result
-    val processor = SimpleProcessor()
-    processor.add(model: _*)
+    val processor = QueryProcessor(Sum(model))
     val results = processor.run()
     printResults(results, index, out)
   }

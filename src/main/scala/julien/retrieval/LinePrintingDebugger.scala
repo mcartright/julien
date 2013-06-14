@@ -1,6 +1,8 @@
 package julien
 package retrieval
 
+import julien.retrieval.processor._
+
 object LinePrintingDebugger { def apply() = new LinePrintingDebugger() }
 class LinePrintingDebugger {
   def printState(

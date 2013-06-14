@@ -4,6 +4,7 @@ package examples
 
 import julien.retrieval._
 import julien.retrieval.Utils._
+import julien.retrieval.processor._
 import julien.eval.QueryResult
 
 import scala.collection.mutable.{ListBuffer,PriorityQueue,HashMap,LinkedHashMap}
@@ -40,14 +41,8 @@ Required parameters:
     val query = params.getString("query").split(" ").map(Term(_))
     val ql = Combine(query.map(a => Dirichlet(a, IndexLengths())))
 
-    // Make a processor to run it
-    val processor = SimpleProcessor()
-
-    // Add the model to the processor
-    processor.add(ql)
-
     // run it and get results for the first run
-    val results = processor.run()
+    val results = QueryProcessor(ql).run()
 
     val selectedGrams = extractGrams(results, index)
 
@@ -63,10 +58,7 @@ Required parameters:
       List(ql, Combine(children = wrappedGrams, weight = (1-lambda)))
     )
 
-    processor.clear
-    processor.add(rm3)
-
-    val finalResults = processor.run()
+    val finalResults = QueryProcessor(rm3).run()
     printResults(results, index, out)
   }
 

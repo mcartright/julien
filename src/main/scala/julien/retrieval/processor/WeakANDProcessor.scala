@@ -1,14 +1,11 @@
 package julien
 package retrieval
+package processor
 
 import scala.annotation.tailrec
 import scala.math._
 import julien._
 import julien.behavior._
-
-object WeakANDProcessor {
-  def apply() = new WeakANDProcessor()
-}
 
 /** This processor handles bag-of-words queries that contain
   * features that have actual bounds (vs infinite bounds).
@@ -28,7 +25,8 @@ object WeakANDProcessor {
   *    - Only 1 index is being used
   *    - Query is a bag of words (term independence assumption)
   */
-class WeakANDProcessor(factor: Double = 1.0) extends SimplePreloadingProcessor {
+class WeakANDProcessor private[processor] (root: Feature, factor: Double = 1.0)
+    extends SimplePreloadingProcessor(root) {
   override def finishScoring[T <: ScoredObject[T]](
     allSentinels: Array[Sentinel],
     iterators: Array[Movable],

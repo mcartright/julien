@@ -9,6 +9,7 @@ import java.io.PrintStream
 
 import julien.retrieval._
 import julien.retrieval.Utils._
+import julien.retrieval.processor._
 
 /** Simple example showing how to compute a bag-of-words
   * query using Dirichlet smoothing.
@@ -34,10 +35,7 @@ Required parameters:
     val ql = Sum(query.map(a => Dirichlet(a, IndexLengths())))
 
     // Make a processor to run it
-    val processor = MaxscoreProcessor()
-
-    // Add the model to the processor
-    processor.add(ql)
+    val processor = QueryProcessor(ql)
 
     // run it and get results
     val results = processor.run()
