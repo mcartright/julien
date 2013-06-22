@@ -24,6 +24,14 @@ trait ScalarWeightedFeature extends Feature {
   override def weight: Double = scalarWeight
   override def weight_=(newWeight: Double): Unit =
     this.scalarWeight = newWeight
+
+  override def toString: String = {
+    val b = new StringBuilder()
+    b append stringPrefix append ":" append scalarWeight
+    b append "(" append children.mkString(",")
+    b append ")"
+    b.result
+  }
 }
 
 /** Instantiates the weight of a [[Feature]] as a settable

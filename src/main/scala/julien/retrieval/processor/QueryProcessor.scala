@@ -22,8 +22,12 @@ object QueryProcessor {
     var all : Int = 0
   )
 
-  // Default this to a no-op
-  def prepare(): Unit = {}
+  /** Selects a QueryProcessor to run all of the models in
+    * parallel - and 'in parallel' means that for each
+    * document, the processor will move once, and evaluate
+    * many times.
+    */
+  def apply(models: Seq[Feature]): QueryProcessor = ???
 
   /** Selects a QueryProcessor for the given query. */
   def apply(root: Feature): QueryProcessor = {
