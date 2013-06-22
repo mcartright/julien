@@ -135,13 +135,21 @@ package object julien {
   /** For debugging/timing purposes, until I can figure out a macro to
     * compile this out - At least moving the definition will be easy.
     */
-  def time[R](label:String)(block: => R): R = {
+  def printTime[R](label:String)(block: => R): R = {
     val t0 = System.currentTimeMillis
     val result = block
     val t1 = System.currentTimeMillis
     debugf("%s: %d ms\n", label, (t1-t0).toInt)  // this is a test macro
     result
   }
+
+  def time[R](block: => R): Tuple2[R, Long] = {
+    val t0 = System.nanoTime
+    val result = block
+    val t1 = System.nanoTime
+    (result, t1-t0)
+  }
+
 
   /** For debugging. This one is elidable, meaning given the correct flag,
     * the compiler will remove the call and the bytecode for this function.

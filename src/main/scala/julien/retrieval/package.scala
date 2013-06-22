@@ -72,7 +72,7 @@ package object retrieval {
 
   def sdm(
     rawterms: Seq[String],
-    scorer: (Term, IndexLengths) => Feature,
+    scorer: (PositionStatsView, IndexLengths) => Feature,
     unigramWeight: Double = 0.8,
     odWeight: Double = 0.15,
     uwWeight: Double = 0.05,
@@ -80,21 +80,25 @@ package object retrieval {
     uwWindowSize: Int = 8)
     (implicit index: Index): Feature = {
     val terms = rawterms.map(Term(_)(index))
-    return Combine(
-      // List of unigram, od, and uw features
-      List[Feature](
-        // unigram feature
-        CombineNorm(children = terms.map(a => Dirichlet(a,IndexLengths())),
-          weight = unigramWeight),
-        // ordered window feature
-        CombineNorm(children = terms.sliding(2,1).map { p =>
-          Dirichlet(OrderedWindow(odWindowSize, p: _*), IndexLengths())
-        }.toSeq, weight = odWeight),
-        // unordered window feature
-        CombineNorm(terms.sliding(2,1).map { p =>
-          Dirichlet(UnorderedWindow(uwWindowSize, p: _*), IndexLengths())
-        }.toSeq, weight = uwWeight)
+    if (terms.length == 1) {
+      scorer(terms(0), IndexLengths())
+    } else {
+      Combine(
+        // List of unigram, od, and uw features
+        List[Feature](
+          // unigram feature
+          CombineNorm(children = terms.map(a => scorer(a,IndexLengths())),
+            weight = unigramWeight),
+          // ordered window feature
+          CombineNorm(children = terms.sliding(2,1).map { p =>
+            scorer(OrderedWindow(odWindowSize, p: _*), IndexLengths())
+          }.toSeq, weight = odWeight),
+          // unordered window feature
+          CombineNorm(terms.sliding(2,1).map { p =>
+            scorer(UnorderedWindow(uwWindowSize, p: _*), IndexLengths())
+          }.toSeq, weight = uwWeight)
+        )
       )
-    )
+    }
   }
 }

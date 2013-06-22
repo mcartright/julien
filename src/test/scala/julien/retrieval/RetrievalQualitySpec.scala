@@ -23,6 +23,10 @@ import scala.collection.JavaConversions._
 class RetrievalQualitySpec
     extends FlatSpec
     with BeforeAndAfterEach {
+  // Just pulling in this one function
+  import julien.time
+
+
   type GARNA = org.lemurproject.galago.core.index.AggregateReader.NodeAggregateIterator
   type GARCA = org.lemurproject.galago.core.index.AggregateReader.CollectionAggregateIterator
   type GMEI = org.lemurproject.galago.core.retrieval.iterator.MovableExtentIterator
@@ -326,22 +330,14 @@ class RetrievalQualitySpec
     galagoCombiner: String
   ) {
 
-    // For timing purposes
-    def time[R](block: => R): Tuple2[R, Long] = {
-      val t0 = System.currentTimeMillis
-      val result = block
-      val t1 = System.currentTimeMillis
-      Tuple2(result, t1-t0)
-    }
-
     // Generate queries
     val queries = getSampleQueries(4, 2)
 
     // Set up processing structures
     val retrieval = new LocalRetrieval(galagoIndex, new Parameters)
 
-    var jTotalTime = 0L
-    var gTotalTime = 0L
+    var jTotalTime = 0.0D
+    var gTotalTime = 0.0D
     var numRun = 0
 
     // For each query, run against each index and compare results
@@ -362,7 +358,7 @@ class RetrievalQualitySpec
           r
         }
 
-        jTotalTime += jSingleTime
+        jTotalTime += (jSingleTime.toDouble / 1000000.0)
 
         // Galago
         val queryParams = new Parameters()
@@ -375,7 +371,7 @@ class RetrievalQualitySpec
           val node = retrieval.transformQuery(root, queryParams)
           retrieval.runQuery(node, queryParams)
         }
-        gTotalTime += gSingleTime
+        gTotalTime += (gSingleTime.toDouble / 1000000.0)
         numRun += 1
 
         // group by score, then compare group by group (so things with the same
