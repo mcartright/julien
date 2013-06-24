@@ -25,12 +25,16 @@ import julien.behavior._
   *    - Only 1 index is being used
   *    - Query is a bag of words (term independence assumption)
   */
-class MaxscoreProcessor private[processor] (root: Feature)
-    extends SimplePreloadingProcessor(root) {
-  override def finishScoring[T <: ScoredObject[T]](
+class MaxscoreProcessor[T <: ScoredObject[T]] private[processor] (
+  root: Feature,
+  acc: Accumulator[T]
+)
+    extends SimplePreloadingProcessor[T](root, acc)
+{
+  override def finishScoring(
     allSentinels: Array[Sentinel],
     iterators: Array[Movable],
-    acc: Accumulator[T] = DefaultAccumulator[ScoredDocument]()
+    acc: Accumulator[T]
   ): List[T] = {
     val hackedAcc = acc.asInstanceOf[DefaultAccumulator[ScoredDocument]]
 

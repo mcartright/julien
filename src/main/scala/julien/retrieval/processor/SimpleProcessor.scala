@@ -20,10 +20,12 @@ import collection.mutable.ArrayBuffer
   * If any of these assumptions are not met, then a different
   * [[julien.retrieval.QueryProcessor QueryProcessor]] should be used.
   */
-class SimpleProcessor private[processor] (val root: Feature)
-    extends QueryProcessor
-{
-  def run[T <: ScoredObject[T]](acc: Accumulator[T]): QueryResult[T] = {
+class SimpleProcessor[T <: ScoredObject[T]] private[processor] (
+  val root: Feature,
+  acc: Accumulator[T]
+)
+    extends SingleQueryProcessor[T] {
+  def run(): QueryResult[T] = {
     import QueryProcessor.isDone
 
     // extract iterators

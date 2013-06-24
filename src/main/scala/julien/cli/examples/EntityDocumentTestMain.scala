@@ -52,9 +52,8 @@ object EntityDocumentTestMain extends App {
 
   // Make a processor to run it
   val model = modelFeatures.result
-  val processor = QueryProcessor(Sum(model))
 
   // run it and get results
-  val results = processor.run()
+  val results = QueryProcessor(Sum(model))
   printResults(results, index)
 }

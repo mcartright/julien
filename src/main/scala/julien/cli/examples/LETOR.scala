@@ -118,8 +118,7 @@ Required parameters:
 
     // Execute it
     val model = modelFeatures.result
-    val processor = QueryProcessor(Sum(model))
-    val results = processor.run()
+    val results = QueryProcessor(Sum(model))
     printResults(results, index, out)
   }
 }

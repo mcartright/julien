@@ -22,15 +22,41 @@ object QueryProcessor {
     var all : Int = 0
   )
 
-  /** Selects a QueryProcessor to run all of the models in
-    * parallel - and 'in parallel' means that for each
-    * document, the processor will move once, and evaluate
-    * many times.
+  /** Selects a QueryProcessor for each query. If any subset of the
+    * batch of queries shares the exact same set of
+    * [[julien.behavior.Movable Movables]], those queries are executed
+    * in one pass of the index. Otherwise distinct queries are executed
+    * independently.
     */
-  def apply(models: Seq[Feature]): QueryProcessor = ???
+  def apply(models: Seq[Feature]): Seq[QueryResult[ScoredDocument]] =
+    this.apply(models, () => DefaultAccumulator[ScoredDocument]())
+  def apply[T <: ScoredObject[T]](
+    models: Seq[Feature],
+    accGen: => Accumulator[T]
+  ): QueryResultSet[T] = {
+    val movables = models.head.movers
+    // This is the "dumb" check - if they all share the same views,
+    // then do them all. We need something in the middle.
+    if (models.forall(m => m.movers.size == movables.size)) {
+      val resultSet = ParallelProcessor(models, accGen).run()
+      return resultSet
+    } else {
+      // NOT shared correctly - back off to safer but much slower
+      // execution
+
+      val resultSet = models.map(m => this.apply(m, makeAcc()))
+      return QueryResultSet(resultSet)
+    }
+  }
 
   /** Selects a QueryProcessor for the given query. */
-  def apply(root: Feature): QueryProcessor = {
+  def apply(root: Feature): QueryResult[ScoredDocument] =
+    this.apply(root, DefaultAccumulator[ScoredDocument]())
+
+  def apply[T <: ScoredObject[T]](
+    root: Feature,
+    accGen: => Accumulator[T]
+  ): QueryResult[T] = {
 
     // First gather statistics - is there any way to do this that isn't
     // a code smell?
@@ -46,18 +72,18 @@ object QueryProcessor {
       if (op.isInstanceOf[RandomAccess]) c.numRandomAccess += 1
     }
 
-    if (c.numNeedsPreparing > 0) {
-      new SimpleProcessor(root) with Preparer {
-        override def run[T <: ScoredObject[T]](
-          acc: Accumulator[T]
-        ): QueryResult[T] = {
-          prepare()
-          super.run(acc)
+    val proc =
+      if (c.numNeedsPreparing > 0) {
+        new SimpleProcessor(root, accGen) with Preparer {
+          override def run() : QueryResult[T] = {
+            prepare()
+            super.run()
+          }
         }
+      } else {
+        new SimpleProcessor(root, accGen)
       }
-    } else {
-      new SimpleProcessor(root)
-    }
+    proc.run()
   }
 
 /** Was the check for the preloading processors. Need to reactivate it somehow.
@@ -102,17 +128,27 @@ object QueryProcessor {
 
 
 /** Generic definition of a query processor instance. */
-trait QueryProcessor {
+sealed trait QueryProcessor {
   // Pull in static functions
   import QueryProcessor.{isDone,matches}
 
   type DebugHook =
   (ScoredDocument, Seq[Feature], Index, QueryProcessor) => Unit
+}
 
-  def root: Feature
+/** Processors that handle one query at a time in isolation should
+  * extend this trait. Processors may assume they will be run
+  * independently.
+  */
+trait SingleQueryProcessor[T <: ScoredObject[T]] extends QueryProcessor {
+  def run(): QueryResult[T]
+}
 
-  // The only abstract method
-  def run[T <: ScoredObject[T]](
-    acc: Accumulator[T] = DefaultAccumulator[ScoredDocument]()
-  ): QueryResult[T]
+/** Will process more than one query simultaneously. How it does that is
+  * it's business. In other words, check the implementing classes.
+  */
+trait MultiQueryProcessor[T <: ScoredObject[T]] extends QueryProcessor {
+  // The only abstract method - all configuration is done at
+  // construction of the processor
+  def run(): QueryResultSet[T]
 }

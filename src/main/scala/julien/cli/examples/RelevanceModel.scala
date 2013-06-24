@@ -42,8 +42,7 @@ Required parameters:
     val ql = Combine(query.map(a => Dirichlet(a, IndexLengths())))
 
     // run it and get results for the first run
-    val results = QueryProcessor(ql).run()
-
+    val results = QueryProcessor(ql)
     val selectedGrams = extractGrams(results, index)
 
     // Prep for adding to model
@@ -58,7 +57,7 @@ Required parameters:
       List(ql, Combine(children = wrappedGrams, weight = (1-lambda)))
     )
 
-    val finalResults = QueryProcessor(rm3).run()
+    val finalResults = QueryProcessor(rm3)
     printResults(results, index, out)
   }
 

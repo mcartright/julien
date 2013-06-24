@@ -8,8 +8,11 @@ import julien._
 import julien.behavior._
 import scala.math._
 
-abstract class SimplePreloadingProcessor private[processor] (root: Feature)
-    extends SimpleProcessor(root: Feature) {
+abstract
+class SimplePreloadingProcessor[T <: ScoredObject[T]] private[processor] (
+  root: Feature,
+  acc: Accumulator[T]
+) extends SimpleProcessor[T](root, acc) {
   import QueryProcessor.isDone
 
   // For encapsulation - note we assume 1-to-1
@@ -35,10 +38,7 @@ abstract class SimplePreloadingProcessor private[processor] (root: Feature)
     iterators: Array[Movable],
     acc: Accumulator[T]): List[T]
 
-  override def run[T <: ScoredObject[T]](
-    acc: Accumulator[T]
-  ): QueryResult[T] = {
-
+  override def run(): QueryResult[T] = {
     val hackedAcc = acc.asInstanceOf[DefaultAccumulator[ScoredDocument]]
 
     // Build the sentinel list - we know we can just go under the root

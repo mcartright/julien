@@ -4,7 +4,6 @@ package retrieval
 //import java.util.PriorityQueue
 import scala.collection.mutable.PriorityQueue
 
-
 object DefaultAccumulator {
   val defaultSize: Int = 5
 
@@ -44,7 +43,7 @@ class DefaultAccumulator[T <: ScoredObject[T]] private(
     this
   }
 
-  /** Produces a List of the result type. Notices that this consumes
+  /** Produces a List of the result type. Notice that this consumes
     * the contents of the Accumulator.
     */
   override def result(): List[T] = {

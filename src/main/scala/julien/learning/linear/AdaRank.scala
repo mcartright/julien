@@ -22,7 +22,6 @@ object AdaRank {
 
 class AdaRank(
   queries: Map[String, String],
-  preparer: QueryPreparer,
   judgments: QueryJudgmentSet,
   evaluator: QueryEvaluator,
   index: Index,
@@ -59,8 +58,7 @@ class AdaRank(
   }
 
   private def scoreQuery(wq: WeightedQuery, feats: Seq[ScalarWeightedFeature]): Double = {
-    val processor = QueryProcessor(Sum(feats))
-    evaluator.eval(processor.run(), judgments(wq.qid))
+    evaluator.eval(QueryProcessor(Sum(feats)), judgments(wq.qid))
   }
 
   private def updateQueryWeights: Unit = {

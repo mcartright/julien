@@ -34,11 +34,8 @@ Required parameters:
     val query = params.getString("query").split(" ").map(Term(_))
     val ql = Sum(query.map(a => Dirichlet(a, IndexLengths())))
 
-    // Make a processor to run it
-    val processor = QueryProcessor(ql)
-
     // run it and get results
-    val results = processor.run()
+    val results = QueryProcessor(ql)
     printResults(results, index, out)
   }
 }

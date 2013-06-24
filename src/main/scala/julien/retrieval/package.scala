@@ -40,7 +40,6 @@ import scala.reflect.runtime.universe._
   * }}}
   */
 package object retrieval {
-  type QueryPreparer = (String) => Seq[Feature]
 
   // Do some type aliasing on objects
   val Combine = Sum

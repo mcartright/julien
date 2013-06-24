@@ -51,15 +51,12 @@ Required parameters:
           weight = 0.05)
       ))
 
-    // Make a processor to run it
-    val processor = QueryProcessor(seqdep)
-
     // Use this to add a line-printing debugger - still experimental
     //processor.debugger =
     //  Some(julien.retrieval.LinePrintingDebugger().printState _)
 
     // run it and get results
-    val results = processor.run()
+    val results = QueryProcessor(seqdep)
 
     printResults(results, index, out)
   }
