@@ -33,7 +33,7 @@ class SimplePreloadingProcessor[T <: ScoredObject[T]] private[processor] (
     * [[julien.retrieval.WeakANDProcessor WeakAND]] algorithms both kick in
     * at this point.
     */
-  def finishScoring[T <: ScoredObject[T]](
+  def finishScoring(
     allSentinels: Array[Sentinel],
     iterators: Array[Movable],
     acc: Accumulator[T]): List[T]

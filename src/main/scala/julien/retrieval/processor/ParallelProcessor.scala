@@ -38,7 +38,7 @@ class ParallelProcessor[T <: ScoredObject[T]] private[processor] (
     val models = modelsToKeys.keys.par
 
     // Set up map of accumulators
-    val accs = Map(models.map(m => (m, accGen)))
+    val accs = models.map(m => (m, accGen)).toMap
 
     // extract movables
     val iterators: Array[Movable] = models.head.movers.distinct.toArray
@@ -81,8 +81,8 @@ class ParallelProcessor[T <: ScoredObject[T]] private[processor] (
 
     // Done - finalize results
     val results = accs.map { case (m,a) =>
-        (modelsToKeys(m), ToQueryResult(a.result))
+        (modelsToKeys(m), QueryResult(a.result))
     }.toMap
-    return QueryResultSet(results)
+    return QueryResultSet(results.seq)
   }
 }

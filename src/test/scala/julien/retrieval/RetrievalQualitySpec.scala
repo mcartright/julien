@@ -348,11 +348,10 @@ class RetrievalQualitySpec
         val requested = 100
         // Julien
         val (jUnstableResult, jSingleTime) = time {
-          val jquery = julienCombiner(query, julienIndex)
+          val jq = julienCombiner(query, julienIndex)
           val r =
-            QueryProcessor(jquery).run(
-              DefaultAccumulator[ScoredDocument](requested)
-            )
+            QueryProcessor(jq, DefaultAccumulator[ScoredDocument](requested))
+
           // Because Galago does it without asking - trying to be fair
           r.foreach(jr => jr.name = julienIndex.name(jr.id))
           r

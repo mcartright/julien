@@ -28,8 +28,11 @@ object QueryProcessor {
     * in one pass of the index. Otherwise distinct queries are executed
     * independently.
     */
-  def apply(models: Seq[Feature]): Seq[QueryResult[ScoredDocument]] =
-    this.apply(models, () => DefaultAccumulator[ScoredDocument]())
+  def apply(models: Seq[Feature]): QueryResultSet[ScoredDocument] = {
+    def accGen = DefaultAccumulator[ScoredDocument]()
+    this.apply(models, accGen)
+  }
+
   def apply[T <: ScoredObject[T]](
     models: Seq[Feature],
     accGen: => Accumulator[T]
@@ -43,9 +46,13 @@ object QueryProcessor {
     } else {
       // NOT shared correctly - back off to safer but much slower
       // execution
-
-      val resultSet = models.map(m => this.apply(m, makeAcc()))
-      return QueryResultSet(resultSet)
+      val serialModels = models.seq
+      val resultMap = serialModels.zipWithIndex.map {
+	case (m, i) =>
+	  val results = this.apply(m, accGen)
+	  (i.toString, QueryResult(results))
+      }.toMap
+      return QueryResultSet(resultMap)
     }
   }
 
@@ -55,9 +62,7 @@ object QueryProcessor {
 
   def apply[T <: ScoredObject[T]](
     root: Feature,
-    accGen: => Accumulator[T]
-  ): QueryResult[T] = {
-
+    acc: Accumulator[T]): QueryResult[T] = {
     // First gather statistics - is there any way to do this that isn't
     // a code smell?
     val c = Counter()
@@ -74,14 +79,14 @@ object QueryProcessor {
 
     val proc =
       if (c.numNeedsPreparing > 0) {
-        new SimpleProcessor(root, accGen) with Preparer {
+        new SimpleProcessor(root, acc) with Preparer {
           override def run() : QueryResult[T] = {
             prepare()
             super.run()
           }
         }
       } else {
-        new SimpleProcessor(root, accGen)
+        new SimpleProcessor(root, acc)
       }
     proc.run()
   }

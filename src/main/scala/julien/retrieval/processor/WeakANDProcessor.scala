@@ -45,8 +45,10 @@ class WeakANDProcessor[T <: ScoredObject[T]] private[processor] (
 
     // Start with a full sort - the only one needed
     var sortedSentinels = allSentinels.sorted(SentinelOrdering)
-    val scoreMinimum = sortedSentinels.foldLeft(0.0) { (sum, sen) =>
-      sum + sen.feat.lowerBound
+    var scoreMinimum = 0.0
+    var i = 0
+    while (i < sortedSentinels.length) {
+      scoreMinimum += sortedSentinels(i).feat.lowerBound
     }
 
     var running = true

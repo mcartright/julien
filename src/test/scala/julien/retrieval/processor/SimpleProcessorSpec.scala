@@ -141,9 +141,12 @@ class SimpleProcessorSpec
   // These are to create factory functions to pass into
   // the behavior trait - each test needs its own way to
   // generate a fresh processor
-  def simpleProc = (f: Feature) => new SimpleProcessor(f)
-  def maxProc = (f: Feature) => new MaxscoreProcessor(f)
-  def wandProc = (f:Feature) => new WeakANDProcessor(f)
+  def simpleProc = (f: Feature) =>
+    new SimpleProcessor(f, DefaultAccumulator[ScoredDocument]())
+  def maxProc = (f: Feature) =>
+    new MaxscoreProcessor(f, DefaultAccumulator[ScoredDocument]())
+  def wandProc = (f:Feature) =>
+    new WeakANDProcessor(f, DefaultAccumulator[ScoredDocument]())
 
   "The SimpleProcessor" should
   behave like aSimpleProcessor(simpleProc)
