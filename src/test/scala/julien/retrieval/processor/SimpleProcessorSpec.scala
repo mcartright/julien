@@ -45,8 +45,8 @@ trait SimpleProcessorBehavior extends QuickIndexBuilder { this: FlatSpec =>
   // This is poorly named, but I just needed to factor out
   // some code.
   def anAccumulatorProcessor(
-    ref: (Feature) => QueryProcessor,
-    pFactory: (Feature) => QueryProcessor) {
+    ref: (Feature, Int) => SingleQueryProcessor[ScoredDocument],
+    pFactory: (Feature, Int) => SingleQueryProcessor[ScoredDocument]) {
     it should "have the same results as the SimpleProcessor" in {
       // Make a random 5-word query.
       val qterms = getQueryTerms()
@@ -54,12 +54,12 @@ trait SimpleProcessorBehavior extends QuickIndexBuilder { this: FlatSpec =>
       val genericClue = s"query=${qterms.mkString(";")},scorer=$scorerName"
 
       // Do the simple run
-      val sp = ref(query)
-      val simpleResults = sp.run(DefaultAccumulator[ScoredDocument](3))
+      val sp = ref(query, 3)
+      val simpleResults = sp.run()
 
       // Now do alternate run
-      val alt = pFactory(query)
-      val altResults = alt.run(DefaultAccumulator[ScoredDocument](3))
+      val alt = pFactory(query, 3)
+      val altResults = alt.run()
 
       // And compare
       withClue(genericClue) {
@@ -81,12 +81,12 @@ trait SimpleProcessorBehavior extends QuickIndexBuilder { this: FlatSpec =>
       val genericClue = s"query=${qterms.mkString(";")},scorer=$scorerName"
 
       // Do the simple run
-      val sp = ref(query)
-      val simpleResults = sp.run(DefaultAccumulator[ScoredDocument](10000))
+      val sp = ref(query, 10000)
+      val simpleResults = sp.run()
 
       // Now do maxscore run
-      val alt = pFactory(query)
-      val altResults = alt.run(DefaultAccumulator[ScoredDocument](10000))
+      val alt = pFactory(query, 10000)
+      val altResults = alt.run()
 
       // And compare
       withClue(genericClue) {
@@ -101,10 +101,15 @@ trait SimpleProcessorBehavior extends QuickIndexBuilder { this: FlatSpec =>
     }
   }
 
-  def aSimpleProcessor(pFactory: (Feature) => QueryProcessor) {
+  def aSimpleProcessor(
+    pFactory: (Feature, Int) => SingleQueryProcessor[ScoredDocument]
+  ) {
     it should "construct using a single feature" in {
       implicit val implicitIndex = index
-      val proc = pFactory(Dirichlet(Term("the"), IndexLengths()))
+      val proc = pFactory(
+        Dirichlet(Term("the"), IndexLengths()),
+        DefaultAccumulator.defaultSize
+      )
     }
   }
 }
@@ -141,12 +146,12 @@ class SimpleProcessorSpec
   // These are to create factory functions to pass into
   // the behavior trait - each test needs its own way to
   // generate a fresh processor
-  def simpleProc = (f: Feature) =>
-    new SimpleProcessor(f, DefaultAccumulator[ScoredDocument]())
-  def maxProc = (f: Feature) =>
-    new MaxscoreProcessor(f, DefaultAccumulator[ScoredDocument]())
-  def wandProc = (f:Feature) =>
-    new WeakANDProcessor(f, DefaultAccumulator[ScoredDocument]())
+  def simpleProc = (f: Feature, i: Int) =>
+    new SimpleProcessor(f, DefaultAccumulator[ScoredDocument](i))
+  def maxProc = (f: Feature, i: Int) =>
+    new MaxscoreProcessor(f, DefaultAccumulator[ScoredDocument](i))
+  def wandProc = (f:Feature, i: Int) =>
+    new WeakANDProcessor(f, DefaultAccumulator[ScoredDocument](i))
 
   "The SimpleProcessor" should
   behave like aSimpleProcessor(simpleProc)
@@ -156,9 +161,8 @@ class SimpleProcessorSpec
       List("arrangement", "baptist", "goethe", "liberal", "october")
     val l = IndexLengths()(index)
     val query = Combine(queryTerms.map(t => TF(Term(t)(index), l)))
-    val sp = simpleProc(query)
-    val acc = DefaultAccumulator[ScoredDocument](size = 1000)
-    val results: QueryResult[ScoredDocument] = sp.run(acc)
+    val sp = simpleProc(query, 1000)
+    val results: QueryResult[ScoredDocument] = sp.run()
 
     // Now let's do this by hand, and compare results
     if (l.isInstanceOf[Movable]) l.asInstanceOf[Movable].reset

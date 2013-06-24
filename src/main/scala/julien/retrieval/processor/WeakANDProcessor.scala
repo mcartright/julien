@@ -49,6 +49,7 @@ class WeakANDProcessor[T <: ScoredObject[T]] private[processor] (
     var i = 0
     while (i < sortedSentinels.length) {
       scoreMinimum += sortedSentinels(i).feat.lowerBound
+      i += 1
     }
 
     var running = true
