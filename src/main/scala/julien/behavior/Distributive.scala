@@ -19,5 +19,6 @@ trait Distributive {
     *    apply the operation to the children should not matter). If this
     *    assumption cannot be met, do not mix in this trait.
     */
-  def distribute: (Seq[Feature], (Feature, InternalId, Double) => Double)
+  def distribute: Seq[Feature]
+  def setChildren(newChildren: Seq[Feature]): Unit
 }

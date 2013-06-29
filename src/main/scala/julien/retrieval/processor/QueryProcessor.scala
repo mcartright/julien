@@ -5,12 +5,15 @@ package processor
 import julien.eval.{QueryResult, QueryResultSet}
 import julien.retrieval._
 import julien.behavior._
+import scala.collection.mutable.ArraySeq
 
 /** Factory for creating QueryProcessor instances. The apply method will
   * eventually build up to act as a large DFA structure for choosing the
   * most appropriate processor for a given query.
   */
 object QueryProcessor {
+  val rewriters: ArraySeq[QueryRewriter] = ArraySeq(Flattener)
+
   private case class Counter(
     var numNeedsPreparing: Int = 0,
     var numBounded: Int = 0,

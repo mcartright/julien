@@ -7,6 +7,10 @@ import scala.math._
 import julien._
 import julien.behavior._
 
+object WeakANDProcessor {
+  def canProcess(root: Feature): Boolean = root.isInstanceOf[Distributive]
+}
+
 /** This processor handles bag-of-words queries that contain
   * features that have actual bounds (vs infinite bounds).
   * Does a structural check for a BOW model, and if it fits,

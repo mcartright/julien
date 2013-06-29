@@ -2,6 +2,7 @@ import edu.umass.ciir.macros.Macros._
 import annotation.elidable
 
 import language.implicitConversions
+import reflect.runtime.universe._
 
 /** Provides classes that are typically used by Julien applications.
   *
@@ -150,6 +151,8 @@ package object julien {
     (result, t1-t0)
   }
 
+  // Returns the concrete reflective type of any instantiated object.
+  def getType[T](obj: T)(implicit tag: TypeTag[T]): Type = tag.tpe
 
   /** For debugging. This one is elidable, meaning given the correct flag,
     * the compiler will remove the call and the bytecode for this function.

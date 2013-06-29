@@ -8,6 +8,10 @@ import julien.behavior._
 import collection.mutable
 import collection.mutable.ArrayBuffer
 
+object SimpleProcessor {
+  def canProcess(root: Feature): Boolean = true
+}
+
 /** The simplest form of query processor. This processor assumes the following:
   *
   * - Only 1 index is provided for execution.
