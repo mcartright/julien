@@ -12,7 +12,7 @@ import scala.collection.mutable.ArraySeq
   * most appropriate processor for a given query.
   */
 object QueryProcessor {
-  val rewriters: ArraySeq[QueryRewriter] = ArraySeq(Flattener)
+  val rewriters: ArraySeq[QueryRewriter] = ArraySeq()
 
   private case class Counter(
     var numNeedsPreparing: Int = 0,

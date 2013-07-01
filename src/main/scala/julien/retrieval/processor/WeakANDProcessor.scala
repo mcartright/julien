@@ -8,6 +8,10 @@ import julien._
 import julien.behavior._
 
 object WeakANDProcessor {
+  def apply[T <: ScoredObject[T]](
+    r: Feature,
+    a: Accumulator[T]
+  ) : WeakANDProcessor[T] = new WeakANDProcessor(r, a)
   def canProcess(root: Feature): Boolean = root.isInstanceOf[Distributive]
 }
 

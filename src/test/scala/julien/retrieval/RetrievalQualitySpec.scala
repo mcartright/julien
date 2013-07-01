@@ -38,7 +38,7 @@ class RetrievalQualitySpec
   private var queries: Map[String, String] = Map.empty
   private var qrels: QueryJudgmentSet = null
   private var sampleRate: Double = 0.1
-  private val vocabulary = collection.mutable.ListBuffer[String]()
+  //private val vocabulary = collection.mutable.ListBuffer[String]()
 
   var julienIndex: Index = null
   var galagoIndex: DIndex = null
@@ -70,16 +70,22 @@ class RetrievalQualitySpec
         julienPath = new File(dir, "julien").getAbsolutePath
         val jtest = Index.disk(julienPath)
         // Load the vocabulary to save time later
+        /*
         if (vocabulary.isEmpty) {
           val vIter = jtest.vocabulary().iterator
           while (vIter.hasNext) vocabulary += vIter.next
         }
+         */
         jtest.close
 
         galagoPath = new File(dir, "galago").getAbsolutePath
         val gtest = new DIndex(galagoPath)
         gtest.close
       }
+
+      // These are not required - this code is here just for reference
+
+      /*
 
       // Get the queries
       // Assumes a TSV format of "<qid>        <query>"
@@ -96,6 +102,8 @@ class RetrievalQualitySpec
         qrels =
           QueryJudgmentSet.fromTrec(new File(dir, "qrels").getAbsolutePath)
       }
+      */
+
       true
     } catch {
       // This will be clear because we're skipping all the tests
@@ -108,7 +116,9 @@ class RetrievalQualitySpec
     if (config.contains("qualityQuery")) {
       buffer ++= config("qualityQuery").asInstanceOf[String].split(";")
     } else {
-      val iter = vocabulary.iterator.buffered
+
+      //val iter = vocabulary.iterator.buffered
+      val iter = julienIndex.vocabulary().iterator.buffered
       while (iter.hasNext) {
         if (Random.nextDouble <= sampleRate) buffer += iter.head
         iter.next

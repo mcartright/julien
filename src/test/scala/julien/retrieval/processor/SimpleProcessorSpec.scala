@@ -204,5 +204,4 @@ class SimpleProcessorSpec
 
   "Maxscore and WeakAND" should
   behave like anAccumulatorProcessor(maxProc, wandProc)
-
 }

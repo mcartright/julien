@@ -9,6 +9,10 @@ import collection.mutable
 import collection.mutable.ArrayBuffer
 
 object SimpleProcessor {
+  def apply[T <: ScoredObject[T]](
+    r: Feature,
+    a: Accumulator[T]
+  ): SimpleProcessor[T] = new SimpleProcessor(r, a)
   def canProcess(root: Feature): Boolean = true
 }
 

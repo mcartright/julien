@@ -8,6 +8,10 @@ import julien._
 import julien.behavior._
 
 object MaxscoreProcessor {
+  def apply[T <: ScoredObject[T]](
+    r: Feature,
+    a: Accumulator[T]
+  ): MaxscoreProcessor[T] = new MaxscoreProcessor(r, a)
   def canProcess(root: Feature): Boolean = root.isInstanceOf[Distributive]
 }
 
