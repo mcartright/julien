@@ -72,6 +72,7 @@ class SimpleProcessor[T <: ScoredObject[T]] private[processor] (
       val hackedAcc = acc.asInstanceOf[Accumulator[ScoredDocument]]
       val sd = ScoredDocument(candidate, score)
       hackedAcc += sd
+      debug(s"SP: scored $candidate = $score")
 
       // As we move forward, set the candidate since movePast reports it
       i = 0
