@@ -36,8 +36,10 @@ class SimpleProcessor[T <: ScoredObject[T]] private[processor] (
   def run(): QueryResult[T] = {
     import QueryProcessor.isDone
 
-    // extract iterators
+    // extract iterators, make sure they're reset
     val iterators: Array[Movable] = root.movers.distinct.toArray
+    for (it <- iterators) it.reset
+
     val drivers: Array[Movable] = iterators.filterNot(_.isDense).toArray
     val scorers: Array[Feature] = Array(root)
 
@@ -72,7 +74,6 @@ class SimpleProcessor[T <: ScoredObject[T]] private[processor] (
       val hackedAcc = acc.asInstanceOf[Accumulator[ScoredDocument]]
       val sd = ScoredDocument(candidate, score)
       hackedAcc += sd
-      debug(s"SP: scored $candidate = $score")
 
       // As we move forward, set the candidate since movePast reports it
       i = 0

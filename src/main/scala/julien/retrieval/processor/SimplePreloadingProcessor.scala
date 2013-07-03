@@ -95,7 +95,6 @@ class SimplePreloadingProcessor[T <: ScoredObject[T]] private[processor] (
       }
 
       acc += ScoredDocument(candidate, score)
-      debug(s"Pre: scored $candidate = $score")
 
       // And select the next one
       i = 0
