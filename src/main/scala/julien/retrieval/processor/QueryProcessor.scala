@@ -18,7 +18,6 @@ object QueryProcessor {
     var numNeedsPreparing: Int = 0,
     var numBounded: Int = 0,
     var numConjunction: Int = 0,
-    var numDistributive: Int = 0,
     var numFinite: Int = 0,
     var numMovable: Int = 0,
     var numRandomAccess: Int = 0,
@@ -74,7 +73,6 @@ object QueryProcessor {
       if (op.isInstanceOf[NeedsPreparing]) c.numNeedsPreparing += 1
       if (op.isInstanceOf[Bounded]) c.numBounded += 1
       if (op.isInstanceOf[Conjunction]) c.numConjunction += 1
-      if (op.isInstanceOf[Distributive]) c.numDistributive += 1
       if (op.isInstanceOf[Finite]) c.numFinite += 1
       if (op.isInstanceOf[Movable]) c.numMovable += 1
       if (op.isInstanceOf[RandomAccess]) c.numRandomAccess += 1
@@ -93,24 +91,6 @@ object QueryProcessor {
       }
     proc.run()
   }
-
-/** Was the check for the preloading processors. Need to reactivate it somehow.
-    // Structural check for something like:
-    // Combine(f1, f2, f3, ...)
-    // All top-level operators in _models should look like this.
-    var result: Boolean = _models.forall(_.isInstanceOf[Distributive])
-    // Make sure for each combiner, each child is a feature with
-    // actual bounds.
-    for (combiner <- _models) {
-      // Do children explicitly so we don't traverse the entire
-      // subtree rooted here.
-      result = result && combiner.children.forall { child =>
-        child.isInstanceOf[Feature] &&
-        child.isInstanceOf[Finite]
-        child.movers.filter(_.isSparse).size == 1 // make sure it's 1-to-1
-      }
-    }
- */
 
   final def isDone(drivers: Array[Movable]): Boolean = {
     var j = 0

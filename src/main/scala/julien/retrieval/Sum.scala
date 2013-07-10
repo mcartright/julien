@@ -27,31 +27,13 @@ sealed abstract class Sum(var children: Seq[Feature]) extends Feature {
   }
 }
 
-final class ScalarSum(
+class ScalarSum(
   c: Seq[Feature],
   override var weight: Double
 ) extends Sum(c)
       with ScalarWeightedFeature
-      with Distributive {
-  def distribute: Seq[Feature] = {
-    // Do NOT like this - would rather immutable & copyable children.
-    for (op <- children) {
-      if (op.isInstanceOf[FunctionWeightedFeature]) {
-        // Need to rebind the function used for the operator
-        val casted = op.asInstanceOf[FunctionWeightedFeature]
-        casted.weight = () => (casted.weight * this.weight)
-      } else {
-        val casted = op.asInstanceOf[ScalarWeightedFeature]
-        casted.weight = casted.weight * this.weight
-      }
-    }
-    children
-  }
 
-  def setChildren(newChildren: Seq[Feature]): Unit = children = newChildren
-}
-
-final class FunctionalSum(
+class FunctionalSum(
   c: Seq[Feature],
   wf: () => Double
 ) extends Sum(c)

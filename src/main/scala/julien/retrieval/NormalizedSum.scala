@@ -38,25 +38,11 @@ sealed abstract class NormalizedSum(
   }
 }
 
-final class ScalarNormedSum(c: Seq[Feature], override var weight: Double)
+class ScalarNormedSum(c: Seq[Feature], override var weight: Double)
   extends NormalizedSum(c)
   with ScalarWeightedFeature
-  with Distributive {
-  def distribute: Seq[Feature] = {
-    // Do NOT like this - would rather immutable & copyable children.
-    for (op <- children) op match {
-      case fwf: FunctionWeightedFeature =>
-        fwf.weight = () => (fwf.weight * (this.weight/weightSum))
-      case swf: ScalarWeightedFeature =>
-        swf.weight = swf.weight * (this.weight/weightSum)
-    }
-    children
-  }
 
-  def setChildren(newChildren: Seq[Feature]): Unit = children = newChildren
-}
-
-final class FunctionalNormedSum(
+class FunctionalNormedSum(
   c: Seq[Feature],
   wf: () => Double
 ) extends NormalizedSum(c)

@@ -19,14 +19,12 @@ object SimpleProcessor {
 /** The simplest form of query processor. This processor assumes the following:
   *
   * - Only 1 index is provided for execution.
-  * - None of the `View` opeators have a [[julien.retrieval.Slicer Slicer]]
-  * attached.
   * - Currently, `SimpleProcessor` only recognizes
-  * [[julien.retrieval.IteratedHook IteratedHooks]]. This may
+  * [[julien.behavior.Movable Movable]]s for scoring organization. This may
   * change in the future.
   *
   * If any of these assumptions are not met, then a different
-  * [[julien.retrieval.QueryProcessor QueryProcessor]] should be used.
+  * [[julien.retrieval.processor.QueryProcessor QueryProcessor]] should be used.
   */
 class SimpleProcessor[T <: ScoredObject[T]] private[processor] (
   val root: Feature,

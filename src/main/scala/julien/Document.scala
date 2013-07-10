@@ -2,12 +2,7 @@ package julien
 
 import scala.language.existentials
 
-/** A view of a single Document in the collection.
-  * An [[julien.access.Index Index]] can support a
-  * [[julien.seq.DocumentSeq DocumentSeq]]
-  * over its collection for instances that implement this
-  * behavior.
-  */
+/** A view of a single Document in the collection. */
 trait Document {
   def identifier: InternalId
   def name: String

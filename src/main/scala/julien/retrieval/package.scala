@@ -1,6 +1,8 @@
 package julien
 
-import scala.reflect.runtime.universe._
+import reflect.runtime.universe._
+import collection.JavaConversions._
+import collection.mutable.Set
 
 /** High-level container of the "retrieval" behaviors in Julien.
   * This package contains all the definitions for operators (views
@@ -52,7 +54,7 @@ package object retrieval {
   import julien.{galago => G}
   // Stopwords here - somewhere else?
   object Stopwords {
-    def inquery =
+    lazy val inquery: Set[String] =
       G.tupleflow.Utility.readStreamToStringSet(
         classOf[G.core.index.Index].getResourceAsStream("/stopwords/inquery")
       )

@@ -1,7 +1,7 @@
 package julien
 package eval
 
-/** Completes the definition of a [[julien.eval.QueryJudgment QueryJudgment]]
+/** Completes the definition of a [[julien.eval.QueryJudgments QueryJudgments]]
   * by binarizing labels into the following category:
   * - <= 0 is non-relevant
   * - > 0 is relevant.

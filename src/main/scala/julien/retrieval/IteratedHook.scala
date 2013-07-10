@@ -4,8 +4,7 @@ package retrieval
 import julien.behavior._
 
 /** Indicates behavior of an [[IndexHook]] that contains
-  * an [[julien.galago.core.index.Iterator]]
-  * as its underlying data source.
+  * an julien.galago.core.index.Iterator as its underlying data source.
   */
 trait IteratedHook[I <: GIterator]
     extends View

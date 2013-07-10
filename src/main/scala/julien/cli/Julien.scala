@@ -76,5 +76,5 @@ ${selectedFn.help}
     // List of PO-functions
     List[CLIFunction](BuildIndex, DumpKeys, DocCount,
       // List of Examples
-      BagOfWords, RelevanceModel, SequentialDependenceModel)
+      BagOfWords, PRF, SequentialDependenceModel)
 }

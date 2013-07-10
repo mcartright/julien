@@ -22,8 +22,9 @@ object DocumentClone {
       original.vocabulary)
 }
 
-/** An implementation of the [[Document]] interface that does not require
-  * an existing connection to an underlying [[Index]].
+/** An implementation of the [[julien.Document Document]] interface that does
+  * not require an existing connection to an underlying
+  * [[julien.access.Index Index]].
   */
 class DocumentClone(
   val identifier: InternalId,

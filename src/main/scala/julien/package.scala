@@ -31,10 +31,6 @@ import reflect.runtime.universe._
   * [[julien.eval.MeanAveragePrecision MAP]] along with a
   * [[julien.eval.QueryJudgments QueryJudgments]] to produce a score).
   *
-  * The [[julien.learning learning]] package is still under construction at the
-  * moment, therefore not all intended components are fully listed at the
-  * moment.
-  *
   * The [[julien.flow flow]] package is a higher-level wrapper around TupleFlow
   * to facilitate constructing TupleFlow jobs. Given the conciseness of Scala
   * and several highly-touted packages that facilitate distributed computation
@@ -43,13 +39,6 @@ import reflect.runtime.universe._
   * will most likely stay, as that is the core idea of the system, and makes it
   * fairly flexible, once jobs are built.
   *
-  * The [[julien.config config]] package is meant to be a place for
-  * configuration classes and convenience methods. Currently these is some
-  * active debate about how we should go about performing configuration
-  * throughout Julien; luckily it is
-  * early enough in the system's lifecycle that should we make a major change,
-  * we can refactor the codebase without too much difficulty.
-  * <i>Feedback is welcome</i>.
   */
 package object julien {
   /**
