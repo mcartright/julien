@@ -7,13 +7,11 @@ object Dirichlet {
   private val defMu = 1500D
   val totallyMadeUpValue = 600
 
-  def apply(op: PositionStatsView, l: LengthsView) = {
+  def apply(op: PositionStatsView, l: LengthsView) =
     new Dirichlet(op, l, op, defMu, () => 1.0)
-  }
 
-  def apply(op: PositionStatsView, l: LengthsView, mu: Double) = {
-    new Dirichlet(op, l, op, mu, () => 1.0)
-  }
+  def apply(op: PositionStatsView, l: LengthsView, mu: Double) =
+      new Dirichlet(op, l, op, mu, () => 1.0)
 
   def apply(op: PositionStatsView,
     l: LengthsView,
@@ -28,7 +26,10 @@ object Dirichlet {
     op: CountView,
     l: LengthsView,
     s: StatisticsView,
-    mu: Double): Dirichlet = new Dirichlet(op, l, s, mu, () => 1.0)
+    mu: Double): Dirichlet = {
+    debug("BUILD 8")
+    new Dirichlet(op, l, s, mu, () => 1.0)
+  }
 }
 
 class Dirichlet(
@@ -44,6 +45,7 @@ class Dirichlet(
   this.weight = w()
   lazy val children: Seq[Operator] = Set[Operator](op, lengths, statsrc).toList
   lazy val views: Set[View] = Set[View](op, lengths, statsrc)
+
   // Runs when asked for the first time, and runs only once
   lazy val cf = {
     val stats: CountStatistics = statsrc.statistics

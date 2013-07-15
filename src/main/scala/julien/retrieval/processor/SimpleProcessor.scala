@@ -9,7 +9,7 @@ import collection.mutable
 import collection.mutable.ArrayBuffer
 
 object SimpleProcessor {
-  def apply[T <: ScoredObject[T]](
+  def apply[T <: ScoredObject](
     r: Feature,
     a: Accumulator[T]
   ): SimpleProcessor[T] = new SimpleProcessor(r, a)
@@ -26,7 +26,7 @@ object SimpleProcessor {
   * If any of these assumptions are not met, then a different
   * [[julien.retrieval.processor.QueryProcessor QueryProcessor]] should be used.
   */
-class SimpleProcessor[T <: ScoredObject[T]] private[processor] (
+class SimpleProcessor[T <: ScoredObject] private[processor] (
   val root: Feature,
   acc: Accumulator[T]
 )

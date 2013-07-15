@@ -7,7 +7,7 @@ import julien.behavior.Movable
 import scala.collection.Map
 
 object ParallelProcessor {
-  def apply[T <: ScoredObject[T]](
+  def apply[T <: ScoredObject](
     models: Seq[Feature],
     accGen: => Accumulator[T]
   ) = {
@@ -22,7 +22,7 @@ object ParallelProcessor {
   * The views are updated once for each doc, and all models are evaluated
   * in parallel.
   */
-class ParallelProcessor[T <: ScoredObject[T]] private[processor] (
+class ParallelProcessor[T <: ScoredObject] private[processor] (
   keysToModels: Map[String, Feature],
   accGen: => Accumulator[T]
 )

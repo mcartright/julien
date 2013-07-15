@@ -105,7 +105,7 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
 }
 
 // width = -1 means that the whole document is considered a match
-final class BufferedUnorderedWindow(
+class BufferedUnorderedWindow(
   val w: Int,
   val t: Seq[PositionStatsView]
 ) extends UnorderedWindow(w, t) {
@@ -168,42 +168,4 @@ final class BufferedUnorderedWindow(
       j += 1
     }
   }
-
-  /*
-  private def moveMinForward(
-    eArrays: Array[ExtentArray],
-    minPos : Int
-  ): Unit = {
-    var j = 0
-    while (j < eArrays.length) {
-      val cur = eArrays(j).head
-      if (cur == minPos) {
-        eArrays(j).next()
-      }
-      j += 1
-    }
-  }
-   */
-
-
-  /*
-  private def updateMinMaxPos(eArrays: Array[ExtentArray]) = {
-    var minIdx = -1
-    var min = Int.MaxValue
-    var max = 0
-    var j = 0
-    while (j < eArrays.length) {
-      val cur = eArrays(j).head()
-      if (cur < min) {
-        min = cur
-        minIdx = j
-      }
-      if (cur > max) {
-        max = cur
-      }
-      j += 1
-    }
-    (min, max, minIdx)
-  }
-   */
 }

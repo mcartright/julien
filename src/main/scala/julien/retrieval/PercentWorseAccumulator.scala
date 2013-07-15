@@ -4,17 +4,19 @@ package retrieval
 import scala.collection.mutable.{ListBuffer,TreeSet}
 
 object PercentWorseAccumulator {
-  def apply[T <: ScoredObject[T]](pct: Double): PercentWorseAccumulator[T] =
-    new PercentWorseAccumulator(TreeSet[T](), pct)
-  def apply[T <: ScoredObject[T]](): PercentWorseAccumulator[T] =
-    new PercentWorseAccumulator(TreeSet[T](), 0.10)
+  def apply[T <: ScoredObject](pct: Double)
+    (implicit order: Ordering[T]): PercentWorseAccumulator[T] =
+    new PercentWorseAccumulator(TreeSet[T]()(order), pct)
+  def apply[T <: ScoredObject]()
+    (implicit order: Ordering[T]): PercentWorseAccumulator[T] =
+    new PercentWorseAccumulator(TreeSet[T]()(order), 0.10)
 }
 
 /** This accumulator operates by only keeping
   * [[julien.ScoredObject ScoredObjects]] within a
   * certain percentage of the maximum score in the accumulator.
   */
-class PercentWorseAccumulator[T <: ScoredObject[T]] private(
+class PercentWorseAccumulator[T <: ScoredObject] private(
   private[this] val elements: TreeSet[T],
   val pct: Double
 ) extends Accumulator[T] {

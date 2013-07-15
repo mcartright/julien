@@ -2,12 +2,11 @@ package julien
 
 import scala.math.Ordered
 
-trait ScoredObject[T <: ScoredObject[T]]
-    extends Comparable[T]
-    with Ordered[T] {
+trait ScoredObject {
   def id : InternalId
   def rank_=(i: Int): Unit
   def rank: Int
+  def name_=(s: String): Unit
   def name: String
   def score: Double
 }

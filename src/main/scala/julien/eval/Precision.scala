@@ -5,7 +5,7 @@ class Precision(docsRetrieved: Int = Int.MaxValue)
     extends QueryEvaluator {
   val relRetrieved = new CountRelevantRetrieved(docsRetrieved)
 
-  def eval[T <: ScoredObject[T]](
+  def eval[T <: ScoredObject](
     result: QueryResult[T],
     judgment: QueryJudgments,
     strictlyEval: Boolean): Double = {

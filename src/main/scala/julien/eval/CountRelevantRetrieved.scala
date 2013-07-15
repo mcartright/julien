@@ -7,7 +7,7 @@ import scala.annotation.tailrec
 class CountRelevantRetrieved(docsRetrieved : Int = Int.MaxValue)
     extends QueryEvaluator {
 
-  def eval[T <: ScoredObject[T]](
+  def eval[T <: ScoredObject](
     result: QueryResult[T],
     judgment: QueryJudgments,
     strictlyEval: Boolean): Double = {
@@ -19,7 +19,7 @@ class CountRelevantRetrieved(docsRetrieved : Int = Int.MaxValue)
   }
 
   @tailrec
-  private def countRelevant[T <: ScoredObject[T]](
+  private def countRelevant[T <: ScoredObject](
     result: QueryResult[T],
     judgment: QueryJudgments,
     idx: Int = 0,

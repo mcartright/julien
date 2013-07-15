@@ -8,7 +8,7 @@ class ExpectedReciprocalRank(docsRetrieved: Int = Int.MaxValue)
     extends QueryEvaluator {
   val maxTrecValue = 4
 
-  def eval[T <: ScoredObject[T]](
+  def eval[T <: ScoredObject](
     result: QueryResult[T],
     judgment: QueryJudgments,
     strictlyEval: Boolean): Double = {

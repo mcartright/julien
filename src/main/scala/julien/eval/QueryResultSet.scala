@@ -7,7 +7,7 @@ import scala.util.Random
 import scala.math._
 
 object QueryResultSet {
-  def fromTrec[T <: ScoredObject[T]](src: String): QueryResultSet[T] = {
+  def fromTrec[T <: ScoredObject](src: String): QueryResultSet[T] = {
     val reader = Source.fromFile(src).bufferedReader
     // TODO: This is not the right pattern. Seriously - I think it's for
     // qrels. This needs to read in run results, if we use it at all.
@@ -25,12 +25,12 @@ object QueryResultSet {
     new QueryResultSet(Map.empty[String, QueryResult[T]])
   }
 
-  def apply[T <: ScoredObject[T]](
+  def apply[T <: ScoredObject](
     input: Map[String, QueryResult[T]]
   ): QueryResultSet[T] = new QueryResultSet(input)
 }
 
-class QueryResultSet[T <: ScoredObject[T]](
+class QueryResultSet[T <: ScoredObject](
   queryMap: Map[String, QueryResult[T]]
 ) extends MapProxy[String, QueryResult[T]] {
   def self = queryMap

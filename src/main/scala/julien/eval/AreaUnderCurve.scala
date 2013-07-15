@@ -18,7 +18,7 @@ class AreaUnderCurve extends QueryEvaluator() {
 
   // TODO : This can probably be optimized using partitioning of the
   // pair array
-  def eval[T <: ScoredObject[T]](
+  def eval[T <: ScoredObject](
     predictions: QueryResult[T],
     actual: QueryJudgments,
     strictlyEval: Boolean

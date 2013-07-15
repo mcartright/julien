@@ -6,16 +6,16 @@ import scala.collection.mutable.PriorityQueue
 object ArrayAccumulator {
   val defaultSize: Int = 1000
 
-  def apply[T <: ScoredObject[T]](
+  def apply[T <: ScoredObject](
     indexSize:Int,
     numResults:Int): ArrayAccumulator[T] =
     new ArrayAccumulator[T](new Array[Double](indexSize), numResults)
 
-  def apply[T <: ScoredObject[T]](indexSize:Int): ArrayAccumulator[T] =
+  def apply[T <: ScoredObject](indexSize:Int): ArrayAccumulator[T] =
     new ArrayAccumulator[T](new Array[Double](indexSize), defaultSize)
 
   /** We assume the provided queue has an ordering of "least is first". */
-  def apply[T <: ScoredObject[T]](
+  def apply[T <: ScoredObject](
     a: Array[Double],
     k: Int = defaultSize): ArrayAccumulator[T] =
     new ArrayAccumulator[T](a, k)
@@ -24,11 +24,12 @@ object ArrayAccumulator {
 /** Implementation of an accumulator with an array underlying the
   * accumulator.
   */
-class ArrayAccumulator[T <: ScoredObject[T]] private(
+class ArrayAccumulator[T <: ScoredObject] private(
   private[this] val acc: Array[Double],
-  val limit: Int
+  l: Int
   ) extends Accumulator[T] {
 
+  override val limit: Option[Int] = Some(l)
   override def clear: Unit = acc.indices.foreach(i => acc(i) = 0.0)
 
   override def +=(elem: T): this.type = {
@@ -54,7 +55,7 @@ class ArrayAccumulator[T <: ScoredObject[T]] private(
 
     var i = 0
     // pre-load
-    while (i < acc.length && topK.size < limit) {
+    while (i < acc.length && topK.size < l) {
       topK += ScoredDocument(InternalId(i), acc(i))
     }
 

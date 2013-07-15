@@ -1,19 +1,20 @@
 package julien
 package retrieval
 
-//import java.util.PriorityQueue
 import scala.collection.mutable.PriorityQueue
 
 object DefaultAccumulator {
-  val defaultSize: Int = 5
+  var defaultSize: Int = 5
 
-  def apply[T <: ScoredObject[T]](size: Int): DefaultAccumulator[T] =
-    new DefaultAccumulator[T](new PriorityQueue[T](), size)
-  def apply[T <: ScoredObject[T]](): DefaultAccumulator[T] =
-    new DefaultAccumulator[T](new PriorityQueue[T](), defaultSize)
+  def apply[T <: ScoredObject](size: Int)
+    (implicit order: Ordering[T]): DefaultAccumulator[T] =
+    new DefaultAccumulator[T](new PriorityQueue[T]()(order), size)
+  def apply[T <: ScoredObject]()
+    (implicit order: Ordering[T]): DefaultAccumulator[T] =
+    new DefaultAccumulator[T](new PriorityQueue[T]()(order), defaultSize)
 
   /** We assume the provided queue has an ordering of "least is first". */
-  def apply[T <: ScoredObject[T]](
+  def apply[T <: ScoredObject](
     q: PriorityQueue[T],
     l: Int = defaultSize): DefaultAccumulator[T] =
     new DefaultAccumulator[T](q, l)
@@ -24,15 +25,15 @@ object DefaultAccumulator {
   * Accumulator structures will be based on this design, but this serves
   * a simple template.
   */
-class DefaultAccumulator[T <: ScoredObject[T]] private(
-  private[this] val q: PriorityQueue[T], val limit: Int
+class DefaultAccumulator[T <: ScoredObject] private(
+  private[this] val q: PriorityQueue[T], l: Int
 ) extends Accumulator[T] {
-  override val hasLimit: Boolean = true
-  override def atCapacity: Boolean = q.size >= limit
+  override val limit: Option[Int] = Some(l)
+  override def atCapacity: Boolean = q.size >= l
 
   override def clear: Unit = q.clear
   override def +=(elem: T): this.type = {
-    if (q.size >= limit) {
+    if (q.size >= l) {
       if (elem.score > q.head.score) {
         q.dequeue
         q += elem

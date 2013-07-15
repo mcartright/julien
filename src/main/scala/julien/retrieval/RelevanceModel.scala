@@ -11,7 +11,7 @@ object RelevanceModel {
   // Get stopwords to filter
   val stopwords = Stopwords.inquery
 
-  def apply[T <: ScoredObject[T]](
+  def apply[T <: ScoredObject](
     initial: QueryResult[T],
     index: Index,
     fbDocs: Int = 10,

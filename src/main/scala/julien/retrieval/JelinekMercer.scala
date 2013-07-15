@@ -11,12 +11,13 @@ object JelinekMercer {
     l: LengthsView,
     lambda: Double = defLambda
   ): JelinekMercer = new JelinekMercer(op, l, op, lambda)
+
   def apply(
     c: CountView,
     l: LengthsView,
     s: StatisticsView,
-    lambda: Double): JelinekMercer =
-    new JelinekMercer(c, l, s, lambda)
+    lambda: Double
+  ): JelinekMercer = new JelinekMercer(c, l, s, lambda)
 }
 
 class JelinekMercer(

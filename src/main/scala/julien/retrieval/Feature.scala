@@ -1,6 +1,8 @@
 package julien
 package retrieval
 
+import julien.behavior.Movable
+
 /** Root of all Features */
 trait Feature extends Operator {
   type WeightType

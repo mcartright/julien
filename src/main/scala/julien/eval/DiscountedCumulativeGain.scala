@@ -9,7 +9,7 @@ import gnu.trove.map.hash.TIntDoubleHashMap
 class DiscountedCumulativeGain(docsRetrieved: Int = Int.MaxValue)
     extends QueryEvaluator() {
 
-  def eval[T <: ScoredObject[T]](
+  def eval[T <: ScoredObject](
     result: QueryResult[T],
     judgment: QueryJudgments,
     strictlyEval: Boolean): Double = {

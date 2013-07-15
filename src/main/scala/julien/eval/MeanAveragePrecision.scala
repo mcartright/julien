@@ -5,7 +5,7 @@ class MeanAveragePrecision extends QueryEvaluator() {
 
   //val name = "Average Precision"
 
-  def eval[T <: ScoredObject[T]](
+  def eval[T <: ScoredObject](
     result: QueryResult[T],
     judgment: QueryJudgments,
     strictlyEval: Boolean): Double = {

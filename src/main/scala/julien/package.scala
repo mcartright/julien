@@ -61,6 +61,7 @@ package object julien {
     def compare(a: InternalId, b: InternalId) = a.underlying compare b.underlying
   }
   implicit def InternalId2int(d: InternalId): Int = d.underlying
+  implicit def InternalId2str(d: InternalId): String = d.underlying.toString
 
   import scala.util.matching.Regex
   /** Implicit extension to the Regex class (done via composition)

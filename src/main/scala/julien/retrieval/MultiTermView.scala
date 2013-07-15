@@ -22,9 +22,9 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
     with Finite
     with NeedsPreparing {
 
-  lazy val movables: Seq[Movable] = terms.
+  lazy val movables: Array[Movable] = terms.
     filter(_.isInstanceOf[Movable]).
-    map(_.asInstanceOf[Movable])
+    map(_.asInstanceOf[Movable]).toArray
 
   def children: Seq[Operator] = terms
   def count(id: InternalId): Int =
@@ -32,13 +32,7 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
     //else
     this.positions(id).length
 
-  override lazy val isDense: Boolean = {
-    val ops =
-      terms.filter(_.isInstanceOf[Operator]).map(_.asInstanceOf[Operator])
-    val movers = ops.flatMap(_.movers)
-    movers.exists(_.isDense)
-  }
-
+  override lazy val isDense: Boolean = movables.forall(_.isDense)
   override def size: Int = statistics.docFreq.toInt
 
   // Start with no knowledge
@@ -73,3 +67,4 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
 
   case class Posting(var docid: Int, var positions: ExtentArray)
 }
+

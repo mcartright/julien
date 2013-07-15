@@ -20,16 +20,18 @@ case class ScoredDocument(
   var score: Double,
   var name: String = "unknown",
   var rank: Int = 0)
-    extends ScoredObject[ScoredDocument] {
-
-  /** Compares two ScoredDocuments by score, breaks ties w/ Docid. */
-  def compare(that: ScoredDocument): Int =
-    if (that.score < this.score) return -1
-    else if (that.score > this.score) return 1
-    else (this.id.underlying - that.id.underlying)
+    extends ScoredObject {
 
   def equals(that: ScoredDocument): Boolean =
     this.id == that.id && this.score == that.score
   def +=(scoreToAdd: Double): Unit = score += scoreToAdd
   def -=(scoreToSubtract: Double): Unit = score -= scoreToSubtract
+}
+
+object ScoredDocumentDefaultOrdering extends Ordering[ScoredDocument] {
+  /** Compares two ScoredDocuments by score, breaks ties w/ Docid. */
+  def compare(sd1: ScoredDocument, sd2: ScoredDocument): Int =
+    if (sd2.score < sd1.score) return -1
+    else if (sd2.score > sd1.score) return 1
+    else (sd1.id.underlying - sd2.id.underlying)
 }

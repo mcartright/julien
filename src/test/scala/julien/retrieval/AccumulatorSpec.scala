@@ -7,7 +7,7 @@ import scala.reflect.runtime.universe._
 import scala.collection.mutable.ArrayBuffer
 
 trait StandardAccumulatorBehavior { this: FlatSpec =>
-  def aStandardAccumulator[T <: ScoredObject[T]](
+  def aStandardAccumulator[T <: ScoredObject](
     genericAcc: Accumulator[T],
     universeSz: Int,
     requested: Int

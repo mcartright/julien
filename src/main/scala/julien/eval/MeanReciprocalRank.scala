@@ -2,7 +2,7 @@ package julien
 package eval
 
 class MeanReciprocalRank extends QueryEvaluator() {
-  def eval[T <: ScoredObject[T]](
+  def eval[T <: ScoredObject](
     result: QueryResult[T],
     judgment: QueryJudgments,
     strictlyEval: Boolean): Double = {

@@ -8,7 +8,7 @@ package eval
   *
   */
 class Accuracy extends QueryEvaluator() {
-  def eval[T <: ScoredObject[T]](
+  def eval[T <: ScoredObject](
     predictions: QueryResult[T],
     actual: QueryJudgments,
     strictlyEval: Boolean

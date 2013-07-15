@@ -117,8 +117,8 @@ class OrderedWindow(
   * Uses cached extent array references to intersect positions
   * faster. Not thread-safe.
   */
-final class BufferedOrderedWindow(val w: Int, val t: Seq[PositionStatsView])
-  extends OrderedWindow(w, t) {
+class BufferedOrderedWindow(val w: Int, val t: Seq[PositionStatsView])
+    extends OrderedWindow(w, t) {
   lazy val eArrays: Array[ExtentArray] = {
     val itBuffer = Array.newBuilder[ExtentArray]
     var t = 0

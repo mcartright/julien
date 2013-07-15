@@ -6,7 +6,7 @@ class BestAtK(docsRetrieved: Int = Int.MaxValue)
     extends QueryEvaluator {
   val relRet = new CountRelevantRetrieved(docsRetrieved)
 
-  def eval[T <: ScoredObject[T]](
+  def eval[T <: ScoredObject](
     result: QueryResult[T],
     judgments: QueryJudgments,
     strictlyEval: Boolean

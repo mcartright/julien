@@ -4,7 +4,7 @@ package eval
 class BalancedYoundenIndex extends QueryEvaluator() {
   val threshold = 0.5
 
-  def eval[T <: ScoredObject[T]](
+  def eval[T <: ScoredObject](
     predictions: QueryResult[T],
     actual: QueryJudgments,
     strictlyEval: Boolean

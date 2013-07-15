@@ -6,7 +6,7 @@ import scala.math._
 import scala.util.Random
 
 // Let's see if this works... if so, should probably mixin IterableProxyLike
-case class QueryResult[T <: ScoredObject[T]](result: Seq[T])
+case class QueryResult[T <: ScoredObject](result: Seq[T])
 extends SeqProxy[T] {
   def self = result
 
@@ -20,4 +20,10 @@ extends SeqProxy[T] {
       QueryResult(Random.shuffle(result).take(newSize))
     }
   }
+
+  def rankEqual(that: QueryResult[T]): Boolean =
+    if (this.length != that.length)
+      false
+    else
+      this.zip(that).forall(p => p._1.id == p._2.id)
 }

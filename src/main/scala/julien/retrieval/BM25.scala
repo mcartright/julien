@@ -12,6 +12,8 @@ object BM25 {
     b: Double = defB,
     k: Double = defK
   ): BM25 = new BM25(op, l, op, defB, defK)
+
+
   def apply(c: CountView, l: LengthsView, s: StatisticsView): BM25 =
     new BM25(c, l, s, defB, defK)
   def apply(

@@ -35,7 +35,7 @@ object QueryProcessor {
     this.apply(models, accGen)
   }
 
-  def apply[T <: ScoredObject[T]](
+  def apply[T <: ScoredObject](
     models: Seq[Feature],
     accGen: => Accumulator[T]
   ): QueryResultSet[T] = {
@@ -62,7 +62,7 @@ object QueryProcessor {
   def apply(root: Feature): QueryResult[ScoredDocument] =
     this.apply(root, DefaultAccumulator[ScoredDocument]())
 
-  def apply[T <: ScoredObject[T]](
+  def apply[T <: ScoredObject](
     root: Feature,
     acc: Accumulator[T]): QueryResult[T] = {
     // First gather statistics - is there any way to do this that isn't
@@ -128,14 +128,14 @@ sealed trait QueryProcessor {
   * extend this trait. Processors may assume they will be run
   * independently.
   */
-trait SingleQueryProcessor[T <: ScoredObject[T]] extends QueryProcessor {
+trait SingleQueryProcessor[T <: ScoredObject] extends QueryProcessor {
   def run(): QueryResult[T]
 }
 
 /** Will process more than one query simultaneously. How it does that is
   * it's business. In other words, check the implementing classes.
   */
-trait MultiQueryProcessor[T <: ScoredObject[T]] extends QueryProcessor {
+trait MultiQueryProcessor[T <: ScoredObject] extends QueryProcessor {
   // The only abstract method - all configuration is done at
   // construction of the processor
   def run(): QueryResultSet[T]

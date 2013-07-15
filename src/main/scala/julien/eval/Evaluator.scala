@@ -44,7 +44,7 @@ object Evaluator {
 //    "P200", "P500", "P1000");
   val evalFormat = "%2$-16s%1$3s %3$6.5f"
 
-  def evaluate[T <: ScoredObject[T]](
+  def evaluate[T <: ScoredObject](
     qrelFile: String,
     resultMap: Map[String, Seq[T]]
   ): (Seq[Judgment], Map[String, DoubleList]) = {

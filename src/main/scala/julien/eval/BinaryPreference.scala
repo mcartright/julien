@@ -6,7 +6,7 @@ package eval
   * version of this paper.
   */
 class BinaryPreference extends QueryEvaluator() {
-  def eval[T <: ScoredObject[T]](
+  def eval[T <: ScoredObject](
     result: QueryResult[T],
     judgments: QueryJudgments,
     strictlyEval: Boolean): Double = {

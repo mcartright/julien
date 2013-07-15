@@ -23,14 +23,14 @@ object Metric {
 abstract class QueryEvaluator() {
   val name:String
 
-  def eval[T <: ScoredObject[T]](
+  def eval[T <: ScoredObject](
     result: QueryResult[T],
     judgment: QueryJudgments,
     strictlyEval: Boolean = true): Double
 
   // TODO
   // Need a natural reducer for this - how to provide?
-  def eval[T <: ScoredObject[T]](
+  def eval[T <: ScoredObject](
     results: QueryResultSet[T],
     judgments: QueryJudgmentSet
   ): Double = {
