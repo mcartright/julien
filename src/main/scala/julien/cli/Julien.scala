@@ -74,7 +74,7 @@ ${selectedFn.help}
   // Would like to find these via reflection, but...not that easy right now.
   def findFunctions : Seq[CLIFunction] =
     // List of PO-functions
-    List[CLIFunction](BuildIndex, DumpKeys, DocCount,
+    List[CLIFunction](BuildIndex, DumpKeys, DocCount, OverwriteManifest,
       // List of Examples
       BagOfWords, PRF, SequentialDependenceModel)
 }
