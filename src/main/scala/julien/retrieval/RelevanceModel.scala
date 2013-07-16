@@ -15,7 +15,8 @@ object RelevanceModel {
     initial: QueryResult[T],
     index: Index,
     fbDocs: Int = 10,
-    fbTerms: Int = 10
+    fbTerms: Int = 10,
+    filterTerms: Set[String] = Set[String]()
   ) : List[Gram] = {
     // take fbDocs
     var initialResults = initial.take(fbDocs)
@@ -50,6 +51,7 @@ object RelevanceModel {
       .filterNot(stopwords(_))          // that are NOT stopwords
       .filterNot(_.size <= 1)           // that are NOT 1-character or less
       .filterNot(t => """\d+""".r == t) // and are NOT all digits
+      .filterNot(filterTerms(_))        // and are NOT in the filter set
 
     // Apparently we need lengths too. Makes (docid -> length) map
     val doclengths = initialFactors.keys.map { docid =>

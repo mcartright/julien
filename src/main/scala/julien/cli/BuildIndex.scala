@@ -53,10 +53,12 @@ object BuildIndex extends TupleFlowFunction {
 
     // Make a separate map for corpus stuff
     val storeP = new Parameters
-    storeP.set("blockSize", gblParms.get("corpusBlockSize", 512));
+    storeP.set("blockSize", gblParms.get("corpusBlockSize", 512))
     storeP.set("filename",
-      s"${gblParms.getString("indexPath")}${slash}corpus");
-    gblParms.set("storeParams", storeP);
+      s"${gblParms.getString("indexPath")}${slash}corpus")
+    storeP.set("readerClass", classOf[CorpusReader].getName)
+    storeP.set("writerClass", classOf[CorpusFolderWriter].getName())
+    gblParms.set("storeParams", storeP)
 
     // tokenizer/fields must be a list of strings [optional parameter]
     // defaults

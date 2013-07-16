@@ -4,11 +4,11 @@ package retrieval
 import julien.behavior._
 
 object Dirichlet {
-  private val defMu = 1500D
+  val defaultMu = 1500D
   val totallyMadeUpValue = 600
 
   def apply(op: PositionStatsView, l: LengthsView) =
-    new Dirichlet(op, l, op, defMu, () => 1.0)
+    new Dirichlet(op, l, op, defaultMu, () => 1.0)
 
   def apply(op: PositionStatsView, l: LengthsView, mu: Double) =
       new Dirichlet(op, l, op, mu, () => 1.0)
@@ -20,16 +20,13 @@ object Dirichlet {
   ) = new Dirichlet(op, l, op, mu, () => weight)
 
   def apply(c: CountView, l: LengthsView, s: StatisticsView) =
-    new Dirichlet(c, l, s, defMu, () => 1.0)
+    new Dirichlet(c, l, s, defaultMu, () => 1.0)
 
   def apply(
     op: CountView,
     l: LengthsView,
     s: StatisticsView,
-    mu: Double): Dirichlet = {
-    debug("BUILD 8")
-    new Dirichlet(op, l, s, mu, () => 1.0)
-  }
+    mu: Double): Dirichlet = new Dirichlet(op, l, s, mu, () => 1.0)
 }
 
 class Dirichlet(
