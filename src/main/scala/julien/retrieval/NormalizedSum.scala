@@ -17,15 +17,8 @@ sealed abstract class NormalizedSum(
   def views: Set[View] = this.grab[View].toSet
   override def toString = s"${getClass.getName}"+children.mkString("(",",",")")
 
-  val weightSum: Double = {
-    var i = 0
-    var sum = 0.0
-    while (i < children.length) {
-      sum += children(i).weight
-      i += 1
-    }
-    sum
-  }
+  // Normalize the actual weights
+  lazy val weightSum: Double = children.map(_.weight).sum
 
   def eval(id: InternalId) = {
     var sum = 0.0

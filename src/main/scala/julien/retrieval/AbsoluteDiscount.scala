@@ -1,20 +1,30 @@
 package julien
 package retrieval
 
+import julien.behavior.{Bounded,Driven,Movable}
+
 object AbsoluteDiscount {
   private val defDelta = 0.7
   val totallyMadeUpValue = 600
-  def apply(op: PositionStatsView, l: LengthsView, d: DocumentView) = {
-    new AbsoluteDiscount(op, l, op, d, defDelta)
-  }
-  def apply(c: CountView, l: LengthsView, s: StatisticsView, d: DocumentView) =
-    new AbsoluteDiscount(c, l, s, d, defDelta)
+
+  def apply(
+    op: PositionStatsView,
+    l: LengthsView,
+    d: DocumentView
+  ): AbsoluteDiscount = apply(op, l, op, d)
+
   def apply(
     op: CountView,
     l: LengthsView,
     s: StatisticsView,
     d: DocumentView,
-    delta: Double): AbsoluteDiscount = new AbsoluteDiscount(op, l, s, d, delta)
+    delta: Double = defDelta
+  ): AbsoluteDiscount = if (op.isInstanceOf[Movable])
+    new AbsoluteDiscount(op, l, s, d, delta) with Driven {
+      val driver = op.asInstanceOf[Movable]
+    }
+    else
+      new AbsoluteDiscount(op, l, s, d, delta)
 }
 
 class AbsoluteDiscount(
@@ -23,7 +33,8 @@ class AbsoluteDiscount(
   val statsrc: StatisticsView,
   val docsrc: DocumentView,
   val delta: Double)
-    extends ScalarWeightedFeature {
+    extends ScalarWeightedFeature
+    with Bounded {
   require(delta > 0, s"Delta must be positive. Received $delta")
   lazy val children: Seq[Operator] =
     Set[Operator](op, lengths, statsrc, docsrc).toList

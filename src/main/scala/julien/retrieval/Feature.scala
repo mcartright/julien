@@ -13,8 +13,6 @@ trait Feature extends Operator {
   def weight_=(newWeight: WeightType): Unit
   def views: Set[View]
   def eval(id: InternalId): Double
-  def upperBound: Double = Double.PositiveInfinity
-  def lowerBound: Double = Double.NegativeInfinity
 }
 
 /** Instantiates the weight of a [[Feature]] as publicly

@@ -7,26 +7,30 @@ object Dirichlet {
   val defaultMu = 1500D
   val totallyMadeUpValue = 600
 
-  def apply(op: PositionStatsView, l: LengthsView) =
-    new Dirichlet(op, l, op, defaultMu, () => 1.0)
-
-  def apply(op: PositionStatsView, l: LengthsView, mu: Double) =
-      new Dirichlet(op, l, op, mu, () => 1.0)
+  def apply(op: PositionStatsView, l: LengthsView): Dirichlet = apply(op, l, op)
+  def apply(op: PositionStatsView,
+    l: LengthsView,
+    mu: Double
+  ): Dirichlet = apply(op, l, op, mu = mu)
 
   def apply(op: PositionStatsView,
     l: LengthsView,
     mu: Double,
     weight: Double
-  ) = new Dirichlet(op, l, op, mu, () => weight)
-
-  def apply(c: CountView, l: LengthsView, s: StatisticsView) =
-    new Dirichlet(c, l, s, defaultMu, () => 1.0)
+  ): Dirichlet = apply(op, l, op, mu, weight)
 
   def apply(
     op: CountView,
     l: LengthsView,
     s: StatisticsView,
-    mu: Double): Dirichlet = new Dirichlet(op, l, s, mu, () => 1.0)
+    mu: Double = defaultMu,
+    weight: Double = 1.0
+  ): Dirichlet = if (op.isInstanceOf[Movable])
+    new Dirichlet(op, l, s, mu, () => weight) with Driven {
+      val driver = op.asInstanceOf[Movable]
+    }
+  else
+    new Dirichlet(op, l, s, mu, () => weight)
 }
 
 class Dirichlet(

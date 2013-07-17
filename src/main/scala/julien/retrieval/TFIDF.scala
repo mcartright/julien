@@ -4,11 +4,12 @@ package retrieval
 import julien.behavior._
 
 object TFIDF {
-  def apply(op: PositionStatsView, l: LengthsView) = {
-    new TFIDF(op, l, op)
-  }
+  def apply(op: PositionStatsView, l: LengthsView): TFIDF = apply(op, l, op)
   def apply(c: CountView, l: LengthsView, s: StatisticsView) =
-    new TFIDF(c, l, s)
+    if (c.isInstanceOf[Movable])
+      new TFIDF(c, l, s) with Driven { val driver = c.asInstanceOf[Movable] }
+    else
+      new TFIDF(c, l, s)
 }
 
 /** Term Frequency (TF) * Inverse Document Frequency (IDF). Classic term-level

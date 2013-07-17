@@ -6,18 +6,27 @@ import julien.behavior._
 object JelinekMercer {
   private val totallyMadeUpValue = 600
   private val defLambda = 0.3
+
+  def apply(op: PositionStatsView, l: LengthsView): JelinekMercer =
+    apply(op, l, op)
+
   def apply(
     op: PositionStatsView,
     l: LengthsView,
-    lambda: Double = defLambda
-  ): JelinekMercer = new JelinekMercer(op, l, op, lambda)
+    lambda: Double
+  ): JelinekMercer = apply(op, l, op, lambda)
 
   def apply(
     c: CountView,
     l: LengthsView,
     s: StatisticsView,
-    lambda: Double
-  ): JelinekMercer = new JelinekMercer(c, l, s, lambda)
+    lambda: Double = defLambda
+  ): JelinekMercer = if (c.isInstanceOf[Movable])
+    new JelinekMercer(c, l, s, lambda) with Driven {
+      val driver = c.asInstanceOf[Movable]
+    }
+    else
+      new JelinekMercer(c, l, s, lambda)
 }
 
 class JelinekMercer(

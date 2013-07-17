@@ -52,6 +52,7 @@ object RelevanceModel {
       .filterNot(_.size <= 1)           // that are NOT 1-character or less
       .filterNot(t => """\d+""".r == t) // and are NOT all digits
       .filterNot(filterTerms(_))        // and are NOT in the filter set
+      .toSet
 
     // Apparently we need lengths too. Makes (docid -> length) map
     val doclengths = initialFactors.keys.map { docid =>
@@ -59,14 +60,15 @@ object RelevanceModel {
     }.toMap
 
     // Time to score the terms
-    val grams = terms.map { T =>
+    val grams = terms.map { t =>
       // map to score-per-doc then sum
-      val score = initialFactors.map { case (docid, score) =>
+      val score = initialFactors.map { case (docid, sc) =>
         val tf =
-          hists(docid).getOrElse(T, 0).toDouble / doclengths(docid)
-        (score * tf)
+          hists(docid).getOrElse(t, 0).toDouble / doclengths(docid)
+        (sc * tf)
       }.sum
-      Gram(T, score)
+      val g = Gram(t, score)
+      g
     }
 
     // Sort and keep top "fbTerms"

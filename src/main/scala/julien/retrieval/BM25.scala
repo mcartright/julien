@@ -6,22 +6,35 @@ import julien.behavior._
 object BM25 {
   private val defB = 0.75
   private val defK = 1.2
+
+  def apply(
+    op: PositionStatsView,
+    l: LengthsView
+  ): BM25 = apply(op, l, op)
+
   def apply(
     op: PositionStatsView,
     l: LengthsView,
-    b: Double = defB,
-    k: Double = defK
-  ): BM25 = new BM25(op, l, op, defB, defK)
+    b: Double
+  ): BM25 = apply(op, l, op, b = b)
 
+  def apply(
+    op: PositionStatsView,
+    l: LengthsView,
+    b: Double,
+    k: Double
+  ): BM25 = apply(op, l, op, b, k)
 
-  def apply(c: CountView, l: LengthsView, s: StatisticsView): BM25 =
-    new BM25(c, l, s, defB, defK)
   def apply(
     c: CountView,
     l: LengthsView,
     s: StatisticsView,
-    b: Double,
-    k: Double) = new BM25(c, l, s, b, k)
+    b: Double = defB,
+    k: Double = defK
+  ) = if (c.isInstanceOf[Movable])
+    new BM25(c, l, s, b, k) with Driven { val driver = c.asInstanceOf[Movable] }
+  else
+    new BM25(c, l, s, b, k)
 }
 
 /** Smoothes raw counts according to the BM25 scoring model, as described by

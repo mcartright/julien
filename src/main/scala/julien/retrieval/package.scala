@@ -67,7 +67,7 @@ package object retrieval {
   def bow(
     terms: Seq[String],
     scorer: (Term, IndexLengths) => Feature)
-  (implicit index: Index): Feature = {
+  (implicit index: Index): ScalarWeightedFeature = {
     CombineNorm(terms.map(t =>
       scorer(Term(t)(index), IndexLengths()(index))))
   }
@@ -80,10 +80,10 @@ package object retrieval {
     uwWeight: Double = 0.05,
     odWindowSize: Int = 1,
     uwWindowSize: Int = 8)
-    (implicit index: Index): Feature = {
+    (implicit index: Index): ScalarWeightedFeature = {
     val terms = rawterms.map(Term(_)(index))
     if (terms.length == 1) {
-      scorer(terms(0), IndexLengths())
+      Combine(Seq(scorer(terms(0), IndexLengths())))
     } else {
       Combine(
         // List of unigram, od, and uw features

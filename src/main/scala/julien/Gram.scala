@@ -7,7 +7,7 @@ import scala.math.Ordered
   */
 case class Gram(term: String, score: Double) extends Ordered[Gram] {
   def compare(that: Gram) = {
-    val result = this.score compare that.score
+    val result = that.score compare this.score
     if (result == 0) this.term compare that.term else result
   }
 }

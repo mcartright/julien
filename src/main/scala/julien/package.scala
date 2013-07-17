@@ -147,5 +147,7 @@ package object julien {
   /** For debugging. This one is elidable, meaning given the correct flag,
     * the compiler will remove the call and the bytecode for this function.
     */
-  @elidable(elidable.FINEST) def debug(msg: String) = Console.err.println(msg)
+  @elidable(elidable.FINEST) def debug(msg: String, print:Boolean = true) =
+    if (print) Console.err.println(msg)
+  @elidable(elidable.INFO) def info(msg: String) = Console.err.println(msg)
 }
