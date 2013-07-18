@@ -93,7 +93,7 @@ package object julien {
   }
 
   /** Implicit lift of Regex to RichRegex. */
-  implicit def regexToRichRegex(r: Regex) = new RichRegex(r)
+  //implicit def regexToRichRegex(r: Regex) = new RichRegex(r)
 
   // Explicitly for the implicit below (get it?)
   import scala.collection.mutable.{ListBuffer,PriorityQueue}
@@ -147,7 +147,13 @@ package object julien {
   /** For debugging. This one is elidable, meaning given the correct flag,
     * the compiler will remove the call and the bytecode for this function.
     */
-  @elidable(elidable.FINEST) def debug(msg: String, print:Boolean = true) =
-    if (print) Console.err.println(msg)
+  val debugPatterns =
+    System.getProperty("julien.debug", ".*").split(",").map(_.r)
+
+  @elidable(elidable.FINEST) def debug(msg: String, tags: String*): Unit = {
+    val result = debugPatterns.forall(dp => tags.exists(t => dp matches t))
+    if (result) Console.err.println(tags.mkString("(",",",")") + ": " + msg)
+  }
+
   @elidable(elidable.INFO) def info(msg: String) = Console.err.println(msg)
 }
