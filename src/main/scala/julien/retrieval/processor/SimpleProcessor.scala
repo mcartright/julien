@@ -32,6 +32,7 @@ class SimpleProcessor[T <: ScoredObject] private[processor] (
 )
     extends SingleQueryProcessor[T] {
   def run(): QueryResult[T] = {
+    debug("Evaluating", "simpleproc")
     import QueryProcessor.isDone
 
     // extract iterators, make sure they're reset
@@ -39,6 +40,8 @@ class SimpleProcessor[T <: ScoredObject] private[processor] (
     for (it <- iterators) it.reset
 
     val drivers: Array[Movable] = iterators.filterNot(_.isDense).toArray
+    debug(s"drivers: ${drivers.mkString(",")}", "simple")
+
     val scorers: Array[Feature] = Array(root)
 
     // Go
@@ -55,6 +58,7 @@ class SimpleProcessor[T <: ScoredObject] private[processor] (
     }
 
     while (!isDone(drivers)) {
+      debug(s"next candidate: $candidate", "simple")
       // At this point the next candidate should be chosen
       // Time to score
       var score = 0.0
@@ -71,6 +75,7 @@ class SimpleProcessor[T <: ScoredObject] private[processor] (
       // SAFETY OFF
       val hackedAcc = acc.asInstanceOf[Accumulator[ScoredDocument]]
       val sd = ScoredDocument(candidate, score)
+      debug(s"Scored $candidate -> $score", "simple")
       hackedAcc += sd
 
       // As we move forward, set the candidate since movePast reports it
