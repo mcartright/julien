@@ -32,7 +32,7 @@ class SimpleProcessor[T <: ScoredObject] private[processor] (
 )
     extends SingleQueryProcessor[T] {
   def run(): QueryResult[T] = {
-    debug("Evaluating", "simpleproc")
+    debug("Evaluating", "simple")
     import QueryProcessor.isDone
 
     // extract iterators, make sure they're reset

@@ -7,7 +7,6 @@
   <version>0.1</version>
   <name>julien</name>
   <url>http://maven.apache.org</url>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -158,7 +157,14 @@
         <artifactId>scala-maven-plugin</artifactId>
         <version>3.1.3</version>
         <configuration>
-          <addScalacArgs>-optimize|-deprecation|-feature|-unchecked</addScalacArgs>
+          <args>
+            <arg>-optimize</arg>
+            <arg>-deprecation</arg>
+            <arg>-feature</arg>
+            <arg>-unchecked</arg>
+            <arg>-Xelide-below</arg>
+            <arg>INFO</arg>
+          </args>
           <recompileMode>incremental</recompileMode>
           <useZincServer>true</useZincServer>
           <excludes>
