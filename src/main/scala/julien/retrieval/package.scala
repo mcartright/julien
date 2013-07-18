@@ -1,5 +1,6 @@
 package julien
 
+import language.implicitConversions
 import reflect.runtime.universe._
 import collection.JavaConversions._
 import collection.mutable.Set
@@ -42,6 +43,7 @@ import collection.mutable.Set
   * }}}
   */
 package object retrieval {
+  implicit def featSeq2Array(s: Seq[Feature]): Array[Feature] = s.toArray
   implicit val sdOrdering = ScoredDocumentDefaultOrdering
 
   // Do some type aliasing on objects

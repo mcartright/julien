@@ -12,19 +12,20 @@ object NormalizedSum {
 }
 
 sealed abstract class NormalizedSum(
-  var children: Seq[Feature]
+  var features: Array[Feature]
 ) extends Feature {
+  def children: Array[Operator] = features.map(_.asInstanceOf[Operator])
   def views: Set[View] = this.grab[View].toSet
-  override def toString = s"${getClass.getName}"+children.mkString("(",",",")")
+  override def toString = s"${getClass.getName}"+features.mkString("(",",",")")
 
   // Normalize the actual weights
-  lazy val weightSum: Double = children.map(_.weight).sum
+  lazy val weightSum: Double = features.map(_.weight).sum
 
   def eval(id: InternalId) = {
     var sum = 0.0
     var i = 0
-    while (i < children.length) {
-      sum += children(i).weight * children(i).eval(id)
+    while (i < features.length) {
+      sum += features(i).weight * features(i).eval(id)
       i += 1
     }
     sum / weightSum

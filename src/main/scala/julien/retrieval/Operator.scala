@@ -9,7 +9,7 @@ import scala.reflect.runtime.universe._
 import julien.behavior._
 
 trait Operator extends Traversable[Operator] {
-  def children: Seq[Operator]
+  def children: Array[Operator]
   def foreach[U](f: Operator => U) = {
     f(this)
     for (c <- children) c foreach f
@@ -58,7 +58,7 @@ object Operator {
 
 // Views
 trait ChildlessOp extends Operator {
-  lazy val children: Seq[Operator] = List.empty
+  lazy val children: Array[Operator] = Array.empty
   // Ever so slightly faster here
   override def foreach[U](f: Operator => U) = f(this)
 }

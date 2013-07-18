@@ -155,5 +155,11 @@ package object julien {
     if (result) Console.err.println(tags.mkString("(",",",")") + ": " + msg)
   }
 
-  @elidable(elidable.INFO) def info(msg: String) = Console.err.println(msg)
+  val infoPatterns =
+    System.getProperty("julien.info", ".*").split(",").map(_.r)
+
+  @elidable(elidable.INFO) def info(msg: String, tags: String*): Unit = {
+    val result = infoPatterns.forall(dp => tags.exists(t => dp matches t))
+    if (result) Console.err.println("[INFO] " + msg)
+  }
 }

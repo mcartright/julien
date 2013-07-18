@@ -16,7 +16,7 @@ object TermCount {
 class TermCount(val op: CountView, val statsrc: StatisticsView)
     extends ScalarWeightedFeature
     with Bounded {
-  lazy val children: Seq[Operator] = Set[Operator](op).toList
+  lazy val children: Array[Operator] = Set[Operator](op).toArray
   lazy val views: Set[View] = Set[View](op)
   override val lowerBound: Double = 0.0
   override val upperBound: Double = statsrc.statistics.max.toDouble

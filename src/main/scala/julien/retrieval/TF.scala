@@ -20,7 +20,8 @@ class TF(
     extends ScalarWeightedFeature
     with Bounded
 {
-  lazy val children: Seq[Operator] = Set[Operator](op, lengths).toList
+  lazy val children: Array[Operator] =
+    Set[Operator](op, lengths).toArray
   lazy val views: Set[View] = Set[View](op, lengths)
   override val upperBound: Double = statsrc.statistics.max.toDouble
   override val lowerBound: Double = 0.0

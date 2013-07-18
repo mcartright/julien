@@ -38,7 +38,8 @@ class JelinekMercer(
     with Bounded
 {
   require(lambda >= 0.0 && lambda <= 1.0, s"Lambda must be [0,1]. Got: $lambda")
-  lazy val children: Seq[Operator] = Set[Operator](op, lengths, statsrc).toList
+  lazy val children: Array[Operator] =
+    Set[Operator](op, lengths, statsrc).toArray
   lazy val views: Set[View] = Set[View](op, lengths, statsrc)
 
   // Runs when asked for the first time, and runs only once

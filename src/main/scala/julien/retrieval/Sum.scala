@@ -11,16 +11,17 @@ object Sum {
     new FunctionalSum(children, weight)
 }
 
-sealed abstract class Sum(var children: Seq[Feature]) extends Feature {
+sealed abstract class Sum(var features: Array[Feature]) extends Feature {
+  lazy val children: Array[Operator] = features.map(_.asInstanceOf[Operator])
   def views: Set[View] =
-    children.foldLeft(Set[View]()) { (s, op) => s ++ op.views }
-  override def toString = s"${getClass.getName}"+children.mkString("(",",",")")
+    features.foldLeft(Set[View]()) { (s, op) => s ++ op.views }
+  override def toString = s"${getClass.getName}"+features.mkString("(",",",")")
 
   def eval(id: InternalId) = {
     var sum = 0.0
     var i = 0
-    while (i < children.length) {
-      sum += children(i).weight * children(i).eval(id)
+    while (i < features.length) {
+      sum += features(i).weight * features(i).eval(id)
       i += 1
     }
     sum
@@ -28,13 +29,13 @@ sealed abstract class Sum(var children: Seq[Feature]) extends Feature {
 }
 
 class ScalarSum(
-  c: Seq[Feature],
+  c: Array[Feature],
   override var weight: Double
 ) extends Sum(c)
       with ScalarWeightedFeature
 
 class FunctionalSum(
-  c: Seq[Feature],
+  c: Array[Feature],
   wf: () => Double
 ) extends Sum(c)
   with FunctionWeightedFeature {

@@ -36,8 +36,8 @@ class AbsoluteDiscount(
     extends ScalarWeightedFeature
     with Bounded {
   require(delta > 0, s"Delta must be positive. Received $delta")
-  lazy val children: Seq[Operator] =
-    Set[Operator](op, lengths, statsrc, docsrc).toList
+  lazy val children: Array[Operator] =
+    Set[Operator](op, lengths, statsrc, docsrc).toArray
   lazy val views: Set[View] = Set[View](op, lengths, statsrc, docsrc)
   // Runs when asked for the first time, and runs only once
   lazy val cf = {

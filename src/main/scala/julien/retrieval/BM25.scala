@@ -53,7 +53,8 @@ class BM25(
 {
   require(b > 0.0 && b < 1.0, s"b must be in [0,1]. Got $b")
   require(k > 0.0, s"k must be positive. Got $k")
-  lazy val children: Seq[Operator] = Set[Operator](op, lengths, statsrc).toList
+  lazy val children: Array[Operator] =
+    Set[Operator](op, lengths, statsrc).toArray
   lazy val views: Set[View] = Set[View](op, lengths, statsrc)
 
   // Runs when asked for the first time, and runs only once

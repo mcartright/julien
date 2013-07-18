@@ -26,7 +26,7 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
     filter(_.isInstanceOf[Movable]).
     map(_.asInstanceOf[Movable]).toArray
 
-  def children: Seq[Operator] = terms
+  def children: Array[Operator] = terms.toArray
   def count(id: InternalId): Int =
     //if (countCache.containsKey(id)) countCache.get(id)
     //else
