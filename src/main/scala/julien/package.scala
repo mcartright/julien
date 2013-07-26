@@ -92,9 +92,6 @@ package object julien {
     def !=(s: String): Boolean = misses(s)
   }
 
-  /** Implicit lift of Regex to RichRegex. */
-  //implicit def regexToRichRegex(r: Regex) = new RichRegex(r)
-
   // Explicitly for the implicit below (get it?)
   import scala.collection.mutable.{ListBuffer,PriorityQueue}
   implicit def q2list[T](q: PriorityQueue[T]): List[T] = {
@@ -152,12 +149,14 @@ package object julien {
 
   @elidable(elidable.FINEST) def debug(msg: String, tags: String*): Unit = {
     val result = debugPatterns.forall(dp => tags.exists(t => dp matches t))
-    if (result) Console.err.println(tags.mkString("(",",",")") + ": " + msg)
+    if (result)
+      Console.err.println(tags.mkString("[DEBUG ",",","]") + ": " + msg)
   }
 
   val infoPatterns =
     System.getProperty("julien.info", ".*").split(",").map(_.r)
 
+  def info(msg: String): Unit = info(msg, "generic")
   @elidable(elidable.INFO) def info(msg: String, tags: String*): Unit = {
     val result = infoPatterns.forall(dp => tags.exists(t => dp matches t))
     if (result) Console.err.println("[INFO] " + msg)

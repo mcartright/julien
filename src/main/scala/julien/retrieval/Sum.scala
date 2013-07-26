@@ -12,7 +12,7 @@ object Sum {
 }
 
 sealed abstract class Sum(var features: Array[Feature]) extends Feature {
-  lazy val children: Array[Operator] = features.map(_.asInstanceOf[Operator])
+  def children: Array[Operator] = features.map(_.asInstanceOf[Operator])
   def views: Set[View] =
     features.foldLeft(Set[View]()) { (s, op) => s ++ op.views }
   override def toString = s"${getClass.getName}"+features.mkString("(",",",")")

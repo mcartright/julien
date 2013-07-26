@@ -8,16 +8,16 @@ import julien.galago.tupleflow.Parameters
 import scala.collection.mutable.{ListBuffer,PriorityQueue,HashMap,LinkedHashMap}
 
 object RelevanceModel {
+
   // Get stopwords to filter
   val stopwords = Stopwords.inquery
 
   def apply[T <: ScoredObject](
     initial: QueryResult[T],
-    index: Index,
     fbDocs: Int = 10,
     fbTerms: Int = 10,
     filterTerms: Set[String] = Set[String]()
-  ) : List[Gram] = {
+  )(implicit index: Index) : List[Gram] = {
     // take fbDocs
     var initialResults = initial.take(fbDocs)
 

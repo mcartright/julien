@@ -30,6 +30,14 @@ trait Operator extends Traversable[Operator] {
     grab[IteratedHook[_ <: GIterator]]
   def hooks: Seq[IndexHook] = grab[IndexHook]
 
+  def terse: String = {
+    val b = new StringBuilder()
+    b append stringPrefix append "("
+    b append children.map(_.terse).mkString(",")
+    b append ")"
+    b.result
+  }
+
   override def toString: String = {
     val b = new StringBuilder()
     b append stringPrefix append "("

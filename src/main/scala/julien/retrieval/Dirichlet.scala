@@ -44,6 +44,7 @@ class Dirichlet(
 {
   require(mu > 0, s"Mu must be positive. Received $mu")
   this.weight = w()
+  override def terse: String = s"Dir(${op.terse})"
   lazy val children: Array[Operator] =
     Set[Operator](op, lengths, statsrc).toArray
   lazy val views: Set[View] = Set[View](op, lengths, statsrc)

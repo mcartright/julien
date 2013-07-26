@@ -20,6 +20,7 @@ sealed abstract class Term(t: String, index: Index)
   with PositionsBufferView
   with ChildlessOp {
   override def toString: String = s"$t: " + index.toString
+  override def terse: String = s"$t"
 }
 
 /** Represents a direct connection to an index via a key specified

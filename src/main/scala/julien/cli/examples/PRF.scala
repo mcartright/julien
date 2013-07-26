@@ -41,7 +41,7 @@ Required parameters:
 
     // run it and get results for the first run
     val results = QueryProcessor(ql)
-    val selectedGrams = RelevanceModel(results, index, 10, 20)
+    val selectedGrams = RelevanceModel(results, 10, 20)
 
     // Prep for adding to model
     val wrappedGrams = selectedGrams.map { gram =>
