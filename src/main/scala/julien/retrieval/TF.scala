@@ -4,7 +4,7 @@ package retrieval
 import julien.behavior._
 
 object TF {
-  def apply(psv: PositionStatsView, l: LengthsView): TF = apply(psv, psv, l)
+  def apply(psv: CountStatsView, l: LengthsView): TF = apply(psv, psv, l)
   def apply(c: CountView, sv: StatisticsView, l: LengthsView) =
     if (c.isInstanceOf[Movable])
       new TF(c, sv, l) with Driven { val driver = c.asInstanceOf[Movable] }

@@ -8,18 +8,18 @@ object BM25 {
   private val defK = 1.2
 
   def apply(
-    op: PositionStatsView,
+    op: CountStatsView,
     l: LengthsView
   ): BM25 = apply(op, l, op)
 
   def apply(
-    op: PositionStatsView,
+    op: CountStatsView,
     l: LengthsView,
     b: Double
   ): BM25 = apply(op, l, op, b = b)
 
   def apply(
-    op: PositionStatsView,
+    op: CountStatsView,
     l: LengthsView,
     b: Double,
     k: Double

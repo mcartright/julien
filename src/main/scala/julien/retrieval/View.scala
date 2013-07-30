@@ -27,6 +27,10 @@ trait ScoreView extends View with ScoreSrc
   */
 trait StatisticsView extends View with StatisticsSrc
 
+/** A view that provides both count and statistics information.
+  */
+trait CountStatsView extends CountView with StatisticsView
+
 /** A view that must provide the positions of occurrences of a given index
   * key for a given identifier.
   */
@@ -35,7 +39,7 @@ trait PositionsView extends CountView with PositionSrc
 /** A view that can provide both position information and statistics information
   * for a given identifier.
   */
-trait PositionStatsView extends PositionsView with StatisticsView
+trait PositionStatsView extends CountStatsView with PositionsView
 
 /** A view that must provide for the number of index key occurrences in
   * a given identifier.

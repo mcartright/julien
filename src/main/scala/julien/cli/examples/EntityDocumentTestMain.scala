@@ -30,7 +30,7 @@ object EntityDocumentTestMain extends App {
   }
   println("docs: " + index.numDocuments + " cf:" + index.collectionLength)
 
-  val query = args(0).split(" ").map(Term(_)).toSeq
+  val query = args(0).split(" ").map(Term.positions(_)).toSeq
   val modelFeatures = List.newBuilder[Feature]
 
   val sdm =

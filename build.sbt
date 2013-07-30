@@ -6,7 +6,8 @@ version := "0.1"
 
 scalaVersion := "2.10.1"
 
-resolvers ++= Seq("Galago" at "http://ayr.cs.umass.edu/m2/repository",
+resolvers ++= Seq( // "Galago" at "http://ayr.cs.umass.edu/m2/repository",
+	  "SCM CIIR" at "http://scm-ciir.cs.umass.edu/maven",
 	  "Mvn Repo" at "http://repo1.maven.org/maven2"
 )
 

@@ -7,11 +7,11 @@ object JelinekMercer {
   private val totallyMadeUpValue = 600
   private val defLambda = 0.3
 
-  def apply(op: PositionStatsView, l: LengthsView): JelinekMercer =
+  def apply(op: CountStatsView, l: LengthsView): JelinekMercer =
     apply(op, l, op)
 
   def apply(
-    op: PositionStatsView,
+    op: CountStatsView,
     l: LengthsView,
     lambda: Double
   ): JelinekMercer = apply(op, l, op, lambda)

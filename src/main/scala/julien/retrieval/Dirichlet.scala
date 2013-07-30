@@ -7,13 +7,13 @@ object Dirichlet {
   val defaultMu = 1500D
   val totallyMadeUpValue = 600
 
-  def apply(op: PositionStatsView, l: LengthsView): Dirichlet = apply(op, l, op)
-  def apply(op: PositionStatsView,
+  def apply(op: CountStatsView, l: LengthsView): Dirichlet = apply(op, l, op)
+  def apply(op: CountStatsView,
     l: LengthsView,
     mu: Double
   ): Dirichlet = apply(op, l, op, mu = mu)
 
-  def apply(op: PositionStatsView,
+  def apply(op: CountStatsView,
     l: LengthsView,
     mu: Double,
     weight: Double

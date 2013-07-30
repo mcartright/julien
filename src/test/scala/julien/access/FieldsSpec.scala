@@ -9,7 +9,7 @@ trait FieldIndexBehavior extends QuickIndexBuilder { this: FlatSpec =>
 
   def aFieldIndex(idx: => Index) {
     it should "complain if a non-existent field is asked for" in {
-      intercept[AssertionError] { idx.iterator("baton", "spinderella") }
+      intercept[AssertionError] { idx.extents("baton", "spinderella") }
     }
 
     it should "provide the vocabulary KeySet over an existing part" in {
@@ -18,12 +18,12 @@ trait FieldIndexBehavior extends QuickIndexBuilder { this: FlatSpec =>
     }
 
     it should "provide an extents iterator for a particular field" in {
-      val iterator = idx.iterator("chlorociboria", "title")
+      val iterator = idx.extents("chlorociboria", "title")
       assert (iterator != null)
     }
 
     it should "provide a null extent iterator for an OOV term" in {
-      val iterator = idx.iterator("groucho!?!?", "title")
+      val iterator = idx.extents("groucho!?!?", "title")
       assert ( iterator.isInstanceOf[NullExtentIterator] )
     }
 

@@ -178,7 +178,7 @@ class RetrievalQualitySpec
       gvIter.skipToKey(Utility.fromString(jValue))
       val gValue: String  = Utility.toString(gvIter.getKey)
       val jstats =
-        julienIndex.iterator(jValue).asInstanceOf[ARNA].getStatistics
+        julienIndex.extents(jValue).asInstanceOf[ARNA].getStatistics
       val gstats =
         gvIter.getValueIterator.asInstanceOf[GARNA].getStatistics
       expectResult(gstats.maximumCount) { jstats.maximumCount }
@@ -199,7 +199,7 @@ class RetrievalQualitySpec
       val genericClue = s"Query $idx: '${window.mkString(";")}'"
       // Run the Julien OD
       implicit val jIndex = julienIndex
-      val jterms = window.map(t => Term(t))
+      val jterms = window.map(t => Term.positions(t))
       val jod = OrderedWindow(1, jterms: _*)
       val jhits = scala.collection.mutable.HashMap[String, Int]()
       for (posting <- jod.walker) {
@@ -270,7 +270,7 @@ class RetrievalQualitySpec
       val genericClue = s"Query $idx: '${window.mkString(";")}'"
       // Run the Julien UW
       implicit val jIndex = julienIndex
-      val jterms = window.map(t => Term(t))
+      val jterms = window.map(t => Term.positions(t))
       val juw = UnorderedWindow(8, jterms: _*)
       val jhits = scala.collection.mutable.HashMap[String, Int]()
       for (posting <- juw.walker) {

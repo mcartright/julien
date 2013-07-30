@@ -46,11 +46,16 @@ class DiskIndexSpec
   }
 
   it should "provide a null extent iterator for a OOV term" in {
-    val iterator = index.iterator("snufalufagus")
+    val iterator = index.extents("snufalufagus")
+    assert ( iterator.isInstanceOf[NullExtentIterator] )
+  }
+
+  it should "provide a null counts iterator for a OOV term" in {
+    val iterator = index.counts("snufalufagus")
     assert ( iterator.isInstanceOf[NullExtentIterator] )
   }
 
   it should "fail an assertion when asking for a non-existent part" in {
-    intercept[AssertionError] { index.iterator("chocula", "bert") }
+    intercept[AssertionError] { index.extents("chocula", "bert") }
   }
 }

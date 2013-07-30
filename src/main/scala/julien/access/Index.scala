@@ -160,8 +160,11 @@ class Index private(
     */
   @deprecated("partReader is a breach of abstraction", "all versions")
   def partReader(name: String): IndexPartReader = underlying.getIndexPart(name)
-  private val iteratorCache =
+  private val extentsCache =
     scala.collection.mutable.HashMap[String, ExtentIterator]()
+  private val countsCache =
+    scala.collection.mutable.HashMap[String, CountIterator]()
+  private val countsParams = Parameters.parse("""{ "type": "counts" }""")
 
   def lengthsIterator(field: String): LI =
     underlying.getIndexPart("lengths").getIterator(field).asInstanceOf[LI]
@@ -169,32 +172,59 @@ class Index private(
   def lengthsIterator(field: Option[String] = None): LI =
     lengthsIterator(field.getOrElse(impliedField))
 
-  def clearIteratorCache: Unit = iteratorCache.clear
+  def clearIteratorCache: Unit = extentsCache.clear
 
   /** Produces a cached ExtentIterator if possible. If not found, a new iterator
     * is constructed and cached for later.
     */
-  def shareableIterator(
+  def shareableExtents(
     key: String,
     field: String = defaultField,
     stem: String = defaultStem): ExtentIterator = {
-    if (!iteratorCache.contains(key)) {
-      iteratorCache(key) = iterator(key, field, stem)
+    if (!extentsCache.contains(key)) {
+      extentsCache(key) = extents(key, field, stem)
     }
-    iteratorCache(key)
+    extentsCache(key)
+  }
+
+  /** Produces a cached CountIterator if possible. If not found, a new iterator
+    * is constructed and cached for later.
+    */
+  def shareableCounts(
+    key: String,
+    field: String = defaultField,
+    stem: String = defaultStem): CountIterator = {
+    if (!countsCache.contains(key)) {
+      countsCache(key) = counts(key, field, stem)
+    }
+    countsCache(key)
   }
 
   /** Returns an ExtentIterator from the underlying index. If the requested
     * index part is missing, an assertion fails. If the key is missing, a
     * NullExtentIterator is returned.
     */
-  def iterator(key: String,
+  def extents(key: String,
     field: String = defaultField,
     stem: String = defaultStem): ExtentIterator = {
     val label = getLabel(field, stem)
     val part = underlying.getIndexPart(label)
     val iter = part.getIterator(key)
     if (iter != null) iter.asInstanceOf[ExtentIterator]
+    else new NullExtentIterator(label)
+  }
+
+  /** Returns a CountIterator from the underlying index. If the requested
+    * index part is missing, an assertion fails. If the key is missing, a
+    * NullExtentIterator is returned.
+    */
+  def counts(key: String,
+    field: String = defaultField,
+    stem: String = defaultStem): CountIterator = {
+    val label = getLabel(field, stem)
+    val part = underlying.getIndexPart(label)
+    val iter = part.getIterator(key, countsParams)
+    if (iter != null) iter.asInstanceOf[CountIterator]
     else new NullExtentIterator(label)
   }
 

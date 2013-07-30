@@ -6,30 +6,20 @@ import galago.core.util.ExtentArray
 import julien.behavior._
 
 object Synonym {
-  def apply(terms: Term*) = new Synonym(terms)
+  def apply(terms: PositionStatsView*) = new Synonym(terms)
 }
 
-class Synonym(terms: Seq[Term])
+class Synonym(terms: Seq[PositionStatsView])
     extends MultiTermView(terms) {
-
-  lazy val iterators: Array[ExtentArray] = {
-    val itBuffer = Array.newBuilder[ExtentArray]
-    var t = 0
-    val numTerms =  terms.size
-    while (t < numTerms) {
-      itBuffer += terms(t).positionsBuffer
-      t += 1
-    }
-    itBuffer.result()
-  }
-
-  private val hits: ExtentArray = new ExtentArray()
+  assume(terms.size > 1, "Synonym expects > 1 term")
 
   override def positions(id: InternalId): ExtentArray = {
-    hits.clear
-    if (!ensurePosition(id)) return hits
+    val hits = new ExtentArray()
+    val eArrays = terms.map { t =>
+      t.synchronized(t.positions(id).copy)
+    }.toArray
     val b = ArrayBuffer[Int]()
-    for (it <- iterators) {
+    for (it <- eArrays) {
       it.reset
       while(it.hasNext) b += it.next
     }

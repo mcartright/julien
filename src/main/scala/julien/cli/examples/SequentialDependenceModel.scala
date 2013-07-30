@@ -34,7 +34,7 @@ Required parameters:
     // Open an index
     implicit val index : Index = Index.disk(params.getString("index"))
 
-    val query = params.getString("query").split(" ").map(Term(_))
+    val query = params.getString("query").split(" ").map(Term.positions(_))
     // Shorthand is:
     // val seqdep = sdm(query, Dirichlet.apply)
     val seqdep =

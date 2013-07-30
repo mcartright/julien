@@ -60,11 +60,16 @@ class MemoryIndexSpec
   }
 
   it should "provide a null extent iterator for a OOV term" in {
-    val iterator = memoryIndex.iterator("snufalufagus")
+    val iterator = memoryIndex.extents("snufalufagus")
+    assert ( iterator.isInstanceOf[NullExtentIterator] )
+  }
+
+  it should "provide a null counts iterator for a OOV term" in {
+    val iterator = memoryIndex.counts("snufalufagus")
     assert ( iterator.isInstanceOf[NullExtentIterator] )
   }
 
   it should "fail an assertion when asking for a non-existent part" in {
-    intercept[AssertionError] { memoryIndex.iterator("chocula", "bert") }
+    intercept[AssertionError] { memoryIndex.extents("chocula", "bert") }
   }
 }

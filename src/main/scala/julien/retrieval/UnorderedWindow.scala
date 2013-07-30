@@ -22,7 +22,7 @@ object UnorderedWindow {
 
 class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
     extends MultiTermView(terms) {
-  assume(terms.size > 1, s"UnorderedWindow expects > 1 term")
+  assume(terms.size > 1, "UnorderedWindow expects > 1 term")
   assume(width >= terms.size,
     s"width should be > # of iterators (got ${terms.length})")
 

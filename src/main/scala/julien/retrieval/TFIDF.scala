@@ -4,7 +4,7 @@ package retrieval
 import julien.behavior._
 
 object TFIDF {
-  def apply(op: PositionStatsView, l: LengthsView): TFIDF = apply(op, l, op)
+  def apply(op: CountStatsView, l: LengthsView): TFIDF = apply(op, l, op)
   def apply(c: CountView, l: LengthsView, s: StatisticsView) =
     if (c.isInstanceOf[Movable])
       new TFIDF(c, l, s) with Driven { val driver = c.asInstanceOf[Movable] }

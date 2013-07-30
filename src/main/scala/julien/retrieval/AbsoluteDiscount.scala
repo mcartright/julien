@@ -8,7 +8,7 @@ object AbsoluteDiscount {
   val totallyMadeUpValue = 600
 
   def apply(
-    op: PositionStatsView,
+    op: CountStatsView,
     l: LengthsView,
     d: DocumentView
   ): AbsoluteDiscount = apply(op, l, op, d)

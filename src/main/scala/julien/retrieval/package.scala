@@ -76,14 +76,14 @@ package object retrieval {
 
   def sdm(
     rawterms: Seq[String],
-    scorer: (PositionStatsView, IndexLengths) => Feature,
+    scorer: (CountStatsView, IndexLengths) => Feature,
     unigramWeight: Double = 0.8,
     odWeight: Double = 0.15,
     uwWeight: Double = 0.05,
     odWindowSize: Int = 1,
     uwWindowSize: Int = 8)
     (implicit index: Index): ScalarWeightedFeature = {
-    val terms = rawterms.map(Term(_)(index))
+    val terms = rawterms.map(Term.positions(_)(index))
     if (terms.length == 1) {
       Combine(Seq(scorer(terms(0), IndexLengths())))
     } else {
