@@ -107,7 +107,7 @@ package object retrieval {
   }
 
   case class EstimatedDocument(
-    val id: InternalId,
+    val id: Int,
     var score: Double,
     var max: Double,
     var min: Double,
@@ -124,7 +124,7 @@ package object retrieval {
       else if (hi2 > hi1) 1
       else if (e1.score < e2.score) -1
       else if (e1.score > e2.score) 1
-      else e1.id.underlying - e2.id.underlying
+      else e1.id - e2.id
     }
   }
 
@@ -137,7 +137,7 @@ package object retrieval {
       else if (lo2 > lo1) 1
       else if (e1.score < e2.score) -1
       else if (e1.score > e2.score) 1
-      else e1.id.underlying - e2.id.underlying
+      else e1.id - e2.id
     }
   }
 }

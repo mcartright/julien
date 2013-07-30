@@ -60,7 +60,7 @@ class JelinekMercer(
     //score(0, statsrc.statistics.longestDoc)
     score(0, JelinekMercer.totallyMadeUpValue)
 
-  def eval(id: InternalId): Double = score(op.count(id), lengths.length(id))
+  def eval(id: Int): Double = score(op.count(id), lengths.length(id))
   def score(c: Int, l: Int) =
     scala.math.log((lambda*(c.toDouble/l)) + ((1.0-lambda)*cf))
 }

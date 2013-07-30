@@ -13,7 +13,7 @@ class Synonym(terms: Seq[PositionStatsView])
     extends MultiTermView(terms) {
   assume(terms.size > 1, "Synonym expects > 1 term")
 
-  override def positions(id: InternalId): ExtentArray = {
+  override def positions(id: Int): ExtentArray = {
     val hits = new ExtentArray()
     val eArrays = terms.map { t =>
       t.synchronized(t.positions(id).copy)

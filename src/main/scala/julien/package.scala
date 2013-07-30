@@ -41,28 +41,6 @@ import reflect.runtime.universe._
   *
   */
 package object julien {
-  /**
-    * Value for a document identifier. We "wrap" these with a value class
-    * because even though the underlying type is an Int, we don't want to
-    * treat it as a numeric (i.e. multiplying two docs is meaningless).
-    *
-    * Good use of a value class - when you want an AnyVal, but you want to
-    * actually *remove* some of the functionality of the AnyVal.
-    *
-    * See SIP-15 (http://docs.scala-lang.org/sips/pending/value-classes.html)
-    * for value class details.
-    *
-    * Also see SIP-13 for details on implicit classes
-    * (http://docs.scala-lang.org/sips/pending/implicit-classes.html)
-    *
-    */
-  implicit class InternalId(val underlying: Int) extends AnyVal
-  implicit object InternalIdOrder extends Ordering[InternalId] {
-    def compare(a: InternalId, b: InternalId) = a.underlying compare b.underlying
-  }
-  implicit def InternalId2int(d: InternalId): Int = d.underlying
-  implicit def InternalId2str(d: InternalId): String = d.underlying.toString
-
   import scala.util.matching.Regex
   /** Implicit extension to the Regex class (done via composition)
   * this class provides easy "match" and "miss" type methods against

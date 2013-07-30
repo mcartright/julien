@@ -61,7 +61,7 @@ final class StreamLengths(override val index: Index, li: LengthsIterator)
     with Movable
     with IteratedHook[LengthsIterator] {
   override val underlying = li
-  def length(id: InternalId): Int = {
+  def length(id: Int): Int = {
     underlying.syncTo(id)
     underlying.getCurrentLength
   }
@@ -81,6 +81,6 @@ final class ArrayLengths(i: Index, nascentArray: Future[Array[Int]])
     Await.result(nascentArray, Duration.Inf) // arbitrary
   }
 
-  def length(id: InternalId): Int = lengthArray(id)
+  def length(id: Int): Int = lengthArray(id)
   override def size: Int = lengthArray.length
 }

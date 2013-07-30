@@ -5,7 +5,7 @@ import scala.collection.JavaConversions._
 object DocumentClone {
   def apply(gd: GDoc): Document =
     new DocumentClone(
-      InternalId(gd.identifier),
+      gd.identifier,
       gd.name,
       gd.terms.size,
       gd.text,
@@ -27,7 +27,7 @@ object DocumentClone {
   * [[julien.access.Index Index]].
   */
 class DocumentClone(
-  val identifier: InternalId,
+  val identifier: Int,
   val name: String,
   val length: Int,
   val content: String,

@@ -20,6 +20,6 @@ class TermCount(val op: CountView, val statsrc: StatisticsView)
   lazy val views: Set[View] = Set[View](op)
   override val lowerBound: Double = 0.0
   override val upperBound: Double = statsrc.statistics.max.toDouble
-  def eval(id: InternalId): Double = score(op.count(id))
+  def eval(id: Int): Double = score(op.count(id))
   def score(c: Int): Double = c.toDouble
 }

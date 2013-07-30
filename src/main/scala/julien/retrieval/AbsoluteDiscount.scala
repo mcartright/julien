@@ -61,7 +61,7 @@ class AbsoluteDiscount(
       1.0 / AbsoluteDiscount.totallyMadeUpValue
     )
 
-  def eval(id: InternalId): Double = {
+  def eval(id: Int): Double = {
     val doc = docsrc.data(id)
     val ratio = doc.vocabulary.size.toDouble / doc.termVector.size
     score(op.count(id), lengths.length(id), ratio)

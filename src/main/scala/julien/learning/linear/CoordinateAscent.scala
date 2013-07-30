@@ -44,7 +44,7 @@ class QueryEvaluation(
 class SimpleVariable extends ScalarWeightedFeature {
   def views = ???
   def children = Seq()
-  def eval(id: InternalId) = scalarWeight
+  def eval(id: Int) = scalarWeight
   def score = scalarWeight
 }
 

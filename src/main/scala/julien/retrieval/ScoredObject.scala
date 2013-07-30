@@ -3,7 +3,7 @@ package julien
 import scala.math.Ordered
 
 trait ScoredObject {
-  def id : InternalId
+  def id : Int
   def rank_=(i: Int): Unit
   def rank: Int
   def name_=(s: String): Unit

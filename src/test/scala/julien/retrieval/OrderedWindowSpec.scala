@@ -40,8 +40,7 @@ class OrderedWindowSpec extends FlatSpec with MockFactory {
     val p2 = new ExtentArray(pos2)
     val p3 = new ExtentArray(pos3)
 
-    val id = InternalId(1000)
-
+    val id = 1000
     mock1.expects('positions)(1000).returning(p1)
     mock2.expects('positions)(1000).returning(p2)
     mock3.expects('positions)(1000).returning(p3)

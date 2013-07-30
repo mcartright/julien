@@ -76,7 +76,7 @@ class UnorderedWindowSpec extends FlatSpec with MockFactory {
     val p1 = new ExtentArray(pos1)
     val p2 = new ExtentArray(pos2)
 
-    val id = InternalId(12)
+    val id = 12
     mock1.expects('positions)(12).returning(p1)
     mock2.expects('positions)(12).returning(p2)
 

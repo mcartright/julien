@@ -47,7 +47,7 @@ trait Preparer {
         }
 
         for (p <- unprepped) {
-          p.asInstanceOf[NeedsPreparing].updateStatistics(InternalId(candidate))
+          p.asInstanceOf[NeedsPreparing].updateStatistics(candidate)
         }
 
         var j = 0

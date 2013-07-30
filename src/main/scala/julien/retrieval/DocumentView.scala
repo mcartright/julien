@@ -16,7 +16,7 @@ final class DocumentView private(override val index: Index)
     "DocumentView: " + index.toString
 
   // Feel like an unchecked version would be faster...
-  def data(id: InternalId): Document = {
+  def data(id: Int): Document = {
     underlying.syncTo(id)
     if (underlying.hasMatch(id)) DocumentClone(underlying.getData)
     else Document.empty

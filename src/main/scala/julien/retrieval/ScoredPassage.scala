@@ -9,7 +9,7 @@ package retrieval
    * Natural ordering is assumed to be by score.
    */
 case class ScoredPassage(
-  val id: InternalId,
+  val id: Int,
   var score: Double,
   val begin: Int,
   val end: Int,
@@ -27,5 +27,5 @@ object ScoredPassageDefaultOrdering extends Ordering[ScoredPassage] {
   def compare(sp1: ScoredPassage, sp2: ScoredPassage): Int =
     if (sp2.score < sp1.score) return -1
     else if (sp2.score > sp1.score) return 1
-    else (sp1.id.underlying - sp2.id.underlying)
+    else (sp1.id - sp2.id)
 }

@@ -47,7 +47,7 @@ final class StreamedCounts (
   )
 
   /** Returns the current count of the underlying iterator. */
-  def count(id: InternalId): Int = {
+  def count(id: Int): Int = {
     underlying.syncTo(id)
     if (underlying.hasMatch(id)) underlying.count else 0
   }
@@ -112,13 +112,13 @@ final class StreamedPositions (
   )
 
   /** Returns the current count of the underlying iterator. */
-  def count(id: InternalId): Int = {
+  def count(id: Int): Int = {
     underlying.syncTo(id)
     if (underlying.hasMatch(id)) underlying.count else 0
   }
 
   /** Returns the current positions of the underlying iterator. */
-  def positions(id: InternalId): ExtentArray = {
+  def positions(id: Int): ExtentArray = {
     underlying.syncTo(id)
     if (underlying.hasMatch(id)) underlying.extents() else ExtentArray.empty
   }

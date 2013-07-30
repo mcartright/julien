@@ -12,7 +12,7 @@ trait Feature extends Operator {
   def weight: Double
   def weight_=(newWeight: WeightType): Unit
   def views: Set[View]
-  def eval(id: InternalId): Double
+  def eval(id: Int): Double
 }
 
 /** Instantiates the weight of a [[Feature]] as publicly

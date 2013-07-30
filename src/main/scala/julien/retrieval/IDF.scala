@@ -24,5 +24,5 @@ class IDF(val statsrc: StatisticsView)
   override lazy val lowerBound: Double = idf
   lazy val score: Double = idf
   // Static value
-  def eval(id: InternalId): Double = score
+  def eval(id: Int): Double = score
 }

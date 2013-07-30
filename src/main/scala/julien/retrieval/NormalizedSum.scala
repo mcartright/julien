@@ -21,7 +21,7 @@ sealed abstract class NormalizedSum(
   // Normalize the actual weights
   lazy val weightSum: Double = features.map(_.weight).sum
 
-  def eval(id: InternalId) = {
+  def eval(id: Int) = {
     var sum = 0.0
     var i = 0
     while (i < features.length) {

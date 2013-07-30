@@ -69,7 +69,7 @@ class BM25(
     score(maxtf, maxtf)
   }
 
-  def eval(id: InternalId): Double = score(op.count(id), lengths.length(id))
+  def eval(id: Int): Double = score(op.count(id), lengths.length(id))
 
   def score(c: Int, l: Int) = {
     val num = c * (k + 1)

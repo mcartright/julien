@@ -27,7 +27,7 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
     map(_.asInstanceOf[Movable]).toArray
 
   def children: Array[Operator] = terms.toArray
-  def count(id: InternalId): Int =
+  def count(id: Int): Int =
     //if (countCache.containsKey(id)) countCache.get(id)
     //else
     this.positions(id).length
@@ -47,7 +47,7 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
   // Override in subclasses with a better value.
   val adjustment = 0
 
-  def updateStatistics(docid: InternalId) = {
+  def updateStatistics(docid: Int) = {
     val c = count(docid)
     // countCache.put(docid, c)
     statistics.collFreq += c
@@ -58,7 +58,7 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
   }
 
   @tailrec
-  final def ensurePosition(id: InternalId, idx: Int = 0): Boolean =
+  final def ensurePosition(id: Int, idx: Int = 0): Boolean =
     if (idx >= movables.length) return true
     else {
       if (!movables(idx).moveTo(id)) return false

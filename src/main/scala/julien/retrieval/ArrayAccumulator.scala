@@ -41,7 +41,7 @@ class ArrayAccumulator[T <: ScoredObject] private(
     private var pos = 0
     def hasNext: Boolean = pos < acc.length-1
     def next: T = {
-      val toReturn = ScoredDocument(InternalId(pos), acc(pos))
+      val toReturn = ScoredDocument(pos, acc(pos))
       pos += 1
       toReturn.asInstanceOf[T]
     }
@@ -56,7 +56,7 @@ class ArrayAccumulator[T <: ScoredObject] private(
     var i = 0
     // pre-load
     while (i < acc.length && topK.size < l) {
-      topK += ScoredDocument(InternalId(i), acc(i))
+      topK += ScoredDocument(i, acc(i))
     }
 
     // NOW we compare
@@ -64,7 +64,7 @@ class ArrayAccumulator[T <: ScoredObject] private(
       val curScore = acc(i)
       if (curScore > topK.head.score) {
         topK.dequeue
-        topK += ScoredDocument(InternalId(i), curScore)
+        topK += ScoredDocument(i, curScore)
       }
       i += 1
     }

@@ -29,7 +29,7 @@ class OrderedWindow(
   assume(terms.size > 1, s"OrderedWindow expects > 1 term.")
   assume(width > 0, s"OrderedWindow needs a positive width. Got $width")
 
-  def positions(id: InternalId): ExtentArray = {
+  def positions(id: Int): ExtentArray = {
     val hits = new ExtentArray()
 
     // Make local copies to be safe
@@ -136,7 +136,7 @@ class BufferedOrderedWindow(val w: Int, val t: Seq[PositionStatsView])
   /** Optimized version of this method: makes use of cached extent buffers
     * to reduce the number of internal method calls and object creation.
     */
-  override def positions(id: InternalId): ExtentArray = {
+  override def positions(id: Int): ExtentArray = {
     hits.clear
     // Ensure lined up, or return empty
     if (!ensurePosition(id)) return hits

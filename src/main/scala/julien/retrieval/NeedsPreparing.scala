@@ -13,7 +13,7 @@ package retrieval
   * I will probably add more traits to cover the different cases.
   */
 trait NeedsPreparing {
-  def updateStatistics(docid: InternalId): Unit
+  def updateStatistics(docid: Int): Unit
   protected var amIReady: Boolean = false
   def isPrepared: Boolean = amIReady
   def prepared: Unit = amIReady = true

@@ -17,7 +17,7 @@ sealed abstract class Sum(var features: Array[Feature]) extends Feature {
     features.foldLeft(Set[View]()) { (s, op) => s ++ op.views }
   override def toString = s"${getClass.getName}"+features.mkString("(",",",")")
 
-  def eval(id: InternalId) = {
+  def eval(id: Int) = {
     var sum = 0.0
     var i = 0
     while (i < features.length) {

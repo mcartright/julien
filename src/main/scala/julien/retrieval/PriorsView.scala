@@ -20,7 +20,7 @@ class PriorsView private(override val index: Index, val defaultValue: Double)
     index.partReader("priors").getIterator("priors").asInstanceOf[ScoreIterator]
 
   lazy val views: Set[View] = Set[View](this)
-  def eval(id: InternalId): Double = {
+  def eval(id: Int): Double = {
     underlying.syncTo(id)
     if (underlying.hasMatch(id)) underlying.score
     else defaultValue

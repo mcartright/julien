@@ -16,7 +16,7 @@ package retrieval
   * if needed.
   */
 case class ScoredDocument(
-  val id: InternalId,
+  val id: Int,
   var score: Double,
   var name: String = "unknown",
   var rank: Int = 0)
@@ -33,5 +33,5 @@ object ScoredDocumentDefaultOrdering extends Ordering[ScoredDocument] {
   def compare(sd1: ScoredDocument, sd2: ScoredDocument): Int =
     if (sd2.score < sd1.score) return -1
     else if (sd2.score > sd1.score) return 1
-    else (sd1.id.underlying - sd2.id.underlying)
+    else (sd1.id - sd2.id)
 }

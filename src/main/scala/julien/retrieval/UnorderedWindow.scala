@@ -26,7 +26,7 @@ class UnorderedWindow(val width: Int, val terms: Seq[PositionStatsView])
   assume(width >= terms.size,
     s"width should be > # of iterators (got ${terms.length})")
 
-  def positions(id: InternalId): ExtentArray = {
+  def positions(id: Int): ExtentArray = {
     val hits = new ExtentArray()
     val eArrays = terms.map { t =>
       t.synchronized(t.positions(id).copy)
@@ -122,7 +122,7 @@ class BufferedUnorderedWindow(
     itBuffer.result()
   }
 
-  override def positions(id: InternalId):  ExtentArray = {
+  override def positions(id: Int):  ExtentArray = {
     hits.clear
     if (!ensurePosition(id)) return hits
 

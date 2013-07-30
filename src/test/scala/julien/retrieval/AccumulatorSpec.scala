@@ -23,7 +23,7 @@ trait StandardAccumulatorBehavior { this: FlatSpec =>
       val samples = ArrayBuffer[ScoredDocument]()
       for (i <- 0 until limit) {
         val sd = ScoredDocument(
-          id = InternalId(i),
+          id = i,
           score = Random.nextDouble*100
         )
         samples += sd

@@ -4,7 +4,7 @@ import scala.language.existentials
 
 /** A view of a single Document in the collection. */
 trait Document {
-  def identifier: InternalId
+  def identifier: Int
   def name: String
   def length: Int
   def content: String
@@ -30,7 +30,7 @@ object Document {
   def apply(gd: GDoc): Document = DocumentClone(gd)
 
   val empty = new Document {
-    val identifier = InternalId(-1)
+    val identifier = -1
     val name = "N/A"
     val length = 0
     val content = ""
