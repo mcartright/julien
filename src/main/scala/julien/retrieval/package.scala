@@ -105,39 +105,4 @@ package object retrieval {
       )
     }
   }
-
-  case class EstimatedDocument(
-    val id: Int,
-    var score: Double,
-    var max: Double,
-    var min: Double,
-    var name: String = "unknown",
-    var rank: Int = 0)
-      extends ScoredObject
-
-  object HiEstimateOrdering extends Ordering[EstimatedDocument] {
-    def compare(e1: EstimatedDocument, e2: EstimatedDocument): Int = {
-      val hi1 = e1.score + e1.max
-      val hi2 = e2.score + e2.max
-
-      if (hi1 < hi2) -1
-      else if (hi2 > hi1) 1
-      else if (e1.score < e2.score) -1
-      else if (e1.score > e2.score) 1
-      else e1.id - e2.id
-    }
-  }
-
-  object LowEstimateOrdering extends Ordering[EstimatedDocument] {
-    def compare(e1: EstimatedDocument, e2: EstimatedDocument): Int = {
-      val lo1 = e1.score + e1.min
-      val lo2 = e2.score + e2.min
-
-      if (lo1 < lo2) -1
-      else if (lo2 > lo1) 1
-      else if (e1.score < e2.score) -1
-      else if (e1.score > e2.score) 1
-      else e1.id - e2.id
-    }
-  }
 }

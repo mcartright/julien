@@ -172,6 +172,50 @@ class Index private(
 
   def partSize(s: String): Long = underlying.indexPartSize(s)
 
+  // Key-specific statistics
+  def collectionCount(
+    key: String,
+    field: String = defaultField,
+    stem: String = defaultStem
+  ): Long = getKeyStatistics(key, field, stem).nodeFrequency
+
+  def docFreq(
+    key: String,
+    field: String = defaultField,
+    stem: String = defaultStem
+  ): Long = getKeyStatistics(key, field, stem).nodeDocumentCount
+
+  private def getKeyStatistics(
+    key: String,
+    field: String,
+    stem: String
+  ) : NS = {
+    val label = getLabel(field, stem)
+    val part = underlying.getIndexPart(label)
+    val it = part.getIterator(key, Parameters.empty)
+    it match {
+      case n: NullExtentIterator => AggregateReader.NodeStatistics.zero
+      case a: ARNA => a.getStatistics
+      case e: ExtentIterator => gatherStatistics(e)
+    }
+  }
+
+  private def gatherStatistics(e: ExtentIterator): NS = {
+    val stats = new NS
+    stats.nodeDocumentCount = 0
+    stats.nodeFrequency = 0
+    stats.maximumCount = 0
+    while (!e.isDone) {
+      if (e.hasMatch(e.currentCandidate())) {
+        stats.nodeFrequency += e.count()
+        stats.maximumCount = scala.math.max(e.count(), stats.maximumCount)
+        stats.nodeDocumentCount += 1
+      }
+      e.movePast(e.currentCandidate())
+    }
+    stats
+  }
+
   def length(d: Int): Int = underlying.getLength(d)
   def length(targetId: String): Int =
     underlying.getLength(underlying.getIdentifier(targetId))
@@ -285,8 +329,7 @@ class Index private(
   def identifier(name: String): Int = underlying.getIdentifier(name)
   def count(key: String, targetId: String): Int =
     positions(key, targetId).length
-  def collectionCount(key: String): Long = getKeyStatistics(key).nodeFrequency
-  def docFreq(key: String): Long = getKeyStatistics(key).nodeDocumentCount
+
   def document(docid: Int): Document =
     IndexBasedDocument(underlying.getItem(underlying.getName(docid),
       Parameters.empty), this)
@@ -295,31 +338,6 @@ class Index private(
   def terms(targetId: String): List[String] = {
     val doc = underlying.getItem(targetId, Parameters.empty)
     doc.terms.toList
-  }
-
-  private def getKeyStatistics(key: String) : NS = {
-    val it = underlying.getIterator(key, Parameters.empty)
-    it match {
-      case n: NullExtentIterator => AggregateReader.NodeStatistics.zero
-      case a: ARNA => a.getStatistics
-      case e: ExtentIterator => gatherStatistics(e)
-    }
-  }
-
-  private def gatherStatistics(e: ExtentIterator): NS = {
-    val stats = new NS
-    stats.nodeDocumentCount = 0
-    stats.nodeFrequency = 0
-    stats.maximumCount = 0
-    while (!e.isDone) {
-      if (e.hasMatch(e.currentCandidate())) {
-        stats.nodeFrequency += e.count()
-        stats.maximumCount = scala.math.max(e.count(), stats.maximumCount)
-        stats.nodeDocumentCount += 1
-      }
-      e.movePast(e.currentCandidate())
-    }
-    stats
   }
 
   private def getLabel(
