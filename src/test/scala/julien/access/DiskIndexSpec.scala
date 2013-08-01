@@ -24,15 +24,15 @@ class DiskIndexSpec
 
   // Start tests
   "A built index" should "have 5 documents" in {
-    expectResult(5L) { index.numDocuments } // currently we have some loss
+    expectResult(5L) { index.numDocuments() } // currently we have some loss
   }
 
   it should "have 86 unique terms" in {
-    expectResult(86L) { index.vocabularySize }
+    expectResult(86L) { index.vocabularySize() }
   }
 
   it should "have 123 term instances" in {
-    expectResult(123L) { index.collectionLength }
+    expectResult(123L) { index.collectionLength() }
   }
 
   it should "provide a valid lengths iterator for the default field" in {

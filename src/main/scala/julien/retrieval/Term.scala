@@ -65,7 +65,7 @@ final class StreamedCounts (
       cs.collectionLength,
       ns.nodeDocumentCount,
       ns.maximumCount.toInt,
-      index.collectionStats.maxLength.toInt
+      index.collectionStats().maxLength.toInt
     )
   }
 
@@ -142,7 +142,7 @@ final class StreamedPositions (
       cs.collectionLength,
       ns.nodeDocumentCount,
       ns.maximumCount.toInt,
-      index.collectionStats.maxLength.toInt
+      index.collectionStats().maxLength.toInt
     )
   }
 

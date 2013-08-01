@@ -145,7 +145,7 @@ class RetrievalQualitySpec
 
   "Julien" should "have the same collection statistics as Galago" in {
     if (!readyToRun) cancel("'qualityDir' was not defined.")
-    val jCS = julienIndex.collectionStats
+    val jCS = julienIndex.collectionStats()
     val gCS = galagoIndex.getLengthsIterator.asInstanceOf[GARCA].getStatistics
     expectResult(gCS.avgLength, "avgLength") { jCS.avgLength }
     expectResult(gCS.collectionLength, "collLength") { jCS.collectionLength }

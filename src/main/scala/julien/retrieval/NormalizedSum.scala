@@ -11,17 +11,11 @@ object NormalizedSum {
     new FunctionalNormedSum(children, weight)
 }
 
-sealed abstract class NormalizedSum(
-  var features: Array[Feature]
-) extends Feature {
-  def children: Array[Operator] = features.map(_.asInstanceOf[Operator])
-  def views: Set[View] = this.grab[View].toSet
-  override def toString = s"${getClass.getName}"+features.mkString("(",",",")")
-
+abstract class NormalizedSum(f: Array[Feature]) extends Sum(f) {
   // Normalize the actual weights
   lazy val weightSum: Double = features.map(_.weight).sum
 
-  def eval(id: Int) = {
+  override def eval(id: Int) = {
     var sum = 0.0
     var i = 0
     while (i < features.length) {

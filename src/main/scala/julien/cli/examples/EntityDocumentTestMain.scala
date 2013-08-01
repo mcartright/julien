@@ -26,34 +26,14 @@ object EntityDocumentTestMain extends App {
   val keys = lengths.keys()
   while (!keys.isDone) {
     keys.nextKey()
-    println(keys.getKey + " " + keys.getKeyString)
+    println(s"${keys.getKey} ${keys.getKeyString}")
   }
-  println("docs: " + index.numDocuments + " cf:" + index.collectionLength)
+  println(s"docs: ${index.numDocuments()} cf: ${index.collectionLength()}")
 
-  val query = args(0).split(" ").map(Term.positions(_)).toSeq
-  val modelFeatures = List.newBuilder[Feature]
-
-  val sdm =
-    Sum(List[Feature](
-      Sum(children = query.map(a => Dirichlet(a, IndexLengths())),
-        weight = 0.8),
-      Sum(children = query.sliding(2, 1).map {
-        p =>
-          Dirichlet(OrderedWindow(1, p: _*), IndexLengths())
-      }.toSeq,
-        weight = 0.15),
-      Sum(query.sliding(2, 1).map {
-        p =>
-          Dirichlet(UnorderedWindow(8, p: _*), IndexLengths())
-      }.toSeq,
-        weight = 0.05)
-    ))
-  modelFeatures += sdm
-
-  // Make a processor to run it
-  val model = modelFeatures.result
+  val query = args(0).split(" ")
+  val seqdep = sdm(query, Dirichlet.apply _)
 
   // run it and get results
-  val results = QueryProcessor(Sum(model))
+  val results = QueryProcessor(seqdep)
   printResults(results, index)
 }

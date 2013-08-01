@@ -7,7 +7,7 @@ import scala.collection.JavaConversions._
 class IndexBasedDocument extends Document {
   var index: Index = null
   var underlying: GDoc = null
-  def identifier: Int = identifier
+  def identifier: Int = underlying.identifier
   def name: String = underlying.name
   def length = index.length(underlying.name)
   def content: String = underlying.text

@@ -35,7 +35,7 @@ abstract class MultiTermView(terms: Seq[PositionStatsView])
   override lazy val isDense: Boolean = movables.forall(_.isDense)
   override def size: Int = statistics.docFreq.toInt
 
-  // Start with no knowledge
+  // Start with no per-term knowledge; copy global statistics
   val statistics = CountStatistics()
 
   // Cache the counts for later

@@ -11,7 +11,7 @@ object Sum {
     new FunctionalSum(children, weight)
 }
 
-sealed abstract class Sum(var features: Array[Feature]) extends Feature {
+abstract class Sum(var features: Array[Feature]) extends Feature {
   def children: Array[Operator] = features.map(_.asInstanceOf[Operator])
   def views: Set[View] =
     features.foldLeft(Set[View]()) { (s, op) => s ++ op.views }

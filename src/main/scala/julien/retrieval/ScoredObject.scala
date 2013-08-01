@@ -1,7 +1,5 @@
 package julien
 
-import scala.math.Ordered
-
 trait ScoredObject {
   def id : Int
   def rank_=(i: Int): Unit

@@ -34,18 +34,18 @@ class MemoryIndexSpec
   // Start tests
   "A memory index" should
   "have the same number of docs as the disk version" in {
-    expectResult(diskIndex.numDocuments) { memoryIndex.numDocuments }
+    expectResult(diskIndex.numDocuments()) { memoryIndex.numDocuments() }
   }
 
   it should "have the same number of unique terms" in {
-    expectResult(diskIndex.vocabularySize) {
-      memoryIndex.vocabularySize
+    expectResult(diskIndex.vocabularySize()) {
+      memoryIndex.vocabularySize()
     }
   }
 
   it should "have the same collection length" in {
-    expectResult(diskIndex.collectionLength) {
-      diskIndex.collectionLength
+    expectResult(diskIndex.collectionLength()) {
+      diskIndex.collectionLength()
     }
   }
 

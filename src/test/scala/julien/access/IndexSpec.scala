@@ -37,15 +37,23 @@ class IndexSpec extends FlatSpec with MockFactory with GivenWhenThen {
     fakePartStats.partName = "postings"
     fakePartStats.vocabCount = 51354292
 
-    // Expectations during initialization
+    // Expectations during initialization - we allow various numbers
+    // because the tests are all over the place - so to pin it down
+    // the call counts should be per-test. Make it a to do.
     (gidx.containsPart _).
-      expects("all.postings.raw").returning(true).noMoreThanTwice()
-      (gidx.getCollectionStatistics _).
-      expects("all").
-      returning(fakeCollStats)
-      (gidx.getIndexPartStatistics _).
       expects("all.postings.raw").
-      returning(fakePartStats)
+      returning(true).
+      anyNumberOfTimes()
+
+    (gidx.getCollectionStatistics _).
+      expects("all").
+      returning(fakeCollStats).
+      anyNumberOfTimes()
+
+    (gidx.getIndexPartStatistics _).
+      expects("all.postings.raw").
+      returning(fakePartStats).
+      anyNumberOfTimes()
   }
 
   "The test index" should "report correct statistics" in {
@@ -53,9 +61,11 @@ class IndexSpec extends FlatSpec with MockFactory with GivenWhenThen {
     import f._
 
     val testingIndex = Index(gidx)
-    expectResult(fakeCollStats.collectionLength)(testingIndex.collectionLength)
-    expectResult(fakeCollStats.documentCount) { testingIndex.numDocuments }
-    expectResult(fakePartStats.vocabCount) { testingIndex.vocabularySize }
+    expectResult(fakeCollStats.collectionLength) {
+      testingIndex.collectionLength()
+    }
+    expectResult(fakeCollStats.documentCount) { testingIndex.numDocuments() }
+    expectResult(fakePartStats.vocabCount) { testingIndex.vocabularySize() }
   }
 
   it should "provide the lengths of documents by docid" in {
@@ -87,7 +97,6 @@ class IndexSpec extends FlatSpec with MockFactory with GivenWhenThen {
   it should "return the count of key occuring in a doc" in (pending)
   it should "return an iterator given a valid key" in (pending)
   it should "return a cached iterator given a previously seen key" in (pending)
-  it should "fail an assertion when asking for a missing part" in (pending)
   it should "fail an assertion when asking for a cached iterator" in (pending)
   it should "be able to set a new default part to an existing part" in (pending)
   it should "fail an assertion to set default to a missing part" in (pending)
@@ -95,7 +104,7 @@ class IndexSpec extends FlatSpec with MockFactory with GivenWhenThen {
   it should "return the name of a document given the docid" in (pending)
   it should "return the docid of a document given the name" in (pending)
   it should "return the term vector of a document given the name" in (pending)
-  it should "return the collectdion count of a key" in (pending)
+  it should "return the collection count of a key" in (pending)
   it should "return the number of documents a key occurs in" in (pending)
 }
 

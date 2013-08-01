@@ -112,10 +112,22 @@ class Index private(
     b.result
   }
 
+  /** In theory, releases the resources associated with this index. In theory.*/
+  def close: Unit = underlying.close
+
+  // Following is related to statistics access. There are impliedStem and
+  // impliedField parameters that can be set. If they are changed, a check
+  // is made to ensure the new default part exists. Access is performedd
+  // by resolving the part name and retrieving the statistics at request
+  // time.
+
   /** Returns the current default stemming pattern */
   def defaultStem: String = impliedStem
 
-  /** Sets the current default stemming pattern. */
+  /** Sets the current default stemming pattern. If a
+    * with that stemming pattern doesn't exist, fails
+    *  an assertion.
+    */
   def defaultStem_=(newDefault: String) {
     impliedStem = newDefault
     checkConfiguration
@@ -133,17 +145,33 @@ class Index private(
     checkConfiguration
   }
 
-  val collectionStats =
-    underlying.getCollectionStatistics(impliedField)
-  private val postingsStats =
-    underlying.getIndexPartStatistics(getLabel())
+  private def checkConfiguration {
+    val testPart = s"$impliedField.postings.$impliedStem"
+    assume(underlying.containsPart(testPart),
+      s"$testPart is not in this index.")
+  }
 
-  /** In theory, releases the resources associated with this index. In theory.*/
-  def close: Unit = underlying.close
-  def collectionLength: Long = collectionStats.collectionLength
-  def numDocuments: Long = collectionStats.documentCount
-  def vocabularySize: Long = postingsStats.vocabCount
+  def collectionStats(field: String = defaultField) =
+    underlying.getCollectionStatistics(field)
+
+  def postingsStats(field: String = defaultField, stem: String = defaultStem) =
+    underlying.getIndexPartStatistics(getLabel(field, stem))
+
+  // Accessors. Field and stem can be specified. Defaults are found
+  // using the accessors (which is primarily why we have them)
+  def collectionLength(field: String = defaultField): Long =
+    collectionStats(field).collectionLength
+
+  def numDocuments(field: String = defaultField): Long =
+    collectionStats(field).documentCount
+
+  def vocabularySize(
+    field: String = defaultField,
+    stem: String = defaultStem
+  ): Long = postingsStats(field, stem).vocabCount
+
   def partSize(s: String): Long = underlying.indexPartSize(s)
+
   def length(d: Int): Int = underlying.getLength(d)
   def length(targetId: String): Int =
     underlying.getLength(underlying.getIdentifier(targetId))
@@ -301,11 +329,5 @@ class Index private(
     assume (underlying.containsPart(label),
       s"$label is not a part in this index ($toString)")
     label
-  }
-
-  private def checkConfiguration {
-    val testPart = s"$impliedField.postings.$impliedStem"
-    assume(underlying.containsPart(testPart),
-      s"$testPart is not in this index.")
   }
 }
