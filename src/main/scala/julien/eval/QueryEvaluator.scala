@@ -36,7 +36,7 @@ abstract class QueryEvaluator() {
   ): Double = {
     var sum = 0.0
     for ((query, result) <- results) {
-    //  assume(judgments.contains(query), s"Judgments missing query $query")
+      assume(judgments.contains(query), s"Judgments missing query $query")
       sum += eval(result, judgments(query))
     }
     sum

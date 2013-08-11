@@ -8,27 +8,39 @@ import collection.mutable.ListBuffer
 // Gonna need some reflection to get the right object type to
 // build. However this should just do it at the line level
 object QueryJudgmentSet {
-//  def apply(src: String, isBinary: Boolean = false): QueryJudgmentSet = {
-//    // TODO - IMPLEMENT ME
-//  //  new QueryJudgmentSet(Map.empty[String, Map.empty[String, Seq[RelevanceJudgment]])
-//  }
 
   def fromTrec(src: String, useBinary: Boolean = false): QueryJudgmentSet = {
     val reader = Source.fromFile(src).bufferedReader
 
-    val mutableMap =
-      scala.collection.mutable.HashMap[String, QueryJudgments]().
-        withDefault(s => QueryJudgments(s))
+    val entries = List.newBuilder[(String, String, Int)]
     while(reader.ready) {
       val line = reader.readLine
       val columns = line.split("\\s+")
       val queryId = columns(0)
       val docId = columns(2)
       val relevance = columns(3).toInt
-      mutableMap(queryId).update(docId, relevance)
+      entries += Tuple3(queryId, docId, relevance)
     }
     reader.close
-    mutableMap.toMap
+    // Map[QueryId, tuple]
+    val grouped = entries.result.groupBy(item => item._1)
+    // Map[QueryId, QueryJudgments]
+    val remapped = grouped.mapValues { items =>
+      val qj = QueryJudgments(items.head._1)
+      for (it <- items) qj.update(it._2, it._3)
+      qj
+    }
+    apply(remapped)
   }
+
+  def apply(jmap: Map[String, QueryJudgments]): QueryJudgmentSet =
+    new QueryJudgmentSet(jmap)
 }
 
+class QueryJudgmentSet(
+  jMap: Map[String, QueryJudgments]
+)
+    extends MapProxy[String, QueryJudgments]
+{
+  def self = jMap
+}

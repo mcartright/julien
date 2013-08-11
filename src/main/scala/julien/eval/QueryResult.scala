@@ -26,4 +26,10 @@ extends SeqProxy[T] {
       false
     else
       this.zip(that).forall(p => p._1.id == p._2.id)
+
+  def scoreEqual(that: QueryResult[T]): Boolean =
+    if (this.length != that.length)
+      false
+    else
+      this.zip(that).forall(p => p._1.id == p._2.id && p._1.score == p._2.score)
 }

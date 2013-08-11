@@ -4,6 +4,7 @@ package retrieval
 import julien.behavior._
 
 object Sum {
+  def apply(weight: Double, children: Feature*): Sum = apply(children, weight)
   def apply(children: Seq[Feature]) = new ScalarSum(children, 1.0)
   def apply(children: Seq[Feature], weight: Double) =
     new ScalarSum(children, weight)
@@ -13,8 +14,7 @@ object Sum {
 
 abstract class Sum(var features: Array[Feature]) extends Feature {
   def children: Array[Operator] = features.map(_.asInstanceOf[Operator])
-  def views: Set[View] =
-    features.foldLeft(Set[View]()) { (s, op) => s ++ op.views }
+  def views: Set[View] = features.flatMap(_.views).toSet
   override def toString = s"${getClass.getName}"+features.mkString("(",",",")")
 
   def eval(id: Int) = {

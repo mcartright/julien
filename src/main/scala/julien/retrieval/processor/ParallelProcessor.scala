@@ -10,12 +10,17 @@ object ParallelProcessor {
   def apply[T <: ScoredObject](
     models: Seq[Feature],
     accGen: => Accumulator[T]
-  ) = {
+  ): ParallelProcessor[T] = {
     val keysToModels = models.zipWithIndex.map { case (m, i) =>
         (i.toString, m)
     }.toMap
-    new ParallelProcessor[T](keysToModels, accGen)
+    apply(keysToModels, accGen)
   }
+
+  def apply[T <: ScoredObject](
+    keysToModels: Map[String, Feature],
+    accGen: => Accumulator[T]
+  ): ParallelProcessor[T] = new ParallelProcessor[T](keysToModels, accGen)
 }
 
 /** Used as a simple optimization for queries with shared movable views.
@@ -42,7 +47,8 @@ class ParallelProcessor[T <: ScoredObject] private[processor] (
 
     // extract movables
     val iterators: Array[Movable] = models.head.movers.distinct.toArray
-    val drivers: Array[Movable] = iterators.filterNot(_.isDense).toArray
+    val (drivers, nondrivers) = iterators.partition(_.isDense)
+    for (it <- iterators) it.reset
 
     // Use this outside the loop once, then we update *when* we move.
     var i = 0
@@ -77,6 +83,13 @@ class ParallelProcessor[T <: ScoredObject] private[processor] (
 
       // Update the next candidate to score
       candidate = newCandidate
+
+      // Move the non-drivers to it
+      i = 0
+      while (i < nondrivers.length) {
+        nondrivers(i).moveTo(candidate)
+        i += 1
+      }
     }
 
     // Done - finalize results

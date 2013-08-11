@@ -2,21 +2,24 @@ package julien
 package retrieval
 package processor
 
+import language.implicitConversions
 import julien.retrieval._
 import julien.behavior._
 
 trait Preparer {
   def root: Feature
 
+  implicit def np2op(np: NeedsPreparing): Operator = np.asInstanceOf[Operator]
+
   def prepare(): Unit = {
-    val unprepped: Set[Operator] =
-      root.flatMap(m =>
-        m.filter(_.isInstanceOf[NeedsPreparing])).toSet
+    val unprepped: Seq[NeedsPreparing] = root.grab[NeedsPreparing].distinct
     if (unprepped.size > 0) {
       // We now need to get the iterators of the unprepped nodes, zip down them
       // and update statistics until done, then reset.
       val iterators: Array[Movable] =
         unprepped.flatMap(_.movers).toSet.filterNot(_.isDense).toArray
+      // Make all needed iterators are ready to run
+      iterators.foreach(_.reset)
 
       while (!QueryProcessor.isDone(iterators)) {
         val activeBuf = Array.newBuilder[Movable]
@@ -47,7 +50,7 @@ trait Preparer {
         }
 
         for (p <- unprepped) {
-          p.asInstanceOf[NeedsPreparing].updateStatistics(candidate)
+          p.updateStatistics(candidate)
         }
 
         var j = 0
@@ -56,7 +59,7 @@ trait Preparer {
           j += 1
         }
       }
-      unprepped.foreach(_.asInstanceOf[NeedsPreparing].prepared)
+      unprepped.foreach(_.prepared)
     }
 
     // Do this regardless in case any iterators are recycled.

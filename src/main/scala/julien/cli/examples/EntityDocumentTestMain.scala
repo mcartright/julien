@@ -31,7 +31,7 @@ object EntityDocumentTestMain extends App {
   println(s"docs: ${index.numDocuments()} cf: ${index.collectionLength()}")
 
   val query = args(0).split(" ")
-  val seqdep = sdm(query, Dirichlet.apply _)
+  val seqdep = sdm(query, Dirichlet.wrap _)
 
   // run it and get results
   val results = QueryProcessor(seqdep)

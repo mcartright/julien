@@ -4,6 +4,8 @@ package retrieval
 import julien.behavior._
 
 object NormalizedSum {
+  def apply(weight: Double, children: Feature*): NormalizedSum =
+    apply(children, weight)
   def apply(children: Seq[Feature]) = new ScalarNormedSum(children, 1.0)
   def apply(children: Seq[Feature], weight: Double) =
     new ScalarNormedSum(children, weight)

@@ -47,14 +47,14 @@ class BM25(
   val lengths: LengthsView,
   val statsrc: StatisticsView,
   val b: Double,
-  val k: Double)
+  val k: Double
+)
     extends ScalarWeightedFeature
     with Bounded
 {
   require(b > 0.0 && b < 1.0, s"b must be in [0,1]. Got $b")
   require(k > 0.0, s"k must be positive. Got $k")
-  lazy val children: Array[Operator] =
-    Set[Operator](op, lengths, statsrc).toArray
+  lazy val children: Array[Operator] = Array(op, lengths, statsrc)
   lazy val views: Set[View] = Set[View](op, lengths, statsrc)
 
   // Runs when asked for the first time, and runs only once
@@ -69,7 +69,10 @@ class BM25(
     score(maxtf, maxtf)
   }
 
-  def eval(id: Int): Double = score(op.count(id), lengths.length(id))
+  def eval(id: Int): Double = {
+    val l = lengths.length(id)
+    if (l == 0) 0 else score(op.count(id), l)
+  }
 
   def score(c: Int, l: Int) = {
     val num = c * (k + 1)

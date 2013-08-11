@@ -31,7 +31,7 @@ sealed abstract class Term(t: String, index: Index)
   override def terse: String = s"$t"
 }
 
-final class StreamedCounts (
+class StreamedCounts (
   val t: String,
   val field: Option[String],
   val stem: Option[String],
@@ -94,7 +94,7 @@ final class StreamedCounts (
   *
   * These are always 1-to-1.
   */
-final class StreamedPositions (
+class StreamedPositions (
   val t: String,
   val field: Option[String],
   val stem: Option[String],

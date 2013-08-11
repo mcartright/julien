@@ -12,7 +12,6 @@ import scala.collection.Iterable
   */
 case class Judgment(var name: String, var label: Int, var isRelevant: Boolean)
 
-
 object QueryJudgments {
   // Default to this for now
   def apply(qid: String): QueryJudgments = new BinaryJudgments(qid)
@@ -70,7 +69,7 @@ abstract class QueryJudgments(val queryName: String)
   def getOrElse(name: String, default: Int): Int =
     if (judgments.containsKey(name)) judgments.get(name) else default
 
-  def keys: Array[String] = judgments.keys.asInstanceOf[Array[String]]
+  def keys: Array[String] = judgments.keys.map(_.asInstanceOf[String])
   def values: Array[Int] = judgments.values
   override def size: Int = judgments.size
 

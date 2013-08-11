@@ -74,9 +74,16 @@ package object retrieval {
       scorer(Term(t)(index), IndexLengths()(index))))
   }
 
+  def sdm(terms: String, weight: Double)
+    (implicit index: Index): ScalarWeightedFeature = {
+    val node = sdm(terms.split(" "), Dirichlet.wrap _)(index)
+    node.weight = weight
+    node
+  }
+
   def sdm(
     rawterms: Seq[String],
-    scorer: (CountStatsView, IndexLengths) => Feature,
+    scorer: (CountStatsView, LengthsView) => Feature,
     unigramWeight: Double = 0.8,
     odWeight: Double = 0.15,
     uwWeight: Double = 0.05,

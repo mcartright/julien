@@ -232,10 +232,12 @@ class Index private(
     */
   @deprecated("partReader is a breach of abstraction", "all versions")
   def partReader(name: String): IndexPartReader = underlying.getIndexPart(name)
+
   private val extentsCache =
     scala.collection.mutable.HashMap[String, ExtentIterator]()
   private val countsCache =
     scala.collection.mutable.HashMap[String, CountIterator]()
+
   private val countsParams = Parameters.parse("""{ "type": "counts" }""")
 
   def lengthsIterator(field: String): LI =
@@ -244,7 +246,10 @@ class Index private(
   def lengthsIterator(field: Option[String] = None): LI =
     lengthsIterator(field.getOrElse(impliedField))
 
-  def clearIteratorCache: Unit = extentsCache.clear
+  def clearIteratorCache: Unit = {
+    extentsCache.clear
+    countsCache.clear
+  }
 
   /** Produces a cached ExtentIterator if possible. If not found, a new iterator
     * is constructed and cached for later.
@@ -253,10 +258,11 @@ class Index private(
     key: String,
     field: String = defaultField,
     stem: String = defaultStem): ExtentIterator = {
-    if (!extentsCache.contains(key)) {
-      extentsCache(key) = extents(key, field, stem)
+    val cacheKey = s"${key}:${field}:${stem}"
+    if (!extentsCache.contains(cacheKey)) {
+      extentsCache(cacheKey) = extents(key, field, stem)
     }
-    extentsCache(key)
+    extentsCache(cacheKey)
   }
 
   /** Produces a cached CountIterator if possible. If not found, a new iterator
@@ -266,10 +272,11 @@ class Index private(
     key: String,
     field: String = defaultField,
     stem: String = defaultStem): CountIterator = {
-    if (!countsCache.contains(key)) {
-      countsCache(key) = counts(key, field, stem)
+    val cacheKey = s"${key}:${field}:${stem}"
+    if (!countsCache.contains(cacheKey)) {
+      countsCache(cacheKey) = counts(key, field, stem)
     }
-    countsCache(key)
+    countsCache(cacheKey)
   }
 
   /** Returns an ExtentIterator from the underlying index. If the requested
@@ -347,5 +354,19 @@ class Index private(
     assume (underlying.containsPart(label),
       s"$label is not a part in this index ($toString)")
     label
+  }
+
+  lazy val fields: Set[String] = {
+    val parts = underlying.getPartNames
+    parts.filter(n => """(\w+).postings.(\w+)""".r matches n).
+      map(_.split('.')(0)).
+      toSet
+  }
+
+  lazy val stems: Set[String] = {
+    val parts = underlying.getPartNames
+    parts.filter(n => """(\w+).postings.(\w+)""".r matches n).
+      map(_.split('.')(2)).
+      toSet
   }
 }

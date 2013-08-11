@@ -26,7 +26,7 @@ object QueryResultSet {
   }
 
   def apply[T <: ScoredObject](
-    input: Map[String, QueryResult[T]]
+    input: Map[String, QueryResult[T]] = Map.empty[String, QueryResult[T]]
   ): QueryResultSet[T] = new QueryResultSet(input)
 }
 

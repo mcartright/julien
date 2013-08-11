@@ -333,7 +333,7 @@ class RetrievalQualitySpec
   def qlWrap(query: Seq[String], i: Index) =
     bow(query, Dirichlet.apply)(i)
   def sdmWrap(query: Seq[String], i: Index) =
-    sdm(query, Dirichlet.apply)(i)
+    sdm(query, Dirichlet.wrap _)(i)
 
   def compareRetrievals(
     julienCombiner: (Seq[String], Index) => Feature,
