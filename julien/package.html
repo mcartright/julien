@@ -1,0 +1,768 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>julien - Julien - julien</title>
+          <meta name="description" content="julien - Julien - julien" />
+          <meta name="keywords" content="julien Julien julien" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../lib/template.js"></script>
+      <script type="text/javascript" src="../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../index.html';
+            var hash = 'julien.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img src="../lib/package_big.png" />
+        
+        <h1>julien</h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">julien</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Provides classes that are typically used by Julien applications.</p><h4>Overview</h4><p>Julien is a retrieval toolkit built on top of the
+<a href="http://http://www.lemurproject.org/galago.php" target="_blank">Galago</a> search system.
+Specifically, Julien uses trimmed versions of TupleFlow and the index
+layer of Galago as data sources to a composable retrieval stack implemented
+in Julien.</p><p>The <a href="access/package.html" class="extype" name="julien.access">access</a> package provides classes and traits that mostly
+deal with direct access to an underlying index for easier data exploration
+work in the Scala <a href="http://www.scala-lang.org/node/2097" target="_blank">REPL</a>.</p><p>The <a href="retrieval/package.html" class="extype" name="julien.retrieval">retrieval</a> package focuses more on creating
+retrieval models to run over a set collection of documents, stored in an
+index. Components such as scoring functions and query processors are in
+this package.</p><p>The <a href="eval/package.html" class="extype" name="julien.eval">eval</a> package is a port of the Galago eval package,
+with minor modifications to more tightly integrate the evaluation
+components with the other parts of Julien (for example, all processors
+return a <a href="eval/QueryResult.html" class="extype" name="julien.eval.QueryResult">QueryResult</a>, which can be directly
+passed to an evaluation function such as
+<a href="eval/MeanAveragePrecision.html" class="extype" name="julien.eval.MeanAveragePrecision">MAP</a> along with a
+<a href="eval/QueryJudgments.html" class="extype" name="julien.eval.QueryJudgments">QueryJudgments</a> to produce a score).</p><p>The <a href="flow/package.html" class="extype" name="julien.flow">flow</a> package is a higher-level wrapper around TupleFlow
+to facilitate constructing TupleFlow jobs. Given the conciseness of Scala
+and several highly-touted packages that facilitate distributed computation
+(i.e. <a href="http://akka.io/" target="_blank">akka</a>), we may eventually replace much of the
+communication and mangement logic of TupleFlow - however the type system
+will most likely stay, as that is the core idea of the system, and makes it
+fairly flexible, once jobs are built.</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/CIIR/julien/tree/master/src/main/scala/julien/package.scala" target="_blank">package.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="julien"><span>julien</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="julien.ARCA" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ARCA=julien.galago.core.index.AggregateReader.CollectionAggregateIterator"></a>
+      <a id="ARCA:ARCA"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ARCA</span><span class="result"> = <span class="extype" name="julien.galago.core.index.AggregateReader.CollectionAggregateIterator">CollectionAggregateIterator</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.ARNA" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ARNA=julien.galago.core.index.AggregateReader.NodeAggregateIterator"></a>
+      <a id="ARNA:ARNA"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ARNA</span><span class="result"> = <span class="extype" name="julien.galago.core.index.AggregateReader.NodeAggregateIterator">NodeAggregateIterator</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.BoolSrc" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="BoolSrcextendsAnyRef"></a>
+      <a id="BoolSrc:BoolSrc"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="BoolSrc.html"><span class="name">BoolSrc</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A trait that indicates Boolean matches can be provided.</p>
+    </li><li name="julien.CLIFunction" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="CLIFunctionextendsAnyRef"></a>
+      <a id="CLIFunction:CLIFunction"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="CLIFunction.html"><span class="name">CLIFunction</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Behavior needed for a valid CLI-interfaced class.</p>
+    </li><li name="julien.CS" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CS=julien.galago.core.index.AggregateReader.CollectionStatistics"></a>
+      <a id="CS:CS"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">CS</span><span class="result"> = <span class="extype" name="julien.galago.core.index.AggregateReader.CollectionStatistics">CollectionStatistics</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.CountSrc" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="CountSrcextendsAnyRef"></a>
+      <a id="CountSrc:CountSrc"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="CountSrc.html"><span class="name">CountSrc</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A trait that indicates a count can be provided.</p>
+    </li><li name="julien.CountStatistics" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CountStatisticsextendsProductwithSerializable"></a>
+      <a id="CountStatistics:CountStatistics"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="CountStatistics.html"><span class="name">CountStatistics</span></a><span class="params">(<span name="collFreq">collFreq: <span class="extype" name="scala.Long">Long</span> = <span class="symbol">0L</span></span>, <span name="numDocs">numDocs: <span class="extype" name="scala.Long">Long</span> = <span class="symbol">0L</span></span>, <span name="collLength">collLength: <span class="extype" name="scala.Long">Long</span> = <span class="symbol">0L</span></span>, <span name="docFreq">docFreq: <span class="extype" name="scala.Long">Long</span> = <span class="symbol">0L</span></span>, <span name="max">max: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>, <span name="longestDoc">longestDoc: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A mix of collection-level and view-specific statistics.</p>
+    </li><li name="julien.DataSrc" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="DataSrc[T]extendsAnyRef"></a>
+      <a id="DataSrc[T]:DataSrc[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="DataSrc.html"><span class="name">DataSrc</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A trait that indicates a generic type T can be provided.</p>
+    </li><li name="julien.Document" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="DocumentextendsAnyRef"></a>
+      <a id="Document:Document"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Document.html"><span class="name">Document</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A view of a single Document in the collection.</p>
+    </li><li name="julien.DocumentClone" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DocumentCloneextendsDocument"></a>
+      <a id="DocumentClone:DocumentClone"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="DocumentClone.html"><span class="name">DocumentClone</span></a><span class="result"> extends <a href="Document.html" class="extype" name="julien.Document">Document</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">An implementation of the <a href="Document.html" class="extype" name="julien.Document">Document</a> interface that does
+not require an existing connection to an underlying
+<a href="access/Index.html" class="extype" name="julien.access.Index">Index</a>.</p>
+    </li><li name="julien.GDoc" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="GDoc=julien.galago.core.parse.Document"></a>
+      <a id="GDoc:GDoc"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">GDoc</span><span class="result"> = <span class="extype" name="julien.galago.core.parse.Document">julien.galago.core.parse.Document</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.GIndex" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="GIndex=julien.galago.core.index.Index"></a>
+      <a id="GIndex:GIndex"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">GIndex</span><span class="result"> = <span class="extype" name="julien.galago.core.index.Index">Index</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.GIterator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="GIterator=julien.galago.core.index.Iterator"></a>
+      <a id="GIterator:GIterator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">GIterator</span><span class="result"> = <span class="extype" name="julien.galago.core.index.Iterator">Iterator</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.Gram" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="GramextendsOrdered[julien.Gram]withProductwithSerializable"></a>
+      <a id="Gram:Gram"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Gram.html"><span class="name">Gram</span></a><span class="params">(<span name="term">term: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="score">score: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result"> extends <span class="extype" name="scala.math.Ordered">Ordered</span>[<a href="Gram.html" class="extype" name="julien.Gram">Gram</a>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Holds a &quot;score&quot; for a particular term in the collection.</p>
+    </li><li name="julien.LI" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="LI=julien.galago.core.index.LengthsReader.LengthsIterator"></a>
+      <a id="LI:LI"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">LI</span><span class="result"> = <span class="extype" name="julien.galago.core.index.LengthsReader.LengthsIterator">LengthsIterator</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.LengthsSrc" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="LengthsSrcextendsAnyRef"></a>
+      <a id="LengthsSrc:LengthsSrc"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="LengthsSrc.html"><span class="name">LengthsSrc</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A trait that indicates a length can be provided.</p>
+    </li><li name="julien.NS" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NS=julien.galago.core.index.AggregateReader.NodeStatistics"></a>
+      <a id="NS:NS"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">NS</span><span class="result"> = <span class="extype" name="julien.galago.core.index.AggregateReader.NodeStatistics">NodeStatistics</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.PositionSrc" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="PositionSrcextendsAnyRef"></a>
+      <a id="PositionSrc:PositionSrc"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="PositionSrc.html"><span class="name">PositionSrc</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A trait that indicates positions (as <code>ExtentArray</code>s) can be provided.</p>
+    </li><li name="julien.RichRegex" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RichRegexextendsAnyRef"></a>
+      <a id="RichRegex:RichRegex"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="package$$RichRegex.html"><span class="name">RichRegex</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Implicit extension to the Regex class (done via composition)
+this class provides easy &quot;match&quot; and &quot;miss&quot; type methods against
+regular Strings.</p>
+    </li><li name="julien.ScoreSrc" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ScoreSrcextendsAnyRef"></a>
+      <a id="ScoreSrc:ScoreSrc"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ScoreSrc.html"><span class="name">ScoreSrc</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A trait that indicates a score can be provided.</p>
+    </li><li name="julien.ScoredObject" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ScoredObjectextendsAnyRef"></a>
+      <a id="ScoredObject:ScoredObject"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ScoredObject.html"><span class="name">ScoredObject</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.StatisticsSrc" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="StatisticsSrcextendsAnyRef"></a>
+      <a id="StatisticsSrc:StatisticsSrc"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="StatisticsSrc.html"><span class="name">StatisticsSrc</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A trait that indicates <a href="CountStatistics.html" class="extype" name="julien.CountStatistics">CountStatistics</a> can be provided.</p>
+    </li><li name="julien.TCI" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TCI=julien.galago.core.index.CountIterator"></a>
+      <a id="TCI:TCI"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">TCI</span><span class="result"> = <span class="extype" name="julien.galago.core.index.CountIterator">CountIterator</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.TEI" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TEI=julien.galago.core.index.ExtentIterator"></a>
+      <a id="TEI:TEI"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">TEI</span><span class="result"> = <span class="extype" name="julien.galago.core.index.ExtentIterator">ExtentIterator</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.TupleFlowFunction" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="TupleFlowFunctionextendsCLIFunction"></a>
+      <a id="TupleFlowFunction:TupleFlowFunction"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="TupleFlowFunction.html"><span class="name">TupleFlowFunction</span></a><span class="result"> extends <a href="CLIFunction.html" class="extype" name="julien.CLIFunction">CLIFunction</a></span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="julien.Document" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Document"></a>
+      <a id="Document:Document"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Document$.html"><span class="name">Document</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.DocumentClone" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DocumentClone"></a>
+      <a id="DocumentClone:DocumentClone"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="DocumentClone$.html"><span class="name">DocumentClone</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.DumpKeys" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DumpKeys"></a>
+      <a id="DumpKeys:DumpKeys"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="DumpKeys$.html"><span class="name">DumpKeys</span></a><span class="result"> extends <a href="CLIFunction.html" class="extype" name="julien.CLIFunction">CLIFunction</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.JulienProperties" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="JulienProperties"></a>
+      <a id="JulienProperties:JulienProperties"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="JulienProperties$.html"><span class="name">JulienProperties</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.OverwriteManifest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="OverwriteManifest"></a>
+      <a id="OverwriteManifest:OverwriteManifest"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="OverwriteManifest$.html"><span class="name">OverwriteManifest</span></a><span class="result"> extends <a href="CLIFunction.html" class="extype" name="julien.CLIFunction">CLIFunction</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.access" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="access"></a>
+      <a id="access:access"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="access/package.html"><span class="name">access</span></a>
+      </span>
+      </h4>
+      <p class="comment cmt">This module represents more &quot;free-form&quot; access to the underlying
+index structures.</p>
+    </li><li name="julien.behavior" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="behavior"></a>
+      <a id="behavior:behavior"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="behavior/package.html"><span class="name">behavior</span></a>
+      </span>
+      </h4>
+      <p class="comment cmt">This package contains the various traits recognized by the processor
+when performing optimizations.</p>
+    </li><li name="julien.cli" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="cli"></a>
+      <a id="cli:cli"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="cli/package.html"><span class="name">cli</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.package#debug" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="debug(msg:String,tags:String*):Unit"></a>
+      <a id="debug(String,String*):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">debug</span><span class="params">(<span name="msg">msg: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="tags">tags: <span class="extype" name="scala.Predef.String">String</span>*</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@elidable</span><span class="args">(<span>
+      
+      <span class="symbol">elidable.FINEST</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="julien.package#debugPatterns" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="debugPatterns:Array[scala.util.matching.Regex]"></a>
+      <a id="debugPatterns:Array[Regex]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">debugPatterns</span><span class="result">: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.util.matching.Regex">Regex</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">For debugging.</p><div class="fullcomment"><div class="comment cmt"><p>For debugging. This one is elidable, meaning given the correct flag,
+the compiler will remove the call and the bytecode for this function.
+</p></div></div>
+    </li><li name="julien.eval" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="eval"></a>
+      <a id="eval:eval"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="eval/package.html"><span class="name">eval</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.flow" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="flow"></a>
+      <a id="flow:flow"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="flow/package.html"><span class="name">flow</span></a>
+      </span>
+      </h4>
+      <p class="comment cmt">The flow package facilitates creation of Tupleflow jobs.</p>
+    </li><li name="julien.package#getType" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="getType(obj:Any):reflect.runtime.universe.Type"></a>
+      <a id="getType(Any):scala.reflect.api.JavaUniverse.Type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getType</span><span class="params">(<span name="obj">obj: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.reflect.api.Types.Type">scala.reflect.api.JavaUniverse.Type</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.package#info" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="info(msg:String,tags:String*):Unit"></a>
+      <a id="info(String,String*):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">info</span><span class="params">(<span name="msg">msg: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="tags">tags: <span class="extype" name="scala.Predef.String">String</span>*</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@elidable</span><span class="args">(<span>
+      
+      <span class="symbol">elidable.INFO</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="julien.package#info" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="info(msg:String):Unit"></a>
+      <a id="info(String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">info</span><span class="params">(<span name="msg">msg: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.package#infoPatterns" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="infoPatterns:Array[scala.util.matching.Regex]"></a>
+      <a id="infoPatterns:Array[Regex]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">infoPatterns</span><span class="result">: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.util.matching.Regex">Regex</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.package#mirror" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="mirror:reflect.runtime.universe.Mirror"></a>
+      <a id="mirror:scala.reflect.api.JavaUniverse.Mirror"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">mirror</span><span class="result">: <span class="extype" name="scala.reflect.api.JavaMirrors.Mirror">scala.reflect.api.JavaUniverse.Mirror</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.package#printTime" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="printTime[R](label:String)(block:=&gt;R):R"></a>
+      <a id="printTime[R](String)(⇒R):R"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">printTime</span><span class="tparams">[<span name="R">R</span>]</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="params">(<span name="block">block: ⇒ <span class="extype" name="julien.printTime.R">R</span></span>)</span><span class="result">: <span class="extype" name="julien.printTime.R">R</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">For debugging/timing purposes, until I can figure out a macro to
+compile this out - At least moving the definition will be easy.</p>
+    </li><li name="julien.package#q2list" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="q2list[T](q:scala.collection.mutable.PriorityQueue[T]):List[T]"></a>
+      <a id="q2list[T](PriorityQueue[T]):List[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">q2list</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="q">q: <span class="extype" name="scala.collection.mutable.PriorityQueue">PriorityQueue</span>[<span class="extype" name="julien.q2list.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<span class="extype" name="julien.q2list.T">T</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="retrieval"></a>
+      <a id="retrieval:retrieval"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="retrieval/package.html"><span class="name">retrieval</span></a>
+      </span>
+      </h4>
+      <p class="comment cmt">High-level container of the &quot;retrieval&quot; behaviors in Julien.</p>
+    </li><li name="julien.package#time" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="time[R](block:=&gt;R):(R,Long)"></a>
+      <a id="time[R](⇒R):(R,Long)"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">time</span><span class="tparams">[<span name="R">R</span>]</span><span class="params">(<span name="block">block: ⇒ <span class="extype" name="julien.time.R">R</span></span>)</span><span class="result">: (<span class="extype" name="julien.time.R">R</span>, <span class="extype" name="scala.Long">Long</span>)</span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
