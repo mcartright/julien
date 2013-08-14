@@ -1,0 +1,232 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>processor - Julien - julien.retrieval.processor</title>
+          <meta name="description" content="processor - Julien - julien.retrieval.processor" />
+          <meta name="keywords" content="processor Julien julien.retrieval.processor" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'julien.retrieval.processor.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img src="../../../lib/package_big.png" />
+        <p id="owner"><a href="../../package.html" class="extype" name="julien">julien</a>.<a href="../package.html" class="extype" name="julien.retrieval">retrieval</a></p>
+        <h1>processor</h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">processor</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="julien.retrieval.processor.MultiQueryProcessor" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MultiQueryProcessor[T&lt;:julien.ScoredObject]extendsQueryProcessor"></a>
+      <a id="MultiQueryProcessor[T&lt;:ScoredObject]:MultiQueryProcessor[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MultiQueryProcessor.html"><span class="name">MultiQueryProcessor</span></a><span class="tparams">[<span name="T">T &lt;: <a href="../../ScoredObject.html" class="extype" name="julien.ScoredObject">ScoredObject</a></span>]</span><span class="result"> extends <a href="QueryProcessor.html" class="extype" name="julien.retrieval.processor.QueryProcessor">QueryProcessor</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Will process more than one query simultaneously.</p>
+    </li><li name="julien.retrieval.processor.ParallelProcessor" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ParallelProcessor[T&lt;:julien.ScoredObject]extendsMultiQueryProcessor[T]"></a>
+      <a id="ParallelProcessor[T&lt;:ScoredObject]:ParallelProcessor[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ParallelProcessor.html"><span class="name">ParallelProcessor</span></a><span class="tparams">[<span name="T">T &lt;: <a href="../../ScoredObject.html" class="extype" name="julien.ScoredObject">ScoredObject</a></span>]</span><span class="result"> extends <a href="MultiQueryProcessor.html" class="extype" name="julien.retrieval.processor.MultiQueryProcessor">MultiQueryProcessor</a>[<span class="extype" name="julien.retrieval.processor.ParallelProcessor.T">T</span>]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Used as a simple optimization for queries with shared movable views.</p>
+    </li><li name="julien.retrieval.processor.Preparer" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="PreparerextendsAnyRef"></a>
+      <a id="Preparer:Preparer"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Preparer.html"><span class="name">Preparer</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.processor.QueryProcessor" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="QueryProcessorextendsAnyRef"></a>
+      <a id="QueryProcessor:QueryProcessor"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="QueryProcessor.html"><span class="name">QueryProcessor</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Generic definition of a query processor instance.</p>
+    </li><li name="julien.retrieval.processor.QueryRewriter" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="QueryRewriterextendsAnyRef"></a>
+      <a id="QueryRewriter:QueryRewriter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="QueryRewriter.html"><span class="name">QueryRewriter</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Generic trait for functions that rewrite queries.</p>
+    </li><li name="julien.retrieval.processor.SimpleProcessor" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SimpleProcessor[T&lt;:julien.ScoredObject]extendsSingleQueryProcessor[T]"></a>
+      <a id="SimpleProcessor[T&lt;:ScoredObject]:SimpleProcessor[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="SimpleProcessor.html"><span class="name">SimpleProcessor</span></a><span class="tparams">[<span name="T">T &lt;: <a href="../../ScoredObject.html" class="extype" name="julien.ScoredObject">ScoredObject</a></span>]</span><span class="result"> extends <a href="SingleQueryProcessor.html" class="extype" name="julien.retrieval.processor.SingleQueryProcessor">SingleQueryProcessor</a>[<span class="extype" name="julien.retrieval.processor.SimpleProcessor.T">T</span>]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">The simplest form of query processor.</p>
+    </li><li name="julien.retrieval.processor.SingleQueryProcessor" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="SingleQueryProcessor[T&lt;:julien.ScoredObject]extendsQueryProcessor"></a>
+      <a id="SingleQueryProcessor[T&lt;:ScoredObject]:SingleQueryProcessor[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="SingleQueryProcessor.html"><span class="name">SingleQueryProcessor</span></a><span class="tparams">[<span name="T">T &lt;: <a href="../../ScoredObject.html" class="extype" name="julien.ScoredObject">ScoredObject</a></span>]</span><span class="result"> extends <a href="QueryProcessor.html" class="extype" name="julien.retrieval.processor.QueryProcessor">QueryProcessor</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Processors that handle one query at a time in isolation should
+extend this trait.</p>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="julien.retrieval.processor.ParallelProcessor" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ParallelProcessor"></a>
+      <a id="ParallelProcessor:ParallelProcessor"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ParallelProcessor$.html"><span class="name">ParallelProcessor</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.processor.QueryProcessor" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="QueryProcessor"></a>
+      <a id="QueryProcessor:QueryProcessor"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="QueryProcessor$.html"><span class="name">QueryProcessor</span></a>
+      </span>
+      </h4>
+      <p class="comment cmt">Factory for creating QueryProcessor instances.</p>
+    </li><li name="julien.retrieval.processor.SimpleProcessor" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SimpleProcessor"></a>
+      <a id="SimpleProcessor:SimpleProcessor"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="SimpleProcessor$.html"><span class="name">SimpleProcessor</span></a>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

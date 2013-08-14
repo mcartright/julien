@@ -1,0 +1,1402 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>retrieval - Julien - julien.retrieval</title>
+          <meta name="description" content="retrieval - Julien - julien.retrieval" />
+          <meta name="keywords" content="retrieval Julien julien.retrieval" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'julien.retrieval.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img src="../../lib/package_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="julien">julien</a></p>
+        <h1>retrieval</h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">retrieval</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>High-level container of the &quot;retrieval&quot; behaviors in Julien.
+This package contains all the definitions for operators (views
+and features), as well as the processor classes necessary to
+execute a query or batch of queries.</p><p>This package makes substantial use of the functionality provided
+by the access API.</p><p>Running a single query:</p><pre><span class="cmt">// Import the retrieval package</span>
+scala&gt; <span class="kw">import</span> julien.retrieval._
+<span class="kw">import</span> julien.retrieval._
+
+<span class="cmt">// Open an index. We set it as implicit to provide defaults</span>
+<span class="cmt">// to all the operators that need it.</span>
+scala&gt; <span class="kw">implicit</span> <span class="kw">val</span> index = Index.disk(<span class="lit">"./myJulienIndex"</span>)
+index: julien.access.Index = disk:./myJulienIndex
+
+<span class="cmt">// Create a query-likelihood query. `Dirichlet.apply` is the</span>
+<span class="cmt">// scoring function applied over each query term.</span>
+scala&gt; <span class="kw">val</span> ql = bow(<span class="std">List</span>(<span class="lit">"new"</span>, <span class="lit">"york"</span>, <span class="lit">"city"</span>), Dirichlet.apply)
+ql: julien.retrieval.Feature = CombineNorm(Dirichlet(<span class="kw">new</span>: ...
+
+Make a processor <span class="kw">for</span> the query
+scala&gt; <span class="kw">val</span> processor = SimpleProcessor()
+processor: julien.retrieval.SimpleProcessor = julien.retrieval.SimpleProcessor@<span class="num">611</span>c048e
+
+<span class="cmt">// Add the query to the processor</span>
+scala&gt; processor add ql
+
+<span class="cmt">// Run and get results</span>
+scala&gt; <span class="kw">val</span> results = processor.run()
+results: julien.eval.QueryResult[julien.retrieval.ScoredDocument] = <span class="std">List</span>(...</pre></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/CIIR/julien/tree/master/src/main/scala/julien/retrieval/package.scala" target="_blank">package.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="julien.retrieval"><span>retrieval</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="julien.retrieval.AbsoluteDiscount" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="AbsoluteDiscountextendsScalarWeightedFeaturewithBounded"></a>
+      <a id="AbsoluteDiscount:AbsoluteDiscount"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="AbsoluteDiscount.html"><span class="name">AbsoluteDiscount</span></a><span class="result"> extends <a href="ScalarWeightedFeature.html" class="extype" name="julien.retrieval.ScalarWeightedFeature">ScalarWeightedFeature</a> with <a href="../behavior/Bounded.html" class="extype" name="julien.behavior.Bounded">Bounded</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.Accumulator" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="Accumulator[T&lt;:julien.ScoredObject]extendsIterable[T]withBuilder[T,List[T]]"></a>
+      <a id="Accumulator[T&lt;:ScoredObject]:Accumulator[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Accumulator.html"><span class="name">Accumulator</span></a><span class="tparams">[<span name="T">T &lt;: <a href="../ScoredObject.html" class="extype" name="julien.ScoredObject">ScoredObject</a></span>]</span><span class="result"> extends <span class="extype" name="scala.collection.mutable.Iterable">Iterable</span>[<span class="extype" name="julien.retrieval.Accumulator.T">T</span>] with <span class="extype" name="scala.collection.mutable.Builder">Builder</span>[<span class="extype" name="julien.retrieval.Accumulator.T">T</span>, <span class="extype" name="scala.List">List</span>[<span class="extype" name="julien.retrieval.Accumulator.T">T</span>]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">This trait defines what an accumulator needs to behave like.</p>
+    </li><li name="julien.retrieval.ArrayAccumulator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ArrayAccumulator[T&lt;:julien.ScoredObject]extendsAccumulator[T]"></a>
+      <a id="ArrayAccumulator[T&lt;:ScoredObject]:ArrayAccumulator[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ArrayAccumulator.html"><span class="name">ArrayAccumulator</span></a><span class="tparams">[<span name="T">T &lt;: <a href="../ScoredObject.html" class="extype" name="julien.ScoredObject">ScoredObject</a></span>]</span><span class="result"> extends <a href="Accumulator.html" class="extype" name="julien.retrieval.Accumulator">Accumulator</a>[<span class="extype" name="julien.retrieval.ArrayAccumulator.T">T</span>]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Implementation of an accumulator with an array underlying the
+accumulator.</p>
+    </li><li name="julien.retrieval.ArrayLengths" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ArrayLengthsextendsIndexLengthswithFinitewithRandomAccess"></a>
+      <a id="ArrayLengths:ArrayLengths"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ArrayLengths.html"><span class="name">ArrayLengths</span></a><span class="result"> extends <a href="IndexLengths.html" class="extype" name="julien.retrieval.IndexLengths">IndexLengths</a> with <a href="../behavior/Finite.html" class="extype" name="julien.behavior.Finite">Finite</a> with <a href="../behavior/RandomAccess.html" class="extype" name="julien.behavior.RandomAccess">RandomAccess</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.BM25" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BM25extendsScalarWeightedFeaturewithBounded"></a>
+      <a id="BM25:BM25"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="BM25.html"><span class="name">BM25</span></a><span class="result"> extends <a href="ScalarWeightedFeature.html" class="extype" name="julien.retrieval.ScalarWeightedFeature">ScalarWeightedFeature</a> with <a href="../behavior/Bounded.html" class="extype" name="julien.behavior.Bounded">Bounded</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Smoothes raw counts according to the BM25 scoring model, as described by
+&quot;Experimentation as a way of life: Okapi at TREC&quot; by
+Robertson, Walker, and Beaulieu.</p>
+    </li><li name="julien.retrieval.BooleanView" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="BooleanViewextendsViewwithBoolSrc"></a>
+      <a id="BooleanView:BooleanView"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="BooleanView.html"><span class="name">BooleanView</span></a><span class="result"> extends <a href="View.html" class="extype" name="julien.retrieval.View">View</a> with <a href="../BoolSrc.html" class="extype" name="julien.BoolSrc">BoolSrc</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A view that must provide Boolean values for a given identifier.</p>
+    </li><li name="julien.retrieval.BufferedOrderedWindow" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BufferedOrderedWindowextendsOrderedWindow"></a>
+      <a id="BufferedOrderedWindow:BufferedOrderedWindow"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="BufferedOrderedWindow.html"><span class="name">BufferedOrderedWindow</span></a><span class="result"> extends <a href="OrderedWindow.html" class="extype" name="julien.retrieval.OrderedWindow">OrderedWindow</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Optimized version of the <a href="OrderedWindow.html" class="extype" name="julien.retrieval.OrderedWindow">julien.retrieval.OrderedWindow</a>.</p>
+    </li><li name="julien.retrieval.BufferedUnorderedWindow" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BufferedUnorderedWindowextendsUnorderedWindow"></a>
+      <a id="BufferedUnorderedWindow:BufferedUnorderedWindow"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="BufferedUnorderedWindow.html"><span class="name">BufferedUnorderedWindow</span></a><span class="result"> extends <a href="UnorderedWindow.html" class="extype" name="julien.retrieval.UnorderedWindow">UnorderedWindow</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.ChildlessOp" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ChildlessOpextendsOperator"></a>
+      <a id="ChildlessOp:ChildlessOp"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ChildlessOp.html"><span class="name">ChildlessOp</span></a><span class="result"> extends <a href="Operator.html" class="extype" name="julien.retrieval.Operator">Operator</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.CountStatsView" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="CountStatsViewextendsCountViewwithStatisticsView"></a>
+      <a id="CountStatsView:CountStatsView"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="CountStatsView.html"><span class="name">CountStatsView</span></a><span class="result"> extends <a href="CountView.html" class="extype" name="julien.retrieval.CountView">CountView</a> with <a href="StatisticsView.html" class="extype" name="julien.retrieval.StatisticsView">StatisticsView</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A view that provides both count and statistics information.</p>
+    </li><li name="julien.retrieval.CountView" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="CountViewextendsViewwithCountSrc"></a>
+      <a id="CountView:CountView"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="CountView.html"><span class="name">CountView</span></a><span class="result"> extends <a href="View.html" class="extype" name="julien.retrieval.View">View</a> with <a href="../CountSrc.html" class="extype" name="julien.CountSrc">CountSrc</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A view that must provide a count of occurrences of a given index key for
+a given identifier.</p>
+    </li><li name="julien.retrieval.DataView" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="DataView[T]extendsViewwithDataSrc[T]"></a>
+      <a id="DataView[T]:DataView[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="DataView.html"><span class="name">DataView</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="View.html" class="extype" name="julien.retrieval.View">View</a> with <a href="../DataSrc.html" class="extype" name="julien.DataSrc">DataSrc</a>[<span class="extype" name="julien.retrieval.DataView.T">T</span>]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">A view provides some generic data for a given index key for
+a given identifier.</p>
+    </li><li name="julien.retrieval.DefaultAccumulator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DefaultAccumulator[T&lt;:julien.ScoredObject]extendsAccumulator[T]"></a>
+      <a id="DefaultAccumulator[T&lt;:ScoredObject]:DefaultAccumulator[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="DefaultAccumulator.html"><span class="name">DefaultAccumulator</span></a><span class="tparams">[<span name="T">T &lt;: <a href="../ScoredObject.html" class="extype" name="julien.ScoredObject">ScoredObject</a></span>]</span><span class="result"> extends <a href="Accumulator.html" class="extype" name="julien.retrieval.Accumulator">Accumulator</a>[<span class="extype" name="julien.retrieval.DefaultAccumulator.T">T</span>]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">A standard implementation of an accumulator,
+which is basically a PriorityQueue wrapper.</p>
+    </li><li name="julien.retrieval.Dirichlet" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DirichletextendsScalarWeightedFeaturewithBounded"></a>
+      <a id="Dirichlet:Dirichlet"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Dirichlet.html"><span class="name">Dirichlet</span></a><span class="result"> extends <a href="ScalarWeightedFeature.html" class="extype" name="julien.retrieval.ScalarWeightedFeature">ScalarWeightedFeature</a> with <a href="../behavior/Bounded.html" class="extype" name="julien.behavior.Bounded">Bounded</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.DocumentView" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DocumentViewextendsIteratedHook[julien.galago.core.index.DataIterator[julien.GDoc]]withDataView[julien.Document]"></a>
+      <a id="DocumentView:DocumentView"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="DocumentView.html"><span class="name">DocumentView</span></a><span class="result"> extends <a href="IteratedHook.html" class="extype" name="julien.retrieval.IteratedHook">IteratedHook</a>[<span class="extype" name="julien.galago.core.index.DataIterator">DataIterator</span>[<a href="../package.html#GDoc=julien.galago.core.parse.Document" class="extmbr" name="julien.GDoc">GDoc</a>]] with <a href="DataView.html" class="extype" name="julien.retrieval.DataView">DataView</a>[<a href="../Document.html" class="extype" name="julien.Document">Document</a>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.Feature" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="FeatureextendsOperator"></a>
+      <a id="Feature:Feature"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Feature.html"><span class="name">Feature</span></a><span class="result"> extends <a href="Operator.html" class="extype" name="julien.retrieval.Operator">Operator</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Root of all Features</p>
+    </li><li name="julien.retrieval.FunctionWeightedFeature" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="FunctionWeightedFeatureextendsFeature"></a>
+      <a id="FunctionWeightedFeature:FunctionWeightedFeature"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="FunctionWeightedFeature.html"><span class="name">FunctionWeightedFeature</span></a><span class="result"> extends <a href="Feature.html" class="extype" name="julien.retrieval.Feature">Feature</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Instantiates the weight of a <a href="Feature.html" class="extype" name="julien.retrieval.Feature">Feature</a> as a settable
+function.</p>
+    </li><li name="julien.retrieval.FunctionalNormedSum" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FunctionalNormedSumextendsNormalizedSumwithFunctionWeightedFeature"></a>
+      <a id="FunctionalNormedSum:FunctionalNormedSum"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="FunctionalNormedSum.html"><span class="name">FunctionalNormedSum</span></a><span class="result"> extends <a href="NormalizedSum.html" class="extype" name="julien.retrieval.NormalizedSum">NormalizedSum</a> with <a href="FunctionWeightedFeature.html" class="extype" name="julien.retrieval.FunctionWeightedFeature">FunctionWeightedFeature</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.FunctionalSum" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FunctionalSumextendsSumwithFunctionWeightedFeature"></a>
+      <a id="FunctionalSum:FunctionalSum"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="FunctionalSum.html"><span class="name">FunctionalSum</span></a><span class="result"> extends <a href="Sum.html" class="extype" name="julien.retrieval.Sum">Sum</a> with <a href="FunctionWeightedFeature.html" class="extype" name="julien.retrieval.FunctionWeightedFeature">FunctionWeightedFeature</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.IDF" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IDFextendsScalarWeightedFeaturewithBounded"></a>
+      <a id="IDF:IDF"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="IDF.html"><span class="name">IDF</span></a><span class="result"> extends <a href="ScalarWeightedFeature.html" class="extype" name="julien.retrieval.ScalarWeightedFeature">ScalarWeightedFeature</a> with <a href="../behavior/Bounded.html" class="extype" name="julien.behavior.Bounded">Bounded</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Just an Inverse Document Frequency (IDF) feature.</p>
+    </li><li name="julien.retrieval.Index" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Index=julien.access.Index"></a>
+      <a id="Index:Index"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Index</span><span class="result"> = <a href="../access/Index.html" class="extype" name="julien.access.Index">access.Index</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.IndexHook" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IndexHookextendsAnyRef"></a>
+      <a id="IndexHook:IndexHook"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IndexHook.html"><span class="name">IndexHook</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Behavior needed by anything that connects to an index.</p>
+    </li><li name="julien.retrieval.IndexLengths" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IndexLengthsextendsLengthsViewwithChildlessOp"></a>
+      <a id="IndexLengths:IndexLengths"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="IndexLengths.html"><span class="name">IndexLengths</span></a><span class="result"> extends <a href="LengthsView.html" class="extype" name="julien.retrieval.LengthsView">LengthsView</a> with <a href="ChildlessOp.html" class="extype" name="julien.retrieval.ChildlessOp">ChildlessOp</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.IteratedHook" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IteratedHook[I&lt;:julien.GIterator]extendsViewwithChildlessOpwithIndexHookwithMovable"></a>
+      <a id="IteratedHook[I&lt;:GIterator]:IteratedHook[I]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IteratedHook.html"><span class="name">IteratedHook</span></a><span class="tparams">[<span name="I">I &lt;: <a href="../package.html#GIterator=julien.galago.core.index.Iterator" class="extmbr" name="julien.GIterator">GIterator</a></span>]</span><span class="result"> extends <a href="View.html" class="extype" name="julien.retrieval.View">View</a> with <a href="ChildlessOp.html" class="extype" name="julien.retrieval.ChildlessOp">ChildlessOp</a> with <a href="IndexHook.html" class="extype" name="julien.retrieval.IndexHook">IndexHook</a> with <a href="../behavior/Movable.html" class="extype" name="julien.behavior.Movable">Movable</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Indicates behavior of an <a href="IndexHook.html" class="extype" name="julien.retrieval.IndexHook">IndexHook</a> that contains
+an julien.</p>
+    </li><li name="julien.retrieval.JelinekMercer" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="JelinekMercerextendsScalarWeightedFeaturewithBounded"></a>
+      <a id="JelinekMercer:JelinekMercer"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="JelinekMercer.html"><span class="name">JelinekMercer</span></a><span class="result"> extends <a href="ScalarWeightedFeature.html" class="extype" name="julien.retrieval.ScalarWeightedFeature">ScalarWeightedFeature</a> with <a href="../behavior/Bounded.html" class="extype" name="julien.behavior.Bounded">Bounded</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.LengthsView" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="LengthsViewextendsViewwithLengthsSrc"></a>
+      <a id="LengthsView:LengthsView"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="LengthsView.html"><span class="name">LengthsView</span></a><span class="result"> extends <a href="View.html" class="extype" name="julien.retrieval.View">View</a> with <a href="../LengthsSrc.html" class="extype" name="julien.LengthsSrc">LengthsSrc</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A view that must provide for the number of index key occurrences in
+a given identifier.</p>
+    </li><li name="julien.retrieval.LinePrintingDebugger" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="LinePrintingDebuggerextendsAnyRef"></a>
+      <a id="LinePrintingDebugger:LinePrintingDebugger"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="LinePrintingDebugger.html"><span class="name">LinePrintingDebugger</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.MultiTermView" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MultiTermViewextendsPositionStatsViewwithConjunctionwithFinitewithNeedsPreparing"></a>
+      <a id="MultiTermView:MultiTermView"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MultiTermView.html"><span class="name">MultiTermView</span></a><span class="result"> extends <a href="PositionStatsView.html" class="extype" name="julien.retrieval.PositionStatsView">PositionStatsView</a> with <a href="../behavior/Conjunction.html" class="extype" name="julien.behavior.Conjunction">Conjunction</a> with <a href="../behavior/Finite.html" class="extype" name="julien.behavior.Finite">Finite</a> with <a href="NeedsPreparing.html" class="extype" name="julien.retrieval.NeedsPreparing">NeedsPreparing</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">This class represents a <a href="View.html" class="extype" name="julien.retrieval.View">View</a> that is
+composed of several children views.</p>
+    </li><li name="julien.retrieval.NeedsPreparing" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="NeedsPreparingextendsAnyRef"></a>
+      <a id="NeedsPreparing:NeedsPreparing"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="NeedsPreparing.html"><span class="name">NeedsPreparing</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">This is a marker trait that indicates the need for preparation
+prior to execution.</p>
+    </li><li name="julien.retrieval.NormalizedSum" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="NormalizedSumextendsSum"></a>
+      <a id="NormalizedSum:NormalizedSum"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="NormalizedSum.html"><span class="name">NormalizedSum</span></a><span class="result"> extends <a href="Sum.html" class="extype" name="julien.retrieval.Sum">Sum</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.Operator" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="OperatorextendsTraversable[julien.retrieval.Operator]"></a>
+      <a id="Operator:Operator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Operator.html"><span class="name">Operator</span></a><span class="result"> extends <span class="extype" name="scala.collection.Traversable">Traversable</span>[<a href="Operator.html" class="extype" name="julien.retrieval.Operator">Operator</a>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.OrderedWindow" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="OrderedWindowextendsMultiTermView"></a>
+      <a id="OrderedWindow:OrderedWindow"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="OrderedWindow.html"><span class="name">OrderedWindow</span></a><span class="result"> extends <a href="MultiTermView.html" class="extype" name="julien.retrieval.MultiTermView">MultiTermView</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Standard OrderedWindow implementation.</p>
+    </li><li name="julien.retrieval.PercentWorseAccumulator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PercentWorseAccumulator[T&lt;:julien.ScoredObject]extendsAccumulator[T]"></a>
+      <a id="PercentWorseAccumulator[T&lt;:ScoredObject]:PercentWorseAccumulator[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="PercentWorseAccumulator.html"><span class="name">PercentWorseAccumulator</span></a><span class="tparams">[<span name="T">T &lt;: <a href="../ScoredObject.html" class="extype" name="julien.ScoredObject">ScoredObject</a></span>]</span><span class="result"> extends <a href="Accumulator.html" class="extype" name="julien.retrieval.Accumulator">Accumulator</a>[<span class="extype" name="julien.retrieval.PercentWorseAccumulator.T">T</span>]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">This accumulator operates by only keeping
+<a href="../ScoredObject.html" class="extype" name="julien.ScoredObject">ScoredObjects</a> within a
+certain percentage of the maximum score in the accumulator.</p>
+    </li><li name="julien.retrieval.PositionStatsView" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="PositionStatsViewextendsCountStatsViewwithPositionsView"></a>
+      <a id="PositionStatsView:PositionStatsView"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="PositionStatsView.html"><span class="name">PositionStatsView</span></a><span class="result"> extends <a href="CountStatsView.html" class="extype" name="julien.retrieval.CountStatsView">CountStatsView</a> with <a href="PositionsView.html" class="extype" name="julien.retrieval.PositionsView">PositionsView</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A view that can provide both position information and statistics information
+for a given identifier.</p>
+    </li><li name="julien.retrieval.PositionsBufferView" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="PositionsBufferViewextendsPositionsView"></a>
+      <a id="PositionsBufferView:PositionsBufferView"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="PositionsBufferView.html"><span class="name">PositionsBufferView</span></a><span class="result"> extends <a href="PositionsView.html" class="extype" name="julien.retrieval.PositionsView">PositionsView</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">An extension to the PositonsView.</p>
+    </li><li name="julien.retrieval.PositionsView" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="PositionsViewextendsCountViewwithPositionSrc"></a>
+      <a id="PositionsView:PositionsView"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="PositionsView.html"><span class="name">PositionsView</span></a><span class="result"> extends <a href="CountView.html" class="extype" name="julien.retrieval.CountView">CountView</a> with <a href="../PositionSrc.html" class="extype" name="julien.PositionSrc">PositionSrc</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A view that must provide the positions of occurrences of a given index
+key for a given identifier.</p>
+    </li><li name="julien.retrieval.PriorsView" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PriorsViewextendsSparseIterator[julien.galago.core.index.ScoreIterator]withScalarWeightedFeature"></a>
+      <a id="PriorsView:PriorsView"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="PriorsView.html"><span class="name">PriorsView</span></a><span class="result"> extends <a href="SparseIterator.html" class="extype" name="julien.retrieval.SparseIterator">SparseIterator</a>[<span class="extype" name="julien.galago.core.index.ScoreIterator">ScoreIterator</span>] with <a href="ScalarWeightedFeature.html" class="extype" name="julien.retrieval.ScalarWeightedFeature">ScalarWeightedFeature</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.ScalarNormedSum" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ScalarNormedSumextendsNormalizedSumwithScalarWeightedFeature"></a>
+      <a id="ScalarNormedSum:ScalarNormedSum"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ScalarNormedSum.html"><span class="name">ScalarNormedSum</span></a><span class="result"> extends <a href="NormalizedSum.html" class="extype" name="julien.retrieval.NormalizedSum">NormalizedSum</a> with <a href="ScalarWeightedFeature.html" class="extype" name="julien.retrieval.ScalarWeightedFeature">ScalarWeightedFeature</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.ScalarSum" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ScalarSumextendsSumwithScalarWeightedFeature"></a>
+      <a id="ScalarSum:ScalarSum"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ScalarSum.html"><span class="name">ScalarSum</span></a><span class="result"> extends <a href="Sum.html" class="extype" name="julien.retrieval.Sum">Sum</a> with <a href="ScalarWeightedFeature.html" class="extype" name="julien.retrieval.ScalarWeightedFeature">ScalarWeightedFeature</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.ScalarWeightedFeature" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ScalarWeightedFeatureextendsFeature"></a>
+      <a id="ScalarWeightedFeature:ScalarWeightedFeature"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ScalarWeightedFeature.html"><span class="name">ScalarWeightedFeature</span></a><span class="result"> extends <a href="Feature.html" class="extype" name="julien.retrieval.Feature">Feature</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Instantiates the weight of a <a href="Feature.html" class="extype" name="julien.retrieval.Feature">Feature</a> as publicly
+exposed variable.</p>
+    </li><li name="julien.retrieval.ScoreView" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ScoreViewextendsViewwithScoreSrc"></a>
+      <a id="ScoreView:ScoreView"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ScoreView.html"><span class="name">ScoreView</span></a><span class="result"> extends <a href="View.html" class="extype" name="julien.retrieval.View">View</a> with <a href="../ScoreSrc.html" class="extype" name="julien.ScoreSrc">ScoreSrc</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A view that must provide a score of a given index key for
+a given identifier.</p>
+    </li><li name="julien.retrieval.ScoredDocument" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ScoredDocumentextendsScoredObjectwithProductwithSerializable"></a>
+      <a id="ScoredDocument:ScoredDocument"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="ScoredDocument.html"><span class="name">ScoredDocument</span></a><span class="params">(<span name="id">id: <span class="extype" name="scala.Int">Int</span></span>, <span name="score">score: <span class="extype" name="scala.Double">Double</span></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;unknown&quot;</span></span>, <span name="rank">rank: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="../ScoredObject.html" class="extype" name="julien.ScoredObject">ScoredObject</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A specialized Tuple for a scored document.</p>
+    </li><li name="julien.retrieval.ScoredPassage" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ScoredPassageextendsScoredObjectwithProductwithSerializable"></a>
+      <a id="ScoredPassage:ScoredPassage"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="ScoredPassage.html"><span class="name">ScoredPassage</span></a><span class="params">(<span name="id">id: <span class="extype" name="scala.Int">Int</span></span>, <span name="score">score: <span class="extype" name="scala.Double">Double</span></span>, <span name="begin">begin: <span class="extype" name="scala.Int">Int</span></span>, <span name="end">end: <span class="extype" name="scala.Int">Int</span></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;unknown&quot;</span></span>, <span name="rank">rank: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="../ScoredObject.html" class="extype" name="julien.ScoredObject">ScoredObject</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A specialized tuple for holding subsections (&quot;slices&quot;)
+of a document.</p>
+    </li><li name="julien.retrieval.SparseIterator" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="SparseIterator[I&lt;:julien.GIterator]extendsIteratedHook[I]"></a>
+      <a id="SparseIterator[I&lt;:GIterator]:SparseIterator[I]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="SparseIterator.html"><span class="name">SparseIterator</span></a><span class="tparams">[<span name="I">I &lt;: <a href="../package.html#GIterator=julien.galago.core.index.Iterator" class="extmbr" name="julien.GIterator">GIterator</a></span>]</span><span class="result"> extends <a href="IteratedHook.html" class="extype" name="julien.retrieval.IteratedHook">IteratedHook</a>[<span class="extype" name="julien.retrieval.SparseIterator.I">I</span>]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">A behavior indicating that the implementing class:
+- Is stream-based,
+- Directly accesses an index segment (most likely a posting list),
+- And is not expected to have a non-degenerate value for every
+  identifier in the index.</p>
+    </li><li name="julien.retrieval.StatisticsView" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="StatisticsViewextendsViewwithStatisticsSrc"></a>
+      <a id="StatisticsView:StatisticsView"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="StatisticsView.html"><span class="name">StatisticsView</span></a><span class="result"> extends <a href="View.html" class="extype" name="julien.retrieval.View">View</a> with <a href="../StatisticsSrc.html" class="extype" name="julien.StatisticsSrc">StatisticsSrc</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A view that must provide a aggregate statistics of a given index key for
+a given identifier.</p>
+    </li><li name="julien.retrieval.StreamLengths" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="StreamLengthsextendsIndexLengthswithMovablewithIteratedHook[julien.galago.core.index.LengthsReader.LengthsIterator]"></a>
+      <a id="StreamLengths:StreamLengths"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="StreamLengths.html"><span class="name">StreamLengths</span></a><span class="result"> extends <a href="IndexLengths.html" class="extype" name="julien.retrieval.IndexLengths">IndexLengths</a> with <a href="../behavior/Movable.html" class="extype" name="julien.behavior.Movable">Movable</a> with <a href="IteratedHook.html" class="extype" name="julien.retrieval.IteratedHook">IteratedHook</a>[<span class="extype" name="julien.galago.core.index.LengthsReader.LengthsIterator">LengthsIterator</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.StreamedCounts" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="StreamedCountsextendsTermwithSparseIterator[julien.galago.core.index.CountIterator]"></a>
+      <a id="StreamedCounts:StreamedCounts"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="StreamedCounts.html"><span class="name">StreamedCounts</span></a><span class="result"> extends <a href="Term.html" class="extype" name="julien.retrieval.Term">Term</a> with <a href="SparseIterator.html" class="extype" name="julien.retrieval.SparseIterator">SparseIterator</a>[<span class="extype" name="julien.galago.core.index.CountIterator">CountIterator</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.StreamedPositions" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="StreamedPositionsextendsTermwithPositionStatsViewwithPositionsBufferViewwithSparseIterator[julien.galago.core.index.ExtentIterator]"></a>
+      <a id="StreamedPositions:StreamedPositions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="StreamedPositions.html"><span class="name">StreamedPositions</span></a><span class="result"> extends <a href="Term.html" class="extype" name="julien.retrieval.Term">Term</a> with <a href="PositionStatsView.html" class="extype" name="julien.retrieval.PositionStatsView">PositionStatsView</a> with <a href="PositionsBufferView.html" class="extype" name="julien.retrieval.PositionsBufferView">PositionsBufferView</a> with <a href="SparseIterator.html" class="extype" name="julien.retrieval.SparseIterator">SparseIterator</a>[<span class="extype" name="julien.galago.core.index.ExtentIterator">ExtentIterator</span>]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Represents a direct connection to an index via a key specified
+the t parameter.</p>
+    </li><li name="julien.retrieval.Sum" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="SumextendsFeature"></a>
+      <a id="Sum:Sum"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Sum.html"><span class="name">Sum</span></a><span class="result"> extends <a href="Feature.html" class="extype" name="julien.retrieval.Feature">Feature</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.Synonym" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SynonymextendsMultiTermView"></a>
+      <a id="Synonym:Synonym"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Synonym.html"><span class="name">Synonym</span></a><span class="result"> extends <a href="MultiTermView.html" class="extype" name="julien.retrieval.MultiTermView">MultiTermView</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.TF" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TFextendsScalarWeightedFeaturewithBounded"></a>
+      <a id="TF:TF"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="TF.html"><span class="name">TF</span></a><span class="result"> extends <a href="ScalarWeightedFeature.html" class="extype" name="julien.retrieval.ScalarWeightedFeature">ScalarWeightedFeature</a> with <a href="../behavior/Bounded.html" class="extype" name="julien.behavior.Bounded">Bounded</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Simple Term Frequency (# times the term occurs in D / |D|) feature.</p>
+    </li><li name="julien.retrieval.TFIDF" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TFIDFextendsScalarWeightedFeaturewithBounded"></a>
+      <a id="TFIDF:TFIDF"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="TFIDF.html"><span class="name">TFIDF</span></a><span class="result"> extends <a href="ScalarWeightedFeature.html" class="extype" name="julien.retrieval.ScalarWeightedFeature">ScalarWeightedFeature</a> with <a href="../behavior/Bounded.html" class="extype" name="julien.behavior.Bounded">Bounded</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Term Frequency (TF) * Inverse Document Frequency (IDF).</p>
+    </li><li name="julien.retrieval.Term" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="TermextendsCountStatsViewwithChildlessOp"></a>
+      <a id="Term:Term"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Term.html"><span class="name">Term</span></a><span class="result"> extends <a href="CountStatsView.html" class="extype" name="julien.retrieval.CountStatsView">CountStatsView</a> with <a href="ChildlessOp.html" class="extype" name="julien.retrieval.ChildlessOp">ChildlessOp</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.TermCount" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TermCountextendsScalarWeightedFeaturewithBounded"></a>
+      <a id="TermCount:TermCount"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="TermCount.html"><span class="name">TermCount</span></a><span class="result"> extends <a href="ScalarWeightedFeature.html" class="extype" name="julien.retrieval.ScalarWeightedFeature">ScalarWeightedFeature</a> with <a href="../behavior/Bounded.html" class="extype" name="julien.behavior.Bounded">Bounded</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Echoes the unnormalized term count.</p>
+    </li><li name="julien.retrieval.UnorderedWindow" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="UnorderedWindowextendsMultiTermView"></a>
+      <a id="UnorderedWindow:UnorderedWindow"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="UnorderedWindow.html"><span class="name">UnorderedWindow</span></a><span class="result"> extends <a href="MultiTermView.html" class="extype" name="julien.retrieval.MultiTermView">MultiTermView</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.View" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ViewextendsOperator"></a>
+      <a id="View:View"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="View.html"><span class="name">View</span></a><span class="result"> extends <a href="Operator.html" class="extype" name="julien.retrieval.Operator">Operator</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A view is an operator that provides information directly stored in an index
+or other lookup structure.</p>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="julien.retrieval.AbsoluteDiscount" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="AbsoluteDiscount"></a>
+      <a id="AbsoluteDiscount:AbsoluteDiscount"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="AbsoluteDiscount$.html"><span class="name">AbsoluteDiscount</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.ArrayAccumulator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ArrayAccumulator"></a>
+      <a id="ArrayAccumulator:ArrayAccumulator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ArrayAccumulator$.html"><span class="name">ArrayAccumulator</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.BM25" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BM25"></a>
+      <a id="BM25:BM25"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="BM25$.html"><span class="name">BM25</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.package#Combine" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Combine:julien.retrieval.Sum.type"></a>
+      <a id="Combine:Sum.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Combine</span><span class="result">: <a href="Sum$.html" class="extype" name="julien.retrieval.Sum">Sum</a>.type</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.package#CombineNorm" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CombineNorm:julien.retrieval.NormalizedSum.type"></a>
+      <a id="CombineNorm:NormalizedSum.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">CombineNorm</span><span class="result">: <a href="NormalizedSum$.html" class="extype" name="julien.retrieval.NormalizedSum">NormalizedSum</a>.type</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.DefaultAccumulator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DefaultAccumulator"></a>
+      <a id="DefaultAccumulator:DefaultAccumulator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="DefaultAccumulator$.html"><span class="name">DefaultAccumulator</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.Dirichlet" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Dirichlet"></a>
+      <a id="Dirichlet:Dirichlet"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Dirichlet$.html"><span class="name">Dirichlet</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.DocumentView" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DocumentView"></a>
+      <a id="DocumentView:DocumentView"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="DocumentView$.html"><span class="name">DocumentView</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.IDF" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IDF"></a>
+      <a id="IDF:IDF"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="IDF$.html"><span class="name">IDF</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.package#Index" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Index:julien.access.Index.type"></a>
+      <a id="Index:access.Index.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Index</span><span class="result">: <a href="../access/Index$.html" class="extype" name="julien.access.Index">access.Index</a>.type</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.IndexLengths" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IndexLengths"></a>
+      <a id="IndexLengths:IndexLengths"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="IndexLengths$.html"><span class="name">IndexLengths</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.JelinekMercer" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="JelinekMercer"></a>
+      <a id="JelinekMercer:JelinekMercer"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="JelinekMercer$.html"><span class="name">JelinekMercer</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.LinePrintingDebugger" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="LinePrintingDebugger"></a>
+      <a id="LinePrintingDebugger:LinePrintingDebugger"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="LinePrintingDebugger$.html"><span class="name">LinePrintingDebugger</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.NormalizedSum" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NormalizedSum"></a>
+      <a id="NormalizedSum:NormalizedSum"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="NormalizedSum$.html"><span class="name">NormalizedSum</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.Operator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Operator"></a>
+      <a id="Operator:Operator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Operator$.html"><span class="name">Operator</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.OrderedWindow" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="OrderedWindow"></a>
+      <a id="OrderedWindow:OrderedWindow"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="OrderedWindow$.html"><span class="name">OrderedWindow</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.PercentWorseAccumulator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PercentWorseAccumulator"></a>
+      <a id="PercentWorseAccumulator:PercentWorseAccumulator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="PercentWorseAccumulator$.html"><span class="name">PercentWorseAccumulator</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.PriorsView" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PriorsView"></a>
+      <a id="PriorsView:PriorsView"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="PriorsView$.html"><span class="name">PriorsView</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.package#QueryProcessor" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="QueryProcessor:julien.retrieval.processor.QueryProcessor.type"></a>
+      <a id="QueryProcessor:retrieval.processor.QueryProcessor.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">QueryProcessor</span><span class="result">: <a href="processor/QueryProcessor$.html" class="extype" name="julien.retrieval.processor.QueryProcessor">retrieval.processor.QueryProcessor</a>.type</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.RelevanceModel" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RelevanceModel"></a>
+      <a id="RelevanceModel:RelevanceModel"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RelevanceModel$.html"><span class="name">RelevanceModel</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.ScoredDocumentDefaultOrdering" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ScoredDocumentDefaultOrdering"></a>
+      <a id="ScoredDocumentDefaultOrdering:ScoredDocumentDefaultOrdering"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ScoredDocumentDefaultOrdering$.html"><span class="name">ScoredDocumentDefaultOrdering</span></a><span class="result"> extends <span class="extype" name="scala.Ordering">Ordering</span>[<a href="ScoredDocument.html" class="extype" name="julien.retrieval.ScoredDocument">ScoredDocument</a>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.ScoredPassageDefaultOrdering" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ScoredPassageDefaultOrdering"></a>
+      <a id="ScoredPassageDefaultOrdering:ScoredPassageDefaultOrdering"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ScoredPassageDefaultOrdering$.html"><span class="name">ScoredPassageDefaultOrdering</span></a><span class="result"> extends <span class="extype" name="scala.Ordering">Ordering</span>[<a href="ScoredPassage.html" class="extype" name="julien.retrieval.ScoredPassage">ScoredPassage</a>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.Stopwords" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Stopwords"></a>
+      <a id="Stopwords:Stopwords"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="package$$Stopwords$.html"><span class="name">Stopwords</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.Sum" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Sum"></a>
+      <a id="Sum:Sum"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Sum$.html"><span class="name">Sum</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.Synonym" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Synonym"></a>
+      <a id="Synonym:Synonym"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Synonym$.html"><span class="name">Synonym</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.TF" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TF"></a>
+      <a id="TF:TF"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="TF$.html"><span class="name">TF</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.TFIDF" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TFIDF"></a>
+      <a id="TFIDF:TFIDF"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="TFIDF$.html"><span class="name">TFIDF</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.Term" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Term"></a>
+      <a id="Term:Term"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Term$.html"><span class="name">Term</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.TermCount" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TermCount"></a>
+      <a id="TermCount:TermCount"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="TermCount$.html"><span class="name">TermCount</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.UnorderedWindow" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="UnorderedWindow"></a>
+      <a id="UnorderedWindow:UnorderedWindow"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="UnorderedWindow$.html"><span class="name">UnorderedWindow</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.Utils" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Utils"></a>
+      <a id="Utils:Utils"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Utils$.html"><span class="name">Utils</span></a>
+      </span>
+      </h4>
+      <p class="comment cmt">Provides printing methods for lists of <a href="ScoredDocument.html" class="extype" name="julien.retrieval.ScoredDocument">ScoredDocument</a>s.</p>
+    </li><li name="julien.retrieval.package#bow" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="bow(terms:Seq[String],scorer:(julien.retrieval.Term,julien.retrieval.IndexLengths)=&gt;julien.retrieval.Feature)(implicitindex:julien.retrieval.package.Index):julien.retrieval.ScalarWeightedFeature"></a>
+      <a id="bow(Seq[String],(Term,IndexLengths)⇒Feature)(Index):ScalarWeightedFeature"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">bow</span><span class="params">(<span name="terms">terms: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="scorer">scorer: (<a href="Term.html" class="extype" name="julien.retrieval.Term">Term</a>, <a href="IndexLengths.html" class="extype" name="julien.retrieval.IndexLengths">IndexLengths</a>) ⇒ <a href="Feature.html" class="extype" name="julien.retrieval.Feature">Feature</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="index">index: <a href="#Index=julien.access.Index" class="extmbr" name="julien.retrieval.Index">Index</a></span>)</span><span class="result">: <a href="ScalarWeightedFeature.html" class="extype" name="julien.retrieval.ScalarWeightedFeature">ScalarWeightedFeature</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.package#featSeq2Array" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="featSeq2Array(s:Seq[julien.retrieval.Feature]):Array[julien.retrieval.Feature]"></a>
+      <a id="featSeq2Array(Seq[Feature]):Array[Feature]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">featSeq2Array</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Seq">Seq</span>[<a href="Feature.html" class="extype" name="julien.retrieval.Feature">Feature</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Array">Array</span>[<a href="Feature.html" class="extype" name="julien.retrieval.Feature">Feature</a>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.package#getType" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="getType[T](x:T)(implicittag:reflect.runtime.universe.TypeTag[T]):reflect.runtime.universe.Type"></a>
+      <a id="getType[T](T)(scala.reflect.api.JavaUniverse.TypeTag[T]):scala.reflect.api.JavaUniverse.Type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getType</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="x">x: <span class="extype" name="julien.retrieval.getType.T">T</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="tag">tag: <span class="extype" name="scala.reflect.api.TypeTags.TypeTag">scala.reflect.api.JavaUniverse.TypeTag</span>[<span class="extype" name="julien.retrieval.getType.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="scala.reflect.api.Types.Type">scala.reflect.api.JavaUniverse.Type</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.processor" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="processor"></a>
+      <a id="processor:processor"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="processor/package.html"><span class="name">processor</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.package#sdOrdering" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="sdOrdering:julien.retrieval.ScoredDocumentDefaultOrdering.type"></a>
+      <a id="sdOrdering:ScoredDocumentDefaultOrdering.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sdOrdering</span><span class="result">: <a href="ScoredDocumentDefaultOrdering$.html" class="extype" name="julien.retrieval.ScoredDocumentDefaultOrdering">ScoredDocumentDefaultOrdering</a>.type</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.package#sdm" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="sdm(rawterms:Seq[String],scorer:(julien.retrieval.CountStatsView,julien.retrieval.LengthsView)=&gt;julien.retrieval.Feature,unigramWeight:Double,odWeight:Double,uwWeight:Double,odWindowSize:Int,uwWindowSize:Int)(implicitindex:julien.retrieval.package.Index):julien.retrieval.ScalarWeightedFeature"></a>
+      <a id="sdm(Seq[String],(CountStatsView,LengthsView)⇒Feature,Double,Double,Double,Int,Int)(Index):ScalarWeightedFeature"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sdm</span><span class="params">(<span name="rawterms">rawterms: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="scorer">scorer: (<a href="CountStatsView.html" class="extype" name="julien.retrieval.CountStatsView">CountStatsView</a>, <a href="LengthsView.html" class="extype" name="julien.retrieval.LengthsView">LengthsView</a>) ⇒ <a href="Feature.html" class="extype" name="julien.retrieval.Feature">Feature</a></span>, <span name="unigramWeight">unigramWeight: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">0.8</span></span>, <span name="odWeight">odWeight: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">0.15</span></span>, <span name="uwWeight">uwWeight: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">0.05</span></span>, <span name="odWindowSize">odWindowSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="uwWindowSize">uwWindowSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">8</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="index">index: <a href="#Index=julien.access.Index" class="extmbr" name="julien.retrieval.Index">Index</a></span>)</span><span class="result">: <a href="ScalarWeightedFeature.html" class="extype" name="julien.retrieval.ScalarWeightedFeature">ScalarWeightedFeature</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.retrieval.package#sdm" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="sdm(terms:String,weight:Double)(implicitindex:julien.retrieval.package.Index):julien.retrieval.ScalarWeightedFeature"></a>
+      <a id="sdm(String,Double)(Index):ScalarWeightedFeature"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sdm</span><span class="params">(<span name="terms">terms: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="weight">weight: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="index">index: <a href="#Index=julien.access.Index" class="extmbr" name="julien.retrieval.Index">Index</a></span>)</span><span class="result">: <a href="ScalarWeightedFeature.html" class="extype" name="julien.retrieval.ScalarWeightedFeature">ScalarWeightedFeature</a></span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

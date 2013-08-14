@@ -1,0 +1,491 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>flow - Julien - julien.flow</title>
+          <meta name="description" content="flow - Julien - julien.flow" />
+          <meta name="keywords" content="flow Julien julien.flow" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'julien.flow.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img src="../../lib/package_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="julien">julien</a></p>
+        <h1>flow</h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">flow</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>The flow package facilitates creation of Tupleflow jobs. Tupleflow itself
+is a suitable software package for distributed computation, however the API
+is not very pleasant, making the generation of new Tupleflow jobs painful.
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/CIIR/julien/tree/master/src/main/scala/julien/flow/package.scala" target="_blank">package.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="julien.flow"><span>flow</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="julien.flow.AbstractFlowStep" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="AbstractFlowStepextendsAnyRef"></a>
+      <a id="AbstractFlowStep:AbstractFlowStep"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="AbstractFlowStep.html"><span class="name">AbstractFlowStep</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Generic defintion of a FlowStep.</p>
+    </li><li name="julien.flow.FlowInput" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FlowInputextendsAbstractFlowStepwithProductwithSerializable"></a>
+      <a id="FlowInput:FlowInput"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowInput.html"><span class="name">FlowInput</span></a><span class="params">(<span name="node">node: <a href="FlowNode.html" class="extype" name="julien.flow.FlowNode">FlowNode</a></span>)</span><span class="result"> extends <a href="AbstractFlowStep.html" class="extype" name="julien.flow.AbstractFlowStep">AbstractFlowStep</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A FlowStep that encapsulates the primary input to a stage.</p>
+    </li><li name="julien.flow.FlowLinearStep" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FlowLinearStepextendsAbstractFlowStepwithProductwithSerializable"></a>
+      <a id="FlowLinearStep:FlowLinearStep"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowLinearStep.html"><span class="name">FlowLinearStep</span></a><span class="params">(<span name="steps">steps: <span class="extype" name="scala.Seq">Seq</span>[<a href="AbstractFlowStep.html" class="extype" name="julien.flow.AbstractFlowStep">AbstractFlowStep</a>]</span>)</span><span class="result"> extends <a href="AbstractFlowStep.html" class="extype" name="julien.flow.AbstractFlowStep">AbstractFlowStep</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A linear collection of steps; not explicit in tupleflow, but simpler here</p>
+    </li><li name="julien.flow.FlowMultiStep" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FlowMultiStepextendsAbstractFlowStepwithProductwithSerializable"></a>
+      <a id="FlowMultiStep:FlowMultiStep"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowMultiStep.html"><span class="name">FlowMultiStep</span></a><span class="params">(<span name="steps">steps: <span class="extype" name="scala.Seq">Seq</span>[<a href="AbstractFlowStep.html" class="extype" name="julien.flow.AbstractFlowStep">AbstractFlowStep</a>]</span>)</span><span class="result"> extends <a href="AbstractFlowStep.html" class="extype" name="julien.flow.AbstractFlowStep">AbstractFlowStep</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">a set of steps to execute in parallel, each getting a copy of the input</p>
+    </li><li name="julien.flow.FlowNode" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FlowNodeextendsProductwithSerializable"></a>
+      <a id="FlowNode:FlowNode"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowNode.html"><span class="name">FlowNode</span></a><span class="params">(<span name="flowType">flowType: <a href="FlowType.html" class="extype" name="julien.flow.FlowType">FlowType</a></span>, <span name="kind">kind: <a href="FlowNodeKind.html" class="extype" name="julien.flow.FlowNodeKind">FlowNodeKind</a></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">flow.this.`package`.gensym(&quot;node&quot;)</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">This represents a node - which encapsulates the an output for one Stage and
+an input for another.</p>
+    </li><li name="julien.flow.FlowNodeJoin" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FlowNodeJoinextendsFlowNodeKindwithProductwithSerializable"></a>
+      <a id="FlowNodeJoin:FlowNodeJoin"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowNodeJoin.html"><span class="name">FlowNodeJoin</span></a><span class="params">()</span><span class="result"> extends <a href="FlowNodeKind.html" class="extype" name="julien.flow.FlowNodeKind">FlowNodeKind</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A node that has a single receiver, but may have multiple inputs.</p>
+    </li><li name="julien.flow.FlowNodeKind" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="FlowNodeKindextendsAnyRef"></a>
+      <a id="FlowNodeKind:FlowNodeKind"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowNodeKind.html"><span class="name">FlowNodeKind</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">This trait is the enum for the type of stage connection.</p>
+    </li><li name="julien.flow.FlowNodeSplit" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FlowNodeSplitextendsFlowNodeKindwithProductwithSerializable"></a>
+      <a id="FlowNodeSplit:FlowNodeSplit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowNodeSplit.html"><span class="name">FlowNodeSplit</span></a><span class="params">()</span><span class="result"> extends <a href="FlowNodeKind.html" class="extype" name="julien.flow.FlowNodeKind">FlowNodeKind</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A node that splits its input to replicas of the receiving end.</p>
+    </li><li name="julien.flow.FlowOutput" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FlowOutputextendsAbstractFlowStepwithProductwithSerializable"></a>
+      <a id="FlowOutput:FlowOutput"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowOutput.html"><span class="name">FlowOutput</span></a><span class="params">(<span name="node">node: <a href="FlowNode.html" class="extype" name="julien.flow.FlowNode">FlowNode</a></span>)</span><span class="result"> extends <a href="AbstractFlowStep.html" class="extype" name="julien.flow.AbstractFlowStep">AbstractFlowStep</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A FlowStep that encapsulates an output of a stage.</p>
+    </li><li name="julien.flow.FlowStage" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FlowStageextendsAnyRef"></a>
+      <a id="FlowStage:FlowStage"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowStage.html"><span class="name">FlowStage</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A class representing knowledge about a particular stage.</p>
+    </li><li name="julien.flow.FlowStep" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FlowStep[T]extendsAbstractFlowStepwithProductwithSerializable"></a>
+      <a id="FlowStep[T]:FlowStep[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowStep.html"><span class="name">FlowStep</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="action">action: <span class="extype" name="scala.Predef.Class">Class</span>[<span class="extype" name="julien.flow.FlowStep.T">T</span>]</span>, <span name="parms">parms: <a href="#Parameters=julien.galago.tupleflow.Parameters" class="extmbr" name="julien.flow.Parameters">Parameters</a> = <span class="defval" name="new flow.this.`package`.Parameters()">...</span></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">flow.this.`package`.gensym(&quot;step&quot;)</span></span>)</span><span class="result"> extends <a href="AbstractFlowStep.html" class="extype" name="julien.flow.AbstractFlowStep">AbstractFlowStep</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.flow.FlowType" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FlowTypeextendsProductwithSerializable"></a>
+      <a id="FlowType:FlowType"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowType.html"><span class="name">FlowType</span></a><span class="params">(<span name="clazz">clazz: <span class="extype" name="scala.Predef.Class">Class</span>[_]</span>, <span name="order">order: <span class="extype" name="scala.Option">Option</span>[<a href="#Order[T]=julien.galago.tupleflow.Order[T]" class="extmbr" name="julien.flow.Order">Order</a>[_]]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A FlowType is used to describe the input and output types of
+any FlowStep or FlowStage.</p>
+    </li><li name="julien.flow.Job" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Job=julien.galago.tupleflow.execution.Job"></a>
+      <a id="Job:Job"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Job</span><span class="result"> = <span class="extype" name="julien.galago.tupleflow.execution.Job">galago.tupleflow.execution.Job</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.flow.Order" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Order[T]=julien.galago.tupleflow.Order[T]"></a>
+      <a id="Order[T]:Order[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Order</span><span class="tparams">[<span name="T">T</span>]</span><span class="result"> = <span class="extype" name="julien.galago.tupleflow.Order">galago.tupleflow.Order</span>[<span class="extype" name="julien.flow.Order.T">T</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.flow.Parameters" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Parameters=julien.galago.tupleflow.Parameters"></a>
+      <a id="Parameters:Parameters"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Parameters</span><span class="result"> = <span class="extype" name="julien.galago.tupleflow.Parameters">galago.tupleflow.Parameters</span></span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="julien.flow.FlowStage" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FlowStage"></a>
+      <a id="FlowStage:FlowStage"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowStage$.html"><span class="name">FlowStage</span></a>
+      </span>
+      </h4>
+      <p class="comment cmt">FlowStage Factory.</p>
+    </li><li name="julien.flow.FlowStep" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FlowStep"></a>
+      <a id="FlowStep:FlowStep"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="FlowStep$.html"><span class="name">FlowStep</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">FlowStep factory.</p>
+    </li><li name="julien.flow.JobGen" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="JobGen"></a>
+      <a id="JobGen:JobGen"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="JobGen$.html"><span class="name">JobGen</span></a>
+      </span>
+      </h4>
+      <p class="comment cmt">A series of factory methods for creating Tupleflow Jobs, or
+providing information about them.</p>
+    </li><li name="julien.flow.Recipe" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Recipe"></a>
+      <a id="Recipe:Recipe"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Recipe$.html"><span class="name">Recipe</span></a>
+      </span>
+      </h4>
+      <p class="comment cmt">Commonly used recipes (i.</p>
+    </li><li name="julien.flow.package#findAnnotation" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="findAnnotation[T&lt;:java.lang.annotation.Annotation](objClass:Class[_],annClass:Class[T]):Option[T]"></a>
+      <a id="findAnnotation[T&lt;:Annotation](Class[_],Class[T]):Option[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">findAnnotation</span><span class="tparams">[<span name="T">T &lt;: <span class="extype" name="java.lang.annotation.Annotation">Annotation</span></span>]</span><span class="params">(<span name="objClass">objClass: <span class="extype" name="scala.Predef.Class">Class</span>[_]</span>, <span name="annClass">annClass: <span class="extype" name="scala.Predef.Class">Class</span>[<span class="extype" name="julien.flow.findAnnotation.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="julien.flow.findAnnotation.T">T</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Hunts for a particular annotation attached to a class.</p><div class="fullcomment"><div class="comment cmt"><p>Hunts for a particular annotation attached to a class. If found,
+returns an option filled w/ the annotation. Otherwise returns None.
+</p></div></div>
+    </li><li name="julien.flow.package#gensym" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="gensym(base:String):String"></a>
+      <a id="gensym(String):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">gensym</span><span class="params">(<span name="base">base: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;gensym&quot;</span></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Function to generate a unique id for connecting jobs together.</p><div class="fullcomment"><div class="comment cmt"><p>Function to generate a unique id for connecting jobs together.
+A prefix can be supplied if desired.
+</p></div></div>
+    </li><li name="julien.flow.package#getClassOption" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="getClassOption(className:String):Option[Class[_]]"></a>
+      <a id="getClassOption(String):Option[Class[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClassOption</span><span class="params">(<span name="className">className: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.Class">Class</span>[_]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Optionally returns a class for the given string.</p>
+    </li><li name="julien.flow.package#getInputType" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getInputType(stepClass:Class[_]):Option[julien.flow.FlowType]"></a>
+      <a id="getInputType(Class[_]):Option[FlowType]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getInputType</span><span class="params">(<span name="stepClass">stepClass: <span class="extype" name="scala.Predef.Class">Class</span>[_]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="FlowType.html" class="extype" name="julien.flow.FlowType">FlowType</a>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Optionally returns the input type of a Tupleflow step.</p><div class="fullcomment"><div class="comment cmt"><p>Optionally returns the input type of a Tupleflow step.
+We may return None, if no input class
+is defined (e.g. a source step), and even in the returned FlowType,
+we may not have an Order defined if the class is an internal
+step.
+</p></div></div>
+    </li><li name="julien.flow.package#getOrder" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getOrder(typeClass:Class[_],order:Array[String]):Option[julien.flow.package.Order[_]]"></a>
+      <a id="getOrder(Class[_],Array[String]):Option[Order[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getOrder</span><span class="params">(<span name="typeClass">typeClass: <span class="extype" name="scala.Predef.Class">Class</span>[_]</span>, <span name="order">order: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="#Order[T]=julien.galago.tupleflow.Order[T]" class="extmbr" name="julien.flow.Order">Order</a>[_]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Given a class and an ordering string, tries to create an Order object
+that is an actual Order of the given type.</p><div class="fullcomment"><div class="comment cmt"><p>Given a class and an ordering string, tries to create an Order object
+that is an actual Order of the given type. If the given order does not
+exist, returns None.
+</p></div></div>
+    </li><li name="julien.flow.package#getOrders" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="getOrders(typeClass:Class[_]):Array[Class[julien.flow.package.Order[_]]]"></a>
+      <a id="getOrders(Class[_]):Array[Class[Order[_]]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getOrders</span><span class="params">(<span name="typeClass">typeClass: <span class="extype" name="scala.Predef.Class">Class</span>[_]</span>)</span><span class="result">: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Predef.Class">Class</span>[<a href="#Order[T]=julien.galago.tupleflow.Order[T]" class="extmbr" name="julien.flow.Order">Order</a>[_]]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Returns all of the Order classes for a given Tupleflow type.</p>
+    </li><li name="julien.flow.package#getOutputType" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getOutputType(stepClass:Class[_]):Option[julien.flow.FlowType]"></a>
+      <a id="getOutputType(Class[_]):Option[FlowType]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getOutputType</span><span class="params">(<span name="stepClass">stepClass: <span class="extype" name="scala.Predef.Class">Class</span>[_]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="FlowType.html" class="extype" name="julien.flow.FlowType">FlowType</a>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Given a class, look up it's annotations to determine it's
+output type and order.</p><div class="fullcomment"><div class="comment cmt"><p>Given a class, look up it's annotations to determine it's
+output type and order. We may return None, if no output class
+is defined (e.g. a writer step), and even in the returned FlowType,
+we may not have an Order defined if the class is an internal
+step.
+</p></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

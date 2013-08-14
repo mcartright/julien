@@ -1,0 +1,538 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>eval - Julien - julien.eval</title>
+          <meta name="description" content="eval - Julien - julien.eval" />
+          <meta name="keywords" content="eval Julien julien.eval" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'julien.eval.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img src="../../lib/package_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="julien">julien</a></p>
+        <h1>eval</h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eval</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/CIIR/julien/tree/master/src/main/scala/julien/eval/package.scala" target="_blank">package.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="julien.eval"><span>eval</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="julien.eval.Accuracy" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="AccuracyextendsQueryEvaluator"></a>
+      <a id="Accuracy:Accuracy"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Accuracy.html"><span class="name">Accuracy</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Reports the accuracy for a given query result/judgment pair.</p>
+    </li><li name="julien.eval.AreaUnderCurve" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="AreaUnderCurveextendsQueryEvaluator"></a>
+      <a id="AreaUnderCurve:AreaUnderCurve"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="AreaUnderCurve.html"><span class="name">AreaUnderCurve</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Measures the area under the curve, approximated
+by measuring rectangles formed by</p>
+    </li><li name="julien.eval.BalancedYoundenIndex" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BalancedYoundenIndexextendsQueryEvaluator"></a>
+      <a id="BalancedYoundenIndex:BalancedYoundenIndex"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="BalancedYoundenIndex.html"><span class="name">BalancedYoundenIndex</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.BestAtK" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BestAtKextendsQueryEvaluator"></a>
+      <a id="BestAtK:BestAtK"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="BestAtK.html"><span class="name">BestAtK</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Returnsd the highest label found by rank k.</p>
+    </li><li name="julien.eval.BinaryJudgments" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BinaryJudgmentsextendsQueryJudgments"></a>
+      <a id="BinaryJudgments:BinaryJudgments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="BinaryJudgments.html"><span class="name">BinaryJudgments</span></a><span class="result"> extends <a href="QueryJudgments.html" class="extype" name="julien.eval.QueryJudgments">QueryJudgments</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Completes the definition of a <a href="QueryJudgments.html" class="extype" name="julien.eval.QueryJudgments">QueryJudgments</a>
+by binarizing labels into the following category:
+- &lt;= 0 is non-relevant
+- &gt; 0 is relevant.</p>
+    </li><li name="julien.eval.BinaryPreference" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BinaryPreferenceextendsQueryEvaluator"></a>
+      <a id="BinaryPreference:BinaryPreference"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="BinaryPreference.html"><span class="name">BinaryPreference</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">I do NOT trust the current implementation of this class, nor do I trust
+the version in Galago.</p>
+    </li><li name="julien.eval.CountRelevant" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CountRelevantextendsQueryEvaluator"></a>
+      <a id="CountRelevant:CountRelevant"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="CountRelevant.html"><span class="name">CountRelevant</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Counts the number of documents judged to be relevant</p>
+    </li><li name="julien.eval.CountRelevantRetrieved" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CountRelevantRetrievedextendsQueryEvaluator"></a>
+      <a id="CountRelevantRetrieved:CountRelevantRetrieved"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="CountRelevantRetrieved.html"><span class="name">CountRelevantRetrieved</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Counts the number of relevant documents that were retrieved.</p>
+    </li><li name="julien.eval.CountRetrieved" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CountRetrievedextendsQueryEvaluator"></a>
+      <a id="CountRetrieved:CountRetrieved"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="CountRetrieved.html"><span class="name">CountRetrieved</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.DiscountedCumulativeGain" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DiscountedCumulativeGainextendsQueryEvaluator"></a>
+      <a id="DiscountedCumulativeGain:DiscountedCumulativeGain"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="DiscountedCumulativeGain.html"><span class="name">DiscountedCumulativeGain</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.ExpectedReciprocalRank" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ExpectedReciprocalRankextendsQueryEvaluator"></a>
+      <a id="ExpectedReciprocalRank:ExpectedReciprocalRank"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ExpectedReciprocalRank.html"><span class="name">ExpectedReciprocalRank</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.Judgment" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="JudgmentextendsProductwithSerializable"></a>
+      <a id="Judgment:Judgment"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Judgment.html"><span class="name">Judgment</span></a><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="label">label: <span class="extype" name="scala.Int">Int</span></span>, <span name="isRelevant">isRelevant: <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">The label of a given document.</p>
+    </li><li name="julien.eval.MeanAveragePrecision" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MeanAveragePrecisionextendsQueryEvaluator"></a>
+      <a id="MeanAveragePrecision:MeanAveragePrecision"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MeanAveragePrecision.html"><span class="name">MeanAveragePrecision</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.MeanReciprocalRank" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MeanReciprocalRankextendsQueryEvaluator"></a>
+      <a id="MeanReciprocalRank:MeanReciprocalRank"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MeanReciprocalRank.html"><span class="name">MeanReciprocalRank</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.NormalizedDiscountedCumulativeGain" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NormalizedDiscountedCumulativeGainextendsQueryEvaluator"></a>
+      <a id="NormalizedDiscountedCumulativeGain:NormalizedDiscountedCumulativeGain"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="NormalizedDiscountedCumulativeGain.html"><span class="name">NormalizedDiscountedCumulativeGain</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.Precision" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PrecisionextendsQueryEvaluator"></a>
+      <a id="Precision:Precision"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Precision.html"><span class="name">Precision</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.QueryEvaluator" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="QueryEvaluatorextendsAnyRef"></a>
+      <a id="QueryEvaluator:QueryEvaluator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="QueryEvaluator.html"><span class="name">QueryEvaluator</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.QueryJudgmentSet" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="QueryJudgmentSetextendsMapProxy[String,julien.eval.QueryJudgments]"></a>
+      <a id="QueryJudgmentSet:QueryJudgmentSet"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="QueryJudgmentSet.html"><span class="name">QueryJudgmentSet</span></a><span class="result"> extends <span class="extype" name="scala.collection.MapProxy">MapProxy</span>[<span class="extype" name="scala.Predef.String">String</span>, <a href="QueryJudgments.html" class="extype" name="julien.eval.QueryJudgments">QueryJudgments</a>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.QueryJudgments" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="QueryJudgmentsextendsIterable[julien.eval.Judgment]"></a>
+      <a id="QueryJudgments:QueryJudgments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="QueryJudgments.html"><span class="name">QueryJudgments</span></a><span class="result"> extends <span class="extype" name="scala.collection.Iterable">Iterable</span>[<a href="Judgment.html" class="extype" name="julien.eval.Judgment">Judgment</a>]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">A set of judgments for a single query.</p>
+    </li><li name="julien.eval.QueryResult" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="QueryResult[T&lt;:julien.ScoredObject]extendsSeqProxy[T]withProductwithSerializable"></a>
+      <a id="QueryResult[T&lt;:ScoredObject]:QueryResult[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="QueryResult.html"><span class="name">QueryResult</span></a><span class="tparams">[<span name="T">T &lt;: <a href="../ScoredObject.html" class="extype" name="julien.ScoredObject">ScoredObject</a></span>]</span><span class="params">(<span name="result">result: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="julien.eval.QueryResult.T">T</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.collection.SeqProxy">SeqProxy</span>[<span class="extype" name="julien.eval.QueryResult.T">T</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.QueryResultSet" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="QueryResultSet[T&lt;:julien.ScoredObject]extendsMapProxy[String,julien.eval.QueryResult[T]]"></a>
+      <a id="QueryResultSet[T&lt;:ScoredObject]:QueryResultSet[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="QueryResultSet.html"><span class="name">QueryResultSet</span></a><span class="tparams">[<span name="T">T &lt;: <a href="../ScoredObject.html" class="extype" name="julien.ScoredObject">ScoredObject</a></span>]</span><span class="result"> extends <span class="extype" name="scala.collection.MapProxy">MapProxy</span>[<span class="extype" name="scala.Predef.String">String</span>, <a href="QueryResult.html" class="extype" name="julien.eval.QueryResult">QueryResult</a>[<span class="extype" name="julien.eval.QueryResultSet.T">T</span>]]</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.QuerySetEvaluation" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="QuerySetEvaluation=scala.collection.immutable.TreeMap[String,Double]"></a>
+      <a id="QuerySetEvaluation:QuerySetEvaluation"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">QuerySetEvaluation</span><span class="result"> = <span class="extype" name="scala.collection.immutable.TreeMap">TreeMap</span>[<span class="extype" name="java.lang.String">String</span>, <span class="extype" name="scala.Double">Double</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.RPrecision" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RPrecisionextendsQueryEvaluator"></a>
+      <a id="RPrecision:RPrecision"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="RPrecision.html"><span class="name">RPrecision</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.Recall" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RecallextendsQueryEvaluator"></a>
+      <a id="Recall:Recall"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Recall.html"><span class="name">Recall</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.RootMeanSquredError" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RootMeanSquredErrorextendsQueryEvaluator"></a>
+      <a id="RootMeanSquredError:RootMeanSquredError"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="RootMeanSquredError.html"><span class="name">RootMeanSquredError</span></a><span class="result"> extends <a href="QueryEvaluator.html" class="extype" name="julien.eval.QueryEvaluator">QueryEvaluator</a></span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="julien.eval.Evaluator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Evaluator"></a>
+      <a id="Evaluator:Evaluator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Evaluator$.html"><span class="name">Evaluator</span></a>
+      </span>
+      </h4>
+      <p class="comment cmt">User: jdalton
+Date: 4/30/13
+</p>
+    </li><li name="julien.eval.Metric" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Metric"></a>
+      <a id="Metric:Metric"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Metric$.html"><span class="name">Metric</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.QueryJudgmentSet" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="QueryJudgmentSet"></a>
+      <a id="QueryJudgmentSet:QueryJudgmentSet"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="QueryJudgmentSet$.html"><span class="name">QueryJudgmentSet</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.QueryJudgments" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="QueryJudgments"></a>
+      <a id="QueryJudgments:QueryJudgments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="QueryJudgments$.html"><span class="name">QueryJudgments</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.QueryResultSet" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="QueryResultSet"></a>
+      <a id="QueryResultSet:QueryResultSet"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="QueryResultSet$.html"><span class="name">QueryResultSet</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.eval.compare" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="compare"></a>
+      <a id="compare:compare"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="compare/package.html"><span class="name">compare</span></a>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

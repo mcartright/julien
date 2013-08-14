@@ -1,0 +1,256 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>access - Julien - julien.access</title>
+          <meta name="description" content="access - Julien - julien.access" />
+          <meta name="keywords" content="access Julien julien.access" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'julien.access.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img src="../../lib/package_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="julien">julien</a></p>
+        <h1>access</h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">access</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>This module represents more &quot;free-form&quot; access to the underlying
+index structures.</p><p>In addition to a fair number of convenience functions avaiable to gather
+simple statistics, constructs such as iterable sequences (i.e. the
+Seq trait from scala.collection) are available over Documents, Postings, and
+Key/Value pairs. I plan to add more to that, time permitting.
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/CIIR/julien/tree/master/src/main/scala/julien/access/package.scala" target="_blank">package.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="julien.access"><span>access</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="julien.access.GalagoQueryParser" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="GalagoQueryParserextendsJavaTokenParsers"></a>
+      <a id="GalagoQueryParser:GalagoQueryParser"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="GalagoQueryParser.html"><span class="name">GalagoQueryParser</span></a><span class="result"> extends <span class="extype" name="scala.util.parsing.combinator.JavaTokenParsers">JavaTokenParsers</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Currently parses:
+query = node
+node = '#' nodeName (':' pair)* '(' args ')'
+nodeName = &quot;combine&quot; | &quot;seqdep&quot; | &quot;sdm&quot;
+pair = string '=' string
+args = node+ | string+
+</p>
+    </li><li name="julien.access.Index" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IndexextendsAnyRef"></a>
+      <a id="Index:Index"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Index.html"><span class="name">Index</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.access.IndexBasedDocument" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IndexBasedDocumentextendsDocument"></a>
+      <a id="IndexBasedDocument:IndexBasedDocument"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="IndexBasedDocument.html"><span class="name">IndexBasedDocument</span></a><span class="result"> extends <a href="../Document.html" class="extype" name="julien.Document">Document</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="julien.access.KeySet" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="KeySetextendsSortedSet[String]"></a>
+      <a id="KeySet:KeySet"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="KeySet.html"><span class="name">KeySet</span></a><span class="result"> extends <span class="extype" name="scala.collection.SortedSet">SortedSet</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="julien.access.GalagoQueryParser" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="GalagoQueryParser"></a>
+      <a id="GalagoQueryParser:GalagoQueryParser"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="GalagoQueryParser$.html"><span class="name">GalagoQueryParser</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.access.Index" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Index"></a>
+      <a id="Index:Index"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Index$.html"><span class="name">Index</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.access.IndexBasedDocument" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IndexBasedDocument"></a>
+      <a id="IndexBasedDocument:IndexBasedDocument"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="IndexBasedDocument$.html"><span class="name">IndexBasedDocument</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.access.KeySet" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="KeySet"></a>
+      <a id="KeySet:KeySet"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="KeySet$.html"><span class="name">KeySet</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="julien.access.package#string2bytes" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="string2bytes(s:String):Array[Byte]"></a>
+      <a id="string2bytes(String):Array[Byte]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">string2bytes</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
